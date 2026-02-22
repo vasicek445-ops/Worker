@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { supabase } from "../supabase";
 
+export const dynamic = 'force-dynamic';
+
 async function getNabidky() {
   const { data } = await supabase.from("Nabídky").select("*");
   return data || [];
