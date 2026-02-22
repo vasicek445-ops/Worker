@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabase } from "../supabase";
+import { SaveButton, ApplyButton } from "../components/JobButtons";
 
 export const dynamic = 'force-dynamic';
 
@@ -100,13 +101,11 @@ export default async function Dashboard() {
                 className="min-w-[170px] max-w-[170px] flex-shrink-0"
               >
                 <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-hidden">
-                  {/* Card gradient header with match */}
                   <div className={`relative h-24 bg-gradient-to-br ${matchColor} p-3 flex items-start justify-end`}>
                     <div className={`${matchBg} w-11 h-11 rounded-full flex items-center justify-center`}>
                       <span className="text-white text-sm font-black">{job.match}%</span>
                     </div>
                   </div>
-                  {/* Card body */}
                   <div className="p-3">
                     <h4 className="text-white font-bold text-sm leading-tight mb-1 line-clamp-2">
                       {job.title?.length > 25 ? job.title.substring(0, 25) + "." : job.title}
@@ -123,38 +122,32 @@ export default async function Dashboard() {
         </div>
       </div>
 
-      {/* Všechny nabídky - vertikální seznam */}
+      {/* Všechny nabídky */}
       <div className="px-5">
         <h3 className="text-white font-bold text-base mb-4">Všechny nabídky</h3>
         <div className="flex flex-col gap-3">
           {jobs.map((job: any) => (
-            <Link key={`list-${job.id}`} href={`/nabidka?id=${job.id}`}>
-              <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1 mr-3">
-                    <h4 className="text-white font-bold text-base leading-tight mb-1">{job.title}</h4>
-                    <p className="text-gray-500 text-sm">{job.company} • {job.location}</p>
-                  </div>
-                  <div className="bg-[#E8302A] text-white rounded-full w-12 h-12 flex flex-col items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-black leading-none">{job.match}%</span>
-                    <span className="text-[8px] leading-none opacity-80">match</span>
-                  </div>
+            <div key={`list-${job.id}`} className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1 mr-3">
+                  <h4 className="text-white font-bold text-base leading-tight mb-1">{job.title}</h4>
+                  <p className="text-gray-500 text-sm">{job.company} • {job.location}</p>
                 </div>
-                <div className="flex gap-2 flex-wrap mb-3">
-                  <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-3 py-1 text-xs">{job.type || "Full-time"}</span>
-                  <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-3 py-1 text-xs">{job.salary || "Dle dohody"}</span>
-                  <span className="bg-[rgba(232,48,42,0.1)] border border-[rgba(232,48,42,0.3)] text-[#E8302A] rounded-full px-3 py-1 text-xs">{job.lang || "🇬🇧 B1+"}</span>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1 bg-[#E8302A] text-white text-center py-3 rounded-xl text-sm font-bold">
-                    Zobrazit kontakt →
-                  </div>
-                  <button className="bg-[#111] border border-gray-800 text-gray-500 font-bold py-3 px-4 rounded-xl text-sm">
-                    🔖
-                  </button>
+                <div className="bg-[#E8302A] text-white rounded-full w-12 h-12 flex flex-col items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-black leading-none">{job.match}%</span>
+                  <span className="text-[8px] leading-none opacity-80">match</span>
                 </div>
               </div>
-            </Link>
+              <div className="flex gap-2 flex-wrap mb-3">
+                <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-3 py-1 text-xs">{job.type || "Full-time"}</span>
+                <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-3 py-1 text-xs">{job.salary || "Dle dohody"}</span>
+                <span className="bg-[rgba(232,48,42,0.1)] border border-[rgba(232,48,42,0.3)] text-[#E8302A] rounded-full px-3 py-1 text-xs">{job.lang || "🇬🇧 B1+"}</span>
+              </div>
+              <div className="flex gap-2">
+                <ApplyButton jobId={job.id} jobTitle={job.title} />
+                <SaveButton jobId={job.id} />
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -164,9 +157,9 @@ export default async function Dashboard() {
         <div className="max-w-2xl mx-auto flex justify-between items-center">
           {[
             { name: "Discover", icon: "🔍", href: "/dashboard", active: true },
-            { name: "Uložené", icon: "🔖", href: "/dashboard", active: false },
+            { name: "Uložené", icon: "🔖", href: "/ulozene", active: false },
             { name: "Průvodce", icon: "📋", href: "/pruvodce", active: false },
-            { name: "Přihlášky", icon: "✉️", href: "/dashboard", active: false },
+            { name: "Přihlášky", icon: "✉️", href: "/prihlasky", active: false },
             { name: "Profil", icon: "👤", href: "/profil", active: false },
           ].map((item) => (
             <Link key={item.name} href={item.href} className="flex flex-col items-center gap-1">
