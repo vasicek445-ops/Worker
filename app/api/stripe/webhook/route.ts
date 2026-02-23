@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
         if (!userId) break
 
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId) as any
 
         await supabaseAdmin.from('subscriptions').upsert({
           user_id: userId,
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
+        const subscription = event.data.object as any
         await supabaseAdmin.from('subscriptions').update({
           status: subscription.status,
           current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription
+        const subscription = event.data.object as any
         await supabaseAdmin.from('subscriptions').update({
           status: 'canceled',
           updated_at: new Date().toISOString(),
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice
+        const invoice = event.data.object as any
         if (!invoice.subscription) break
         await supabaseAdmin.from('subscriptions').update({
           status: 'past_due',
