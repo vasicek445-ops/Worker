@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import Stripe from 'stripe'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
   const signature = req.headers.get('stripe-signature')!
 
-  let event: Stripe.Event
+  let event: any
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -23,14 +22,14 @@ export async function POST(req: NextRequest) {
   try {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session
+        const session = event.data.object as any
         const userId = session.metadata?.supabase_user_id
         const plan = session.metadata?.plan
         const subscriptionId = session.subscription as string
 
         if (!userId) break
 
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId) as any
+        const subscription: any = await stripe.subscriptions.retrieve(subscriptionId)
 
         await supabaseAdmin.from('subscriptions').upsert({
           user_id: userId,
