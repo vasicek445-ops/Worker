@@ -32,7 +32,7 @@ export default async function Dashboard() {
                 <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
             </button>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-500"></div>
+            <Link href="/profil" className="w-9 h-9 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-500" />
           </div>
         </div>
       </div>
@@ -50,8 +50,8 @@ export default async function Dashboard() {
       {/* Hero Banner */}
       <div className="px-5 mb-6">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1a4e] via-[#2d1b3d] to-[#E8302A] p-6 min-h-[140px] flex items-end">
-          <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-[#E8302A] opacity-80 blur-sm"></div>
-          <div className="absolute top-8 right-16 w-10 h-10 rounded-lg bg-[#E8302A] opacity-60 rotate-12"></div>
+          <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-[#E8302A] opacity-80 blur-sm" />
+          <div className="absolute top-8 right-16 w-10 h-10 rounded-lg bg-[#E8302A] opacity-60 rotate-12" />
           <div>
             <h2 className="text-white font-black text-lg leading-tight uppercase">
               Práce ve Švýcarsku:<br />
@@ -61,8 +61,96 @@ export default async function Dashboard() {
         </div>
       </div>
 
+      {/* ===================== */}
+      {/* SLUŽBY WOKER – NOVÉ  */}
+      {/* ===================== */}
+      <div className="px-5 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-white font-bold text-base">Služby Woker</h3>
+          <span className="text-gray-600 text-xs">Vše pro tvůj start</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {/* Kontakty na firmy */}
+          <Link href="/kontakty" className="group">
+            <div className="bg-gradient-to-br from-[#1A1A1A] to-[#111] border border-gray-800 rounded-2xl p-4 hover:border-[#E8302A]/50 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center mb-3">
+                <span className="text-xl">📇</span>
+              </div>
+              <h4 className="text-white font-bold text-sm mb-1">Kontakty</h4>
+              <p className="text-gray-500 text-xs leading-relaxed">200+ firem, přímé emaily a telefony</p>
+              <div className="flex items-center gap-1 mt-3">
+                <span className="text-[#E8302A] text-xs font-semibold">Zobrazit</span>
+                <span className="text-[#E8302A] text-xs">{"->"}</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* AI Asistent */}
+          <Link href="/asistent" className="group">
+            <div className="bg-gradient-to-br from-[#1A1A1A] to-[#111] border border-gray-800 rounded-2xl p-4 hover:border-[#E8302A]/50 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center mb-3">
+                <span className="text-xl">🤖</span>
+              </div>
+              <h4 className="text-white font-bold text-sm mb-1">AI Asistent</h4>
+              <p className="text-gray-500 text-xs leading-relaxed">CV, dopisy, poradenství 24/7</p>
+              <div className="flex items-center gap-1 mt-3">
+                <span className="text-[#E8302A] text-xs font-semibold">Spustit</span>
+                <span className="text-[#E8302A] text-xs">{"->"}</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* Průvodce */}
+          <Link href="/pruvodce" className="group">
+            <div className="bg-gradient-to-br from-[#1A1A1A] to-[#111] border border-gray-800 rounded-2xl p-4 hover:border-[#E8302A]/50 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center mb-3">
+                <span className="text-xl">📚</span>
+              </div>
+              <h4 className="text-white font-bold text-sm mb-1">Průvodce</h4>
+              <p className="text-gray-500 text-xs leading-relaxed">Dokumenty, pojištění, daně, bydlení</p>
+              <div className="flex items-center gap-1 mt-3">
+                <span className="text-[#E8302A] text-xs font-semibold">Číst</span>
+                <span className="text-[#E8302A] text-xs">{"->"}</span>
+              </div>
+            </div>
+          </Link>
+
+          {/* Jazyky */}
+          <Link href="/jazyky" className="group">
+            <div className="bg-gradient-to-br from-[#1A1A1A] to-[#111] border border-gray-800 rounded-2xl p-4 hover:border-[#E8302A]/50 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center mb-3">
+                <span className="text-xl">🇩🇪</span>
+              </div>
+              <h4 className="text-white font-bold text-sm mb-1">Jazyky</h4>
+              <p className="text-gray-500 text-xs leading-relaxed">Němčina pro práci, fráze, testy</p>
+              <div className="flex items-center gap-1 mt-3">
+                <span className="text-[#E8302A] text-xs font-semibold">Učit se</span>
+                <span className="text-[#E8302A] text-xs">{"->"}</span>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Premium CTA banner */}
+        <Link href="/pricing" className="block mt-3">
+          <div className="bg-gradient-to-r from-[#E8302A] to-orange-600 rounded-2xl p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">⭐</span>
+              <div>
+                <p className="text-white font-bold text-sm">Woker Premium</p>
+                <p className="text-white/70 text-xs">Odemkni vše za 9,90 EUR/měsíc</p>
+              </div>
+            </div>
+            <div className="bg-white/20 rounded-full px-3 py-1">
+              <span className="text-white text-xs font-bold">Aktivovat</span>
+            </div>
+          </div>
+        </Link>
+      </div>
+
       {/* Filter Chips */}
-      <div className="px-5 mb-6">
+      <div className="px-5 mb-4">
         <div className="flex gap-2 overflow-x-auto pb-2">
           <div className="bg-[#E8302A] text-white px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap flex items-center gap-1">
             🎯 AI Match
