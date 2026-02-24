@@ -40,9 +40,9 @@ export async function POST(req: NextRequest) {
         let cancelAtPeriodEnd = false
         if (session.subscription) {
           try {
-            const sub = await stripe.subscriptions.retrieve(session.subscription as string)
-            periodEnd = safeDate(sub.current_period_end)
-            cancelAtPeriodEnd = sub.cancel_at_period_end || false
+           const sub = await stripe.subscriptions.retrieve(session.subscription as string) as any
+           periodEnd = safeDate(sub.current_period_end)
+           cancelAtPeriodEnd = sub.cancel_at_period_end || false
           } catch (e) {
             console.error('Failed to retrieve subscription:', e)
           }
