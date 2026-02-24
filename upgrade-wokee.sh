@@ -1,3 +1,159 @@
+#!/bin/bash
+# Upgrade AI Assistant to "Wokee" with modern mascot + professional chat
+set -e
+echo "🤖 Upgrading to Wokee..."
+
+# 1. Create Wokee mascot SVG
+cat > public/wokee-avatar.svg << 'SVGEND'
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8302A"/>
+      <stop offset="100%" style="stop-color:#C42420"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A2A2A"/>
+      <stop offset="100%" style="stop-color:#1A1A1A"/>
+    </linearGradient>
+    <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00D4FF"/>
+      <stop offset="50%" style="stop-color:#A78BFA"/>
+      <stop offset="100%" style="stop-color:#FF3D71"/>
+    </linearGradient>
+    <linearGradient id="faceplate" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5F5F5"/>
+      <stop offset="100%" style="stop-color:#E8E8E8"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softShadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000" flood-opacity="0.25"/>
+    </filter>
+    <clipPath id="circleClip">
+      <circle cx="100" cy="100" r="100"/>
+    </clipPath>
+  </defs>
+  <circle cx="100" cy="100" r="100" fill="url(#bg)"/>
+  <g opacity="0.06" clip-path="url(#circleClip)">
+    <line x1="-10" y1="30" x2="190" y2="30" stroke="white" stroke-width="0.8"/>
+    <line x1="-10" y1="60" x2="190" y2="60" stroke="white" stroke-width="0.8"/>
+    <line x1="-10" y1="90" x2="190" y2="90" stroke="white" stroke-width="0.8"/>
+    <line x1="-10" y1="120" x2="190" y2="120" stroke="white" stroke-width="0.8"/>
+    <line x1="-10" y1="150" x2="190" y2="150" stroke="white" stroke-width="0.8"/>
+    <line x1="-10" y1="180" x2="190" y2="180" stroke="white" stroke-width="0.8"/>
+  </g>
+  <rect x="36" y="38" width="128" height="128" rx="40" fill="url(#headGrad)" filter="url(#softShadow)"/>
+  <rect x="50" y="68" width="100" height="70" rx="24" fill="url(#faceplate)"/>
+  <rect x="54" y="82" width="92" height="28" rx="14" fill="#111"/>
+  <rect x="58" y="86" width="84" height="20" rx="10" fill="url(#visorGrad)" filter="url(#glow)" opacity="0.85"/>
+  <circle cx="80" cy="96" r="6" fill="white" opacity="0.95"/>
+  <circle cx="81" cy="95" r="2.5" fill="white"/>
+  <circle cx="120" cy="96" r="6" fill="white" opacity="0.95"/>
+  <circle cx="121" cy="95" r="2.5" fill="white"/>
+  <path d="M 82 126 Q 100 136 118 126" stroke="#BBBBBB" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <rect x="70" y="46" width="60" height="3.5" rx="1.75" fill="#444"/>
+  <rect x="96.5" y="52" width="7" height="14" rx="1.5" fill="#E8302A" opacity="0.5"/>
+  <rect x="93" y="55.5" width="14" height="7" rx="1.5" fill="#E8302A" opacity="0.5"/>
+  <rect x="97" y="26" width="6" height="16" rx="3" fill="#333"/>
+  <circle cx="100" cy="24" r="4.5" fill="url(#visorGrad)" filter="url(#glow)"/>
+  <rect x="30" y="88" width="8" height="16" rx="4" fill="#333"/>
+  <rect x="162" y="88" width="8" height="16" rx="4" fill="#333"/>
+  <circle cx="150" cy="140" r="4.5" fill="#00E676"/>
+  <circle cx="150" cy="140" r="7" fill="#00E676" opacity="0.15"/>
+</svg>
+SVGEND
+
+# 2. Update API route with Wokee branding + correct model
+cat > app/api/chat/route.ts << 'ROUTEEND'
+import { NextRequest, NextResponse } from 'next/server'
+import Anthropic from '@anthropic-ai/sdk'
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+})
+
+const SYSTEM_PROMPT = `Jsi Wokee – moderní AI průvodce pro Čechy a Slováky, kteří chtějí pracovat ve Švýcarsku.
+
+TVOJE OSOBNOST:
+- Jsi přátelský a přímý – mluvíš jako zkušený kamarád
+- Jsi konkrétní – vždy uvádíš čísla, ceny, lhůty
+- Jsi motivující – pomáháš lidem udělat ten krok
+
+TVOJE ZNALOSTI:
+- Pracovní povolení (B, L, G, C permit) a jak je získat
+- Švýcarský pracovní trh – platy, obory, kantony
+- Dokumenty potřebné pro práci (výpis z RT, potvrzení o zaměstnání, Aufenthaltsbewilligung)
+- Zdravotní pojištění (Grundversicherung, KVG)
+- Daňový systém (Quellensteuer pro cizince)
+- Bydlení (Homegate, Comparis, Immoscout24, kauce = 3 nájmy)
+- Pracovní právo (výpovědní lhůty, dovolená min. 4 týdny, 13. plat)
+- Životní náklady podle kantonů
+- Němčina pro práci – základní fráze a tipy
+
+PRAVIDLA FORMÁTOVÁNÍ:
+- Odpovídej VŽDY česky
+- NEPOUŽÍVEJ markdown formátování (žádné #, ##, **, - odrážky)
+- Piš přirozeným textem, strukturuj pomocí emoji (📌 💰 📋 ✅ 🏠 📍)
+- Když píšeš CV nebo motivační dopis, ptej se na detaily
+- Drž odpovědi stručné ale kompletní (max 250 slov)
+- Pokud si nejsi jistý, řekni to – nelži
+
+TYPICKÉ PLATY (CHF/měsíc):
+📌 Stavebnictví: 5 200–6 800
+📌 Gastronomie: 4 200–5 500
+📌 IT: 8 000–12 000
+📌 Zdravotnictví: 6 500–9 000
+📌 Logistika: 5 000–6 500
+📌 Úklid: 4 000–4 800
+📌 Řemesla: 5 200–6 200`
+
+export async function POST(req: NextRequest) {
+  try {
+    const { messages } = await req.json()
+
+    if (!messages || !Array.isArray(messages)) {
+      return NextResponse.json({ error: 'Invalid messages' }, { status: 400 })
+    }
+
+    const recentMessages = messages.slice(-10)
+
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      system: SYSTEM_PROMPT,
+      messages: recentMessages.map((m: any) => ({
+        role: m.role,
+        content: m.content,
+      })),
+    })
+
+    const textBlock = response.content.find((block: any) => block.type === 'text')
+    const text = textBlock ? (textBlock as any).text : 'Promiň, něco se mi zamotalo. Zkus to znovu! 🔄'
+
+    return NextResponse.json({ 
+      response: text,
+      usage: {
+        input: response.usage.input_tokens,
+        output: response.usage.output_tokens,
+      }
+    })
+  } catch (error: any) {
+    console.error('Chat API error:', error)
+    return NextResponse.json(
+      { error: error.message || 'AI assistant error' },
+      { status: 500 }
+    )
+  }
+}
+ROUTEEND
+
+# 3. Update asistent page with Wokee branding + modern chat UI
+cat > app/asistent/page.tsx << 'PAGEEND'
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
@@ -219,3 +375,8 @@ export default function Asistent() {
     </main>
   )
 }
+PAGEEND
+
+echo "✅ Wokee upgrade complete!"
+echo ""
+echo "Run: git add -A && git commit -m 'feat: Wokee mascot + professional chat UI' && git push"
