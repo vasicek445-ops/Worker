@@ -1,3 +1,9 @@
+#!/bin/bash
+# Fix Wokee - real knowledge from HeroHero + strict formatting
+set -e
+echo "🔧 Upgrading Wokee with real knowledge..."
+
+cat > app/api/chat/route.ts << 'ROUTEEND'
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
@@ -213,3 +219,7 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+ROUTEEND
+
+echo "✅ Wokee knowledge upgraded!"
+echo "Run: git add -A && git commit -m 'feat: Wokee with real knowledge + strict formatting' && git push"
