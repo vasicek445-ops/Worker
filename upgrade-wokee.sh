@@ -97,7 +97,10 @@ TVOJE ZNALOSTI:
 
 PRAVIDLA FORMÁTOVÁNÍ:
 - Odpovídej VŽDY česky
-- NEPOUŽÍVEJ markdown formátování (žádné #, ##, **, - odrážky)
+- ABSOLUTNĚ NIKDY nepoužívej markdown: žádné **, ##, #, ani pomlčkové odrážky
+- Místo **tučného** napiš text normálně nebo VELKÝMI PÍSMENY pro důraz
+- Místo odrážek s - použij emoji (📌, ✅, 💰) nebo prostě nový řádek
+- Toto je KRITICKÉ – markdown znaky se zobrazují jako raw text a vypadá to ošklivě
 - Piš přirozeným textem, strukturuj pomocí emoji (📌 💰 📋 ✅ 🏠 📍)
 - Když píšeš CV nebo motivační dopis, ptej se na detaily
 - Drž odpovědi stručné ale kompletní (max 250 slov)
