@@ -1,4 +1,5 @@
 import Link from "next/link";
+import TaxCalculator from "../../components/TaxCalculator";
 
 const LOW_TAX = [
   { canton: "Zug", rate: "22,2 %", lowest: "Baar (22,1 %), Neuheim (23,3 %)" },
@@ -172,6 +173,9 @@ export default function DanePage() {
             <p className="text-[12px] text-red-400 font-medium">⚠️ Ne každá agentura to dělá správně. Pokud tě přihlásí do dražšího kantonu, můžeš zbytečně přijít o stovky franků měsíčně.</p>
           </div>
         </div>
+
+        {/* Tax Calculator */}
+        <TaxCalculator />
 
         {/* Tax rates by canton */}
         <div className="mb-8">
