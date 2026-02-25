@@ -1,7 +1,13 @@
 "use client";
+import SharedHeader from "../components/SharedHeader";
+import BottomNav from "../components/BottomNav";
 
-import { AuthGuard } from "../components/AuthGuard";
-
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  return <AuthGuard>{children}</AuthGuard>;
+export default function ProfilLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <SharedHeader backHref="/dashboard" />
+      {children}
+      <BottomNav active="profile" />
+    </>
+  );
 }

@@ -1,7 +1,13 @@
 "use client";
-
-import { AuthGuard } from "../components/AuthGuard";
+import SharedHeader from "../components/SharedHeader";
+import BottomNav from "../components/BottomNav";
 
 export default function JazykyLayout({ children }: { children: React.ReactNode }) {
-  return <AuthGuard>{children}</AuthGuard>;
+  return (
+    <>
+      <SharedHeader backHref="/dashboard" />
+      {children}
+      <BottomNav active="guide" />
+    </>
+  );
 }
