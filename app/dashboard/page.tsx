@@ -25,7 +25,7 @@ export default async function Dashboard() {
 
   const guides = [
     { icon: "📋", title: "Pracovní povolení", desc: "Typy povolení, jak získat", tag: "Důležité", tagColor: "red", href: "/pruvodce" },
-    { icon: "🏠", title: "Bydlení", desc: "Jak najít byt, ceny, tipy", tag: "Populární", tagColor: "blue", href: "/pruvodce" },
+    { icon: "🏥", title: "Zdravotní pojištění", desc: "Jak ušetřit stovky CHF měsíčně", tag: "Populární", tagColor: "blue", href: "/pruvodce/pojisteni" },
     { icon: "💰", title: "Daně a pojištění", desc: "Systém daní, povinné pojištění", tag: "Nové", tagColor: "green", href: "/pruvodce/dane" },
     { icon: "🗣️", title: "Němčina pro práci", desc: "Fráze, testy, kurzy", tag: "Doporučeno", tagColor: "blue", href: "/jazyky" },
   ];
