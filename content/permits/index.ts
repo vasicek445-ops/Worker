@@ -1,5 +1,5 @@
 import { PermitsContent } from "./types";
-import { Locale } from "../../../lib/i18n/types";
+import { Locale } from "../../lib/i18n/types";
 import cs from "./cs";
 import en from "./en";
 import pl from "./pl";
