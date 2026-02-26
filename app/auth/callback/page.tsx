@@ -1,11 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
+import { supabase } from "../supabase";
 
 export default function AuthCallback() {
   const [status, setStatus] = useState("Přihlašuji...");
@@ -14,7 +9,11 @@ export default function AuthCallback() {
     const hash = window.location.hash;
     const params = new URLSearchParams(window.location.search);
     
-    // If there's an access_token in hash, set session manually
+    console.log("Callback URL:", window.location.href);
+    console.log("Hash:", hash);
+    console.log("Search:", window.location.search);
+
+    // Hash fragment flow (implicit)
     if (hash && hash.includes("access_token")) {
       const hashParams = new URLSearchParams(hash.substring(1));
       const accessToken = hashParams.get("access_token");
@@ -25,36 +24,38 @@ export default function AuthCallback() {
           access_token: accessToken,
           refresh_token: refreshToken,
         }).then(({ data, error }) => {
+          console.log("setSession result:", data, error);
           if (data?.session) {
             window.location.replace("/dashboard");
           } else {
-            setStatus("Chyba: " + (error?.message || "neznámá"));
+            setStatus("Chyba session: " + (error?.message || "neznámá"));
           }
         });
         return;
       }
     }
     
-    // If there's a code param (PKCE flow)
+    // PKCE flow (code in query)
     const code = params.get("code");
     if (code) {
       supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+        console.log("exchangeCode result:", data, error);
         if (data?.session) {
           window.location.replace("/dashboard");
         } else {
-          setStatus("Chyba: " + (error?.message || "neznámá"));
+          setStatus("Chyba code: " + (error?.message || "neznámá"));
         }
       });
       return;
     }
 
-    // Fallback - check if already logged in
+    // Check existing session
     supabase.auth.getSession().then(({ data }) => {
+      console.log("getSession result:", data);
       if (data?.session) {
         window.location.replace("/dashboard");
       } else {
-        setStatus("Nepodařilo se přihlásit. Zkuste to znovu.");
-        setTimeout(() => window.location.replace("/login"), 3000);
+        setStatus("Žádný token v URL. Zkontroluj Supabase redirect URL.");
       }
     });
   }, []);
@@ -66,12 +67,13 @@ export default function AuthCallback() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
+      flexDirection: "column",
+      gap: "16px",
     }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: "32px", marginBottom: "16px", animation: "spin 1s linear infinite" }}>⚙️</div>
-        <p style={{ color: "white", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>{status}</p>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
+      <div style={{ fontSize: "32px", animation: "spin 1s linear infinite" }}>⚙️</div>
+      <p style={{ color: "white", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>{status}</p>
+      <p style={{ color: "#666", fontSize: "12px", fontFamily: "monospace" }}>{typeof window !== "undefined" ? window.location.href : ""}</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </main>
   );
 }
