@@ -46,7 +46,7 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
         <div style={{ position: "fixed", inset: 0, backgroundImage: "linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)", backgroundSize: "60px 60px", maskImage: "radial-gradient(ellipse at center, black 20%, transparent 70%)", WebkitMaskImage: "radial-gradient(ellipse at center, black 20%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
 
         {/* Header */}
-        <div style={{ position: "relative", zIndex: 10, padding: "20px 20px 0" }}>
+        <div style={{ position: "relative", zIndex: 50, padding: "20px 20px 0" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.35)", fontWeight: 500, letterSpacing: "0.05em", textTransform: "uppercase", margin: 0 }}>{t.dashboard.greeting}</p>
@@ -64,7 +64,7 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
         </div>
 
         {/* Stats */}
-        <div style={{ position: "relative", zIndex: 10, padding: "20px 20px 0", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
+        <div style={{ position: "relative", zIndex: 50, padding: "20px 20px 0", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
           {stats.map((s, i) => (
             <div key={i} style={{ background: "rgba(255,255,255,0.03)", borderRadius: "16px", padding: "14px 10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.05)" }}>
               <div style={{ fontSize: "18px", marginBottom: "6px" }}>{s.icon}</div>
