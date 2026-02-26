@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -8,33 +8,55 @@ const supabase = createClient(
 );
 
 export default function AuthCallback() {
+  const [status, setStatus] = useState("Přihlašuji...");
+
   useEffect(() => {
-    const run = async () => {
-      // This picks up tokens from URL hash (#access_token=...)
-      const { data, error } = await supabase.auth.getSession();
+    const hash = window.location.hash;
+    const params = new URLSearchParams(window.location.search);
+    
+    // If there's an access_token in hash, set session manually
+    if (hash && hash.includes("access_token")) {
+      const hashParams = new URLSearchParams(hash.substring(1));
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
       
-      if (data?.session) {
-        window.location.replace("/dashboard");
+      if (accessToken && refreshToken) {
+        supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        }).then(({ data, error }) => {
+          if (data?.session) {
+            window.location.replace("/dashboard");
+          } else {
+            setStatus("Chyba: " + (error?.message || "neznámá"));
+          }
+        });
         return;
       }
-
-      // If no session yet, wait for auth state change
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          if (session) {
-            subscription.unsubscribe();
-            window.location.replace("/dashboard");
-          }
+    }
+    
+    // If there's a code param (PKCE flow)
+    const code = params.get("code");
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+        if (data?.session) {
+          window.location.replace("/dashboard");
+        } else {
+          setStatus("Chyba: " + (error?.message || "neznámá"));
         }
-      );
+      });
+      return;
+    }
 
-      // Fallback
-      setTimeout(() => {
+    // Fallback - check if already logged in
+    supabase.auth.getSession().then(({ data }) => {
+      if (data?.session) {
         window.location.replace("/dashboard");
-      }, 4000);
-    };
-
-    run();
+      } else {
+        setStatus("Nepodařilo se přihlásit. Zkuste to znovu.");
+        setTimeout(() => window.location.replace("/login"), 3000);
+      }
+    });
   }, []);
 
   return (
@@ -47,7 +69,7 @@ export default function AuthCallback() {
     }}>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: "32px", marginBottom: "16px", animation: "spin 1s linear infinite" }}>⚙️</div>
-        <p style={{ color: "white", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>Přihlašuji...</p>
+        <p style={{ color: "white", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>{status}</p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     </main>
