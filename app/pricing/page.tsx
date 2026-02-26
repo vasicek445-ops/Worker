@@ -95,16 +95,16 @@ export default function Pricing() {
           <div className="mb-6">
             {billing === 'monthly' ? (
               <div className="flex items-baseline gap-1">
-                <span className="text-white text-4xl font-bold">9,90</span>
+                <span className="text-white text-4xl font-bold">9,99</span>
                 <span className="text-gray-400">€ / měsíc</span>
               </div>
             ) : (
               <div>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-white text-4xl font-bold">99,90</span>
+                  <span className="text-white text-4xl font-bold">99,99</span>
                   <span className="text-gray-400">€ / rok</span>
                 </div>
-                <p className="text-green-400 text-sm mt-1">Ušetříš 18,90 € ročně</p>
+                <p className="text-green-400 text-sm mt-1">Ušetříš 19,89 € ročně</p>
               </div>
             )}
           </div>
@@ -133,7 +133,7 @@ export default function Pricing() {
             disabled={loading !== null}
             className="w-full bg-[#E8302A] text-white py-4 rounded-xl font-bold text-lg hover:opacity-90 disabled:opacity-50 transition"
           >
-            {loading ? 'Načítání...' : billing === 'monthly' ? 'Začít za 9,90 €/měsíc' : 'Začít za 99,90 €/rok'}
+            {loading ? 'Načítání...' : billing === 'monthly' ? 'Začít za 9,99 €/měsíc' : 'Začít za 99,99 €/rok'}
           </button>
 
           <p className="text-gray-600 text-xs text-center mt-3">
