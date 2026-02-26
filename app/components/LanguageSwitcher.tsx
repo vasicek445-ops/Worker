@@ -23,8 +23,8 @@ export default function LanguageSwitcher() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-[150]" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 z-[151] bg-[#1a1a1e] border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden min-w-[180px]">
+          <div className="fixed inset-0 z-[200]" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-2 z-[201] bg-[#1a1a1e] border border-white/[0.08] rounded-xl shadow-2xl overflow-hidden min-w-[180px]">
             <div className="px-3 py-2 border-b border-white/[0.06]">
               <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Language</span>
             </div>
