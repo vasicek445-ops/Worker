@@ -39,12 +39,6 @@ const PREMIUM_GUIDES = [
     tag: 'Premium',
   },
   {
-    icon: '📝',
-    title: 'Šablony: CV, motivační dopis, email firmě',
-    content: 'Stáhni si hotové šablony přizpůsobené švýcarskému trhu. Životopis ve formátu, který švýcarské firmy očekávají. Motivační dopis v němčině s českým překladem. Email šablona pro oslovení HR...',
-    tag: 'Premium',
-  },
-  {
     icon: '🚗',
     title: 'Řidičský průkaz, bankovní účet, daně',
     content: 'Český řidičák platí 12 měsíců, pak musíš vyměnit. Nejlepší banky pro cizince: Neon, Yuh (bez poplatků). Daňový systém se liší podle kantonu – kompletní přehled...',
@@ -73,7 +67,6 @@ export default function Pruvodce() {
           Vše co potřebuješ vědět – od dokumentů po první výplatu
         </p>
 
-        {/* Free guides */}
         <div className="space-y-4 mb-8">
           {FREE_GUIDES.map((guide) => (
             <div key={guide.title} className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-5">
@@ -91,20 +84,45 @@ export default function Pruvodce() {
           ))}
         </div>
 
-        {/* Premium guides */}
         <div className="flex items-center gap-3 mb-4">
           <h2 className="text-white text-lg font-bold">Premium průvodce</h2>
           <span className="bg-[#E8302A]/10 text-[#E8302A] text-xs font-bold px-2 py-1 rounded-full">
-            {PREMIUM_GUIDES.length} článků
+            {PREMIUM_GUIDES.length + 1} článků
           </span>
         </div>
 
         <PaywallOverlay
           isLocked={!isActive && !loading}
           title="Odemkni kompletní průvodce"
-          description="Platy, bydlení, pojištění, šablony CV a další – vše na jednom místě"
+          description="Platy, bydlení, pojištění, AI šablony a další – vše na jednom místě"
         >
           <div className="space-y-4">
+            <Link href="/pruvodce/sablony">
+              <div className="bg-gradient-to-r from-[#1A1A1A] to-[#1f1215] border border-[#E8302A]/30 rounded-2xl p-5 hover:border-[#E8302A]/60 transition-colors cursor-pointer">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">📝</span>
+                  <div className="flex-1">
+                    <h3 className="text-white font-bold">Šablony: CV, motivační dopis, email firmě</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-green-500/10 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                      AI
+                    </span>
+                    <span className="bg-[#E8302A]/10 text-[#E8302A] text-xs font-bold px-2 py-1 rounded-full">
+                      Premium
+                    </span>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed mb-3">
+                  AI vytvoří profesionální dokumenty v němčině za tebe. Vyplníš údaje česky, dostaneš hotový dopis, email nebo CV přizpůsobené švýcarskému trhu.
+                </p>
+                <div className="flex items-center text-[#E8302A] text-sm font-medium">
+                  Otevřít AI šablony →
+                </div>
+              </div>
+            </Link>
+
             {PREMIUM_GUIDES.map((guide) => (
               <div key={guide.title} className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-5">
                 <div className="flex items-center gap-3 mb-3">
