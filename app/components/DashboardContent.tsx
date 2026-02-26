@@ -39,7 +39,7 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
   return (
     <>
       <style jsx global>{`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');`}</style>
-      <main style={{ minHeight: "100vh", background: "#0a0a12", fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif", paddingBottom: "100px", position: "relative", overflow: "hidden" }}>
+      <main style={{ minHeight: "100vh", background: "#0a0a12", fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif", paddingBottom: "100px", position: "relative", overflow: "visible" }}>
         {/* Background effects */}
         <div style={{ position: "fixed", width: "600px", height: "600px", borderRadius: "50%", filter: "blur(140px)", pointerEvents: "none", zIndex: 0, opacity: 0.2, top: "-200px", right: "-200px", background: "radial-gradient(circle, rgba(57,255,110,0.2), transparent 70%)" }} />
         <div style={{ position: "fixed", width: "400px", height: "400px", borderRadius: "50%", filter: "blur(120px)", pointerEvents: "none", zIndex: 0, opacity: 0.15, bottom: "100px", left: "-150px", background: "radial-gradient(circle, rgba(100,60,255,0.15), transparent 70%)" }} />
@@ -85,7 +85,7 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
             </div>
             <Link href="/kontakty" style={{ fontSize: "12px", color: "#39ff6e", fontWeight: 600, textDecoration: "none" }}>{agencyCount.toLocaleString()} {t.dashboard.agencies_count} →</Link>
           </div>
-          <div style={{ background: "#111120", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
+          <div style={{ background: "#111120", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.06)", overflow: "visible" }}>
             {agencies.map((a: any, i: number) => (
               <Link key={i} href="/kontakty" style={{ display: "flex", padding: "14px 16px", alignItems: "center", justifyContent: "space-between", textDecoration: "none", borderBottom: i < agencies.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -133,7 +133,7 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
         {/* Premium */}
         <div style={{ position: "relative", zIndex: 10, padding: "28px 20px 0" }}>
           <Link href="/pricing" style={{ textDecoration: "none", display: "block" }}>
-            <div style={{ background: "linear-gradient(135deg, #111120, #0f1a14)", borderRadius: "20px", padding: "24px", border: "1px solid rgba(57,255,110,0.15)", position: "relative", overflow: "hidden" }}>
+            <div style={{ background: "linear-gradient(135deg, #111120, #0f1a14)", borderRadius: "20px", padding: "24px", border: "1px solid rgba(57,255,110,0.15)", position: "relative", overflow: "visible" }}>
               <div style={{ position: "absolute", top: "-50px", right: "-50px", width: "200px", height: "200px", borderRadius: "50%", background: "radial-gradient(circle, rgba(57,255,110,0.1), transparent 70%)", pointerEvents: "none" }} />
               <div style={{ position: "absolute", inset: 0, opacity: 0.04, backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "20px 20px", pointerEvents: "none" }} />
               <div style={{ position: "relative", zIndex: 1 }}>
