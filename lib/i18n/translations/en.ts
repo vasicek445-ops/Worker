@@ -10,7 +10,7 @@ const en: Translation = {
     guides_title: "Switzerland Guide", guides_all: "All",
     premium_title: "Woker Premium",
     premium_desc: "Unlock 1,000+ contacts, premium guides and AI assistant for working in Switzerland.",
-    premium_cta: "Activate for €9.90/month", premium_trial: "7 days free",
+    premium_cta: "Activate for €9.99/month", premium_trial: "No commitment",
     wokee_name: "Wokee assistant", wokee_online: "Online 24/7",
     wokee_message: "Hi! 👋 I'm Wokee, your assistant for working in Switzerland. I can help with permits, housing and job search.",
     wokee_open: "Open chat →",

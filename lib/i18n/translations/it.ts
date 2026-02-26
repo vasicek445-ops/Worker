@@ -10,7 +10,7 @@ const it: Translation = {
     guides_title: "Guida alla Svizzera", guides_all: "Tutto",
     premium_title: "Woker Premium",
     premium_desc: "Sblocca oltre 1.000 contatti, guide premium e assistente AI per lavorare in Svizzera.",
-    premium_cta: "Attiva a 9,90 €/mese", premium_trial: "7 giorni gratis",
+    premium_cta: "Attiva a 9,99 €/mese", premium_trial: "Senza impegno",
     wokee_name: "Assistente Wokee", wokee_online: "Online 24/7",
     wokee_message: "Ciao! 👋 Sono Wokee, il tuo assistente per lavorare in Svizzera. Ti aiuto con permessi, alloggio e ricerca lavoro.",
     wokee_open: "Apri chat →",

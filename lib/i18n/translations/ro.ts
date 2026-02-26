@@ -10,7 +10,7 @@ const ro: Translation = {
     guides_title: "Ghidul Elveției", guides_all: "Tot",
     premium_title: "Woker Premium",
     premium_desc: "Deblochează peste 1.000 de contacte, ghiduri premium și asistent AI pentru lucrul în Elveția.",
-    premium_cta: "Activează la 9,90 €/lună", premium_trial: "7 zile gratuit",
+    premium_cta: "Activează la 9,99 €/lună", premium_trial: "Fără obligații",
     wokee_name: "Asistent Wokee", wokee_online: "Online 24/7",
     wokee_message: "Salut! 👋 Sunt Wokee, asistentul tău pentru lucrul în Elveția. Te ajut cu permise, locuință și căutarea unui job.",
     wokee_open: "Deschide chat →",

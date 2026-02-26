@@ -10,7 +10,7 @@ const pt: Translation = {
     guides_title: "Guia da Suíça", guides_all: "Tudo",
     premium_title: "Woker Premium",
     premium_desc: "Desbloqueie mais de 1.000 contactos, guias premium e assistente AI para trabalhar na Suíça.",
-    premium_cta: "Ativar por 9,90 €/mês", premium_trial: "7 dias grátis",
+    premium_cta: "Ativar por 9,99 €/mês", premium_trial: "Sem compromisso",
     wokee_name: "Assistente Wokee", wokee_online: "Online 24/7",
     wokee_message: "Olá! 👋 Sou o Wokee, o teu assistente para trabalhar na Suíça. Ajudo-te com autorizações, alojamento e procura de emprego.",
     wokee_open: "Abrir chat →",

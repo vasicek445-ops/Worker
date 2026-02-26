@@ -10,7 +10,7 @@ const hu: Translation = {
     guides_title: "Svájci útmutató", guides_all: "Mind",
     premium_title: "Woker Premium",
     premium_desc: "Hozzáférés 1000+ kapcsolathoz, prémium útmutatókhoz és AI asszisztenshez a svájci munkához.",
-    premium_cta: "Aktiválás 9,90 €/hó", premium_trial: "7 nap ingyen",
+    premium_cta: "Aktiválás 9,99 €/hó", premium_trial: "Kötelezettség nélkül",
     wokee_name: "Wokee asszisztens", wokee_online: "Online 24/7",
     wokee_message: "Szia! 👋 Wokee vagyok, a személyes asszisztensed a svájci munkához. Segítek engedélyekkel, lakhatással és álláskeresésben.",
     wokee_open: "Chat megnyitása →",

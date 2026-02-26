@@ -10,7 +10,7 @@ const uk: Translation = {
     guides_title: "Гід по Швейцарії", guides_all: "Все",
     premium_title: "Woker Premium",
     premium_desc: "Розблокуйте 1 000+ контактів, преміум-гіди та AI-асистента для роботи у Швейцарії.",
-    premium_cta: "Активувати за €9,90/міс.", premium_trial: "7 днів безкоштовно",
+    premium_cta: "Активувати за €9,99/міс.", premium_trial: "Без зобов'язань",
     wokee_name: "Асистент Wokee", wokee_online: "Онлайн 24/7",
     wokee_message: "Привіт! 👋 Я Wokee, ваш асистент для роботи у Швейцарії. Допоможу з дозволами, житлом та пошуком роботи.",
     wokee_open: "Відкрити чат →",

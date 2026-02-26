@@ -10,7 +10,7 @@ const el: Translation = {
     guides_title: "Οδηγός Ελβετίας", guides_all: "Όλα",
     premium_title: "Woker Premium",
     premium_desc: "Ξεκλείδωσε 1.000+ επαφές, premium οδηγούς και AI βοηθό για εργασία στην Ελβετία.",
-    premium_cta: "Ενεργοποίηση 9,90 €/μήνα", premium_trial: "7 ημέρες δωρεάν",
+    premium_cta: "Ενεργοποίηση 9,99 €/μήνα", premium_trial: "Χωρίς δέσμευση",
     wokee_name: "Βοηθός Wokee", wokee_online: "Online 24/7",
     wokee_message: "Γεια! 👋 Είμαι ο Wokee, ο βοηθός σου για εργασία στην Ελβετία. Βοηθάω με άδειες, στέγαση και αναζήτηση εργασίας.",
     wokee_open: "Άνοιγμα chat →",

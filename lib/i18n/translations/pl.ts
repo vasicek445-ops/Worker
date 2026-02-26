@@ -10,7 +10,7 @@ const pl: Translation = {
     guides_title: "Przewodnik po Szwajcarii", guides_all: "Wszystko",
     premium_title: "Woker Premium",
     premium_desc: "Odblokuj ponad 1000 kontaktów, przewodniki premium i asystenta AI do pracy w Szwajcarii.",
-    premium_cta: "Aktywuj za 9,90 €/mies.", premium_trial: "7 dni za darmo",
+    premium_cta: "Aktywuj za 9,99 €/mies.", premium_trial: "Bez zobowiązań",
     wokee_name: "Asystent Wokee", wokee_online: "Online 24/7",
     wokee_message: "Cześć! 👋 Jestem Wokee, Twój asystent do pracy w Szwajcarii. Pomogę z pozwoleniami, mieszkaniem i szukaniem pracy.",
     wokee_open: "Otwórz czat →",

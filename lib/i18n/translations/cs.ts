@@ -10,7 +10,7 @@ const cs: Translation = {
     guides_title: "Průvodce Švýcarskem", guides_all: "Vše",
     premium_title: "Woker Premium",
     premium_desc: "Odemkni 1 000+ kontaktů, prémiové průvodce a AI asistenta za práci ve Švýcarsku.",
-    premium_cta: "Aktivovat za 9,90 €/měsíc", premium_trial: "7 dní zdarma",
+    premium_cta: "Aktivovat za 9,99 €/měsíc", premium_trial: "Bez závazků",
     wokee_name: "Wokee asistent", wokee_online: "Online 24/7",
     wokee_message: "Ahoj! 👋 Jsem Wokee, tvůj asistent pro práci ve Švýcarsku. Poradím ti s povolením, bydlením i hledáním práce.",
     wokee_open: "Otevřít chat →",
