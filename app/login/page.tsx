@@ -16,6 +16,20 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [forgotMode, setForgotMode] = useState(false);
+
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email) { setError("Zadej svůj email"); return; }
+    setLoading(true);
+    setError("");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/auth/callback",
+    });
+    if (error) setError(error.message);
+    else setMessage("Odkaz pro reset hesla byl odeslán na " + email);
+    setLoading(false);
+  }
 
   async function handleGoogle() {
     await supabase.auth.signInWithOAuth({
@@ -118,7 +132,7 @@ export default function Login() {
             }}>Woker</h1>
             <p style={{
               color: 'rgba(255,255,255,0.45)', fontSize: '14px',
-            }}>Najdi práci ve Švýcarsku bez agentury</p>
+            }}>AI průvodce prací a životem ve Švýcarsku</p>
           </div>
 
           {/* Card */}
@@ -169,7 +183,7 @@ export default function Login() {
             </div>
 
             {/* Email Form */}
-            <form onSubmit={handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <form onSubmit={forgotMode ? handleForgotPassword : handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <input
                 type="email"
                 placeholder="Email"
@@ -191,7 +205,7 @@ export default function Login() {
                 onFocus={(e) => e.target.style.borderColor = 'rgba(57,255,110,0.4)'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
               />
-              <input
+              {!forgotMode && <input
                 type="password"
                 placeholder="Heslo"
                 value={password}
@@ -212,7 +226,22 @@ export default function Login() {
                 }}
                 onFocus={(e) => e.target.style.borderColor = 'rgba(57,255,110,0.4)'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
-              />
+              />}
+
+              {!isRegister && !forgotMode && (
+                <button
+                  type="button"
+                  onClick={() => setForgotMode(true)}
+                  style={{
+                    background: 'none', border: 'none', padding: 0,
+                    color: 'rgba(255,255,255,0.3)', fontSize: '12px',
+                    cursor: 'pointer', fontFamily: 'inherit',
+                    textAlign: 'right', width: '100%', marginTop: '-4px',
+                  }}
+                >
+                  Zapomenuté heslo?
+                </button>
+              )}
 
               {error && (
                 <div style={{
@@ -259,14 +288,14 @@ export default function Login() {
                   marginTop: '4px',
                 }}
               >
-                {loading ? "..." : isRegister ? "Vytvořit účet" : "Přihlásit se"}
+                {loading ? "..." : forgotMode ? "Odeslat reset hesla" : isRegister ? "Vytvořit účet" : "Přihlásit se"}
               </button>
             </form>
 
             {/* Toggle */}
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <button
-                onClick={() => { setIsRegister(!isRegister); setError(""); setMessage(""); }}
+                onClick={() => { if (forgotMode) { setForgotMode(false); } else { setIsRegister(!isRegister); } setError(""); setMessage(""); }}
                 style={{
                   background: 'none', border: 'none',
                   color: 'rgba(255,255,255,0.4)', fontSize: '13px',
@@ -276,7 +305,7 @@ export default function Login() {
                 onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#39ff6e'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.4)'}
               >
-                {isRegister ? "Už máš účet? Přihlas se" : "Nemáš účet? Zaregistruj se"}
+                {forgotMode ? "← Zpět na přihlášení" : isRegister ? "Už máš účet? Přihlas se" : "Nemáš účet? Zaregistruj se"}
               </button>
             </div>
           </div>
@@ -286,7 +315,7 @@ export default function Login() {
             textAlign: 'center', marginTop: '24px',
             color: 'rgba(255,255,255,0.2)', fontSize: '12px',
           }}>
-            🔒 Bezpečné přihlášení přes Supabase Auth
+            ✅ 1007 agentur &nbsp; ✅ 8 AI nástrojů &nbsp; ✅ Komunita &nbsp; ✅ Zdarma na start
           </p>
         </div>
       </main>
