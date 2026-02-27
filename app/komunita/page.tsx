@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
+import BottomNav from '../components/BottomNav'
 import { supabase } from '../supabase'
 import Link from 'next/link'
 
@@ -19,6 +20,7 @@ const REGIONS = ['Zürich', 'Bern', 'Basel', 'Luzern', 'St. Gallen', 'Aargau', '
 interface Post {
   id: string; user_name: string; category: string; title: string; content: string
   region?: string; budget?: string; move_date?: string; looking_for?: string
+  images?: string[]
   upvotes: number; comments_count: number; is_pinned: boolean
   created_at: string; hasUpvoted: boolean
 }
@@ -41,6 +43,19 @@ export default function KomunitaPage() {
 
   // Form state
   const [form, setForm] = useState<Record<string, string>>({ category: 'dotaz' })
+  const [formImages, setFormImages] = useState<string[]>([])
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+    Array.from(files).forEach(file => {
+      if (file.size > 5 * 1024 * 1024) { setError('Max. velikost obrázku je 5 MB'); return }
+      const reader = new FileReader()
+      reader.onloadend = () => setFormImages(prev => [...prev, reader.result as string])
+      reader.readAsDataURL(file)
+    })
+    e.target.value = ''
+  }
 
   const fetchPosts = useCallback(async () => {
     setLoadingPosts(true)
@@ -93,10 +108,10 @@ export default function KomunitaPage() {
       const res = await fetch('/api/community', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ action: 'create_post', ...form }),
+        body: JSON.stringify({ action: 'create_post', ...form, images: formImages.length > 0 ? formImages : undefined }),
       })
       if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
-      setShowForm(false); setForm({ category: 'dotaz' }); fetchPosts()
+      setShowForm(false); setForm({ category: 'dotaz' }); setFormImages([]); fetchPosts()
     } catch (err: any) { setError(err.message) }
     finally { setSubmitting(false) }
   }
@@ -196,6 +211,7 @@ export default function KomunitaPage() {
               {submitting ? '...' : '→'}
             </button>
           </div>
+          <BottomNav active="community" />
         </div>
       </main>
     )
@@ -265,6 +281,25 @@ export default function KomunitaPage() {
               </div>
             )}
 
+            {/* Image upload */}
+            <div>
+              <label className="text-gray-300 text-sm font-medium mb-1.5 block">📷 Přidat obrázek (volitelné)</label>
+              <label className="w-full bg-[#1A1A1A] border border-dashed border-gray-600 rounded-xl p-3 text-center cursor-pointer hover:border-gray-400 transition block">
+                <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+                <span className="text-gray-400 text-sm">Klikni pro nahrání fotky</span>
+              </label>
+              {formImages.length > 0 && (
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {formImages.map((img, i) => (
+                    <div key={i} className="relative group">
+                      <img src={img} alt="" className="w-16 h-16 object-cover rounded-lg border border-gray-700" />
+                      <button onClick={() => setFormImages(prev => prev.filter((_, idx) => idx !== i))} className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3"><p className="text-red-400 text-sm">⚠️ {error}</p></div>}
 
             <button onClick={handleCreatePost} disabled={submitting} className="w-full bg-[#E8302A] text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
@@ -272,6 +307,7 @@ export default function KomunitaPage() {
             </button>
           </div>
         </div>
+        <BottomNav active="community" />
       </main>
     )
   }
@@ -354,6 +390,7 @@ export default function KomunitaPage() {
 
         </PaywallOverlay>
       </div>
+      <BottomNav active="community" />
     </main>
   )
 }
