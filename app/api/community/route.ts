@@ -134,15 +134,6 @@ export async function POST(req: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     // Update comments count
-    await supabaseAdmin.rpc('increment_comments', { post_uuid: post_id }).catch(() => {
-      // Fallback: manual update
-      supabaseAdmin
-        .from('community_posts')
-        .update({ comments_count: supabaseAdmin.rpc ? undefined : 0 })
-        .eq('id', post_id)
-    })
-
-    // Actually just do a simple increment
     const { data: post } = await supabaseAdmin.from('community_posts').select('comments_count').eq('id', post_id).single()
     if (post) {
       await supabaseAdmin.from('community_posts').update({ comments_count: (post.comments_count || 0) + 1 }).eq('id', post_id)
