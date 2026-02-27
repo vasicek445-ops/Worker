@@ -13,21 +13,47 @@ const FIELD_OPTIONS = {
 }
 
 const TEMPLATES = [
-  { id: 'klassisch' as const, name: 'Klassisch', desc: 'Tmavý sidebar, profesionální', icon: '🏢' },
-  { id: 'modern' as const, name: 'Modern', desc: 'Čistý, světlý, elegantní', icon: '✨' },
-  { id: 'kreativ' as const, name: 'Kreativ', desc: 'Výrazný banner, odvážný', icon: '🎨' },
+  { id: 'klassisch' as const, name: 'Klassisch', desc: 'Tmavý sidebar', icon: '🏢' },
+  { id: 'modern' as const, name: 'Modern', desc: 'Čistý, elegantní', icon: '✨' },
+  { id: 'kreativ' as const, name: 'Kreativ', desc: 'Výrazný banner', icon: '🎨' },
+  { id: 'elegant' as const, name: 'Elegant', desc: 'Jemný, sofistikovaný', icon: '💎' },
+  { id: 'minimal' as const, name: 'Minimal', desc: 'Čistá typografie', icon: '📐' },
 ]
 
-const COLORS = [
-  { value: '#2c3e50', name: 'Tmavě modrá' },
-  { value: '#1a5276', name: 'Královská modrá' },
+const COLOR_PALETTE = [
+  // Row 1: Blues
+  { value: '#1a3a5c', name: 'Námořní' },
+  { value: '#1a5276', name: 'Královská' },
+  { value: '#2471a3', name: 'Oceán' },
+  { value: '#2e86c1', name: 'Azurová' },
+  { value: '#5dade2', name: 'Nebeská' },
+  // Row 2: Greens
+  { value: '#0e4429', name: 'Tmavě zelená' },
   { value: '#1e8449', name: 'Smaragdová' },
+  { value: '#27ae60', name: 'Zelená' },
+  { value: '#2ecc71', name: 'Mátová' },
+  { value: '#58d68d', name: 'Světle zelená' },
+  // Row 3: Reds & Warm
+  { value: '#641e16', name: 'Bordó' },
   { value: '#922b21', name: 'Vínová' },
+  { value: '#c0392b', name: 'Červená' },
+  { value: '#e74c3c', name: 'Jasně červená' },
+  { value: '#ec7063', name: 'Korálová' },
+  // Row 4: Purples
+  { value: '#4a235a', name: 'Tmavě fialová' },
   { value: '#6c3483', name: 'Fialová' },
+  { value: '#8e44ad', name: 'Ametyst' },
+  { value: '#a569bd', name: 'Levandule' },
+  { value: '#c39bd3', name: 'Světle fialová' },
+  // Row 5: Neutrals & Gold
   { value: '#1c1c1c', name: 'Černá' },
-  { value: '#2e4053', name: 'Ocelová' },
+  { value: '#2c3e50', name: 'Antracit' },
+  { value: '#566573', name: 'Ocel' },
+  { value: '#7d6608', name: 'Tmavě zlatá' },
   { value: '#b9770e', name: 'Zlatá' },
 ]
+
+type TemplateType = 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal'
 
 export default function CVSablona() {
   const { isActive, loading } = useSubscription()
@@ -36,7 +62,7 @@ export default function CVSablona() {
   const [cvData, setCvData] = useState<any | null>(null)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [template, setTemplate] = useState<'klassisch' | 'modern' | 'kreativ'>('klassisch')
+  const [template, setTemplate] = useState<TemplateType>('klassisch')
   const [accentColor, setAccentColor] = useState('#2c3e50')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -86,19 +112,19 @@ export default function CVSablona() {
               <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Styl šablony</span>
               <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Barva</span>
             </div>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex gap-2">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex gap-1.5 flex-wrap" style={{ maxWidth: '320px' }}>
                 {TEMPLATES.map((t) => (
                   <button key={t.id} onClick={() => setTemplate(t.id)}
-                    className={`px-3 py-2 rounded-lg text-xs font-medium transition ${template === t.id ? 'bg-white text-black' : 'bg-[#252525] text-gray-400 hover:text-white'}`}>
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${template === t.id ? 'bg-white text-black' : 'bg-[#252525] text-gray-400 hover:text-white'}`}>
                     {t.icon} {t.name}
                   </button>
                 ))}
               </div>
-              <div className="flex gap-2">
-                {COLORS.map((c) => (
+              <div className="grid grid-cols-5 gap-1.5">
+                {COLOR_PALETTE.map((c) => (
                   <button key={c.value} onClick={() => setAccentColor(c.value)} title={c.name}
-                    className="w-7 h-7 rounded-full transition-transform hover:scale-110"
+                    className="w-6 h-6 rounded-full transition-transform hover:scale-125"
                     style={{ backgroundColor: c.value, border: accentColor === c.value ? '2px solid #fff' : '2px solid transparent', boxShadow: accentColor === c.value ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none' }} />
                 ))}
               </div>
@@ -125,37 +151,43 @@ export default function CVSablona() {
           <span className="text-3xl">📄</span>
           <div>
             <h1 className="text-white text-xl font-bold">Životopis – švýcarský formát</h1>
-            <p className="text-gray-400 text-xs">Profesionální PDF s fotkou a výběrem stylu</p>
+            <p className="text-gray-400 text-xs">5 profesionálních stylů · 25 barev · fotka · PDF ke stažení</p>
           </div>
         </div>
 
         <PaywallOverlay isLocked={!isActive && !loading} title="AI šablony jsou součástí Premium" description="Získej profesionální CV ve švýcarském formátu">
           <div className="space-y-4">
 
-            {/* Step 1: Template selection */}
+            {/* Step 1: Template */}
             <div>
               <label className="text-gray-300 text-sm font-medium mb-2 block">1. Vyber styl šablony</label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-5 gap-2">
                 {TEMPLATES.map((t) => (
                   <button key={t.id} onClick={() => setTemplate(t.id)}
-                    className={`p-3 rounded-xl border text-left transition ${template === t.id ? 'border-[#E8302A] bg-[#E8302A]/10' : 'border-gray-800 bg-[#1A1A1A] hover:border-gray-600'}`}>
-                    <span className="text-xl mb-1 block">{t.icon}</span>
-                    <span className="text-white text-sm font-semibold block">{t.name}</span>
-                    <span className="text-gray-500 text-xs">{t.desc}</span>
+                    className={`p-2.5 rounded-xl border text-center transition ${template === t.id ? 'border-[#E8302A] bg-[#E8302A]/10' : 'border-gray-800 bg-[#1A1A1A] hover:border-gray-600'}`}>
+                    <span className="text-lg block">{t.icon}</span>
+                    <span className="text-white text-xs font-semibold block">{t.name}</span>
+                    <span className="text-gray-500 text-[10px] leading-tight">{t.desc}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Step 2: Color selection */}
+            {/* Step 2: Color palette */}
             <div>
               <label className="text-gray-300 text-sm font-medium mb-2 block">2. Vyber barvu</label>
-              <div className="flex gap-2 flex-wrap">
-                {COLORS.map((c) => (
-                  <button key={c.value} onClick={() => setAccentColor(c.value)} title={c.name}
-                    className="w-9 h-9 rounded-full transition-transform hover:scale-110"
-                    style={{ backgroundColor: c.value, border: accentColor === c.value ? '3px solid #E8302A' : '3px solid #333', boxShadow: accentColor === c.value ? '0 0 0 2px rgba(232,48,42,0.3)' : 'none' }} />
-                ))}
+              <div className="bg-[#1A1A1A] rounded-xl p-3 border border-gray-800">
+                <div className="grid grid-cols-5 gap-2">
+                  {COLOR_PALETTE.map((c) => (
+                    <button key={c.value} onClick={() => setAccentColor(c.value)} title={c.name}
+                      className="group relative w-full aspect-square rounded-lg transition-transform hover:scale-105"
+                      style={{ backgroundColor: c.value, border: accentColor === c.value ? '3px solid #E8302A' : '3px solid transparent', boxShadow: accentColor === c.value ? '0 0 0 2px rgba(232,48,42,0.3)' : 'none' }}>
+                      {accentColor === c.value && (
+                        <span className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold">✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -177,12 +209,10 @@ export default function CVSablona() {
 
             <div className="h-px bg-gray-800 my-2" />
 
-            {/* Step 4: Personal data */}
+            {/* Step 4: Personal */}
             <label className="text-gray-300 text-sm font-medium block">4. Osobní údaje</label>
             <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2">
-                <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Celé jméno *" className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              </div>
+              <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Celé jméno *" className="col-span-2 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
               <input type="text" value={formData.birthdate || ''} onChange={(e) => handleChange('birthdate', e.target.value)} placeholder="Datum narození *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
               <input type="text" value={formData.phone || ''} onChange={(e) => handleChange('phone', e.target.value)} placeholder="Telefon *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
               <input type="text" value={formData.email || ''} onChange={(e) => handleChange('email', e.target.value)} placeholder="Email *" className="col-span-2 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
@@ -190,25 +220,25 @@ export default function CVSablona() {
               <input type="text" value={formData.driving || ''} onChange={(e) => handleChange('driving', e.target.value)} placeholder="Řidičský průkaz" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
             </div>
 
-            {/* Step 5: Job target */}
+            {/* Step 5 */}
             <label className="text-gray-300 text-sm font-medium block">5. Cílová pozice</label>
             <div className="grid grid-cols-2 gap-3">
-              <input type="text" value={formData.position || ''} onChange={(e) => handleChange('position', e.target.value)} placeholder="Pozice (Monteur, Lagerist...) *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
+              <input type="text" value={formData.position || ''} onChange={(e) => handleChange('position', e.target.value)} placeholder="Pozice *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
               <select value={formData.field || ''} onChange={(e) => handleChange('field', e.target.value)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:border-gray-600 focus:outline-none transition appearance-none">
                 <option value="">Obor *</option>
                 {FIELD_OPTIONS.fields.map((o) => <option key={o} value={o}>{o}</option>)}
               </select>
             </div>
 
-            {/* Step 6: Experience */}
+            {/* Step 6 */}
             <label className="text-gray-300 text-sm font-medium block">6. Pracovní zkušenosti</label>
-            <textarea value={formData.experience_detail || ''} onChange={(e) => handleChange('experience_detail', e.target.value)} placeholder={'Napiš své zkušenosti – AI je rozšíří a vylepší:\n2019–2024: Zedník, StavbyPraha – hrubé stavby\n2017–2019: Pomocný dělník, XY firma'} rows={4} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
+            <textarea value={formData.experience_detail || ''} onChange={(e) => handleChange('experience_detail', e.target.value)} placeholder={'Napiš zkušenosti – AI je rozšíří:\n2019–2024: Zedník, StavbyPraha – hrubé stavby\n2017–2019: Pomocný dělník, XY firma'} rows={4} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
 
-            {/* Step 7: Education */}
+            {/* Step 7 */}
             <label className="text-gray-300 text-sm font-medium block">7. Vzdělání</label>
             <textarea value={formData.education || ''} onChange={(e) => handleChange('education', e.target.value)} placeholder={'2014–2017: SOU stavební, Praha – výuční list'} rows={2} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
 
-            {/* Step 8: Languages */}
+            {/* Step 8 */}
             <label className="text-gray-300 text-sm font-medium block">8. Jazyky</label>
             <div className="grid grid-cols-2 gap-3">
               <select value={formData.german || ''} onChange={(e) => handleChange('german', e.target.value)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:border-gray-600 focus:outline-none transition appearance-none">
@@ -218,9 +248,9 @@ export default function CVSablona() {
               <input type="text" value={formData.other_languages || ''} onChange={(e) => handleChange('other_languages', e.target.value)} placeholder="Další jazyky" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
             </div>
 
-            {/* Step 9: Skills */}
+            {/* Step 9 */}
             <label className="text-gray-300 text-sm font-medium block">9. Dovednosti</label>
-            <textarea value={formData.skills || ''} onChange={(e) => handleChange('skills', e.target.value)} placeholder="svařování MIG/MAG, jeřáb, práce ve výškách... (AI doplní další)" rows={2} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
+            <textarea value={formData.skills || ''} onChange={(e) => handleChange('skills', e.target.value)} placeholder="svařování, jeřáb, práce ve výškách... (AI doplní)" rows={2} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
 
             {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3"><p className="text-red-400 text-sm">⚠️ {error}</p></div>}
 
