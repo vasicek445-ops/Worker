@@ -17,11 +17,11 @@ export default function Nabidka() {
           <h2 className="text-white font-bold text-lg mb-2">Připravujeme pro tebe</h2>
           <p className="text-gray-400 text-sm mb-6">
             Pracujeme na napojení reálných pracovních nabídek přímo od švýcarských zaměstnavatelů. 
-            Brzy tu najdeš pozice s přímým kontaktem — žádné agentury, žádní prostředníci.
+            Brzy tu najdeš aktuální pozice od švýcarských temporárních agentur i přímých zaměstnavatelů — vše na jednom místě.
           </p>
           <div className="flex flex-col gap-3">
             <Link href="/kontakty" className="block w-full bg-[#E8302A] text-white font-bold py-3 rounded-xl text-center hover:opacity-90 transition">
-              📇 Prozatím prohlédni 1000+ kontaktů na agentury
+              📇 Prohlédni 1000+ kontaktů na temporární agentury
             </Link>
             <Link href="/pruvodce/sablony" className="block w-full bg-[#1A1A1A] border border-gray-700 text-white font-bold py-3 rounded-xl text-center hover:border-gray-500 transition">
               📝 Připrav si CV a motivační dopis s AI
