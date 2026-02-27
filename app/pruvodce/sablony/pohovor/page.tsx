@@ -61,14 +61,20 @@ export default function PohovorPage() {
     if (!resultRef.current) return
     try {
       const html2pdf = (await import('html2pdf.js')).default
+      const element = resultRef.current
       await html2pdf().set({
-        margin: [10, 10, 10, 10],
+        margin: [8, 8, 8, 8],
         filename: `Pohovor_${formData.position?.replace(/\s+/g, '_') || 'priprava'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 1.5, useCORS: true, logging: false, backgroundColor: '#0E0E0E' },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      } as any).from(resultRef.current).save()
-    } catch { alert('Chyba při generování PDF.') }
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      } as any).from(element).save()
+    } catch (err) {
+      console.error('PDF error:', err)
+      // Fallback: print
+      window.print()
+    }
   }
 
   // ─── RESULTS ───
