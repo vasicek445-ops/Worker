@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
-import BottomNav from '../components/BottomNav'
 import { supabase } from '../supabase'
 import Link from 'next/link'
 
@@ -211,7 +210,6 @@ export default function KomunitaPage() {
               {submitting ? '...' : '→'}
             </button>
           </div>
-          <BottomNav active="community" />
         </div>
       </main>
     )
@@ -307,7 +305,6 @@ export default function KomunitaPage() {
             </button>
           </div>
         </div>
-        <BottomNav active="community" />
       </main>
     )
   }
@@ -390,7 +387,6 @@ export default function KomunitaPage() {
 
         </PaywallOverlay>
       </div>
-      <BottomNav active="community" />
     </main>
   )
 }

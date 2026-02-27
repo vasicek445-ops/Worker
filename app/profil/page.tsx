@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../supabase'
 import { useSubscription } from '../../hooks/useSubscription'
 import Link from 'next/link'
-import BottomNav from '../components/BottomNav'
 
 const COUNTRIES = [
   { code: 'CH', flag: '🇨🇭', name: 'Švýcarsko' },
@@ -542,7 +541,6 @@ export default function Profil() {
           Woker v1.0
         </p>
       </div>
-      <BottomNav active="profile" />
     </main>
   )
 }

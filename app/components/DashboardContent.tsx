@@ -167,8 +167,6 @@ export default function DashboardContent({ agencyCount }: Props) {
         <div className="relative z-10 px-5 pt-6">
           <WokeeWidget />
         </div>
-
-        <BottomNav active="home" />
       </main>
     </>
   );

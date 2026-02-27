@@ -1,6 +1,5 @@
 "use client"
 import Link from 'next/link'
-import BottomNav from '../components/BottomNav'
 
 export default function Nabidka() {
   return (
@@ -47,7 +46,6 @@ export default function Nabidka() {
           </div>
         </div>
       </div>
-      <BottomNav active="tools" />
     </main>
   )
 }

@@ -1,6 +1,5 @@
 "use client"
 import Link from 'next/link'
-import BottomNav from '../components/BottomNav'
 import { useSubscription } from '../../hooks/useSubscription'
 
 export default function Pruvodce() {
@@ -71,7 +70,6 @@ export default function Pruvodce() {
           ))}
         </div>
       </div>
-      <BottomNav active="tools" />
     </main>
   )
 }
