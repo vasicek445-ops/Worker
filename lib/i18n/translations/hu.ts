@@ -1,7 +1,7 @@
 import { Translation } from "../types";
 const hu: Translation = {
   locale: "hu", flag: "🇭🇺", name: "Magyar",
-  nav: { overview: "Főoldal", contacts: "Kapcsolatok", guide: "Útmutató", jobs: "Állások", profile: "Profil" },
+  nav: { overview: "Főoldal", contacts: "Kapcsolatok", guide: "Útmutató", jobs: "Állások", profile: "Profil", community: "Közösség" },
   dashboard: {
     greeting: "Szia 👋", welcome: "Üdvözöl a Woker",
     search: "Ügynökség, város, pozíció keresése...",

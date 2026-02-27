@@ -1,7 +1,7 @@
 import { Translation } from "../types";
 const uk: Translation = {
   locale: "uk", flag: "🇺🇦", name: "Українська",
-  nav: { overview: "Головна", contacts: "Контакти", guide: "Гід", jobs: "Вакансії", profile: "Профіль" },
+  nav: { overview: "Головна", contacts: "Контакти", guide: "Гід", jobs: "Вакансії", profile: "Профіль", community: "Спільнота" },
   dashboard: {
     greeting: "Привіт 👋", welcome: "Ласкаво просимо до Woker",
     search: "Шукати агенцію, місто, посаду...",

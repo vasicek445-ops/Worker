@@ -1,7 +1,7 @@
 import { Translation } from "../types";
 const en: Translation = {
   locale: "en", flag: "🇬🇧", name: "English",
-  nav: { overview: "Home", contacts: "Contacts", guide: "Guides", jobs: "Jobs", profile: "Profile" },
+  nav: { overview: "Home", contacts: "Contacts", guide: "Guides", jobs: "Jobs", profile: "Profile", community: "Community" },
   dashboard: {
     greeting: "Hello 👋", welcome: "Welcome to Woker",
     search: "Search agency, city, position...",

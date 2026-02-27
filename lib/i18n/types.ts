@@ -10,6 +10,7 @@ export interface Translation {
     guide: string;
     jobs: string;
     profile: string;
+    community: string;
   };
   dashboard: {
     greeting: string;

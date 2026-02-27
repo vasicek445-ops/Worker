@@ -1,7 +1,7 @@
 import { Translation } from "../types";
 const ro: Translation = {
   locale: "ro", flag: "🇷🇴", name: "Română",
-  nav: { overview: "Acasă", contacts: "Contacte", guide: "Ghid", jobs: "Joburi", profile: "Profil" },
+  nav: { overview: "Acasă", contacts: "Contacte", guide: "Ghid", jobs: "Joburi", profile: "Profil", community: "Comunitate" },
   dashboard: {
     greeting: "Salut 👋", welcome: "Bine ai venit la Woker",
     search: "Caută agenție, oraș, poziție...",
