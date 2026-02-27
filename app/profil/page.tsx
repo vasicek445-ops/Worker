@@ -7,7 +7,7 @@ import { useLanguage } from '../../lib/i18n/LanguageContext'
 
 export default function Profil() {
   const { isActive, loading: subLoading } = useSubscription()
-  const { language, setLanguage } = useLanguage()
+  const { locale, setLocale } = useLanguage()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -119,7 +119,7 @@ export default function Profil() {
   const userEmail = user?.email || ''
   const userInitial = displayName.charAt(0).toUpperCase()
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString('cs-CZ', { month: 'long', year: 'numeric' }) : ''
-  const currentLang = LANGUAGES.find(l => l.code === language) || LANGUAGES[0]
+  const currentLang = LANGUAGES.find(l => l.code === locale) || LANGUAGES[0]
 
   return (
     <>
@@ -245,8 +245,8 @@ export default function Profil() {
               <div className="flex items-center justify-between py-3 border-b border-white/[0.04]">
                 <span className="text-white/40 text-sm">Jazyk aplikace</span>
                 <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value as any)}
+                  value={locale}
+                  onChange={(e) => setLocale(e.target.value as any)}
                   className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 appearance-none cursor-pointer"
                 >
                   {LANGUAGES.map(l => (
