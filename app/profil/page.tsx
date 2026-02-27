@@ -18,6 +18,16 @@ export default function Profil() {
   const [notifications, setNotifications] = useState(true)
   const [savingNotif, setSavingNotif] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [newEmail, setNewEmail] = useState('')
+  const [emailSaving, setEmailSaving] = useState(false)
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordSaving, setPasswordSaving] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleteText, setDeleteText] = useState('')
+  const [deleting, setDeleting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const LANGUAGES = [
@@ -107,6 +117,48 @@ export default function Profil() {
       if (data.url) window.location.href = data.url
     } catch { showToast('Něco se pokazilo') }
     finally { setPortalLoading(false) }
+  }
+
+  const handleChangeEmail = async () => {
+    if (!newEmail || !newEmail.includes('@')) { showToast('Zadej platný email'); return }
+    setEmailSaving(true)
+    try {
+      const { error } = await supabase.auth.updateUser({ email: newEmail })
+      if (error) throw error
+      showToast('Potvrzovací email odeslán na ' + newEmail)
+      setNewEmail('')
+    } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')) }
+    finally { setEmailSaving(false) }
+  }
+
+  const handleChangePassword = async () => {
+    if (newPassword.length < 6) { showToast('Heslo musí mít min. 6 znaků'); return }
+    if (newPassword !== confirmPassword) { showToast('Hesla se neshodují'); return }
+    setPasswordSaving(true)
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      if (error) throw error
+      showToast('Heslo změněno!')
+      setShowPasswordChange(false)
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')) }
+    finally { setPasswordSaving(false) }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (deleteText !== 'SMAZAT') return
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      })
+      if (!res.ok) throw new Error('Chyba při mazání')
+      await supabase.auth.signOut()
+      window.location.href = '/login'
+    } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')); setDeleting(false) }
   }
 
   const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/login' }
@@ -270,6 +322,93 @@ export default function Profil() {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* Security */}
+          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
+            <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider mb-4">Zabezpečení</h3>
+
+            {/* Change email */}
+            <div className="pb-3 mb-3 border-b border-white/[0.04]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-white/40 text-sm">Změnit email</span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="Nový email..." className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30"
+                />
+                <button onClick={handleChangeEmail} disabled={emailSaving} className="bg-white/[0.06] border border-white/[0.08] text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-white/[0.1] transition disabled:opacity-50">
+                  {emailSaving ? '...' : 'Změnit'}
+                </button>
+              </div>
+              <p className="text-white/20 text-[11px] mt-1.5">Na nový email přijde potvrzovací odkaz</p>
+            </div>
+
+            {/* Change password */}
+            <div className="pb-3 mb-3 border-b border-white/[0.04]">
+              {!showPasswordChange ? (
+                <button onClick={() => setShowPasswordChange(true)} className="text-white/40 text-sm hover:text-white transition">
+                  Změnit heslo →
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Nové heslo (min. 6 znaků)" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+                  <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Potvrdit nové heslo" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+                  <div className="flex gap-2">
+                    <button onClick={handleChangePassword} disabled={passwordSaving} className="bg-[#39ff6e] text-[#0a0a12] text-xs font-bold px-4 py-2 rounded-lg hover:opacity-90 transition disabled:opacity-50">
+                      {passwordSaving ? '...' : 'Uložit heslo'}
+                    </button>
+                    <button onClick={() => { setShowPasswordChange(false); setNewPassword(''); setConfirmPassword('') }} className="text-white/30 text-xs px-3 py-2 hover:text-white/50 transition">
+                      Zrušit
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Export data */}
+            <div>
+              <button onClick={() => {
+                const data = { profile, email: userEmail, memberSince, subscription: isActive ? 'Premium' : 'Free' }
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url; a.download = 'woker-data.json'; a.click()
+                showToast('Data exportována!')
+              }} className="text-white/40 text-sm hover:text-white transition">
+                📥 Exportovat moje data (GDPR)
+              </button>
+            </div>
+          </div>
+
+          {/* Danger Zone */}
+          <div className="bg-[#111120] rounded-[20px] border border-red-500/10 p-5 mb-4">
+            <h3 className="text-red-400/40 text-[10px] font-bold uppercase tracking-wider mb-3">Nebezpečná zóna</h3>
+            {!showDeleteConfirm ? (
+              <button onClick={() => setShowDeleteConfirm(true)} className="text-red-400/60 text-sm hover:text-red-400 transition">
+                🗑️ Smazat účet a všechna data
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                  <p className="text-red-400 text-xs font-medium mb-1">⚠️ Tato akce je nevratná!</p>
+                  <p className="text-red-400/60 text-[11px]">Tvůj účet, profil, předplatné a všechna data budou trvale smazána.</p>
+                </div>
+                <div>
+                  <p className="text-white/30 text-xs mb-1.5">Napiš SMAZAT pro potvrzení:</p>
+                  <input type="text" value={deleteText} onChange={(e) => setDeleteText(e.target.value)} placeholder="SMAZAT" className="w-full bg-white/[0.04] border border-red-500/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-red-500/40" />
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={handleDeleteAccount} disabled={deleteText !== 'SMAZAT' || deleting} className="bg-red-500 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-red-600 transition disabled:opacity-30">
+                    {deleting ? 'Mažu...' : 'Trvale smazat účet'}
+                  </button>
+                  <button onClick={() => { setShowDeleteConfirm(false); setDeleteText('') }} className="text-white/30 text-xs px-3 py-2 hover:text-white/50 transition">
+                    Zrušit
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Logout */}
