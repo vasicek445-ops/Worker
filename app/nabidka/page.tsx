@@ -47,7 +47,7 @@ export default function Nabidka() {
           </div>
         </div>
       </div>
-      <BottomNav active="jobs" />
+      <BottomNav active="tools" />
     </main>
   )
 }

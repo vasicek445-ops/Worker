@@ -7,7 +7,7 @@ export default function JazykyLayout({ children }: { children: React.ReactNode }
     <>
       <SharedHeader backHref="/dashboard" />
       {children}
-      <BottomNav active="guide" />
+      <BottomNav active="tools" />
     </>
   );
 }

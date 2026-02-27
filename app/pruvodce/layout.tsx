@@ -7,7 +7,7 @@ export default function PruvodceLayout({ children }: { children: React.ReactNode
     <>
       <SharedHeader backHref="/dashboard" backLabel="Zpět" />
       {children}
-      <BottomNav active="guide" />
+      <BottomNav active="tools" />
     </>
   );
 }
