@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
 import CVPreview from '../../../components/CVPreview'
@@ -58,7 +57,6 @@ type TemplateType = 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal'
 
 export default function CVSablona() {
   const { isActive, loading } = useSubscription()
-  const searchParams = useSearchParams()
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [photo, setPhoto] = useState<string | null>(null)
   const [cvData, setCvData] = useState<any | null>(null)
@@ -70,9 +68,11 @@ export default function CVSablona() {
   const [prefilled, setPrefilled] = useState(false)
 
   useEffect(() => {
-    const p = searchParams.get('prefill')
-    if (p && !prefilled) {
-      try {
+    if (prefilled) return
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const p = params.get('prefill')
+      if (p) {
         const data = JSON.parse(decodeURIComponent(p))
         setFormData(prev => ({
           ...prev,
@@ -80,9 +80,9 @@ export default function CVSablona() {
           ...(data.skills && { skills: data.skills }),
         }))
         setPrefilled(true)
-      } catch {}
-    }
-  }, [searchParams, prefilled])
+      }
+    } catch {}
+  }, [prefilled])
 
   const handleChange = (name: string, value: string) => setFormData((prev) => ({ ...prev, [name]: value }))
 

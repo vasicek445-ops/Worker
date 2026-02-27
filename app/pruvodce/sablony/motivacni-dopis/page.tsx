@@ -1,7 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useMemo, useEffect, useState } from 'react'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
 import GenerateForm from '../../../components/GenerateForm'
@@ -83,20 +82,22 @@ const FIELDS = [
 
 export default function MotivacniDopis() {
   const { isActive, loading } = useSubscription()
-  const searchParams = useSearchParams()
+  const [initialData, setInitialData] = useState<Record<string, string> | undefined>(undefined)
 
-  const initialData = useMemo(() => {
-    const p = searchParams.get('prefill')
-    if (!p) return undefined
+  useEffect(() => {
     try {
-      const data = JSON.parse(decodeURIComponent(p))
-      const result: Record<string, string> = {}
-      if (data.position) result.position = data.position
-      if (data.company) result.company = data.company
-      if (data.keywords?.length) result.skills = data.keywords.join(', ')
-      return Object.keys(result).length > 0 ? result : undefined
-    } catch { return undefined }
-  }, [searchParams])
+      const params = new URLSearchParams(window.location.search)
+      const p = params.get('prefill')
+      if (p) {
+        const data = JSON.parse(decodeURIComponent(p))
+        const result: Record<string, string> = {}
+        if (data.position) result.position = data.position
+        if (data.company) result.company = data.company
+        if (data.keywords?.length) result.skills = data.keywords.join(', ')
+        if (Object.keys(result).length > 0) setInitialData(result)
+      }
+    } catch {}
+  }, [])
 
   return (
     <main className="min-h-screen bg-[#0E0E0E] px-4 py-6 pb-24">
