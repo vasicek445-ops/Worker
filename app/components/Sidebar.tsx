@@ -42,11 +42,6 @@ export default function Sidebar() {
         : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]"
     }`;
 
-  // Don't render on login/register pages
-  if (pathname === "/login" || pathname === "/registrace" || pathname === "/auth/callback" || pathname === "/pricing") {
-    return null;
-  }
-
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-[#0a0a12] border-r border-white/[0.06] flex flex-col z-50 overflow-y-auto">
       {/* Logo */}
