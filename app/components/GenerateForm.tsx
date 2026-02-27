@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '../../supabase'
+import { supabase } from '../supabase'
 
 interface Field {
   name: string
@@ -32,10 +32,6 @@ export default function GenerateForm({ type, title, subtitle, fields, initialDat
       setFormData(prev => ({ ...prev, ...initialData }))
     }
   }, [initialData])
-  const [result, setResult] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
 
   const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
