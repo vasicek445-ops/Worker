@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useLanguage } from "../../lib/i18n/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import WokeeWidget from "./WokeeWidget";
+import { useSubscription } from "../../hooks/useSubscription";
 import type { Agency } from "../../lib/types";
 
 const langFlag: Record<string, string> = { de: "🇩🇪", fr: "🇫🇷", it: "🇮🇹" };
@@ -14,6 +15,7 @@ interface Props {
 
 export default function DashboardContent({ agencyCount, agencies }: Props) {
   const { t } = useLanguage();
+  const { isActive } = useSubscription();
 
   const guides = [
     { icon: "📋", title: t.guides.permits_title, desc: t.guides.permits_desc, tag: t.tags.important, tagColor: "text-red-400", tagBg: "bg-red-500/10", href: "/pruvodce/povoleni", gradient: "bg-gradient-to-br from-red-500/[0.08] to-red-500/[0.02]", borderColor: "border-red-500/[0.12]" },
@@ -26,6 +28,7 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
     { icon: "🏠", label: t.nav.overview, href: "/dashboard", active: true },
     { icon: "📇", label: t.nav.contacts, href: "/kontakty", active: false },
     { icon: "📖", label: t.nav.guide, href: "/pruvodce", active: false },
+    { icon: "💬", label: t.nav.community, href: "/komunita", active: false },
     { icon: "💼", label: t.nav.jobs, href: "/nabidka", active: false },
     { icon: "👤", label: t.nav.profile, href: "/profil", active: false },
   ];
@@ -131,8 +134,8 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
           </div>
         </div>
 
-        {/* Premium */}
-        <div className="relative z-10 px-5 pt-7">
+        {/* Premium - hide for subscribers */}
+        {!isActive && (<div className="relative z-10 px-5 pt-7">
           <Link href="/pricing" className="no-underline block">
             <div className="bg-gradient-to-br from-[#111120] to-[#0f1a14] rounded-[20px] p-6 border border-[#39ff6e]/15 relative overflow-visible">
               <div className="absolute -top-[50px] -right-[50px] w-[200px] h-[200px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.1), transparent 70%)" }} />
@@ -150,7 +153,22 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
               </div>
             </div>
           </Link>
-        </div>
+        </div>)}
+
+        {/* Premium active badge */}
+        {isActive && (
+          <div className="relative z-10 px-5 pt-7">
+            <div className="bg-gradient-to-br from-[#111120] to-[#0f1a14] rounded-[20px] p-5 border border-[#39ff6e]/15">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center text-lg">⭐</div>
+                <div>
+                  <p className="text-white font-extrabold text-sm m-0">Woker Premium</p>
+                  <p className="text-[#39ff6e] text-xs m-0 mt-0.5 font-medium">Aktivní — plný přístup ke všemu</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Wokee */}
         <div className="relative z-10 px-5 pt-7">
@@ -161,9 +179,9 @@ export default function DashboardContent({ agencyCount, agencies }: Props) {
         <div className="fixed bottom-0 left-0 right-0 bg-[#0a0a12]/[0.92] backdrop-blur-[20px] border-t border-white/[0.06] px-2 py-2 pb-3 z-[100]">
           <div className="max-w-[500px] mx-auto flex justify-around items-center">
             {navItems.map((item) => (
-              <Link key={item.label} href={item.href} className={`flex flex-col items-center gap-1 py-2 px-3.5 rounded-xl no-underline ${item.active ? "bg-[#39ff6e]/[0.08]" : ""}`}>
+              <Link key={item.label} href={item.href} className={`flex flex-col items-center gap-1 py-2 px-2 rounded-xl no-underline ${item.active ? "bg-[#39ff6e]/[0.08]" : ""}`}>
                 <span className={`text-xl ${item.active ? "" : "grayscale opacity-40"}`}>{item.icon}</span>
-                <span className={`text-[10px] tracking-wide ${item.active ? "text-[#39ff6e] font-bold" : "text-white/35 font-medium"}`}>{item.label}</span>
+                <span className={`text-[9px] tracking-wide ${item.active ? "text-[#39ff6e] font-bold" : "text-white/35 font-medium"}`}>{item.label}</span>
               </Link>
             ))}
           </div>
