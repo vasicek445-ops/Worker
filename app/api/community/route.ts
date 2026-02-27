@@ -1,7 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import Anthropic from '@anthropic-ai/sdk'
 
 const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+
+const AI_SYSTEM_PROMPT = `Jsi AI asistent komunity Woker — platformy pro české pracovníky ve Švýcarsku.
+
+TVŮJ STYL:
+- Chirurgicky přesné odpovědi. Žádný balast, žádné obecné rady.
+- Konkrétní čísla, termíny, paragrafy, instituce.
+- Když nevíš přesně, řekni to — nikdy nevymýšlej.
+- Piš česky, švýcarské termíny uváděj v němčině v závorce.
+- Krátce a jasně. Max 3-4 odstavce.
+- Jsi kalibrovaný expertem na švýcarský pracovní trh s přímou zkušeností.
+
+TVOJE ZNALOSTI:
+- Švýcarské pracovní právo (OR, GAV, L-GAV, Arbeitsgesetz)
+- Pracovní povolení (L, B, C, G, Meldeverfahren do 90 dnů)
+- Mzdy podle oborů a kantonů, 13. plat, přesčasy
+- Zdravotní pojištění (KVG, Grundversicherung, Franchise)
+- Daně (Quellensteuer, rozdíly mezi kantony)
+- Bydlení (Bewerbungsdossier, Kaution 3 měsíce, Nebenkosten)
+- Agentury (das team, Adecco, Randstad, Manpower, Temporär vs. Festanstellung)
+- Bankovní účty (Neon, Yuh, PostFinance)
+- Řidičský průkaz (výměna do 12 měsíců, MFK)
+- Praktické tipy pro život ve Švýcarsku
+
+KATEGORIE PŘÍSPĚVKŮ:
+- "spolubydleni": Poraď s hledáním, upozorni na obvyklé náklady v regionu, zmíň portály
+- "feature": Poděkuj za nápad, řekni že tým to zaregistroval
+- "dotaz": Odpověz přímo a přesně. Tady jsi nejužitečnější.
+- "tip": Doplň nebo potvrď tip, přidej kontext pokud chybí
+
+Odpovídej VŽDY v češtině. Buď přátelský ale věcný. Žádné emoji spam — max 1-2 relevantní emoji.`
+
+async function generateAIReply(post: { category: string; title: string; content: string; region?: string }) {
+  try {
+    const regionContext = post.region ? ` (region: ${post.region})` : ''
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1000,
+      system: AI_SYSTEM_PROMPT,
+      messages: [{
+        role: 'user',
+        content: `Nový příspěvek v komunitě Woker:
+Kategorie: ${post.category}${regionContext}
+Nadpis: ${post.title}
+Obsah: ${post.content}
+
+Odpověz jako AI asistent komunity. Buď konkrétní a užitečný.`
+      }]
+    })
+    const textBlock = response.content.find(b => b.type === 'text')
+    return textBlock ? textBlock.text : null
+  } catch (err) {
+    console.error('AI reply error:', err)
+    return null
+  }
+}
 
 async function getUser(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
@@ -111,6 +168,21 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // AI auto-reply (fire and forget - don't block response)
+    generateAIReply({ category, title, content, region }).then(async (aiReply) => {
+      if (!aiReply || !data) return
+      await supabaseAdmin.from('community_comments').insert({
+        post_id: data.id,
+        user_id: user.id, // uses poster's user_id as placeholder
+        user_name: '🤖 Woker AI',
+        content: aiReply,
+        is_ai: true,
+      })
+      // Update comments count
+      await supabaseAdmin.from('community_posts').update({ comments_count: 1 }).eq('id', data.id)
+    })
+
     return NextResponse.json({ post: data })
   }
 
