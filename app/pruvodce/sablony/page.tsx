@@ -26,11 +26,20 @@ const TEMPLATES = [
   {
     icon: '📄',
     title: 'Životopis (Lebenslauf) švýcarský formát',
-    description: 'CV ve formátu, který švýcarské firmy očekávají. Tabulkový styl, správné sekce, němčina. Úplně jiný než český životopis.',
+    description: 'CV ve formátu, který švýcarské firmy očekávají. 5 šablon, 25 barev, fotka, PDF ke stažení. Úplně jiný než český životopis.',
     href: '/pruvodce/sablony/cv',
     tag: 'Kompletní CV',
     tagColor: 'bg-green-500/10 text-green-400',
     time: '~45 sekund',
+  },
+  {
+    icon: '🎤',
+    title: 'AI příprava na pohovor',
+    description: '10 typických otázek pro tvou pozici v němčině + vzorové odpovědi + klíčové fráze. Specifické pro obor, ne generic. Včetně tipu na platové očekávání.',
+    href: '/pruvodce/sablony/pohovor',
+    tag: '🆕 Nové',
+    tagColor: 'bg-purple-500/10 text-purple-400',
+    time: '~30 sekund',
   },
 ]
 
@@ -81,6 +90,7 @@ export default function Sablony() {
           </div>
         </PaywallOverlay>
 
+        {/* How it works */}
         <div className="mt-8 bg-[#1A1A1A] border border-gray-800 rounded-2xl p-5">
           <h3 className="text-white font-bold mb-4">Jak to funguje?</h3>
           <div className="space-y-3">
