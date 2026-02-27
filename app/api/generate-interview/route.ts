@@ -83,7 +83,7 @@ DŮLEŽITÉ:
 
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 4000,
+      max_tokens: 8000,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userMessage }],
     })
@@ -92,14 +92,27 @@ DŮLEŽITÉ:
     let text = textBlock ? (textBlock as any).text : ''
     if (!text) return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
 
+    // Clean up and extract JSON
     text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+    const jsonStart = text.indexOf('{')
+    const jsonEnd = text.lastIndexOf('}')
+    if (jsonStart !== -1 && jsonEnd !== -1) {
+      text = text.substring(jsonStart, jsonEnd + 1)
+    }
 
     let interviewData
     try {
       interviewData = JSON.parse(text)
     } catch (parseError) {
-      console.error('JSON parse error:', text)
-      return NextResponse.json({ error: 'AI generated invalid data. Try again.' }, { status: 500 })
+      console.error('JSON parse error, attempting fix...')
+      // Try to fix common JSON issues
+      try {
+        text = text.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']')
+        interviewData = JSON.parse(text)
+      } catch {
+        console.error('JSON parse failed:', text.substring(0, 500))
+        return NextResponse.json({ error: 'AI generated invalid data. Try again.' }, { status: 500 })
+      }
     }
 
     return NextResponse.json({ interviewData, usage: { input: response.usage.input_tokens, output: response.usage.output_tokens } })
