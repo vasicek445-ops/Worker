@@ -10,9 +10,16 @@ export default function Sidebar() {
   const { isActive } = useSubscription();
   const [toolsOpen, setToolsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user));
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      if (user) {
+        supabase.from("profiles").select("avatar_url").eq("id", user.id).single()
+          .then(({ data }) => { if (data?.avatar_url) setAvatarUrl(data.avatar_url); });
+      }
+    });
   }, []);
 
   // Auto-expand tools if on a tools page
@@ -177,7 +184,7 @@ export default function Sidebar() {
 
         {/* User */}
         <Link href="/profil" className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl no-underline ${isActive2("/profil") ? "bg-white/[0.08]" : "hover:bg-white/[0.04]"}`}>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-400 flex items-center justify-center text-white font-bold text-xs">{userInitial}</div>
+          {avatarUrl ? <img src={avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover" /> : <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-400 flex items-center justify-center text-white font-bold text-xs">{userInitial}</div>}
           <div>
             <p className="text-white text-xs font-medium m-0">{displayName}</p>
             <p className="text-gray-600 text-[10px] m-0">Můj profil</p>
