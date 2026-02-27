@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useLanguage } from "../../lib/i18n/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
 import WokeeWidget from "./WokeeWidget";
-import BottomNav from "./BottomNav";
 import { useSubscription } from "../../hooks/useSubscription";
 import type { Agency } from "../../lib/types";
 
