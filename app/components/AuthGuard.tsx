@@ -1,12 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "../supabase";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -48,15 +44,27 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 export function useUser() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
+    supabase.auth.getUser()
+      .then(({ data: { user }, error: err }) => {
+        if (err) {
+          setError(err.message);
+        }
+        setUser(user);
+      })
+      .catch((err) => {
+        setError(err.message || "Failed to get user");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  return user;
+  return { user, loading, error };
 }
 
 export function signOut() {
@@ -64,5 +72,3 @@ export function signOut() {
     window.location.href = "/login";
   });
 }
-
-export { supabase };

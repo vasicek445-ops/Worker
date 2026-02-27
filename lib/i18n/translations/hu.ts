@@ -23,5 +23,11 @@ const hu: Translation = {
     language_title: "Német a munkához", language_desc: "Kifejezések, tesztek, tanfolyamok",
   },
   tags: { important: "Fontos", popular: "Népszerű", new_tag: "Új", recommended: "Ajánlott" },
+  paywall: {
+    title: "Teljes hozzáférés feloldása",
+    description: "Szerezd meg a céges kapcsolatokat, útmutatókat és AI asszisztenst",
+    cta: "Előfizetés 9,99 €/hó",
+    disclaimer: "Bármikor lemondható • 7 nap ingyenes",
+  },
 };
 export default hu;

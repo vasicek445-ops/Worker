@@ -23,5 +23,11 @@ const uk: Translation = {
     language_title: "Німецька для роботи", language_desc: "Фрази, тести, курси",
   },
   tags: { important: "Важливо", popular: "Популярне", new_tag: "Нове", recommended: "Рекомендовано" },
+  paywall: {
+    title: "Розблокуйте повний доступ",
+    description: "Отримайте контакти компаній, гіди та AI-асистента",
+    cta: "Підписатися за €9,99/міс.",
+    disclaimer: "Скасуйте будь-коли • 7 днів безкоштовно",
+  },
 };
 export default uk;

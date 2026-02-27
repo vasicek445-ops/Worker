@@ -23,5 +23,11 @@ const pl: Translation = {
     language_title: "Niemiecki do pracy", language_desc: "Zwroty, testy, kursy",
   },
   tags: { important: "Ważne", popular: "Popularne", new_tag: "Nowe", recommended: "Polecane" },
+  paywall: {
+    title: "Odblokuj pełny dostęp",
+    description: "Zdobądź kontakty do firm, przewodniki i asystenta AI",
+    cta: "Subskrybuj za 9,99 €/mies.",
+    disclaimer: "Anulujesz kiedy chcesz • 7 dni za darmo",
+  },
 };
 export default pl;

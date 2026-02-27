@@ -1,4 +1,5 @@
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -15,8 +16,11 @@ export default function RootLayout({
   return (
     <html lang="cs">
       <body className="bg-[#0a0a0c]">
-        <LanguageProvider>{children}</LanguageProvider>
+        <ErrorBoundary>
+          <LanguageProvider>{children}</LanguageProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
 }
+

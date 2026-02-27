@@ -48,6 +48,12 @@ export interface Translation {
     new_tag: string;
     recommended: string;
   };
+  paywall: {
+    title: string;
+    description: string;
+    cta: string;
+    disclaimer: string;
+  };
 }
 
 export const LOCALES: { code: Locale; flag: string; name: string }[] = [

@@ -23,5 +23,11 @@ const es: Translation = {
     language_title: "Alemán para el trabajo", language_desc: "Frases, tests, cursos",
   },
   tags: { important: "Importante", popular: "Popular", new_tag: "Nuevo", recommended: "Recomendado" },
+  paywall: {
+    title: "Desbloquea el acceso completo",
+    description: "Obtén contactos de empresas, guías y asistente AI",
+    cta: "Suscribirse por 9,99 €/mes",
+    disclaimer: "Cancela cuando quieras • 7 días gratis",
+  },
 };
 export default es;

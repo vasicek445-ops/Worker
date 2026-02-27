@@ -23,5 +23,11 @@ const cs: Translation = {
     language_title: "Němčina pro práci", language_desc: "Fráze, testy, kurzy",
   },
   tags: { important: "Důležité", popular: "Populární", new_tag: "Nové", recommended: "Doporučeno" },
+  paywall: {
+    title: "Odemkni plný přístup",
+    description: "Získej kontakty na firmy, průvodce procesem a AI asistenta",
+    cta: "Předplatit za 9,99 €/měsíc",
+    disclaimer: "Zrušíš kdykoliv • Testovací období 7 dní",
+  },
 };
 export default cs;

@@ -23,5 +23,11 @@ const ro: Translation = {
     language_title: "Germană pentru muncă", language_desc: "Expresii, teste, cursuri",
   },
   tags: { important: "Important", popular: "Popular", new_tag: "Nou", recommended: "Recomandat" },
+  paywall: {
+    title: "Deblochează accesul complet",
+    description: "Obține contacte la companii, ghiduri și asistent AI",
+    cta: "Abonează-te la 9,99 €/lună",
+    disclaimer: "Anulezi oricând • 7 zile gratuit",
+  },
 };
 export default ro;

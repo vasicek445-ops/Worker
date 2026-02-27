@@ -23,5 +23,11 @@ const el: Translation = {
     language_title: "Γερμανικά για δουλειά", language_desc: "Φράσεις, τεστ, μαθήματα",
   },
   tags: { important: "Σημαντικό", popular: "Δημοφιλές", new_tag: "Νέο", recommended: "Προτεινόμενο" },
+  paywall: {
+    title: "Ξεκλείδωσε πλήρη πρόσβαση",
+    description: "Απόκτησε επαφές εταιρειών, οδηγούς και AI βοηθό",
+    cta: "Συνδρομή 9,99 €/μήνα",
+    disclaimer: "Ακύρωση ανά πάσα στιγμή • 7 ημέρες δωρεάν",
+  },
 };
 export default el;
