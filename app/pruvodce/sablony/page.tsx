@@ -41,6 +41,15 @@ const TEMPLATES = [
     tagColor: 'bg-purple-500/10 text-purple-400',
     time: '~30 sekund',
   },
+  {
+    icon: '📋',
+    title: 'AI analýza inzerátu',
+    description: 'Vlož text inzerátu z jobs.ch nebo LinkedIn – AI vytáhne požadavky, ohodnotí obtížnost, navrhne jak se prezentovat a co napsat do dopisu.',
+    href: '/pruvodce/sablony/analyza',
+    tag: '🆕 Nové',
+    tagColor: 'bg-blue-500/10 text-blue-400',
+    time: '~20 sekund',
+  },
 ]
 
 export default function Sablony() {
