@@ -123,7 +123,7 @@ export default function Profil() {
 
   return (
     <>
-      <style jsx global>{String.raw`@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');`}</style>
+      <style jsx global>{'@import url(https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap)'}</style>
       <main className="min-h-screen bg-[#0a0a12] py-8 px-6 relative" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
         {/* Background */}
         <div className="fixed w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none z-0 opacity-15 -top-[200px] -right-[200px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.2), transparent 70%)" }} />
