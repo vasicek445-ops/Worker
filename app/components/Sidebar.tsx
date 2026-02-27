@@ -97,6 +97,7 @@ export default function Sidebar() {
               </Link>
               <Link href="/jazyky" className={subLinkClass("/jazyky")}>
                 <span>🗣️</span><span>Němčina pro práci</span>
+                <span className="ml-auto text-[9px] bg-blue-500/15 text-blue-400 font-bold px-1.5 py-0.5 rounded">AI</span>
               </Link>
 
               {/* Hledam praci */}
