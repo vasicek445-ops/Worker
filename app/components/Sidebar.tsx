@@ -144,6 +144,7 @@ export default function Sidebar() {
         <Link href="/komunita" className={linkClass("/komunita")}>
           <span className="text-lg">💬</span>
           <span>Komunita</span>
+          <span className="ml-auto text-[9px] bg-blue-500/15 text-blue-400 font-bold px-1.5 py-0.5 rounded">AI</span>
         </Link>
 
         <Link href="/asistent" className={linkClass("/asistent")}>
