@@ -90,31 +90,51 @@ export async function POST(req: NextRequest) {
 
     if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
-    const { contractText } = await req.json()
-    if (!contractText || typeof contractText !== 'string' || contractText.trim().length < 50) {
-      return NextResponse.json({ error: 'Vlož text smlouvy (min. 50 znaků)' }, { status: 400 })
+    const { contractText, contractImage } = await req.json()
+    
+    if ((!contractText || contractText.trim().length < 50) && !contractImage) {
+      return NextResponse.json({ error: 'Vlož text smlouvy (min. 50 znaků) nebo nahraj fotku' }, { status: 400 })
     }
 
-    const userMessage = `Analyzuj tuto švýcarskou pracovní smlouvu:
+    const instructionText = `Analyzuj tuto švýcarskou pracovní smlouvu:
 
---- SMLOUVA ---
-${contractText.substring(0, 8000)}
---- KONEC SMLOUVY ---
+${contractText ? `--- SMLOUVA ---\n${contractText.substring(0, 8000)}\n--- KONEC SMLOUVY ---` : '(Smlouva je na přiloženém obrázku – přečti veškerý text z obrázku)'}
 
-DŮLEŽITÉ:
+DŮLEŽITÉ:`
+
+    const userContent: any[] = []
+    
+    if (contractImage) {
+      // Support multiple images
+      const images = Array.isArray(contractImage) ? contractImage : [contractImage]
+      for (const img of images) {
+        const match = img.match(/^data:(image\/\w+);base64,(.+)$/)
+        if (match) {
+          userContent.push({
+            type: 'image',
+            source: { type: 'base64', media_type: match[1], data: match[2] },
+          })
+        }
+      }
+    }
+    
+    userContent.push({
+      type: 'text',
+      text: `${instructionText}
 - Vytáhni VŠECHNY klíčové klauzule a přelož je
 - Porovnej se švýcarským standardem (OR čl. 319-362)
 - Upozorni na red flags i green flags
 - Řekni co ve smlouvě chybí
 - Dej konkrétní tipy co si vyjednat
 - Ohodnoť celkově: good/acceptable/caution/bad
-- Odpověz POUZE validním JSON`
+- Odpověz POUZE validním JSON`,
+    })
 
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 6000,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userMessage }],
+      messages: [{ role: 'user', content: userContent }],
     })
 
     const textBlock = response.content.find((block: any) => block.type === 'text')

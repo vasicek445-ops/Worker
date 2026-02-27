@@ -34,12 +34,29 @@ const STATUS_STYLE = {
 export default function SmlouvaPage() {
   const { isActive, loading } = useSubscription()
   const [contractText, setContractText] = useState('')
+  const [images, setImages] = useState<string[]>([])
   const [result, setResult] = useState<ContractData | null>(null)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+    Array.from(files).forEach(file => {
+      if (file.size > 10 * 1024 * 1024) { setError('Max. velikost obrázku je 10 MB'); return }
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImages(prev => [...prev, reader.result as string])
+      }
+      reader.readAsDataURL(file)
+    })
+    e.target.value = ''
+  }
+
+  const removeImage = (idx: number) => setImages(prev => prev.filter((_, i) => i !== idx))
+
   const handleSubmit = async () => {
-    if (contractText.trim().length < 50) { setError('Vlož celý text smlouvy (min. 50 znaků)'); return }
+    if (contractText.trim().length < 50 && images.length === 0) { setError('Vlož text smlouvy nebo nahraj fotku'); return }
     setGenerating(true); setError(null)
     try {
       const { data: { session } } = await supabase.auth.getSession()
@@ -47,7 +64,7 @@ export default function SmlouvaPage() {
       const res = await fetch('/api/analyze-contract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ contractText }),
+        body: JSON.stringify({ contractText: contractText || undefined, contractImage: images.length > 0 ? images : undefined }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Analýza selhala')
@@ -219,7 +236,7 @@ export default function SmlouvaPage() {
             </div>
           )}
 
-          <button onClick={() => { setResult(null); setContractText('') }} className="w-full text-gray-400 hover:text-white text-sm py-3 mt-3 transition">
+          <button onClick={() => { setResult(null); setContractText(''); setImages([]) }} className="w-full text-gray-400 hover:text-white text-sm py-3 mt-3 transition">
             🔄 Analyzovat jinou smlouvu
           </button>
         </div>
@@ -237,7 +254,7 @@ export default function SmlouvaPage() {
           <span className="text-3xl">📑</span>
           <div>
             <h1 className="text-white text-xl font-bold">AI analýza pracovní smlouvy</h1>
-            <p className="text-gray-400 text-xs">Vlož smlouvu v němčině → AI přeloží, vysvětlí a upozorní na problémy</p>
+            <p className="text-gray-400 text-xs">Vlož text nebo nahraj fotku smlouvy → AI přeloží, vysvětlí a upozorní na problémy</p>
           </div>
         </div>
 
@@ -254,19 +271,50 @@ export default function SmlouvaPage() {
         <PaywallOverlay isLocked={!isActive && !loading} title="AI analýza smluv je součástí Premium" description="Porozuměj své pracovní smlouvě v němčině">
           <div className="space-y-4">
 
+            {/* Image upload */}
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-1.5 block">Vlož text pracovní smlouvy *</label>
+              <label className="text-gray-300 text-sm font-medium mb-1.5 block">📸 Nahraj fotku smlouvy (volitelné)</label>
+              <div className="flex flex-col gap-2">
+                <label className="w-full bg-[#1A1A1A] border border-dashed border-gray-600 rounded-xl p-4 text-center cursor-pointer hover:border-gray-400 transition">
+                  <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+                  <span className="text-gray-400 text-sm">📷 Klikni pro nahrání fotky nebo screenshotu</span>
+                  <p className="text-gray-600 text-xs mt-1">Můžeš nahrát více stránek · JPG, PNG · max. 10 MB</p>
+                </label>
+                {images.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {images.map((img, i) => (
+                      <div key={i} className="relative group">
+                        <img src={img} alt={`Strana ${i + 1}`} className="w-20 h-28 object-cover rounded-lg border border-gray-700" />
+                        <button onClick={() => removeImage(i)} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition">×</button>
+                        <span className="absolute bottom-0.5 left-0.5 text-[9px] bg-black/70 text-white px-1 rounded">{i + 1}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {images.length > 0 && (
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-gray-800" />
+                <span className="text-gray-600 text-xs">nebo vlož text</span>
+                <div className="flex-1 h-px bg-gray-800" />
+              </div>
+            )}
+
+            <div>
+              <label className="text-gray-300 text-sm font-medium mb-1.5 block">Vlož text pracovní smlouvy {images.length === 0 ? '*' : '(volitelné)'}</label>
               <textarea value={contractText} onChange={(e) => setContractText(e.target.value)} placeholder={'Zkopíruj text smlouvy v němčině...\n\nArbeitsvertrag\nzwischen [Firma] als Arbeitgeber\nund [Jméno] als Arbeitnehmer\n\n1. Beginn und Dauer\nDas Arbeitsverhältnis beginnt am...'} rows={12} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
-              <p className="text-gray-600 text-xs mt-1">{contractText.length} znaků · {contractText.length < 50 ? 'vlož celý text smlouvy' : '✓ dostatečný text'}</p>
+              <p className="text-gray-600 text-xs mt-1">{contractText.length} znaků {images.length > 0 ? `· ${images.length} fotk${images.length === 1 ? 'a' : images.length < 5 ? 'y' : 'ek'} nahrán${images.length === 1 ? 'a' : 'o'}` : contractText.length < 50 && images.length === 0 ? '· vlož text nebo nahraj fotku' : '· ✓ dostatečný text'}</p>
             </div>
 
             <div className="bg-blue-500/5 border border-blue-500/15 rounded-xl p-3">
-              <p className="text-blue-300 text-xs">💡 Tip: Smlouvu můžeš zkopírovat z PDF nebo emailu. Čím víc textu vložíš, tím přesnější analýza.</p>
+              <p className="text-blue-300 text-xs">💡 Tip: Smlouvu můžeš vyfotit telefonem, udělat screenshot nebo zkopírovat text z PDF/emailu. Při fotce nahraj všechny stránky.</p>
             </div>
 
             {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3"><p className="text-red-400 text-sm">⚠️ {error}</p></div>}
 
-            <button onClick={handleSubmit} disabled={generating || contractText.trim().length < 50} className="w-full bg-[#E8302A] text-white font-bold py-3.5 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={handleSubmit} disabled={generating || (contractText.trim().length < 50 && images.length === 0)} className="w-full bg-[#E8302A] text-white font-bold py-3.5 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed">
               {generating ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -274,7 +322,7 @@ export default function SmlouvaPage() {
                 </span>
               ) : '📑 Analyzovat smlouvu'}
             </button>
-            <p className="text-gray-600 text-xs text-center">AI přeloží, vysvětlí klauzule a porovná se švýcarským standardem</p>
+            <p className="text-gray-600 text-xs text-center">AI přečte text z fotky nebo vloženého textu, přeloží a porovná se švýcarským standardem</p>
           </div>
         </PaywallOverlay>
       </div>
