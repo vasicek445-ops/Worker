@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { supabase } from '../supabase'
+import { useState, useEffect } from 'react'
+import { supabase } from '../../supabase'
 
 interface Field {
   name: string
@@ -17,10 +17,21 @@ interface GenerateFormProps {
   title: string
   subtitle: string
   fields: Field[]
+  initialData?: Record<string, string>
 }
 
-export default function GenerateForm({ type, title, subtitle, fields }: GenerateFormProps) {
+export default function GenerateForm({ type, title, subtitle, fields, initialData }: GenerateFormProps) {
   const [formData, setFormData] = useState<Record<string, string>>({})
+  const [result, setResult] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (initialData && Object.keys(initialData).length > 0) {
+      setFormData(prev => ({ ...prev, ...initialData }))
+    }
+  }, [initialData])
   const [result, setResult] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,6 +42,7 @@ export default function GenerateForm({ type, title, subtitle, fields }: Generate
   }
 
   const handleSubmit = async () => {
+    // Validate required fields
     const missing = fields
       .filter((f) => f.required !== false && !formData[f.name]?.trim())
       .map((f) => f.label)
@@ -82,6 +94,7 @@ export default function GenerateForm({ type, title, subtitle, fields }: Generate
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
+      // Fallback
       const textarea = document.createElement('textarea')
       textarea.value = result
       document.body.appendChild(textarea)
@@ -98,6 +111,7 @@ export default function GenerateForm({ type, title, subtitle, fields }: Generate
     setError(null)
   }
 
+  // ─── RESULT VIEW ────────────────────────────────────────
   if (result) {
     return (
       <div className="space-y-4">
@@ -132,6 +146,7 @@ export default function GenerateForm({ type, title, subtitle, fields }: Generate
           💡 Tip: Zkopíruj text a vlož do Wordu nebo Google Docs pro finální úpravy
         </p>
 
+        {/* Generate another */}
         <button
           onClick={() => {
             setResult(null)
@@ -145,6 +160,7 @@ export default function GenerateForm({ type, title, subtitle, fields }: Generate
     )
   }
 
+  // ─── FORM VIEW ──────────────────────────────────────────
   return (
     <div className="space-y-4">
       <div className="mb-6">

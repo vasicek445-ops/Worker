@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
 import { supabase } from '../../../supabase'
@@ -25,6 +26,7 @@ interface InterviewData {
 
 export default function PohovorPage() {
   const { isActive, loading } = useSubscription()
+  const searchParams = useSearchParams()
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [result, setResult] = useState<InterviewData | null>(null)
   const [generating, setGenerating] = useState(false)
@@ -32,6 +34,22 @@ export default function PohovorPage() {
   const [expandedQ, setExpandedQ] = useState<number | null>(0)
   const [showCz, setShowCz] = useState(true)
   const resultRef = useRef<HTMLDivElement>(null)
+  const [prefilled, setPrefilled] = useState(false)
+
+  useEffect(() => {
+    const p = searchParams.get('prefill')
+    if (p && !prefilled) {
+      try {
+        const data = JSON.parse(decodeURIComponent(p))
+        setFormData(prev => ({
+          ...prev,
+          ...(data.position && { position: data.position }),
+          ...(data.company && { company: data.company }),
+        }))
+        setPrefilled(true)
+      } catch {}
+    }
+  }, [searchParams, prefilled])
 
   const handleChange = (name: string, value: string) => setFormData((prev) => ({ ...prev, [name]: value }))
 

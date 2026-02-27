@@ -1,24 +1,102 @@
 'use client'
 
+import { useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
 import GenerateForm from '../../../components/GenerateForm'
 import Link from 'next/link'
 
 const FIELDS = [
-  { name: 'name', label: 'Tvoje celé jméno', placeholder: 'Jan Novák' },
-  { name: 'position', label: 'Na jakou pozici se hlásíš?', placeholder: 'např. Monteur, Küchenhilfe, Lagerist, Maurer...' },
-  { name: 'company', label: 'Název firmy nebo agentury', placeholder: 'např. Adecco, Randstad, nebo konkrétní firma', required: false },
-  { name: 'field', label: 'Obor', placeholder: 'Vyber obor', type: 'select' as const, options: ['Stavebnictví', 'Gastronomie / Hotelnictví', 'Logistika / Sklad', 'Zdravotnictví', 'Úklid / Údržba', 'Strojírenství / Technik', 'IT / Software', 'Elektro / Instalatér', 'Řidič / Doprava', 'Jiný obor'] },
-  { name: 'experience', label: 'Kolik let praxe máš v oboru?', placeholder: 'např. 5 let' },
-  { name: 'skills', label: 'Hlavní dovednosti a zkušenosti', placeholder: 'např. svařování, obsluha CNC, řidičák C, práce ve výškách...', type: 'textarea' as const },
-  { name: 'german', label: 'Úroveň němčiny', placeholder: 'Vyber úroveň', type: 'select' as const, options: ['Žádná – teprve se učím', 'Základy – pár frází (A1)', 'Základní komunikace (A2)', 'Dorozumím se (B1)', 'Dobrá úroveň (B2)', 'Plynulá (C1/C2)'] },
-  { name: 'motivation', label: 'Proč chceš pracovat ve Švýcarsku?', placeholder: 'např. lepší podmínky, zkušenosti v zahraničí, profesní růst...', required: false },
-  { name: 'extra', label: 'Něco navíc? (volitelné)', placeholder: 'např. mám rodinu ve Švýcarsku, jsem ochotný se přestěhovat ihned...', required: false },
+  {
+    name: 'name',
+    label: 'Tvoje celé jméno',
+    placeholder: 'Jan Novák',
+  },
+  {
+    name: 'position',
+    label: 'Na jakou pozici se hlásíš?',
+    placeholder: 'např. Monteur, Küchenhilfe, Lagerist, Maurer...',
+  },
+  {
+    name: 'company',
+    label: 'Název firmy nebo agentury',
+    placeholder: 'např. Adecco, Randstad, nebo konkrétní firma',
+    required: false,
+  },
+  {
+    name: 'field',
+    label: 'Obor',
+    placeholder: 'Vyber obor',
+    type: 'select' as const,
+    options: [
+      'Stavebnictví',
+      'Gastronomie / Hotelnictví',
+      'Logistika / Sklad',
+      'Zdravotnictví',
+      'Úklid / Údržba',
+      'Strojírenství / Technik',
+      'IT / Software',
+      'Elektro / Instalatér',
+      'Řidič / Doprava',
+      'Jiný obor',
+    ],
+  },
+  {
+    name: 'experience',
+    label: 'Kolik let praxe máš v oboru?',
+    placeholder: 'např. 5 let',
+  },
+  {
+    name: 'skills',
+    label: 'Hlavní dovednosti a zkušenosti',
+    placeholder: 'např. svařování, obsluha CNC, řidičák C, práce ve výškách...',
+    type: 'textarea' as const,
+  },
+  {
+    name: 'german',
+    label: 'Úroveň němčiny',
+    placeholder: 'Vyber úroveň',
+    type: 'select' as const,
+    options: [
+      'Žádná – teprve se učím',
+      'Základy – pár frází (A1)',
+      'Základní komunikace (A2)',
+      'Dorozumím se (B1)',
+      'Dobrá úroveň (B2)',
+      'Plynulá (C1/C2)',
+    ],
+  },
+  {
+    name: 'motivation',
+    label: 'Proč chceš pracovat ve Švýcarsku?',
+    placeholder: 'např. lepší podmínky, zkušenosti v zahraničí, profesní růst...',
+    required: false,
+  },
+  {
+    name: 'extra',
+    label: 'Něco navíc? (volitelné)',
+    placeholder: 'např. mám rodinu ve Švýcarsku, jsem ochotný se přestěhovat ihned...',
+    required: false,
+  },
 ]
 
 export default function MotivacniDopis() {
   const { isActive, loading } = useSubscription()
+  const searchParams = useSearchParams()
+
+  const initialData = useMemo(() => {
+    const p = searchParams.get('prefill')
+    if (!p) return undefined
+    try {
+      const data = JSON.parse(decodeURIComponent(p))
+      const result: Record<string, string> = {}
+      if (data.position) result.position = data.position
+      if (data.company) result.company = data.company
+      if (data.keywords?.length) result.skills = data.keywords.join(', ')
+      return Object.keys(result).length > 0 ? result : undefined
+    } catch { return undefined }
+  }, [searchParams])
 
   return (
     <main className="min-h-screen bg-[#0E0E0E] px-4 py-6 pb-24">
@@ -26,6 +104,7 @@ export default function MotivacniDopis() {
         <Link href="/pruvodce/sablony" className="text-gray-500 hover:text-white mb-6 inline-block text-sm">
           ← Zpět na šablony
         </Link>
+
         <div className="flex items-center gap-3 mb-6">
           <span className="text-3xl">✉️</span>
           <div>
@@ -33,8 +112,19 @@ export default function MotivacniDopis() {
             <p className="text-gray-400 text-xs">Bewerbungsschreiben pro švýcarský trh</p>
           </div>
         </div>
-        <PaywallOverlay isLocked={!isActive && !loading} title="AI šablony jsou součástí Premium" description="Získej profesionální motivační dopis v němčině za 30 sekund">
-          <GenerateForm type="motivacni-dopis" title="Vyplň údaje česky" subtitle="AI vytvoří profesionální dopis v němčině + přidá český překlad" fields={FIELDS} />
+
+        <PaywallOverlay
+          isLocked={!isActive && !loading}
+          title="AI šablony jsou součástí Premium"
+          description="Získej profesionální motivační dopis v němčině za 30 sekund"
+        >
+          <GenerateForm
+            type="motivacni-dopis"
+            title="Vyplň údaje česky"
+            subtitle={initialData ? "✅ Data z analýzy inzerátu předvyplněna" : "AI vytvoří profesionální dopis v němčině + přidá český překlad"}
+            fields={FIELDS}
+            initialData={initialData}
+          />
         </PaywallOverlay>
       </div>
     </main>
