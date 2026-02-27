@@ -50,6 +50,15 @@ const TEMPLATES = [
     tagColor: 'bg-blue-500/10 text-blue-400',
     time: '~20 sekund',
   },
+  {
+    icon: '📑',
+    title: 'AI analýza pracovní smlouvy',
+    description: 'Vlož smlouvu v němčině – AI přeloží klauzule, upozorní na red flags, porovná se švýcarským standardem a poradí co si vyjednat.',
+    href: '/pruvodce/sablony/smlouva',
+    tag: '🆕 Nové',
+    tagColor: 'bg-green-500/10 text-green-400',
+    time: '~30 sekund',
+  },
 ]
 
 export default function Sablony() {
