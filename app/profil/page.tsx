@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../supabase'
 import { useSubscription } from '../../hooks/useSubscription'
 import Link from 'next/link'
+import BottomNav from '../components/BottomNav'
 
 const COUNTRIES = [
   { code: 'CH', flag: '🇨🇭', name: 'Švýcarsko' },
@@ -325,7 +326,7 @@ export default function Profil() {
         {/* Settings Card */}
         <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-5 mb-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-white font-bold text-base">Nastavení hledání</h2>
+            <h2 className="text-white font-bold text-base">Nastavení profilu</h2>
             {!editMode ? (
               <button
                 onClick={() => setEditMode(true)}
@@ -541,6 +542,7 @@ export default function Profil() {
           Woker v1.0
         </p>
       </div>
+      <BottomNav active="profile" />
     </main>
   )
 }
