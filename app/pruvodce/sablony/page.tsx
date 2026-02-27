@@ -59,6 +59,15 @@ const TEMPLATES = [
     tagColor: 'bg-green-500/10 text-green-400',
     time: '~30 sekund',
   },
+  {
+    icon: '🏠',
+    title: 'AI hledání bydlení',
+    description: 'Bewerbungsdossier v němčině pro pronajímatele + checklist dokumentů + kde hledat + náklady + varování před podvody. Vše na míru podle regionu.',
+    href: '/pruvodce/sablony/bydleni',
+    tag: '🆕 Nové',
+    tagColor: 'bg-green-500/10 text-green-400',
+    time: '~30 sekund',
+  },
 ]
 
 export default function Sablony() {
