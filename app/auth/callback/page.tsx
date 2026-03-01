@@ -20,8 +20,13 @@ export default function AuthCallback() {
         supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
-        }).then(({ data, error }) => {
+        }).then(async ({ data, error }) => {
           if (data?.session) {
+            // Save profile name
+            const user = data.session.user;
+            if (user?.user_metadata?.full_name) {
+              await supabase.from("profiles").upsert({ id: user.id, full_name: user.user_metadata.full_name }, { onConflict: "id" });
+            }
             window.location.replace(isRecovery ? "/reset-heslo" : "/dashboard");
           } else {
             setStatus("Chyba session: " + (error?.message || "neznámá"));
@@ -34,9 +39,14 @@ export default function AuthCallback() {
     // PKCE flow (code in query)
     const code = params.get("code");
     if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+      supabase.auth.exchangeCodeForSession(code).then(async ({ data, error }) => {
         if (data?.session) {
-          window.location.replace(isRecovery ? "/reset-heslo" : "/dashboard");
+          // Save profile name
+            const user = data.session.user;
+            if (user?.user_metadata?.full_name) {
+              await supabase.from("profiles").upsert({ id: user.id, full_name: user.user_metadata.full_name }, { onConflict: "id" });
+            }
+            window.location.replace(isRecovery ? "/reset-heslo" : "/dashboard");
         } else {
           setStatus("Chyba code: " + (error?.message || "neznámá"));
         }

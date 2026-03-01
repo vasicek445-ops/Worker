@@ -11,6 +11,7 @@ const supabase = createClient(
 
 export default function Login() {
   const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,10 +48,11 @@ export default function Login() {
     setMessage("");
 
     if (isRegister) {
-      const { error } = await supabase.auth.signUp({
+      const { data: signUpData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          data: { full_name: fullName },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
@@ -184,6 +186,24 @@ export default function Login() {
 
             {/* Email Form */}
             <form onSubmit={forgotMode ? handleForgotPassword : handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {isRegister && <input
+                type="text"
+                placeholder="Celé jméno"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  background: '#1a1a30',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '12px',
+                  padding: '14px 16px',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  outline: 'none',
+                }}
+              />}
               <input
                 type="email"
                 placeholder="Email"
