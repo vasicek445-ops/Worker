@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import type { Metadata } from "next";
@@ -20,7 +21,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <LanguageProvider><AppShell>{children}</AppShell></LanguageProvider>
         </ErrorBoundary>
-      </body>
+      <Analytics /></body>
     </html>
   );
 }
