@@ -27,7 +27,7 @@ const cs: Translation = {
     title: "Odemkni plný přístup",
     description: "Získej kontakty na firmy, průvodce procesem a AI asistenta",
     cta: "Předplatit za 9,99 €/měsíc",
-    disclaimer: "Zrušíš kdykoliv • Testovací období 7 dní",
+    disclaimer: "Zrušíš kdykoliv • Bez závazků",
   },
 };
 export default cs;

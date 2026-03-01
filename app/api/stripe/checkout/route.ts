@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
         plan: planKey,
       },
       subscription_data: {
+        ...(planKey === 'yearly' ? { trial_period_days: 3 } : {}),
         metadata: {
           supabase_user_id: userId,
           plan: planKey,
