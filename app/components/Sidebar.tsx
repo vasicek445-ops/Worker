@@ -4,10 +4,12 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useSubscription } from "../../hooks/useSubscription";
 import { supabase } from "../supabase";
+import { useTheme } from "../../lib/ThemeContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { isActive } = useSubscription();
+  const { theme, toggleTheme } = useTheme();
   const [toolsOpen, setToolsOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -180,6 +182,14 @@ export default function Sidebar() {
         </Link>
       </nav>
 
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-3 px-3 py-2.5 mx-3 mb-2 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
+        >
+          <span className="text-lg">{theme === "dark" ? "☀️" : "🌙"}</span>
+          <span>{theme === "dark" ? "Světlý režim" : "Tmavý režim"}</span>
+        </button>
       {/* Bottom section */}
       <div className="px-3 pb-5 space-y-2">
         {isActive ? (

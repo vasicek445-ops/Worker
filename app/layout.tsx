@@ -1,3 +1,4 @@
+import { ThemeProvider } from "../lib/ThemeContext";
 import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -18,9 +19,9 @@ export default function RootLayout({
   return (
     <html lang="cs">
       <body className="bg-[#0a0a0c]">
-        <ErrorBoundary>
+        <ThemeProvider><ErrorBoundary>
           <LanguageProvider><AppShell>{children}</AppShell></LanguageProvider>
-        </ErrorBoundary>
+        </ErrorBoundary></ThemeProvider>
       <Analytics /></body>
     </html>
   );

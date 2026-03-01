@@ -1,26 +1,100 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --bg-primary: #0a0a12;
+  --bg-secondary: #0E0E0E;
+  --bg-card: #1A1A1A;
+  --bg-card-alt: #111120;
+  --border-color: rgba(255,255,255,0.06);
+  --border-card: #333;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.55);
+  --text-muted: #888;
+  --foreground: #ededed;
+}
+
+:root.light {
+  --bg-primary: #f5f5f7;
+  --bg-secondary: #eeeef0;
+  --bg-card: #ffffff;
+  --bg-card-alt: #f9f9fb;
+  --border-color: rgba(0,0,0,0.08);
+  --border-card: #e0e0e0;
+  --text-primary: #111111;
+  --text-secondary: rgba(0,0,0,0.6);
+  --text-muted: #666;
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  background: var(--bg-primary);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Global light mode overrides for inline styles */
+:root.light main[style*="background"],
+:root.light div[style*="#0a0a12"],
+:root.light div[style*="#0a0a0c"],
+:root.light div[style*="#0E0E0E"] {
+  background: var(--bg-primary) !important;
+}
+
+:root.light div[style*="#1A1A1A"],
+:root.light div[style*="#111120"],
+:root.light div[style*="#1a1a30"] {
+  background: var(--bg-card) !important;
+  border-color: var(--border-card) !important;
+}
+
+:root.light span[style*="color: white"],
+:root.light p[style*="color: white"],
+:root.light h1[style*="color: white"],
+:root.light h2[style*="color: white"],
+:root.light h3[style*="color: white"] {
+  color: var(--text-primary) !important;
+}
+
+:root.light .bg-\[\#0a0a0c\],
+:root.light .bg-\[\#0a0a12\],
+:root.light .bg-\[\#0E0E0E\] {
+  background: var(--bg-primary) !important;
+}
+
+:root.light .bg-\[\#1A1A1A\] {
+  background: var(--bg-card) !important;
+}
+
+:root.light .text-white {
+  color: var(--text-primary) !important;
+}
+
+:root.light .text-gray-400,
+:root.light .text-gray-500 {
+  color: var(--text-secondary) !important;
+}
+
+:root.light .text-gray-600 {
+  color: var(--text-muted) !important;
+}
+
+:root.light .border-gray-800,
+:root.light .border-white\/\[0\.06\] {
+  border-color: var(--border-card) !important;
+}
+
+/* Sidebar light mode */
+:root.light aside.bg-\[\#0a0a12\],
+:root.light aside[class*="bg-[#0a0a12]"] {
+  background: #ffffff !important;
+  border-right-color: #e5e5e5 !important;
+}
+
+:root.light aside .text-gray-400 {
+  color: #555 !important;
+}
+
+:root.light aside .text-gray-500 {
+  color: #777 !important;
 }
