@@ -9,6 +9,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { isActive } = useSubscription();
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
@@ -22,12 +23,26 @@ export default function Sidebar() {
     });
   }, []);
 
-  // Auto-expand tools if on a tools page
   useEffect(() => {
     if (pathname?.startsWith("/pruvodce") || pathname?.startsWith("/jazyky")) {
       setToolsOpen(true);
     }
   }, [pathname]);
+
+  // Close mobile sidebar on navigation
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when mobile sidebar open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
 
   const isActive2 = (href: string) => pathname === href;
   const isToolsActive = pathname?.startsWith("/pruvodce") || pathname?.startsWith("/jazyky");
@@ -49,18 +64,25 @@ export default function Sidebar() {
         : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]"
     }`;
 
-  return (
-    <aside className="fixed left-0 top-0 bottom-0 w-[260px] bg-[#0a0a12] border-r border-white/[0.06] flex flex-col z-50 overflow-y-auto">
+  const sidebarContent = (
+    <>
       {/* Logo */}
-      <div className="px-5 pt-6 pb-4">
+      <div className="px-5 pt-6 pb-4 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2.5 no-underline">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E8302A] to-orange-500 flex items-center justify-center text-white font-black text-sm">W</div>
           <span className="text-white font-extrabold text-lg tracking-tight">Woker</span>
         </Link>
+        {/* Close button - mobile only */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="md:hidden text-gray-400 hover:text-white p-1"
+        >
+          ✕
+        </button>
       </div>
 
       {/* Main Nav */}
-      <nav className="flex-1 px-3 space-y-1">
+      <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
         <Link href="/dashboard" className={linkClass("/dashboard")}>
           <span className="text-lg">🏠</span>
           <span>Domů</span>
@@ -89,7 +111,6 @@ export default function Sidebar() {
 
           {toolsOpen && (
             <div className="mt-1 space-y-0.5">
-              {/* Pred odjezdem */}
               <div className="px-3 pt-2 pb-1">
                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wider">Před odjezdem</span>
               </div>
@@ -107,7 +128,6 @@ export default function Sidebar() {
                 <span className="ml-auto text-[9px] bg-blue-500/15 text-blue-400 font-bold px-1.5 py-0.5 rounded">AI</span>
               </Link>
 
-              {/* Hledam praci */}
               <div className="px-3 pt-3 pb-1">
                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wider">Hledám práci</span>
               </div>
@@ -132,7 +152,6 @@ export default function Sidebar() {
                 <span className="ml-auto text-[9px] bg-blue-500/15 text-blue-400 font-bold px-1.5 py-0.5 rounded">AI</span>
               </Link>
 
-              {/* Uz pracuju */}
               <div className="px-3 pt-3 pb-1">
                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wider">Už pracuju</span>
               </div>
@@ -163,7 +182,6 @@ export default function Sidebar() {
 
       {/* Bottom section */}
       <div className="px-3 pb-5 space-y-2">
-        {/* Premium */}
         {isActive ? (
           <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#39ff6e]/[0.06] border border-[#39ff6e]/[0.1]">
             <span className="text-lg">⭐</span>
@@ -182,7 +200,6 @@ export default function Sidebar() {
           </Link>
         )}
 
-        {/* User */}
         <Link href="/profil" className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl no-underline ${isActive2("/profil") ? "bg-white/[0.08]" : "hover:bg-white/[0.04]"}`}>
           {avatarUrl ? <img src={avatarUrl} alt="" className="w-8 h-8 rounded-full object-cover" /> : <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-400 flex items-center justify-center text-white font-bold text-xs">{userInitial}</div>}
           <div>
@@ -191,6 +208,39 @@ export default function Sidebar() {
           </div>
         </Link>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="md:hidden fixed top-4 left-4 z-[60] bg-[#1A1A1A] border border-gray-800 rounded-xl p-2.5 text-white"
+        style={{ display: mobileOpen ? 'none' : 'block' }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/60 z-[70]"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - desktop: always visible, mobile: slide in */}
+      <aside className={`
+        fixed left-0 top-0 bottom-0 w-[260px] bg-[#0a0a12] border-r border-white/[0.06] flex flex-col z-[80] overflow-y-auto
+        transition-transform duration-300 ease-in-out
+        md:translate-x-0
+        ${mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
 import Link from 'next/link'
+import { supabase } from '../supabase'
 
 type Agency = {
   id: number
@@ -55,7 +56,8 @@ export default function Kontakty() {
       if (canton) params.set('canton', canton)
       params.set('page', String(page))
 
-      const res = await fetch(`/api/agencies?${params}`)
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(`/api/agencies?${params}`, { headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {} })
       const data = await res.json()
 
       if (data.error) {
