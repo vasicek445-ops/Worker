@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID || "";
 
 // URL tvého průvodce PDF
-const GUIDE_PDF_URL = process.env.GUIDE_PDF_URL || "https://gowoker.com/pruvodce.pdf";
+const GUIDE_PDF_URL = process.env.GUIDE_PDF_URL || "https://www.gowoker.com/downloads/5-kroku-prace-svycarsko.pdf";
 
 export async function POST(req: NextRequest) {
   try {
