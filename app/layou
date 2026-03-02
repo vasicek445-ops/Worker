@@ -4,8 +4,7 @@ import { LanguageProvider } from "../lib/i18n/LanguageContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import type { Metadata } from "next";
 import "./globals.css"
-import AppShell from "./components/AppShell";
-import LeadMagnetOverlay from "./components/LeadMagnetOverlay";
+import AppShell from "./components/AppShell";import LeadMagnetOverlay from "./components/LeadMagnetOverlay";
 
 export const metadata: Metadata = {
   title: "Woker",
@@ -23,8 +22,7 @@ export default function RootLayout({
         <ThemeProvider><ErrorBoundary>
           <LanguageProvider><AppShell>{children}</AppShell></LanguageProvider>
         </ErrorBoundary></ThemeProvider>
-      <LeadMagnetOverlay />
-            <Analytics /></body>
+      <Analytics /></body>
     </html>
   );
 }
