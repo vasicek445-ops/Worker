@@ -525,6 +525,46 @@
     margin-top: 2px;
   }
 
+  /* DM Screenshots gallery */
+  .dm-gallery-wrap {
+    overflow: hidden;
+    width: 100%;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    margin-top: 48px;
+  }
+  .dm-gallery {
+    display: flex;
+    gap: 20px;
+    animation: dmScroll 40s linear infinite;
+    width: max-content;
+  }
+  .dm-gallery:hover {
+    animation-play-state: paused;
+  }
+  @keyframes dmScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .dm-screenshot {
+    width: 280px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .dm-screenshot:hover {
+    transform: scale(1.03);
+    box-shadow: 0 12px 40px rgba(74, 222, 128, 0.15);
+  }
+  .dm-screenshot img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
   /* Testimonial marquee */
   .testimonial-marquee-wrap {
     overflow: hidden;
@@ -1316,6 +1356,31 @@
         </div>
       </div>
     </div>
+
+    <!-- Real DM Screenshots -->
+    <div style="text-align:center;margin-top:56px;" class="reveal">
+      <span class="section-label">Reálné zprávy</span>
+      <h3 style="font-size:24px;font-weight:800;margin-bottom:4px;">Co nám píšou uživatelé</h3>
+      <p style="color:var(--text-muted);font-size:15px;margin-bottom:24px;">Nescreenované zprávy z Instagramu</p>
+    </div>
+
+    <div class="dm-gallery-wrap reveal">
+      <div class="dm-gallery">
+        <!-- Original set -->
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2910.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2908.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2906.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2905.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2911.jpg" alt="DM recenze" loading="lazy"></div>
+        <!-- Duplicate for seamless loop -->
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2910.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2908.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2906.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2905.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2911.jpg" alt="DM recenze" loading="lazy"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
