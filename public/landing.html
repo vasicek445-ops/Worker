@@ -421,22 +421,57 @@
   .trust-section {
     background: linear-gradient(180deg, var(--bg), #0d0d1a, var(--bg));
   }
-  .founder-row {
+  .founder-card {
     display: flex;
     gap: 40px;
     align-items: center;
-    margin-bottom: 60px;
-  }
-  .founder-photo {
-    width: 200px;
-    height: 200px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
     border-radius: 20px;
-    object-fit: cover;
-    border: 2px solid var(--border-light);
+    padding: 40px;
+    margin-bottom: 60px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+  .founder-card:hover {
+    border-color: rgba(57,255,110,0.12);
+  }
+  .founder-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), transparent);
+  }
+  .founder-photo-wrap {
+    position: relative;
     flex-shrink: 0;
   }
+  .founder-photo {
+    width: 180px;
+    height: 180px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 2px solid rgba(57,255,110,0.15);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  .founder-badge {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green);
+    color: #000;
+    font-weight: 800;
+    font-size: 10px;
+    padding: 4px 14px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
   .founder-text h3 {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 800;
     margin-bottom: 4px;
   }
@@ -446,7 +481,7 @@
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
   }
   .founder-text p {
     color: var(--text-dim);
@@ -457,6 +492,29 @@
   .founder-text .highlight {
     color: var(--green);
     font-weight: 600;
+  }
+  .founder-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  .founder-stat {
+    text-align: center;
+  }
+  .founder-stat .num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--green);
+    display: block;
+  }
+  .founder-stat .lbl {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
   }
 
   .testimonial-grid {
@@ -492,8 +550,9 @@
   .t-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
   @media (max-width: 768px) {
-    .founder-row { flex-direction: column; text-align: center; gap: 24px; }
+    .founder-card { flex-direction: column; text-align: center; gap: 24px; padding: 28px 22px; }
     .founder-photo { width: 140px; height: 140px; }
+    .founder-stats { justify-content: center; }
     .testimonial-grid { grid-template-columns: 1fr; }
   }
 
@@ -995,14 +1054,34 @@
   <div class="section" style="text-align:center;">
     <span class="section-label reveal">Kdo za tím stojí</span>
 
-    <div class="founder-row reveal" style="text-align:left; margin-top:28px;">
-      <img src="/images/founder-lake.jpg" alt="Václav Kočka" class="founder-photo">
+    <div class="founder-card reveal" style="text-align:left; margin-top:28px;">
+      <div class="founder-photo-wrap">
+        <img src="/images/founder-lake.jpg" alt="Václav Kočka – zakladatel Woker" class="founder-photo">
+        <span class="founder-badge">🇨🇭 Žije ve Švýcarsku</span>
+      </div>
       <div class="founder-text">
         <h3>Václav Kočka</h3>
-        <p class="role">Zakladatel Woker · žije ve Švýcarsku</p>
-        <p>Zaplatil jsem agentuře, nic se nestalo. Ptal se ChatGPT — poslal mě na úřad, co neexistuje. Gemini mi dal obecné rady, co platí pro Německo, ne Švýcarsko. Proto jsem vytvořil Woker.</p>
-        <p><span class="highlight">1 007 kontaktů jsem sesbíral ručně.</span> AI nástroje jsem postavil tak, aby ti za minuty udělaly to, co mně trvalo dny. Průvodce jsem napsal z vlastní zkušenosti, ne z internetu.</p>
-        <p style="color:rgba(255,255,255,0.4); font-size:13px; margin-top:8px;">S ročním plánem dostaneš i moji osobní podporu — odpovím ti do 48 hodin.</p>
+        <p class="role">Zakladatel & CEO · Software engineer · Expat ve Švýcarsku</p>
+        <p>Prošel jsem si celým procesem sám — od agentur co berou prachy za nic, přes halucinace ChatGPT, až po byrokracii na migrační úřadě. <span class="highlight">Dnes žiju a pracuju ve Švýcarsku.</span></p>
+        <p>Woker jsem postavil jako nástroj, který jsem sám potřeboval. <span class="highlight">1 007 kontaktů sesbíraných ručně</span>, 10 AI nástrojů co automatizují celý proces, a průvodce napsaný z vlastní zkušenosti — ne z internetu.</p>
+        <div class="founder-stats">
+          <div class="founder-stat">
+            <span class="num">1 007</span>
+            <span class="lbl">Kontaktů</span>
+          </div>
+          <div class="founder-stat">
+            <span class="num">10</span>
+            <span class="lbl">AI nástrojů</span>
+          </div>
+          <div class="founder-stat">
+            <span class="num">10</span>
+            <span class="lbl">Jazyků</span>
+          </div>
+          <div class="founder-stat">
+            <span class="num">24/7</span>
+            <span class="lbl">Podpora</span>
+          </div>
+        </div>
       </div>
     </div>
 
