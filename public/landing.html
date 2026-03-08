@@ -2143,4 +2143,417 @@ async function submitLead(){
 }
 if(sessionStorage.getItem('woker-overlay-dismissed')||localStorage.getItem('woker-subscribed')){document.getElementById('leadOverlay').style.display='none'}
 </script>
+
+<!-- ═══════════ WOKEE AI CHAT WIDGET ═══════════ -->
+<style>
+.wokee-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(74,222,128,0.4), 0 0 60px rgba(74,222,128,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  animation: wokeePulse 3s ease-in-out infinite;
+}
+.wokee-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 32px rgba(74,222,128,0.5), 0 0 80px rgba(74,222,128,0.2);
+}
+@keyframes wokeePulse {
+  0%, 100% { box-shadow: 0 4px 24px rgba(74,222,128,0.4), 0 0 0 0 rgba(74,222,128,0.3); }
+  50% { box-shadow: 0 4px 24px rgba(74,222,128,0.4), 0 0 0 12px rgba(74,222,128,0); }
+}
+.wokee-fab-label {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  z-index: 10000;
+  background: #1a1a2e;
+  border: 1px solid rgba(74,222,128,0.2);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: wokeeLabelIn 0.4s 2s ease-out both;
+  cursor: pointer;
+  max-width: 220px;
+}
+.wokee-fab-label::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 24px;
+  width: 12px;
+  height: 12px;
+  background: #1a1a2e;
+  border-right: 1px solid rgba(74,222,128,0.2);
+  border-bottom: 1px solid rgba(74,222,128,0.2);
+  transform: rotate(45deg);
+}
+@keyframes wokeeLabelIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wokee-chat {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10001;
+  width: 380px;
+  height: 560px;
+  background: #0e0e14;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 20px 80px rgba(0,0,0,0.6), 0 0 40px rgba(74,222,128,0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: wokeeChatIn 0.3s ease-out;
+}
+@keyframes wokeeChatIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 480px) {
+  .wokee-chat { width: calc(100vw - 16px); height: calc(100vh - 80px); bottom: 8px; right: 8px; border-radius: 16px; }
+  .wokee-fab { bottom: 16px; right: 16px; width: 56px; height: 56px; font-size: 24px; }
+  .wokee-fab-label { bottom: 80px; right: 16px; }
+}
+
+.wokee-chat-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.02);
+}
+.wokee-chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.wokee-chat-info { flex: 1; }
+.wokee-chat-name { color: #fff; font-weight: 700; font-size: 15px; }
+.wokee-chat-status { color: #4ade80; font-size: 12px; font-weight: 500; }
+.wokee-chat-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.wokee-chat-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.wokee-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.wokee-msg {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+.wokee-msg-ai {
+  background: #1a1a2e;
+  color: rgba(255,255,255,0.9);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+.wokee-msg-user {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #000;
+  font-weight: 500;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+.wokee-msg-typing {
+  display: flex;
+  gap: 5px;
+  padding: 14px 20px;
+}
+.wokee-msg-typing span {
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: wokeeBounce 1.4s ease-in-out infinite;
+}
+.wokee-msg-typing span:nth-child(2) { animation-delay: 0.15s; }
+.wokee-msg-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes wokeeBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.wokee-quick-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 20px;
+}
+.wokee-quick-btn {
+  background: rgba(74,222,128,0.08);
+  border: 1px solid rgba(74,222,128,0.15);
+  color: #4ade80;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+.wokee-quick-btn:hover {
+  background: rgba(74,222,128,0.15);
+  border-color: rgba(74,222,128,0.3);
+}
+
+.wokee-chat-input {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  gap: 10px;
+  background: rgba(255,255,255,0.02);
+}
+.wokee-chat-input input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #fff;
+  font-size: 14px;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.wokee-chat-input input::placeholder { color: rgba(255,255,255,0.3); }
+.wokee-chat-input input:focus { border-color: rgba(74,222,128,0.3); }
+.wokee-chat-input button {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.wokee-chat-input button:hover { transform: scale(1.05); }
+.wokee-chat-input button:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+.wokee-chat-input button svg { width: 20px; height: 20px; }
+
+.wokee-cta-bar {
+  padding: 12px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+.wokee-cta-link {
+  display: inline-block;
+  background: rgba(74,222,128,0.1);
+  border: 1px solid rgba(74,222,128,0.2);
+  color: #4ade80;
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+.wokee-cta-link:hover { background: rgba(74,222,128,0.2); }
+</style>
+
+<div id="wokeeFab" onclick="openWokeeChat()">
+  <button class="wokee-fab" aria-label="Chat s Wokee">🤖</button>
+  <div class="wokee-fab-label" onclick="openWokeeChat()">
+    👋 Chceš vědět kolik vyděláš ve Švýcarsku? Zeptej se mě!
+  </div>
+</div>
+
+<div id="wokeeChat" class="wokee-chat" style="display:none;">
+  <div class="wokee-chat-header">
+    <div class="wokee-chat-avatar">🤖</div>
+    <div class="wokee-chat-info">
+      <div class="wokee-chat-name">Wokee</div>
+      <div class="wokee-chat-status" id="wokeeStatus">● Online 24/7</div>
+    </div>
+    <button class="wokee-chat-close" onclick="closeWokeeChat()">✕</button>
+  </div>
+  <div class="wokee-chat-messages" id="wokeeMessages">
+    <div class="wokee-msg wokee-msg-ai">Ahoj! 👋 Jsem Wokee, tvůj AI průvodce prací ve Švýcarsku.\n\nZeptej se mě na cokoliv – platy, povolení, bydlení, jazyky... Poradím ti na rovinu! 🇨🇭</div>
+  </div>
+  <div class="wokee-quick-questions" id="wokeeQuickQ">
+    <button class="wokee-quick-btn" onclick="wokeeAsk(this.textContent)">💰 Kolik vydělám?</button>
+    <button class="wokee-quick-btn" onclick="wokeeAsk(this.textContent)">📋 Jak získat povolení?</button>
+    <button class="wokee-quick-btn" onclick="wokeeAsk(this.textContent)">🏠 Ceny bydlení?</button>
+    <button class="wokee-quick-btn" onclick="wokeeAsk(this.textContent)">🇩🇪 Potřebuju němčinu?</button>
+    <button class="wokee-quick-btn" onclick="wokeeAsk(this.textContent)">🔑 Jak začít?</button>
+  </div>
+  <div class="wokee-chat-input">
+    <input type="text" id="wokeeInput" placeholder="Zeptej se na cokoliv..." onkeydown="if(event.key==='Enter')wokeeSend()">
+    <button onclick="wokeeSend()" id="wokeeSendBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+  <div class="wokee-cta-bar">
+    <a href="/login" class="wokee-cta-link">🚀 Registrace zdarma – odemkni AI nástroje</a>
+  </div>
+</div>
+
+<script>
+(function() {
+  var chatMessages = [];
+  var isLoading = false;
+
+  window.openWokeeChat = function() {
+    document.getElementById('wokeeChat').style.display = 'flex';
+    document.getElementById('wokeeFab').style.display = 'none';
+    document.getElementById('wokeeInput').focus();
+  };
+
+  window.closeWokeeChat = function() {
+    document.getElementById('wokeeChat').style.display = 'none';
+    document.getElementById('wokeeFab').style.display = 'block';
+  };
+
+  window.wokeeAsk = function(text) {
+    document.getElementById('wokeeQuickQ').style.display = 'none';
+    document.getElementById('wokeeInput').value = text;
+    wokeeSend();
+  };
+
+  window.wokeeSend = async function() {
+    var input = document.getElementById('wokeeInput');
+    var text = input.value.trim();
+    if (!text || isLoading) return;
+
+    // Hide quick questions
+    document.getElementById('wokeeQuickQ').style.display = 'none';
+
+    // Add user message
+    chatMessages.push({ role: 'user', content: text });
+    addMessageToUI(text, 'user');
+    input.value = '';
+    isLoading = true;
+    updateStatus('typing');
+    document.getElementById('wokeeSendBtn').disabled = true;
+
+    // Show typing indicator
+    var typingId = addTypingIndicator();
+
+    try {
+      var res = await fetch('/api/chat-landing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatMessages })
+      });
+      var data = await res.json();
+
+      removeTypingIndicator(typingId);
+
+      if (data.error) {
+        addMessageToUI('Jejda, něco se pokazilo 😅 Zkus to znovu!', 'ai');
+      } else {
+        chatMessages.push({ role: 'assistant', content: data.response });
+        addMessageToUI(data.response, 'ai');
+      }
+    } catch (e) {
+      removeTypingIndicator(typingId);
+      addMessageToUI('Problém s připojením 📡 Zkus to znovu.', 'ai');
+    }
+
+    isLoading = false;
+    updateStatus('online');
+    document.getElementById('wokeeSendBtn').disabled = false;
+    input.focus();
+  };
+
+  function addMessageToUI(text, type) {
+    var container = document.getElementById('wokeeMessages');
+    var div = document.createElement('div');
+    div.className = 'wokee-msg ' + (type === 'user' ? 'wokee-msg-user' : 'wokee-msg-ai');
+    div.textContent = text;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function addTypingIndicator() {
+    var container = document.getElementById('wokeeMessages');
+    var div = document.createElement('div');
+    div.className = 'wokee-msg wokee-msg-ai wokee-msg-typing';
+    div.id = 'wokee-typing';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return 'wokee-typing';
+  }
+
+  function removeTypingIndicator(id) {
+    var el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function updateStatus(state) {
+    var el = document.getElementById('wokeeStatus');
+    if (state === 'typing') {
+      el.textContent = '✏️ Píše...';
+      el.style.color = '#facc15';
+    } else {
+      el.textContent = '● Online 24/7';
+      el.style.color = '#4ade80';
+    }
+  }
+
+  // Auto-hide label after 8 seconds
+  setTimeout(function() {
+    var label = document.querySelector('.wokee-fab-label');
+    if (label) label.style.opacity = '0';
+    setTimeout(function() { if (label) label.style.display = 'none'; }, 300);
+  }, 8000);
+})();
+</script>
 </html>
