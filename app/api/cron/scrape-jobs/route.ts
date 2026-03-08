@@ -197,6 +197,16 @@ export async function GET(req: NextRequest) {
       console.error('Robert Half error:', err)
     }
 
+    // 5. Fetch from jobs.ch (hospitality & seasonal)
+    try {
+      const jchStats = await fetchJobsCh()
+      added += jchStats.added
+      skipped += jchStats.skipped
+      console.log(`jobs.ch: +${jchStats.added} jobs`)
+    } catch (err) {
+      console.error('jobs.ch error:', err)
+    }
+
     return NextResponse.json({
       success: true,
       added,
@@ -380,6 +390,109 @@ async function fetchRobertHalf(): Promise<{ added: number; skipped: number }> {
     }
   } catch (err) {
     console.error('Robert Half fetch error:', err)
+  }
+
+  return { added, skipped }
+}
+
+// ─── jobs.ch Scraper (hospitality & seasonal) ───
+
+async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
+  let added = 0
+  let skipped = 0
+  const seenIds = new Set<string>()
+
+  const keywords = [
+    'hotel', 'Koch Küche', 'Restaurant Kellner', 'Housekeeping Zimmer',
+    'Saison Resort', 'Rezeption Empfang Hotel', 'Gastro Service',
+    'Barkeeper Barista', 'Spa Wellness',
+  ]
+
+  for (const keyword of keywords) {
+    for (let page = 1; page <= 3; page++) { // Max 3 pages per keyword in cron (time limit)
+      try {
+        const url = `https://www.jobs.ch/en/vacancies/?term=${encodeURIComponent(keyword)}&page=${page}`
+        const res = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+            'Accept': 'text/html',
+          },
+          signal: AbortSignal.timeout(15000),
+        })
+
+        if (!res.ok) break
+        const html = await res.text()
+
+        // Extract __INIT__ JSON
+        const initIdx = html.indexOf('__INIT__ = ')
+        if (initIdx < 0) break
+        const jsonStart = initIdx + 11
+        let endIdx = html.indexOf(';\n', jsonStart)
+        if (endIdx < 0) endIdx = html.indexOf(';</script>', jsonStart)
+        if (endIdx < 0) break
+
+        let results: any[] = []
+        try {
+          const data = JSON.parse(html.substring(jsonStart, endIdx))
+          results = data?.vacancy?.results?.main?.results || []
+        } catch { break }
+
+        if (results.length === 0) break
+
+        for (const job of results) {
+          const jobId = job.id || ''
+          if (!jobId || seenIds.has(jobId)) continue
+          seenIds.add(jobId)
+
+          const title = (job.title || '').trim()
+          const company = job.company?.name || 'jobs.ch'
+          const place = (job.place || '').trim()
+          if (!title) continue
+
+          let postedAt = null
+          if (job.publicationDate) {
+            try { postedAt = new Date(job.publicationDate).toISOString() } catch {}
+          }
+
+          const empTypes = job.employmentTypeIds || []
+          const jobType = empTypes.includes('2') || empTypes.includes('3') ? 'Temporary' : 'Full-time'
+
+          let salaryMin = null, salaryMax = null, salaryText = null
+          if (job.salary?.range) {
+            salaryMin = job.salary.range.min || null
+            salaryMax = job.salary.range.max || null
+            const currency = job.salary.currency || 'CHF'
+            salaryText = `${currency} ${salaryMin || '?'} - ${salaryMax || '?'}`
+          }
+
+          try {
+            await supabaseAdmin.from('jobs').upsert({
+              external_id: jobId,
+              source: 'jobsch',
+              title,
+              company,
+              location: place || 'Switzerland',
+              canton: detectCanton(place || ''),
+              description: '',
+              salary_min: salaryMin && salaryMin > 1000 ? salaryMin : null,
+              salary_max: salaryMax && salaryMax > 1000 ? salaryMax : null,
+              salary_text: salaryText,
+              job_type: jobType,
+              category: detectCategory(title),
+              url: `https://www.jobs.ch/en/vacancies/detail/${jobId}/`,
+              remote: false,
+              posted_at: postedAt,
+            }, { onConflict: 'source,external_id' })
+            added++
+          } catch {
+            skipped++
+          }
+        }
+      } catch (err) {
+        console.error(`jobs.ch error for "${keyword}" page ${page}:`, err)
+        break
+      }
+    }
   }
 
   return { added, skipped }

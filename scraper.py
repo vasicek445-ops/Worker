@@ -451,6 +451,119 @@ def _parse_rh_job(job):
     }
 
 
+def fetch_jobsch():
+    """Stáhne hospitality/sezónní nabídky z jobs.ch."""
+    print("📡 Stahuji z jobs.ch (hospitality & sezónní)...")
+    import json
+
+    keywords = [
+        "hotel", "Koch Küche", "Restaurant Kellner", "Housekeeping Zimmer",
+        "Saison Resort", "Rezeption Empfang Hotel", "Gastro Service",
+        "Barkeeper Barista", "Spa Wellness",
+    ]
+
+    all_jobs = []
+    seen_ids = set()
+
+    for keyword in keywords:
+        for page in range(1, 6):  # Max 5 pages per keyword
+            try:
+                url = f"https://www.jobs.ch/en/vacancies/?term={requests.utils.quote(keyword)}&page={page}"
+                response = requests.get(
+                    url,
+                    headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"},
+                    timeout=15,
+                )
+                if response.status_code != 200:
+                    break
+                html = response.text
+            except Exception as e:
+                print(f"  ⚠️ Chyba {keyword} p{page}: {e}")
+                break
+
+            # Extract __INIT__ JSON - find the assignment and parse
+            init_idx = html.find('__INIT__ = ')
+            if init_idx < 0:
+                break
+            # Find the end of the JSON object (ends with ;\n)
+            json_start = init_idx + 11
+            end_idx = html.find(';\n', json_start)
+            if end_idx < 0:
+                end_idx = html.find(';</script>', json_start)
+            if end_idx < 0:
+                break
+
+            try:
+                data = json.loads(html[json_start:end_idx])
+                results = data.get("vacancy", {}).get("results", {}).get("main", {}).get("results", [])
+            except json.JSONDecodeError:
+                break
+
+            if not results:
+                break
+
+            for job in results:
+                job_id = job.get("id", "")
+                if not job_id or job_id in seen_ids:
+                    continue
+                seen_ids.add(job_id)
+
+                title = (job.get("title") or "").strip()
+                company = (job.get("company", {}).get("name") or "").strip()
+                place = (job.get("place") or "").strip()
+                if not title:
+                    continue
+
+                posted_at = None
+                if job.get("publicationDate"):
+                    try:
+                        posted_at = datetime.fromisoformat(job["publicationDate"]).isoformat()
+                    except (ValueError, TypeError):
+                        pass
+
+                emp_types = job.get("employmentTypeIds", [])
+                job_type = "Full-time"
+                if "2" in emp_types or "3" in emp_types:
+                    job_type = "Temporary"
+
+                salary_text = None
+                salary_min = None
+                salary_max = None
+                salary_data = job.get("salary")
+                if salary_data and salary_data.get("range"):
+                    salary_min = salary_data["range"].get("min")
+                    salary_max = salary_data["range"].get("max")
+                    currency = salary_data.get("currency", "CHF")
+                    salary_text = f"{currency} {salary_min or '?'} - {salary_max or '?'}"
+
+                all_jobs.append({
+                    "external_id": job_id,
+                    "source": "jobsch",
+                    "title": title,
+                    "company": company or "jobs.ch",
+                    "location": place or "Switzerland",
+                    "canton": detect_canton(place or ""),
+                    "description": "",
+                    "salary_min": salary_min,
+                    "salary_max": salary_max,
+                    "salary_text": salary_text,
+                    "job_type": job_type,
+                    "category": detect_category(title),
+                    "url": f"https://www.jobs.ch/en/vacancies/detail/{job_id}/",
+                    "tags": None,
+                    "remote": False,
+                    "posted_at": posted_at,
+                })
+
+        print(f"  🔑 '{keyword}': {len([j for j in all_jobs if j['external_id'] in seen_ids])} celkem")
+
+    # Dedupe
+    unique = {j["external_id"]: j for j in all_jobs}
+    result = list(unique.values())
+    print(f"  ✅ Celkem {len(result)} unikátních nabídek z jobs.ch")
+    return result
+
+
 def save_jobs(jobs: list[dict], dry_run: bool = False) -> tuple[int, int]:
     """Uloží nabídky do Supabase. Vrací (added, skipped)."""
     added = 0
@@ -511,6 +624,10 @@ def main():
     # Robert Half
     if not source_filter or source_filter == "roberthalf":
         all_jobs.extend(fetch_roberthalf())
+
+    # jobs.ch (hospitality & seasonal)
+    if not source_filter or source_filter == "jobsch":
+        all_jobs.extend(fetch_jobsch())
 
     if not all_jobs:
         print("\n⚠️  Žádné nabídky k uložení")

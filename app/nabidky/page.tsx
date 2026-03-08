@@ -104,6 +104,7 @@ export default function Nabidky() {
     const labels: Record<string, string> = {
       michaelpage: 'Michael Page',
       roberthalf: 'Robert Half',
+      jobsch: 'jobs.ch',
       jooble: 'Jooble',
       arbeitnow: 'arbeitnow',
     }
