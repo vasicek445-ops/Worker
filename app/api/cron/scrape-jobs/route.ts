@@ -207,10 +207,65 @@ export async function GET(req: NextRequest) {
       console.error('jobs.ch error:', err)
     }
 
+    // 6. Cleanup — remove jobs older than 14 days
+    let cleaned = 0
+    try {
+      const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+      const { count } = await supabaseAdmin
+        .from('jobs')
+        .delete({ count: 'exact' })
+        .lt('posted_at', cutoff)
+      cleaned = count || 0
+      console.log(`Cleanup: removed ${cleaned} expired jobs (older than 14 days)`)
+    } catch (err) {
+      console.error('Cleanup error:', err)
+    }
+
+    // Also remove jobs without posted_at that were created more than 14 days ago
+    try {
+      const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString()
+      const { count } = await supabaseAdmin
+        .from('jobs')
+        .delete({ count: 'exact' })
+        .is('posted_at', null)
+        .lt('created_at', cutoff)
+      cleaned += (count || 0)
+    } catch {}
+
+    // 7. Health check — warn if any scraper returned 0 results
+    const sourceResults: Record<string, number> = {}
+    const warnings: string[] = []
+
+    // Count jobs per source from this run
+    try {
+      const { data: counts } = await supabaseAdmin
+        .from('jobs')
+        .select('source')
+      if (counts) {
+        for (const row of counts) {
+          sourceResults[row.source] = (sourceResults[row.source] || 0) + 1
+        }
+      }
+
+      const expectedSources = ['arbeitnow', 'jooble', 'michaelpage', 'roberthalf', 'jobsch']
+      for (const src of expectedSources) {
+        if (!sourceResults[src] || sourceResults[src] === 0) {
+          warnings.push(`⚠️ ${src}: 0 jobs in database — scraper may be broken`)
+        }
+      }
+
+      if (warnings.length > 0) {
+        console.warn('SCRAPER HEALTH WARNINGS:', warnings.join(' | '))
+      }
+    } catch {}
+
     return NextResponse.json({
       success: true,
       added,
       skipped,
+      cleaned,
+      warnings,
+      sources: sourceResults,
       timestamp: new Date().toISOString(),
     })
   } catch (error: any) {
