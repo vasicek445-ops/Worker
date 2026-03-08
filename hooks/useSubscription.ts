@@ -19,16 +19,19 @@ export function useSubscription() {
   useEffect(() => {
     const check = async () => {
       const { data: { user } } = await supabase.auth.getUser()
+      console.log('[useSubscription] user:', user?.id, user?.email)
       if (!user) {
         setStatus({ isActive: false, plan: null, loading: false })
         return
       }
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('subscriptions')
         .select('status, plan')
         .eq('user_id', user.id)
         .single()
+
+      console.log('[useSubscription] sub data:', data, 'error:', error)
 
       setStatus({
         isActive: data?.status === 'active',
