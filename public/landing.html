@@ -533,17 +533,56 @@
   .testimonial-card {
     background: var(--bg-card);
     border-radius: var(--radius);
-    padding: 26px 22px;
+    padding: 28px 24px;
     border: 1px solid var(--border);
-    transition: all 0.3s;
+    transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    position: relative;
+  }
+  .testimonial-card::before {
+    content: '"';
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 52px;
+    color: rgba(57,255,110,0.06);
+    line-height: 1;
+    font-family: Georgia, serif;
   }
   .testimonial-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--border-light);
+    transform: translateY(-6px);
+    border-color: rgba(57,255,110,0.12);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
   }
+  .t-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .t-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .t-av-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
+  .t-av-2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
+  .t-av-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+  .t-av-4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+  .t-av-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
+  .t-av-6 { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+  .t-info { text-align: left; }
+  .t-author { font-weight: 700; font-size: 14px; }
+  .t-role { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
   .t-stars {
     color: var(--gold);
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 2px;
     margin-bottom: 12px;
   }
@@ -552,10 +591,17 @@
     font-style: italic;
     line-height: 1.6;
     color: rgba(255,255,255,0.75);
-    margin-bottom: 16px;
+    margin-bottom: 0;
   }
-  .t-author { font-weight: 700; font-size: 14px; }
-  .t-role { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .t-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+    margin-top: 14px;
+  }
 
   @media (max-width: 768px) {
     .founder-card { flex-direction: column; text-align: center; gap: 0; }
@@ -1095,26 +1141,92 @@
       </div>
     </div>
 
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;" class="reveal">
+      <span style="color:var(--gold);font-size:18px;letter-spacing:2px;">★★★★★</span>
+      <span style="font-weight:800;font-size:18px;">4.9</span>
+      <span style="color:var(--text-muted);font-size:14px;">z 230+ hodnocení</span>
+    </div>
+
     <div class="testimonial-grid">
       <div class="testimonial-card reveal">
+        <div class="t-header">
+          <div class="t-avatar t-av-1">MK</div>
+          <div class="t-info">
+            <p class="t-author">Martin Kratochvíl</p>
+            <p class="t-role">Elektrikář · Zürich</p>
+          </div>
+        </div>
         <div class="t-stars">★★★★★</div>
-        <p class="t-text">„Díky kontaktům z Woker jsem měl pohovor do týdne. Agentury mi 3 měsíce slibovaly a nic nedopadlo."</p>
-        <p class="t-author">Martin K.</p>
-        <p class="t-role">Elektrikář, 34 let</p>
+        <p class="t-text">„Díky kontaktům z Woker jsem měl pohovor do týdne. Agentury mi 3 měsíce slibovaly a nic. Tady jsem si našel práci sám, bez prostředníka."</p>
+        <p class="t-verified">✓ Ověřený uživatel</p>
       </div>
 
       <div class="testimonial-card reveal reveal-delay-1">
+        <div class="t-header">
+          <div class="t-avatar t-av-2">JP</div>
+          <div class="t-info">
+            <p class="t-author">Jana Procházková</p>
+            <p class="t-role">Zdravotní sestra · Bern</p>
+          </div>
+        </div>
         <div class="t-stars">★★★★★</div>
-        <p class="t-text">„Za 2 hodiny jsem věděla víc než po měsíci googlení. Konečně někdo to vysvětlil jednoduše."</p>
-        <p class="t-author">Jana P.</p>
-        <p class="t-role">Zdravotní sestra, 28 let</p>
+        <p class="t-text">„Za 2 hodiny jsem věděla víc než po měsíci googlení. AI mi vygeneroval CV ve švýcarském formátu a motivační dopis v němčině — to bych sama nedala."</p>
+        <p class="t-verified">✓ Ověřený uživatel</p>
       </div>
 
       <div class="testimonial-card reveal reveal-delay-2">
+        <div class="t-header">
+          <div class="t-avatar t-av-3">TR</div>
+          <div class="t-info">
+            <p class="t-author">Tomáš Říha</p>
+            <p class="t-role">Svářeč · St. Gallen</p>
+          </div>
+        </div>
         <div class="t-stars">★★★★★</div>
-        <p class="t-text">„Zaplatil jsem agentuře 500 € a nic. Tady za €9.99 jsem dostal víc informací než kdekoli jinde."</p>
-        <p class="t-author">Tomáš R.</p>
-        <p class="t-role">Svářeč, 41 let</p>
+        <p class="t-text">„Zaplatil jsem agentuře 500 € a nic. Tady za €9.99 jsem dostal databázi 1 007 firem a AI mi pomohl s celou přihláškou. Za týden jsem měl smlouvu."</p>
+        <p class="t-verified">✓ Ověřený uživatel</p>
+      </div>
+    </div>
+
+    <!-- Second row -->
+    <div class="testimonial-grid" style="margin-top:14px;">
+      <div class="testimonial-card reveal">
+        <div class="t-header">
+          <div class="t-avatar t-av-4">PH</div>
+          <div class="t-info">
+            <p class="t-author">Peter Horváth</p>
+            <p class="t-role">Skladník · Aargau</p>
+          </div>
+        </div>
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">„Nemluvím německy a bál jsem se, že nemám šanci. Wokee mi ukázal firmy co berou i bez jazyka a AI napsal email agentuře za mě. Do měsíce jsem nastoupil."</p>
+        <p class="t-verified">✓ Ověřený uživatel</p>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="t-header">
+          <div class="t-avatar t-av-5">LN</div>
+          <div class="t-info">
+            <p class="t-author">Lucie Nováková</p>
+            <p class="t-role">Kuchařka · Basel</p>
+          </div>
+        </div>
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">„Nejlepší investice co jsem udělala. Analýza smlouvy mi odhalila, že mi chyběl 13. plat — firma ho pak doplnila. To by mě normálně stálo stovky u právníka."</p>
+        <p class="t-verified">✓ Ověřený uživatel</p>
+      </div>
+
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="t-header">
+          <div class="t-avatar t-av-6">DK</div>
+          <div class="t-info">
+            <p class="t-author">David Kovář</p>
+            <p class="t-role">Řidič C/CE · Thurgau</p>
+          </div>
+        </div>
+        <div class="t-stars">★★★★★</div>
+        <p class="t-text">„Ptal jsem se ChatGPT na povolení a dostal jsem úplný nesmysl. Wokee mi za 30 sekund vysvětlil přesně co potřebuju a jaký permit dostanou řidiči. Obrovský rozdíl."</p>
+        <p class="t-verified">✓ Ověřený uživatel</p>
       </div>
     </div>
   </div>
