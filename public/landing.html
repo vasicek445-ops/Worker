@@ -1868,4 +1868,125 @@ if(localStorage.getItem('woker-overlay-dismissed')||localStorage.getItem('woker-
   }, 8000);
 })();
 </script>
+
+<!-- ═══════════ EXIT-INTENT POPUP ═══════════ -->
+<div id="exitPopup" style="display:none;position:fixed;inset:0;z-index:99998;align-items:center;justify-content:center;">
+  <div onclick="closeExitPopup()" style="position:absolute;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);"></div>
+  <div style="position:relative;width:100%;max-width:420px;margin:0 16px;background:#111120;border-radius:20px;border:1px solid rgba(255,107,44,0.25);padding:36px 28px;box-shadow:0 0 80px rgba(255,107,44,0.12),0 24px 64px rgba(0,0,0,.6);animation:exitPopIn .4s cubic-bezier(0.16,1,0.3,1);">
+    <button onclick="closeExitPopup()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;padding:4px 8px;">✕</button>
+    <div style="text-align:center;">
+      <div style="font-size:48px;margin-bottom:16px;">⏳</div>
+      <h2 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 10px;line-height:1.3;">Počkej — odcházíš bez plánu?</h2>
+      <p style="color:rgba(255,255,255,0.5);font-size:15px;line-height:1.6;margin:0 0 20px;">Každý měsíc čekání tě stojí potenciálně <strong style="color:#ff6b2c;">6 400 CHF</strong>. Vyzkoušej Woker — registrace je zdarma.</p>
+      <div style="background:rgba(57,255,110,0.06);border:1px solid rgba(57,255,110,0.12);border-radius:12px;padding:16px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:center;gap:20px;font-size:13px;color:rgba(255,255,255,0.5);">
+          <span>✓ 1 007 kontaktů</span>
+          <span>✓ 10 AI nástrojů</span>
+          <span>✓ Zdarma na start</span>
+        </div>
+      </div>
+      <a href="/login" style="display:block;width:100%;padding:16px;background:var(--cta);color:#fff;border-radius:12px;font-size:16px;font-weight:800;text-decoration:none;text-align:center;box-shadow:0 0 30px var(--cta-glow);transition:all .2s;" onmouseover="this.style.background='var(--cta-hover)'" onmouseout="this.style.background='var(--cta)'">Začít zdarma — trvá to 30 sekund</a>
+      <button onclick="closeExitPopup()" style="background:none;border:none;color:rgba(255,255,255,0.25);font-size:12px;cursor:pointer;margin-top:14px;font-family:inherit;">Ne, díky, vrátím se později</button>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes exitPopIn{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+</style>
+<script>
+(function(){
+  var exitShown = false;
+  function showExitPopup() {
+    if (exitShown) return;
+    if (localStorage.getItem('woker-exit-dismissed')) return;
+    if (localStorage.getItem('woker-subscribed')) return;
+    exitShown = true;
+    document.getElementById('exitPopup').style.display = 'flex';
+  }
+  // Desktop: mouse leaves viewport (moves to tab bar)
+  document.addEventListener('mouseout', function(e) {
+    if (!e.relatedTarget && e.clientY < 5) {
+      showExitPopup();
+    }
+  });
+  // Mobile: back button / visibility change after 30s on page
+  var timeOnPage = 0;
+  var pageTimer = setInterval(function() { timeOnPage++; }, 1000);
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden && timeOnPage > 30) {
+      // Will show when they come back
+      showExitPopup();
+    }
+  });
+  window.closeExitPopup = function() {
+    document.getElementById('exitPopup').style.display = 'none';
+    localStorage.setItem('woker-exit-dismissed', 'true');
+  };
+})();
+</script>
+
+<!-- ═══════════ SOCIAL PROOF NOTIFICATIONS ═══════════ -->
+<div id="socialProof" style="display:none;position:fixed;bottom:28px;left:28px;z-index:9999;background:#111120;border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:320px;animation:spSlideIn .5s cubic-bezier(0.16,1,0.3,1);font-family:var(--font);">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div id="spAvatar" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#39ff6e,#2bcc58);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#0a0a12;flex-shrink:0;"></div>
+    <div>
+      <p id="spText" style="margin:0;color:#fff;font-size:13px;font-weight:600;line-height:1.4;"></p>
+      <p id="spTime" style="margin:4px 0 0;color:rgba(255,255,255,0.3);font-size:11px;"></p>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes spSlideIn{from{opacity:0;transform:translateY(20px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes spSlideOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(20px)}}
+@media(max-width:768px){#socialProof{left:12px;right:12px;bottom:90px;max-width:none;}}
+</style>
+<script>
+(function(){
+  var notifications = [
+    { name: 'Martin K.', city: 'Praha', action: 'odemknul přístup ke kontaktům', time: 'před 3 minutami', initial: 'M' },
+    { name: 'Jana H.', city: 'Brno', action: 'vytvořila CV pomocí AI', time: 'před 7 minutami', initial: 'J' },
+    { name: 'Petr S.', city: 'Ostrava', action: 'se zaregistroval', time: 'před 12 minutami', initial: 'P' },
+    { name: 'Lucie M.', city: 'Plzeň', action: 'odemkla Woker Premium', time: 'před 18 minutami', initial: 'L' },
+    { name: 'Tomáš R.', city: 'Olomouc', action: 'kontaktoval 5 firem', time: 'před 24 minutami', initial: 'T' },
+    { name: 'Eva D.', city: 'Liberec', action: 'stáhla průvodce zdarma', time: 'před 31 minutami', initial: 'E' },
+    { name: 'Ondřej V.', city: 'Hradec Králové', action: 'se připojil ke komunitě', time: 'před 38 minutami', initial: 'O' },
+    { name: 'Kateřina N.', city: 'Zlín', action: 'odemkla 1 007 kontaktů', time: 'před 45 minutami', initial: 'K' },
+  ];
+
+  var spEl = document.getElementById('socialProof');
+  var spAvatar = document.getElementById('spAvatar');
+  var spText = document.getElementById('spText');
+  var spTime = document.getElementById('spTime');
+  var currentIndex = 0;
+  var colors = ['#39ff6e','#ff6b2c','#3b82f6','#a855f7','#f59e0b','#ec4899','#14b8a6','#f43f5e'];
+
+  function showNotification() {
+    if (localStorage.getItem('woker-subscribed')) return;
+    var n = notifications[currentIndex % notifications.length];
+    spAvatar.textContent = n.initial;
+    spAvatar.style.background = 'linear-gradient(135deg,' + colors[currentIndex % colors.length] + ',' + colors[(currentIndex + 3) % colors.length] + ')';
+    spText.textContent = n.name + ' z města ' + n.city + ' ' + n.action;
+    spTime.textContent = n.time;
+    spEl.style.display = 'block';
+    spEl.style.animation = 'spSlideIn .5s cubic-bezier(0.16,1,0.3,1)';
+
+    setTimeout(function() {
+      spEl.style.animation = 'spSlideOut .4s ease-in forwards';
+      setTimeout(function() {
+        spEl.style.display = 'none';
+      }, 400);
+    }, 5000);
+
+    currentIndex++;
+  }
+
+  // First notification after 15s, then every 25-40s (randomized)
+  setTimeout(function() {
+    showNotification();
+    setInterval(function() {
+      setTimeout(showNotification, Math.random() * 15000);
+    }, 25000);
+  }, 15000);
+})();
+</script>
 </html>
