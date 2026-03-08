@@ -3,17 +3,19 @@
 import { useState, useEffect } from "react";
 
 export default function LeadMagnetOverlay() {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    // Check if user already dismissed or subscribed
+    // Don't show on login, auth, dashboard, or pricing pages
+    const path = window.location.pathname;
+    if (path.startsWith("/login") || path.startsWith("/auth") || path.startsWith("/dashboard") || path.startsWith("/pricing") || path.startsWith("/profil") || path.startsWith("/reset-heslo")) return;
+
     const dismissed = localStorage.getItem("woker-overlay-dismissed");
     const subscribed = localStorage.getItem("woker-subscribed");
     if (!dismissed && !subscribed) {
-      // Small delay so the page loads first, then overlay appears
       const timer = setTimeout(() => setIsVisible(true), 300);
       return () => clearTimeout(timer);
     }
