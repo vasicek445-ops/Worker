@@ -54,14 +54,9 @@ export default function RootLayout({
           n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
           t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
           (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init','FACEBOOK_PIXEL_ID');fbq('track','PageView');
+          fbq('init','1450061966530469');fbq('track','PageView');
         `}</Script>
-        {/* Google Ads */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=GOOGLE_ADS_ID" strategy="afterInteractive" />
-        <Script id="gtag-init" strategy="afterInteractive">{`
-          window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
-          gtag('js',new Date());gtag('config','GOOGLE_ADS_ID');
-        `}</Script>
+        {/* Google Ads — přidej až budeš mít ID */}
 
         <ThemeProvider><ErrorBoundary><ToastProvider>
           <LanguageProvider><AppShell>{children}</AppShell></LanguageProvider>
