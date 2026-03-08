@@ -2406,7 +2406,7 @@ if(localStorage.getItem('woker-overlay-dismissed')||localStorage.getItem('woker-
 </style>
 
 <div id="wokeeFab" onclick="openWokeeChat()">
-  <button class="wokee-fab" aria-label="Chat s Wokee">🤖</button>
+  <button class="wokee-fab" aria-label="Chat s Wokee"><img src="/wokee-avatar.svg" alt="Wokee" width="40" height="40" style="border-radius:50%;"></button>
   <div class="wokee-fab-label" onclick="openWokeeChat()">
     👋 Chceš vědět kolik vyděláš ve Švýcarsku? Zeptej se mě!
   </div>
@@ -2414,7 +2414,7 @@ if(localStorage.getItem('woker-overlay-dismissed')||localStorage.getItem('woker-
 
 <div id="wokeeChat" class="wokee-chat" style="display:none;">
   <div class="wokee-chat-header">
-    <div class="wokee-chat-avatar">🤖</div>
+    <div class="wokee-chat-avatar"><img src="/wokee-avatar.svg" alt="Wokee" width="28" height="28" style="border-radius:50%;"></div>
     <div class="wokee-chat-info">
       <div class="wokee-chat-name">Wokee</div>
       <div class="wokee-chat-status" id="wokeeStatus">● Online 24/7</div>
@@ -2514,10 +2514,25 @@ if(localStorage.getItem('woker-overlay-dismissed')||localStorage.getItem('woker-
 
   function addMessageToUI(text, type) {
     var container = document.getElementById('wokeeMessages');
-    var div = document.createElement('div');
-    div.className = 'wokee-msg ' + (type === 'user' ? 'wokee-msg-user' : 'wokee-msg-ai');
-    div.textContent = text;
-    container.appendChild(div);
+    if (type === 'ai') {
+      var wrapper = document.createElement('div');
+      wrapper.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
+      var avatar = document.createElement('img');
+      avatar.src = '/wokee-avatar.svg';
+      avatar.alt = 'Wokee';
+      avatar.style.cssText = 'width:28px;height:28px;border-radius:50%;flex-shrink:0;margin-top:2px;';
+      var div = document.createElement('div');
+      div.className = 'wokee-msg wokee-msg-ai';
+      div.textContent = text;
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(div);
+      container.appendChild(wrapper);
+    } else {
+      var div = document.createElement('div');
+      div.className = 'wokee-msg wokee-msg-user';
+      div.textContent = text;
+      container.appendChild(div);
+    }
     container.scrollTop = container.scrollHeight;
   }
 
