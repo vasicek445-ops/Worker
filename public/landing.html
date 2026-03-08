@@ -547,7 +547,7 @@
     100% { transform: translateX(-50%); }
   }
   .dm-screenshot {
-    width: 280px;
+    width: 200px;
     flex-shrink: 0;
     border-radius: 16px;
     overflow: hidden;
@@ -565,99 +565,13 @@
     display: block;
   }
 
-  /* Testimonial marquee */
-  .testimonial-marquee-wrap {
-    overflow: hidden;
-    width: 100%;
-    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-  }
-  .testimonial-marquee {
-    display: flex;
-    gap: 16px;
-    animation: marqueeScroll 35s linear infinite;
-    width: max-content;
-  }
-  .testimonial-marquee:hover {
-    animation-play-state: paused;
-  }
-  @keyframes marqueeScroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .testimonial-card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 28px 24px;
-    border: 1px solid var(--border);
-    transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
-    position: relative;
-    width: 340px;
-    flex-shrink: 0;
-  }
-  .testimonial-card::before {
-    content: '"';
-    position: absolute;
-    top: 14px;
-    right: 18px;
-    font-size: 52px;
-    color: rgba(57,255,110,0.06);
-    line-height: 1;
-    font-family: Georgia, serif;
-  }
-  .testimonial-card:hover {
-    transform: translateY(-6px);
-    border-color: rgba(57,255,110,0.12);
-    box-shadow: 0 16px 48px rgba(0,0,0,0.25);
-  }
-  .t-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .t-avatar {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    border: 2px solid var(--border-light);
-  }
-  .t-stars-4 { color: var(--text-muted); }
-  .t-info { text-align: left; }
-  .t-author { font-weight: 700; font-size: 14px; }
-  .t-role { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-  .t-stars {
-    color: var(--gold);
-    font-size: 13px;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
-  }
-  .t-text {
-    font-size: 15px;
-    font-style: italic;
-    line-height: 1.6;
-    color: rgba(255,255,255,0.75);
-    margin-bottom: 0;
-  }
-  .t-verified {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    color: var(--green);
-    font-weight: 600;
-    margin-top: 14px;
-  }
-
   @media (max-width: 768px) {
     .founder-card { flex-direction: column; text-align: center; gap: 0; }
     .founder-photo-wrap { width: 100%; min-height: 240px; }
     .founder-photo { border-radius: 20px 20px 0 0; }
     .founder-text { padding: 28px 22px; }
     .founder-stats { justify-content: center; }
-    .testimonial-card { width: 290px; }
+    .dm-screenshot { width: 170px; }
   }
 
   /* ════════════ PRICING ════════════ */
@@ -1189,179 +1103,11 @@
       </div>
     </div>
 
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;" class="reveal">
-      <span style="color:var(--gold);font-size:18px;letter-spacing:2px;">★★★★★</span>
-      <span style="font-weight:800;font-size:18px;">4.6</span>
-      <span style="color:var(--text-muted);font-size:14px;">z 230+ hodnocení</span>
-    </div>
-
-    <div class="testimonial-marquee-wrap reveal">
-      <div class="testimonial-marquee" id="testimonialMarquee">
-        <!-- Original set -->
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=12" alt="Martin K.">
-            <div class="t-info">
-              <p class="t-author">Martin Kratochvíl</p>
-              <p class="t-role">Elektrikář · Zürich</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">„Díky kontaktům z Woker jsem měl pohovor do týdne. Agentury mi 3 měsíce slibovaly a nic. Tady jsem si našel práci sám, bez prostředníka."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=32" alt="Jana P.">
-            <div class="t-info">
-              <p class="t-author">Jana Procházková</p>
-              <p class="t-role">Zdravotní sestra · Bern</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
-          <p class="t-text">„AI mi vygeneroval CV a motivační dopis v němčině — to bych sama nedala. Občas je odpověď AI trochu obecná, ale na 90 % otázek odpověděl přesně."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=59" alt="Tomáš Ř.">
-            <div class="t-info">
-              <p class="t-author">Tomáš Říha</p>
-              <p class="t-role">Svářeč · St. Gallen</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">„Zaplatil jsem agentuře 500 € a nic. Tady za €9.99 jsem dostal databázi 1 007 firem a AI mi pomohl s celou přihláškou. Za týden jsem měl smlouvu."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=53" alt="Peter H.">
-            <div class="t-info">
-              <p class="t-author">Peter Horváth</p>
-              <p class="t-role">Skladník · Aargau</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
-          <p class="t-text">„Nemluvím německy a bál jsem se. Wokee mi ukázal firmy co berou i bez jazyka a AI napsal email za mě. Do měsíce jsem nastoupil. Appka by mohla mít víc filtrů, ale jinak super."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=45" alt="Lucie N.">
-            <div class="t-info">
-              <p class="t-author">Lucie Nováková</p>
-              <p class="t-role">Kuchařka · Basel</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">„Analýza smlouvy mi odhalila, že mi chyběl 13. plat — firma ho pak doplnila. To by mě normálně stálo stovky u právníka. Nejlepší investice co jsem udělala."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=15" alt="David K.">
-            <div class="t-info">
-              <p class="t-author">David Kovář</p>
-              <p class="t-role">Řidič C/CE · Thurgau</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
-          <p class="t-text">„Wokee mi za 30 sekund vysvětlil přesně jaký permit dostanu jako řidič. Ze začátku jsem nevěděl kde co najít, ale po chvíli se v tom zorientujete. Lepší než googlit hodiny."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <!-- Duplicate set for seamless loop -->
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=12" alt="Martin K.">
-            <div class="t-info">
-              <p class="t-author">Martin Kratochvíl</p>
-              <p class="t-role">Elektrikář · Zürich</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">„Díky kontaktům z Woker jsem měl pohovor do týdne. Agentury mi 3 měsíce slibovaly a nic. Tady jsem si našel práci sám, bez prostředníka."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=32" alt="Jana P.">
-            <div class="t-info">
-              <p class="t-author">Jana Procházková</p>
-              <p class="t-role">Zdravotní sestra · Bern</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
-          <p class="t-text">„AI mi vygeneroval CV a motivační dopis v němčině — to bych sama nedala. Občas je odpověď AI trochu obecná, ale na 90 % otázek odpověděl přesně."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=59" alt="Tomáš Ř.">
-            <div class="t-info">
-              <p class="t-author">Tomáš Říha</p>
-              <p class="t-role">Svářeč · St. Gallen</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">„Zaplatil jsem agentuře 500 € a nic. Tady za €9.99 jsem dostal databázi 1 007 firem a AI mi pomohl s celou přihláškou. Za týden jsem měl smlouvu."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=53" alt="Peter H.">
-            <div class="t-info">
-              <p class="t-author">Peter Horváth</p>
-              <p class="t-role">Skladník · Aargau</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
-          <p class="t-text">„Nemluvím německy a bál jsem se. Wokee mi ukázal firmy co berou i bez jazyka a AI napsal email za mě. Do měsíce jsem nastoupil. Appka by mohla mít víc filtrů, ale jinak super."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=45" alt="Lucie N.">
-            <div class="t-info">
-              <p class="t-author">Lucie Nováková</p>
-              <p class="t-role">Kuchařka · Basel</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★★</div>
-          <p class="t-text">„Analýza smlouvy mi odhalila, že mi chyběl 13. plat — firma ho pak doplnila. To by mě normálně stálo stovky u právníka. Nejlepší investice co jsem udělala."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="t-header">
-            <img class="t-avatar" src="https://i.pravatar.cc/96?img=15" alt="David K.">
-            <div class="t-info">
-              <p class="t-author">David Kovář</p>
-              <p class="t-role">Řidič C/CE · Thurgau</p>
-            </div>
-          </div>
-          <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
-          <p class="t-text">„Wokee mi za 30 sekund vysvětlil přesně jaký permit dostanu jako řidič. Ze začátku jsem nevěděl kde co najít, ale po chvíli se v tom zorientujete. Lepší než googlit hodiny."</p>
-          <p class="t-verified">✓ Ověřený uživatel</p>
-        </div>
-      </div>
-    </div>
-
     <!-- Real DM Screenshots -->
-    <div style="text-align:center;margin-top:56px;" class="reveal">
+    <div style="text-align:center;margin-top:48px;" class="reveal">
       <span class="section-label">Reálné zprávy</span>
       <h3 style="font-size:24px;font-weight:800;margin-bottom:4px;">Co nám píšou uživatelé</h3>
-      <p style="color:var(--text-muted);font-size:15px;margin-bottom:24px;">Nescreenované zprávy z Instagramu</p>
+      <p style="color:var(--text-muted);font-size:15px;margin-bottom:24px;">Nescreenované zprávy z Instagramu a Messengeru</p>
     </div>
 
     <div class="dm-gallery-wrap reveal">
@@ -1369,12 +1115,14 @@
         <!-- Original set -->
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2910.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2908.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2912.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2906.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2905.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2911.jpg" alt="DM recenze" loading="lazy"></div>
         <!-- Duplicate for seamless loop -->
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2910.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2908.jpg" alt="DM recenze" loading="lazy"></div>
+        <div class="dm-screenshot"><img src="/images/reviews/IMG_2912.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2906.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2905.jpg" alt="DM recenze" loading="lazy"></div>
         <div class="dm-screenshot"><img src="/images/reviews/IMG_2911.jpg" alt="DM recenze" loading="lazy"></div>
