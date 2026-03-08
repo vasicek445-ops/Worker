@@ -10,7 +10,7 @@ export default function LeadMagnetOverlay() {
 
   useEffect(() => {
     // Check if user already dismissed or subscribed
-    const dismissed = sessionStorage.getItem("woker-overlay-dismissed");
+    const dismissed = localStorage.getItem("woker-overlay-dismissed");
     const subscribed = localStorage.getItem("woker-subscribed");
     if (!dismissed && !subscribed) {
       // Small delay so the page loads first, then overlay appears
@@ -21,7 +21,7 @@ export default function LeadMagnetOverlay() {
 
   const handleClose = () => {
     setIsVisible(false);
-    sessionStorage.setItem("woker-overlay-dismissed", "true");
+    localStorage.setItem("woker-overlay-dismissed", "true");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
