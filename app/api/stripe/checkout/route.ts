@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: plan.priceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/platba/uspech`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/platba/zruseno`,
       metadata: {
         supabase_user_id: userId,
         plan: planKey,

@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /dashboard
+Disallow: /profil
+Disallow: /kontakty
+Disallow: /prihlasky
+Disallow: /ulozene
+Disallow: /kriteria
+Disallow: /asistent
+Disallow: /nabidka
+Disallow: /reset-heslo
+
+Sitemap: https://www.gowoker.com/sitemap.xml

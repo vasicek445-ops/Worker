@@ -1,0 +1,21 @@
+{
+  "name": "Woker – Práce ve Švýcarsku",
+  "short_name": "Woker",
+  "description": "AI průvodce prací ve Švýcarsku. 1 007 kontaktů, 10 AI nástrojů, průvodce od A do Z.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0a0a12",
+  "theme_color": "#39ff6e",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

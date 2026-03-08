@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
+import { SkeletonPage } from "./Skeleton";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -11,6 +12,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
+        // Check if first-time user needs onboarding
+        if (!localStorage.getItem("woker_onboarded")) {
+          localStorage.setItem("woker_onboarded", "1");
+          window.location.href = "/onboarding";
+          return;
+        }
         setAuthenticated(true);
       } else {
         window.location.href = "/login";
@@ -28,14 +35,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (loading) {
-    return (
-      <main className="min-h-screen bg-[#0E0E0E] flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-spin">⚙️</div>
-          <p className="text-white font-bold">Načítám...</p>
-        </div>
-      </main>
-    );
+    return <SkeletonPage />;
   }
 
   if (!authenticated) return null;
