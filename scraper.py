@@ -259,6 +259,198 @@ def fetch_jooble() -> list[dict]:
     return swiss_jobs
 
 
+def fetch_michaelpage():
+    """Stáhne nabídky z Michael Page Switzerland."""
+    print("📡 Stahuji z Michael Page...")
+    all_jobs = []
+    max_pages = 16  # ~465 jobs / 30 per page
+
+    for page in range(max_pages):
+        try:
+            response = requests.get(
+                f"https://www.michaelpage.ch/jobs?page={page}",
+                headers={"User-Agent": "Mozilla/5.0 (compatible; WokerBot/1.0)"},
+                timeout=15,
+            )
+            if response.status_code != 200:
+                break
+            html = response.text
+        except Exception as e:
+            print(f"  ⚠️ Strana {page} chyba: {e}")
+            break
+
+        # Extract job links: /job-detail/[slug]/ref/jn-MMYYYY-NNNNNNN
+        import re as _re
+        pattern = r'<a[^>]*href="(\/(?:de|fr|en)?\/?\/?job-detail\/[^"]+\/ref\/(jn-[^"]+))"[^>]*>([^<]+)</a>'
+        matches = _re.findall(pattern, html, _re.IGNORECASE)
+
+        seen_refs = set()
+        page_jobs = []
+        for url, ref_id, title in matches:
+            title = title.strip()
+            if not title or len(title) < 3 or ref_id in seen_refs:
+                continue
+            seen_refs.add(ref_id)
+            page_jobs.append((url, ref_id, title))
+
+        if not page_jobs:
+            break
+
+        for url, ref_id, title in page_jobs:
+            # Detect location from HTML context
+            location = _detect_mp_location(html, url)
+            # Detect job type from ref context
+            idx = html.find(ref_id)
+            context = html[max(0, idx - 200):idx + 200] if idx >= 0 else ""
+            job_type = "Temporary" if "Interim" in context else "Full-time"
+
+            # Extract date from ref: jn-MMYYYY-NNNNNNN
+            posted_at = None
+            date_match = _re.match(r"jn-(\d{2})(\d{4})-", ref_id)
+            if date_match:
+                month, year = date_match.groups()
+                posted_at = f"{year}-{month}-01T00:00:00Z"
+
+            all_jobs.append({
+                "external_id": ref_id,
+                "source": "michaelpage",
+                "title": title,
+                "company": "Michael Page",
+                "location": location or "Switzerland",
+                "canton": detect_canton(location or ""),
+                "description": "",
+                "salary_min": None,
+                "salary_max": None,
+                "salary_text": None,
+                "job_type": job_type,
+                "category": detect_category(title),
+                "url": f"https://www.michaelpage.ch{url}",
+                "tags": None,
+                "remote": False,
+                "posted_at": posted_at,
+            })
+
+        print(f"  📄 Strana {page}: {len(page_jobs)} nabídek")
+
+    print(f"  ✅ Celkem {len(all_jobs)} nabídek z Michael Page")
+    return all_jobs
+
+
+def _detect_mp_location(html, job_url):
+    """Detekuje lokaci z HTML kontextu kolem job URL."""
+    idx = html.find(job_url)
+    if idx < 0:
+        return None
+    context = html[max(0, idx - 500):min(len(html), idx + 1000)]
+    cities = [
+        ("Geneva", "Geneva"), ("Genève", "Geneva"), ("Zürich", "Zürich"), ("Zurich", "Zürich"),
+        ("Lausanne", "Lausanne"), ("Basel", "Basel"), ("Bern", "Bern"), ("Zug", "Zug"),
+        ("Lugano", "Lugano"), ("Nyon", "Nyon"), ("Neuchâtel", "Neuchâtel"),
+        ("Winterthur", "Winterthur"), ("Vaud", "Vaud"), ("Baar", "Baar"),
+        ("Fribourg", "Fribourg"), ("Yverdon", "Yverdon"), ("Vevey", "Vevey"),
+        ("Meyrin", "Meyrin"), ("St. Gallen", "St. Gallen"), ("Solothurn", "Solothurn"),
+        ("Luzern", "Luzern"), ("Lucerne", "Luzern"),
+    ]
+    for search, city in cities:
+        if search.lower() in context.lower():
+            return city
+    return None
+
+
+def fetch_roberthalf():
+    """Stáhne nabídky z Robert Half Switzerland."""
+    print("📡 Stahuji z Robert Half...")
+    try:
+        response = requests.get(
+            "https://www.roberthalf.com/ch/en/jobs",
+            headers={"User-Agent": "Mozilla/5.0 (compatible; WokerBot/1.0)"},
+            timeout=20,
+        )
+        if response.status_code != 200:
+            print(f"  ❌ HTTP {response.status_code}")
+            return []
+        html = response.text
+    except Exception as e:
+        print(f"  ❌ Chyba: {e}")
+        return []
+
+    # Extract embedded JSON from aemSettings
+    import json
+    jobs = []
+
+    # Extract JSON from: initialResults = JSON.parse('...')
+    match = re.search(r"initialResults\s*=\s*JSON\.parse\('(.+?)'\)", html)
+    if not match:
+        print("  ⚠️ initialResults nenalezeno v HTML")
+        print(f"  ✅ Nalezeno {len(jobs)} nabídek z Robert Half")
+        return jobs
+
+    try:
+        raw = match.group(1)
+        # Decode \xNN and \uNNNN escape sequences
+        decoded = raw.encode('utf-8').decode('unicode_escape').encode('latin-1').decode('utf-8')
+        data = json.loads(decoded)
+        job_list = data.get("data", {}).get("jobs", [])
+        for j in job_list:
+            parsed = _parse_rh_job(j)
+            if parsed:
+                jobs.append(parsed)
+    except (json.JSONDecodeError, UnicodeError) as e:
+        print(f"  ❌ Parse chyba: {e}")
+
+    print(f"  ✅ Nalezeno {len(jobs)} nabídek z Robert Half")
+    return jobs
+
+
+def _parse_rh_job(job):
+    """Parsuje jednotlivou nabídku z Robert Half JSON."""
+    title = (job.get("jobtitle") or job.get("title") or "").strip()
+    job_id = job.get("google_job_id") or job.get("unique_job_number") or job.get("job_id") or ""
+    if not title or not job_id:
+        return None
+
+    city = (job.get("city") or job.get("location") or "").strip()
+    emp_type = (job.get("emptype") or "").lower()
+    job_type = "Temporary" if ("temp" in emp_type or "contract" in emp_type) else "Full-time"
+
+    posted_at = None
+    if job.get("date_posted"):
+        try:
+            posted_at = datetime.fromisoformat(str(job["date_posted"]).replace("Z", "+00:00")).isoformat()
+        except (ValueError, TypeError):
+            pass
+
+    salary_min = int(job["payrate_min"]) if job.get("payrate_min") else None
+    salary_max = int(job["payrate_max"]) if job.get("payrate_max") else None
+    if salary_min and salary_min <= 1000:
+        salary_min = None
+    if salary_max and salary_max <= 1000:
+        salary_max = None
+
+    url = job.get("job_detail_url") or ""
+    if url and not url.startswith("http"):
+        url = f"https://www.roberthalf.com{url}"
+
+    return {
+        "external_id": str(job_id),
+        "source": "roberthalf",
+        "title": title,
+        "company": "Robert Half",
+        "location": city or "Switzerland",
+        "canton": detect_canton(city or ""),
+        "description": clean_html(job.get("description") or ""),
+        "salary_min": salary_min,
+        "salary_max": salary_max,
+        "salary_text": f"{job.get('salary_currency', 'CHF')} {salary_min or '?'} - {salary_max or '?'}" if (salary_min or salary_max) else None,
+        "job_type": job_type,
+        "category": detect_category(title),
+        "url": url,
+        "tags": None,
+        "remote": "remote" in (job.get("remote") or "").lower(),
+        "posted_at": posted_at,
+    }
+
+
 def save_jobs(jobs: list[dict], dry_run: bool = False) -> tuple[int, int]:
     """Uloží nabídky do Supabase. Vrací (added, skipped)."""
     added = 0
@@ -311,6 +503,14 @@ def main():
     # Jooble
     if not source_filter or source_filter == "jooble":
         all_jobs.extend(fetch_jooble())
+
+    # Michael Page
+    if not source_filter or source_filter == "michaelpage":
+        all_jobs.extend(fetch_michaelpage())
+
+    # Robert Half
+    if not source_filter or source_filter == "roberthalf":
+        all_jobs.extend(fetch_roberthalf())
 
     if not all_jobs:
         print("\n⚠️  Žádné nabídky k uložení")

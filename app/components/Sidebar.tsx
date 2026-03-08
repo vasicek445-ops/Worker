@@ -102,6 +102,11 @@ export default function Sidebar() {
           <span className="ml-auto text-[10px] bg-[#39ff6e]/10 text-[#39ff6e] font-bold px-2 py-0.5 rounded-full">1007</span>
         </Link>
 
+        <Link href="/prihlasky" className={linkClass("/prihlasky")}>
+          <span className="text-lg">✉️</span>
+          <span>Moje přihlášky</span>
+        </Link>
+
         {/* Tools - expandable */}
         <div>
           <button

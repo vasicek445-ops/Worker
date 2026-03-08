@@ -100,6 +100,16 @@ export default function Nabidky() {
     return `Před ${Math.floor(days / 30)} měsíci`
   }
 
+  function sourceLabel(source: string): string {
+    const labels: Record<string, string> = {
+      michaelpage: 'Michael Page',
+      roberthalf: 'Robert Half',
+      jooble: 'Jooble',
+      arbeitnow: 'arbeitnow',
+    }
+    return labels[source] || source
+  }
+
   const categoryColors: Record<string, string> = {
     'IT / Software': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
     'Stavebnictví': 'bg-orange-500/10 text-orange-400 border-orange-500/30',
@@ -237,6 +247,11 @@ export default function Nabidky() {
                   {job.salary_text && (
                     <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-2.5 py-0.5 text-[11px]">
                       💰 {job.salary_text}
+                    </span>
+                  )}
+                  {job.source && job.source !== 'arbeitnow' && (
+                    <span className="bg-[#111] border border-gray-800 text-gray-500 rounded-full px-2.5 py-0.5 text-[10px]">
+                      {sourceLabel(job.source)}
                     </span>
                   )}
                 </div>
