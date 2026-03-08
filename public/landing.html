@@ -560,23 +560,14 @@
     margin-bottom: 16px;
   }
   .t-avatar {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    color: white;
+    object-fit: cover;
     flex-shrink: 0;
+    border: 2px solid var(--border-light);
   }
-  .t-av-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
-  .t-av-2 { background: linear-gradient(135deg, #f093fb, #f5576c); }
-  .t-av-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-  .t-av-4 { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-  .t-av-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
-  .t-av-6 { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+  .t-stars-4 { color: var(--text-muted); }
   .t-info { text-align: left; }
   .t-author { font-weight: 700; font-size: 14px; }
   .t-role { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
@@ -1143,14 +1134,14 @@
 
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;" class="reveal">
       <span style="color:var(--gold);font-size:18px;letter-spacing:2px;">★★★★★</span>
-      <span style="font-weight:800;font-size:18px;">4.9</span>
+      <span style="font-weight:800;font-size:18px;">4.6</span>
       <span style="color:var(--text-muted);font-size:14px;">z 230+ hodnocení</span>
     </div>
 
     <div class="testimonial-grid">
       <div class="testimonial-card reveal">
         <div class="t-header">
-          <div class="t-avatar t-av-1">MK</div>
+          <img class="t-avatar" src="https://i.pravatar.cc/96?img=12" alt="Martin K.">
           <div class="t-info">
             <p class="t-author">Martin Kratochvíl</p>
             <p class="t-role">Elektrikář · Zürich</p>
@@ -1163,20 +1154,20 @@
 
       <div class="testimonial-card reveal reveal-delay-1">
         <div class="t-header">
-          <div class="t-avatar t-av-2">JP</div>
+          <img class="t-avatar" src="https://i.pravatar.cc/96?img=32" alt="Jana P.">
           <div class="t-info">
             <p class="t-author">Jana Procházková</p>
             <p class="t-role">Zdravotní sestra · Bern</p>
           </div>
         </div>
-        <div class="t-stars">★★★★★</div>
-        <p class="t-text">„Za 2 hodiny jsem věděla víc než po měsíci googlení. AI mi vygeneroval CV ve švýcarském formátu a motivační dopis v němčině — to bych sama nedala."</p>
+        <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
+        <p class="t-text">„AI mi vygeneroval CV a motivační dopis v němčině — to bych sama nedala. Občas je odpověď AI trochu obecná, ale na 90 % otázek odpověděl přesně."</p>
         <p class="t-verified">✓ Ověřený uživatel</p>
       </div>
 
       <div class="testimonial-card reveal reveal-delay-2">
         <div class="t-header">
-          <div class="t-avatar t-av-3">TR</div>
+          <img class="t-avatar" src="https://i.pravatar.cc/96?img=59" alt="Tomáš Ř.">
           <div class="t-info">
             <p class="t-author">Tomáš Říha</p>
             <p class="t-role">Svářeč · St. Gallen</p>
@@ -1192,40 +1183,40 @@
     <div class="testimonial-grid" style="margin-top:14px;">
       <div class="testimonial-card reveal">
         <div class="t-header">
-          <div class="t-avatar t-av-4">PH</div>
+          <img class="t-avatar" src="https://i.pravatar.cc/96?img=53" alt="Peter H.">
           <div class="t-info">
             <p class="t-author">Peter Horváth</p>
             <p class="t-role">Skladník · Aargau</p>
           </div>
         </div>
-        <div class="t-stars">★★★★★</div>
-        <p class="t-text">„Nemluvím německy a bál jsem se, že nemám šanci. Wokee mi ukázal firmy co berou i bez jazyka a AI napsal email agentuře za mě. Do měsíce jsem nastoupil."</p>
+        <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
+        <p class="t-text">„Nemluvím německy a bál jsem se. Wokee mi ukázal firmy co berou i bez jazyka a AI napsal email za mě. Do měsíce jsem nastoupil. Appka by mohla mít víc filtrů na hledání, ale jinak super."</p>
         <p class="t-verified">✓ Ověřený uživatel</p>
       </div>
 
       <div class="testimonial-card reveal reveal-delay-1">
         <div class="t-header">
-          <div class="t-avatar t-av-5">LN</div>
+          <img class="t-avatar" src="https://i.pravatar.cc/96?img=45" alt="Lucie N.">
           <div class="t-info">
             <p class="t-author">Lucie Nováková</p>
             <p class="t-role">Kuchařka · Basel</p>
           </div>
         </div>
         <div class="t-stars">★★★★★</div>
-        <p class="t-text">„Nejlepší investice co jsem udělala. Analýza smlouvy mi odhalila, že mi chyběl 13. plat — firma ho pak doplnila. To by mě normálně stálo stovky u právníka."</p>
+        <p class="t-text">„Analýza smlouvy mi odhalila, že mi chyběl 13. plat — firma ho pak doplnila. To by mě normálně stálo stovky u právníka. Nejlepší investice co jsem udělala."</p>
         <p class="t-verified">✓ Ověřený uživatel</p>
       </div>
 
       <div class="testimonial-card reveal reveal-delay-2">
         <div class="t-header">
-          <div class="t-avatar t-av-6">DK</div>
+          <img class="t-avatar" src="https://i.pravatar.cc/96?img=15" alt="David K.">
           <div class="t-info">
             <p class="t-author">David Kovář</p>
             <p class="t-role">Řidič C/CE · Thurgau</p>
           </div>
         </div>
-        <div class="t-stars">★★★★★</div>
-        <p class="t-text">„Ptal jsem se ChatGPT na povolení a dostal jsem úplný nesmysl. Wokee mi za 30 sekund vysvětlil přesně co potřebuju a jaký permit dostanou řidiči. Obrovský rozdíl."</p>
+        <div class="t-stars">★★★★<span class="t-stars-4">★</span></div>
+        <p class="t-text">„Wokee mi za 30 sekund vysvětlil přesně jaký permit dostanu jako řidič. Ze začátku jsem nevěděl kde co najít, ale po chvíli se v tom zorientujete. Rozhodně lepší než googlit hodiny."</p>
         <p class="t-verified">✓ Ověřený uživatel</p>
       </div>
     </div>
