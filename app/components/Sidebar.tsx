@@ -90,6 +90,12 @@ export default function Sidebar() {
           <span>Domů</span>
         </Link>
 
+        <Link href="/nabidky" className={linkClass("/nabidky")}>
+          <span className="text-lg">💼</span>
+          <span>Nabídky práce</span>
+          <span className="ml-auto text-[9px] bg-orange-500/15 text-orange-400 font-bold px-1.5 py-0.5 rounded">Nové</span>
+        </Link>
+
         <Link href="/kontakty" className={linkClass("/kontakty")}>
           <span className="text-lg">📇</span>
           <span>Kontakty</span>
@@ -133,6 +139,10 @@ export default function Sidebar() {
               <div className="px-3 pt-3 pb-1">
                 <span className="text-[10px] text-gray-600 font-bold uppercase tracking-wider">Hledám práci</span>
               </div>
+              <Link href="/pruvodce/matching" className={subLinkClass("/pruvodce/matching")}>
+                <span>🎯</span><span>Smart Matching</span>
+                <span className="ml-auto text-[9px] bg-[#39ff6e]/15 text-[#39ff6e] font-bold px-1.5 py-0.5 rounded">AI</span>
+              </Link>
               <Link href="/pruvodce/sablony/analyza" className={subLinkClass("/pruvodce/sablony/analyza")}>
                 <span>📊</span><span>Analýza inzerátu</span>
                 <span className="ml-auto text-[9px] bg-blue-500/15 text-blue-400 font-bold px-1.5 py-0.5 rounded">AI</span>

@@ -30,6 +30,32 @@ export default function Profil() {
   const [deleting, setDeleting] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Pracovní profil
+  const [obor, setObor] = useState('')
+  const [pozice, setPozice] = useState('')
+  const [preferovanyKanton, setPreferovanyKanton] = useState('')
+  const [nemcinaUroven, setNemcinaUroven] = useState('')
+  const [zkusenosti, setZkusenosti] = useState('')
+  const [vzdelani, setVzdelani] = useState('')
+  const [dovednosti, setDovednosti] = useState('')
+  const [telefon, setTelefon] = useState('')
+  const [adresa, setAdresa] = useState('')
+  const [datumNarozeni, setDatumNarozeni] = useState('')
+  const [ridickyPrukaz, setRidickyPrukaz] = useState('')
+  const [dalsiJazyky, setDalsiJazyky] = useState('')
+  const [savingProfile, setSavingProfile] = useState(false)
+
+  const OBORY = ['Stavebnictví', 'Gastronomie / Hotelnictví', 'Logistika / Sklad', 'Zdravotnictví', 'Úklid / Údržba', 'Strojírenství / Technik', 'IT / Software', 'Elektro / Instalatér', 'Řidič / Doprava', 'Jiný obor']
+  const NEMCINA = ['Žádná – teprve se učím', 'Základy (A1)', 'Základní komunikace (A2)', 'Dorozumím se (B1)', 'Dobrá úroveň (B2)', 'Plynulá (C1/C2)']
+  const KANTONY: Record<string, string> = {
+    ZH: 'Zürich', BE: 'Bern', LU: 'Luzern', UR: 'Uri', SZ: 'Schwyz',
+    OW: 'Obwalden', NW: 'Nidwalden', GL: 'Glarus', ZG: 'Zug', FR: 'Fribourg',
+    SO: 'Solothurn', BS: 'Basel-Stadt', BL: 'Basel-Land', SH: 'Schaffhausen',
+    AR: 'Appenzell AR', AI: 'Appenzell AI', SG: 'St. Gallen', GR: 'Graubünden',
+    AG: 'Aargau', TG: 'Thurgau', TI: 'Ticino', VD: 'Vaud', VS: 'Valais',
+    NE: 'Neuchâtel', GE: 'Genève', JU: 'Jura',
+  }
+
   const LANGUAGES = [
     { code: 'cs', flag: '🇨🇿', name: 'Čeština' },
     { code: 'en', flag: '🇬🇧', name: 'English' },
@@ -53,6 +79,19 @@ export default function Profil() {
         setProfile(profileData)
         setEditName(profileData.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || '')
         setNotifications(profileData.notifications ?? true)
+        // Load work profile fields
+        setObor(profileData.obor || '')
+        setPozice(profileData.pozice || '')
+        setPreferovanyKanton(profileData.preferovany_kanton || '')
+        setNemcinaUroven(profileData.nemcina_uroven || '')
+        setZkusenosti(profileData.zkusenosti || '')
+        setVzdelani(profileData.vzdelani || '')
+        setDovednosti(profileData.dovednosti || '')
+        setTelefon(profileData.telefon || '')
+        setAdresa(profileData.adresa || '')
+        setDatumNarozeni(profileData.datum_narozeni || '')
+        setRidickyPrukaz(profileData.ridicky_prukaz || '')
+        setDalsiJazyky(profileData.dalsi_jazyky || '')
       } else {
         const defaultName = user.user_metadata?.full_name || user.email?.split('@')[0] || ''
         const { data: newProfile } = await supabase.from('profiles').insert({ id: user.id, full_name: defaultName }).select().single()
@@ -159,6 +198,23 @@ export default function Profil() {
       await supabase.auth.signOut()
       window.location.href = '/login'
     } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')); setDeleting(false) }
+  }
+
+  const handleSaveWorkProfile = async () => {
+    if (!user) return
+    setSavingProfile(true)
+    const isComplete = !!(obor && pozice && preferovanyKanton && nemcinaUroven && zkusenosti)
+    try {
+      await supabase.from('profiles').update({
+        obor, pozice, preferovany_kanton: preferovanyKanton, nemcina_uroven: nemcinaUroven,
+        zkusenosti, vzdelani, dovednosti, telefon, adresa, datum_narozeni: datumNarozeni,
+        ridicky_prukaz: ridickyPrukaz, dalsi_jazyky: dalsiJazyky, profile_complete: isComplete,
+        updated_at: new Date().toISOString(),
+      }).eq('id', user.id)
+      setProfile((prev: any) => ({ ...prev, obor, pozice, preferovany_kanton: preferovanyKanton, nemcina_uroven: nemcinaUroven, zkusenosti, vzdelani, dovednosti, telefon, adresa, datum_narozeni: datumNarozeni, ridicky_prukaz: ridickyPrukaz, dalsi_jazyky: dalsiJazyky, profile_complete: isComplete }))
+      showToast(isComplete ? 'Pracovní profil uložen! Můžeš spustit Smart Matching.' : 'Profil uložen! Vyplň všechna povinná pole pro Smart Matching.')
+    } catch { showToast('Chyba při ukládání') }
+    finally { setSavingProfile(false) }
   }
 
   const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/login' }
@@ -287,6 +343,118 @@ export default function Profil() {
               </div>
             </div>
           </div>
+
+          {/* Work Profile */}
+          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider">Pracovní profil</h3>
+              {profile?.profile_complete && <span className="text-[10px] bg-[#39ff6e]/10 text-[#39ff6e] font-bold px-2.5 py-1 rounded-full">Kompletní</span>}
+            </div>
+
+            <div className="space-y-3">
+              {/* Obor */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Obor *</label>
+                <select value={obor} onChange={(e) => setObor(e.target.value)} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 appearance-none">
+                  <option value="" className="bg-[#111120]">Vyber obor...</option>
+                  {OBORY.map(o => <option key={o} value={o} className="bg-[#111120]">{o}</option>)}
+                </select>
+              </div>
+
+              {/* Pozice */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Cílová pozice *</label>
+                <input type="text" value={pozice} onChange={(e) => setPozice(e.target.value)} placeholder="např. Elektriker, Koch, Bauarbeiter..." className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+              </div>
+
+              {/* Kanton */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Preferovaný kanton *</label>
+                <select value={preferovanyKanton} onChange={(e) => setPreferovanyKanton(e.target.value)} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 appearance-none">
+                  <option value="" className="bg-[#111120]">Vyber kanton...</option>
+                  {Object.entries(KANTONY).map(([code, name]) => <option key={code} value={code} className="bg-[#111120]">{name} ({code})</option>)}
+                </select>
+              </div>
+
+              {/* Nemcina */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Úroveň němčiny *</label>
+                <select value={nemcinaUroven} onChange={(e) => setNemcinaUroven(e.target.value)} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 appearance-none">
+                  <option value="" className="bg-[#111120]">Vyber úroveň...</option>
+                  {NEMCINA.map(n => <option key={n} value={n} className="bg-[#111120]">{n}</option>)}
+                </select>
+              </div>
+
+              {/* Datum narozeni */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Datum narození</label>
+                <input type="text" value={datumNarozeni} onChange={(e) => setDatumNarozeni(e.target.value)} placeholder="např. 15.03.1990" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+              </div>
+
+              {/* Telefon */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Telefon</label>
+                <input type="tel" value={telefon} onChange={(e) => setTelefon(e.target.value)} placeholder="+420 ..." className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+              </div>
+
+              {/* Adresa */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Adresa</label>
+                <input type="text" value={adresa} onChange={(e) => setAdresa(e.target.value)} placeholder="Ulice, město, země" className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+              </div>
+
+              {/* Zkusenosti */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Pracovní zkušenosti *</label>
+                <textarea value={zkusenosti} onChange={(e) => setZkusenosti(e.target.value)} placeholder="Popiš své pracovní zkušenosti, pozice, firmy, období..." rows={4} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 resize-none" />
+              </div>
+
+              {/* Vzdelani */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Vzdělání</label>
+                <textarea value={vzdelani} onChange={(e) => setVzdelani(e.target.value)} placeholder="Školy, obory, certifikáty..." rows={2} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 resize-none" />
+              </div>
+
+              {/* Dovednosti */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Dovednosti</label>
+                <textarea value={dovednosti} onChange={(e) => setDovednosti(e.target.value)} placeholder="Technické dovednosti, soft skills, certifikáty..." rows={2} className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 resize-none" />
+              </div>
+
+              {/* Ridicky prukaz */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Řidičský průkaz</label>
+                <input type="text" value={ridickyPrukaz} onChange={(e) => setRidickyPrukaz(e.target.value)} placeholder="např. B, C, D..." className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+              </div>
+
+              {/* Dalsi jazyky */}
+              <div>
+                <label className="text-white/40 text-xs block mb-1">Další jazyky</label>
+                <input type="text" value={dalsiJazyky} onChange={(e) => setDalsiJazyky(e.target.value)} placeholder="např. Angličtina B2, Slovenština..." className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30" />
+              </div>
+
+              {/* Save button */}
+              <button onClick={handleSaveWorkProfile} disabled={savingProfile} className="w-full bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50 text-sm mt-2">
+                {savingProfile ? 'Ukládám...' : 'Uložit pracovní profil'}
+              </button>
+
+              <p className="text-white/20 text-[11px] text-center">* povinné pole pro Smart Matching</p>
+            </div>
+          </div>
+
+          {/* Smart Matching CTA */}
+          {profile?.profile_complete && (
+            <a href="/pruvodce/matching" className="block mb-4 no-underline">
+              <div className="bg-gradient-to-br from-[#111120] to-[#0f1420] rounded-[20px] p-5 border border-blue-500/15">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-lg">🎯</div>
+                  <span className="text-white font-extrabold text-sm">Smart Matching</span>
+                </div>
+                <p className="text-white/35 text-xs mb-3 m-0">AI najde nejlepší agentury pro tvůj profil a odešle přihlášku jedním klikem.</p>
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2.5 rounded-xl text-sm font-extrabold text-center">Spustit matching →</div>
+              </div>
+            </a>
+          )}
 
           {/* Preferences */}
           <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">

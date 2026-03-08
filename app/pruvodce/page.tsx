@@ -20,6 +20,7 @@ export default function Pruvodce() {
       title: "🔍 Hledám práci",
       desc: "AI nástroje pro přípravu na zaměstnání",
       items: [
+        { icon: "🎯", title: "AI Smart Matching", desc: "Najdi agentury a přihlas se jedním klikem", href: "/pruvodce/matching", ai: true },
         { icon: "📊", title: "AI analýza inzerátu", desc: "Pochop co firma hledá", href: "/pruvodce/sablony/analyza", ai: true },
         { icon: "📝", title: "AI životopis", desc: "5 profesionálních šablon", href: "/pruvodce/sablony/cv", ai: true },
         { icon: "✉️", title: "AI motivační dopis", desc: "Personalizovaný Bewerbungsschreiben", href: "/pruvodce/sablony/motivacni-dopis", ai: true },

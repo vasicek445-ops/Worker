@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import { useLanguage } from "../../lib/i18n/LanguageContext";
-export default function BottomNav({ active }: { active: "home" | "contacts" | "tools" | "community" | "profile" }) {
+export default function BottomNav({ active }: { active: "home" | "jobs" | "contacts" | "tools" | "community" | "profile" }) {
   const { t } = useLanguage();
   const items = [
     { icon: "🏠", label: t.nav.overview, href: "/dashboard", id: "home" as const },
-    { icon: "📇", label: t.nav.contacts, href: "/kontakty", id: "contacts" as const },
+    { icon: "💼", label: "Nabídky", href: "/nabidky", id: "jobs" as const },
     { icon: "🛠️", label: "Nástroje", href: "/pruvodce", id: "tools" as const },
     { icon: "💬", label: t.nav.community, href: "/komunita", id: "community" as const },
     { icon: "👤", label: t.nav.profile, href: "/profil", id: "profile" as const },
