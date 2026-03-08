@@ -1,11 +1,30 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabase";
+
+async function handlePostAuth(user: any, plan: string | null, isRecovery: boolean) {
+  if (user?.user_metadata?.full_name) {
+    await supabase.from("profiles").upsert({ id: user.id, full_name: user.user_metadata.full_name }, { onConflict: "id" });
+  }
+  if (isRecovery) { window.location.replace("/reset-heslo"); return; }
+  if (plan && (plan === "monthly" || plan === "yearly")) {
+    const res = await fetch('/api/stripe/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ planKey: plan, userId: user.id, email: user.email }),
+    });
+    const data = await res.json();
+    if (data.url) { window.location.href = data.url; return; }
+  }
+  window.location.replace("/dashboard");
+}
+
 export default function AuthCallback() {
   const [status, setStatus] = useState("Přihlašuji...");
   useEffect(() => {
     const hash = window.location.hash;
     const params = new URLSearchParams(window.location.search);
+    const plan = params.get("plan");
 
     // Detect recovery type from hash
     const isRecovery = hash.includes("type=recovery");
@@ -22,12 +41,7 @@ export default function AuthCallback() {
           refresh_token: refreshToken,
         }).then(async ({ data, error }) => {
           if (data?.session) {
-            // Save profile name
-            const user = data.session.user;
-            if (user?.user_metadata?.full_name) {
-              await supabase.from("profiles").upsert({ id: user.id, full_name: user.user_metadata.full_name }, { onConflict: "id" });
-            }
-            window.location.replace(isRecovery ? "/reset-heslo" : "/dashboard");
+            await handlePostAuth(data.session.user, plan, isRecovery);
           } else {
             setStatus("Chyba session: " + (error?.message || "neznámá"));
           }
@@ -41,12 +55,7 @@ export default function AuthCallback() {
     if (code) {
       supabase.auth.exchangeCodeForSession(code).then(async ({ data, error }) => {
         if (data?.session) {
-          // Save profile name
-            const user = data.session.user;
-            if (user?.user_metadata?.full_name) {
-              await supabase.from("profiles").upsert({ id: user.id, full_name: user.user_metadata.full_name }, { onConflict: "id" });
-            }
-            window.location.replace(isRecovery ? "/reset-heslo" : "/dashboard");
+            await handlePostAuth(data.session.user, plan, isRecovery);
         } else {
           setStatus("Chyba code: " + (error?.message || "neznámá"));
         }
@@ -57,7 +66,8 @@ export default function AuthCallback() {
     // Check existing session
     supabase.auth.getSession().then(({ data }) => {
       if (data?.session) {
-        window.location.replace("/dashboard");
+        if (plan) { handlePostAuth(data.session.user, plan, false); }
+        else { window.location.replace("/dashboard"); }
       } else {
         setStatus("Žádný token. Zkus to znovu.");
       }

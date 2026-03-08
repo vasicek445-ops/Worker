@@ -1,10 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../supabase";
 
-export default function Login() {
+async function redirectToCheckout(plan: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const res = await fetch('/api/stripe/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ planKey: plan, userId: user.id, email: user.email }),
+  });
+  const data = await res.json();
+  if (data.url) window.location.href = data.url;
+  else window.location.href = '/dashboard';
+}
+
+function LoginInner() {
+  const searchParams = useSearchParams();
+  const planParam = searchParams.get("plan");
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
@@ -28,11 +44,12 @@ export default function Login() {
   }
 
   async function handleGoogle() {
+    const redirectUrl = planParam
+      ? `https://www.gowoker.com/auth/callback?plan=${planParam}`
+      : 'https://www.gowoker.com/auth/callback';
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: 'https://www.gowoker.com/auth/callback',
-      },
+      options: { redirectTo: redirectUrl },
     });
   }
 
@@ -59,6 +76,7 @@ export default function Login() {
         password,
       });
       if (error) setError(error.message);
+      else if (planParam) { await redirectToCheckout(planParam); return; }
       else window.location.href = "/dashboard";
     }
     setLoading(false);
@@ -335,5 +353,13 @@ export default function Login() {
         </div>
       </main>
     </>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#0a0a12' }} />}>
+      <LoginInner />
+    </Suspense>
   );
 }

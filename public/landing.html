@@ -1188,7 +1188,7 @@
           <div class="pf-item"><span class="pf-check">✓</span> 10 jazyků</div>
         </div>
 
-        <a href="/pricing" class="cta-pricing">Odemknout 1 007 kontaktů</a>
+        <button onclick="handleCheckout('monthly')" class="cta-pricing" id="btn-monthly">Odemknout 1 007 kontaktů</button>
         <p class="pricing-secure">🔒 Stripe · Zrušíš kdykoliv</p>
       </div>
 
@@ -1207,7 +1207,7 @@
           <div class="pf-item"><span class="pf-check">✓</span> 2 měsíce zdarma</div>
         </div>
 
-        <a href="/pricing" class="cta-pricing">Vyzkoušet 3 dny zdarma</a>
+        <button onclick="handleCheckout('yearly')" class="cta-pricing" id="btn-yearly">Vyzkoušet 3 dny zdarma</button>
         <p class="pricing-secure">🔒 Stripe · Zrušíš kdykoliv</p>
       </div>
     </div>
@@ -1332,6 +1332,7 @@
   <p style="text-align:center;">&copy; 2026 Woker &middot; <a href="/podminky">Podmínky</a> &middot; <a href="/ochrana-udaju">Ochrana údajů</a></p>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
   // Scroll reveal
   const observer = new IntersectionObserver((entries) => {
@@ -1345,6 +1346,49 @@
   window.addEventListener('scroll', () => {
     document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
   });
+
+  // Direct Stripe checkout from landing page
+  const _sb = supabase.createClient(
+    'https://recyoezvcfiarmeizgqc.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlY3lvZXp2Y2ZpYXJtZWl6Z3FjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MDE1NDIsImV4cCI6MjA4NzI3NzU0Mn0.PCJOW-vJPkggmZmnHX9GfVVTOZyEhHdfzH4UuyA7-r4'
+  );
+
+  async function handleCheckout(plan) {
+    var btn = document.getElementById('btn-' + plan);
+    var originalText = btn.textContent;
+    btn.textContent = 'Načítání...';
+    btn.disabled = true;
+
+    try {
+      var { data: { user } } = await _sb.auth.getUser();
+
+      if (!user) {
+        // Not logged in — redirect to login with plan param, then login page redirects to checkout
+        window.location.href = '/login?plan=' + plan;
+        return;
+      }
+
+      var res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planKey: plan, userId: user.id, email: user.email }),
+      });
+      var data = await res.json();
+
+      if (data.error) {
+        alert(data.error);
+        btn.textContent = originalText;
+        btn.disabled = false;
+        return;
+      }
+
+      window.location.href = data.url;
+    } catch (e) {
+      alert('Něco se pokazilo, zkuste to znovu.');
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  }
 </script>
 
 </body>
