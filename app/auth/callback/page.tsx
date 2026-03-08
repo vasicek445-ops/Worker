@@ -6,6 +6,24 @@ async function handlePostAuth(user: any, plan: string | null, isRecovery: boolea
   if (user?.user_metadata?.full_name) {
     await supabase.from("profiles").upsert({ id: user.id, full_name: user.user_metadata.full_name }, { onConflict: "id" });
   }
+
+  // Send welcome email for new users (only once)
+  const welcomeSentKey = 'woker_welcome_sent';
+  if (!localStorage.getItem(welcomeSentKey) && !isRecovery) {
+    localStorage.setItem(welcomeSentKey, '1');
+    // Initialize drip sequence in profile
+    await supabase.from("profiles").update({
+      user_email_step: 1,
+      last_user_email_at: new Date().toISOString(),
+    }).eq('id', user.id);
+    // Fire and forget - don't block auth flow
+    fetch('/api/email/welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, name: user.user_metadata?.full_name }),
+    }).catch(() => {});
+  }
+
   if (isRecovery) { window.location.replace("/reset-heslo"); return; }
   if (plan && (plan === "monthly" || plan === "yearly")) {
     const res = await fetch('/api/stripe/checkout', {
