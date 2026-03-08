@@ -8,6 +8,11 @@ export default function PaymentSuccess() {
 
   useEffect(() => {
     setTimeout(() => setShow(true), 100);
+    // Track purchase conversion
+    if (typeof window !== 'undefined') {
+      if ((window as any).fbq) (window as any).fbq('track', 'Purchase', { currency: 'EUR', value: 9.99 });
+      if ((window as any).gtag) (window as any).gtag('event', 'purchase', { currency: 'EUR', value: 9.99 });
+    }
   }, []);
 
   return (
