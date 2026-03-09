@@ -18,6 +18,7 @@ export default function DashboardContent({ agencyCount }: Props) {
   const actions = [
     { icon: "💼", title: "Nabídky práce", desc: "Aktuální pozice", href: "/nabidky", grad: "from-orange-500/[0.08] to-orange-500/[0.02]", border: "border-orange-500/[0.12]" },
     { icon: "🎯", title: "Smart Matching", desc: "AI najde agentury", href: "/pruvodce/matching", grad: "from-blue-500/[0.08] to-blue-500/[0.02]", border: "border-blue-500/[0.12]" },
+    { icon: "🏠", title: "Bydlení", desc: "Byty a pokoje", href: "/bydleni", grad: "from-cyan-500/[0.08] to-cyan-500/[0.02]", border: "border-cyan-500/[0.12]" },
     { icon: "📝", title: "Připravit CV", desc: "5 AI šablon", href: "/pruvodce/sablony", grad: "from-green-500/[0.08] to-green-500/[0.02]", border: "border-green-500/[0.12]" },
     { icon: "📇", title: "Kontakty agentur", desc: agencyCount.toLocaleString() + " agentur", href: "/kontakty", grad: "from-red-500/[0.08] to-red-500/[0.02]", border: "border-red-500/[0.12]" },
   ];

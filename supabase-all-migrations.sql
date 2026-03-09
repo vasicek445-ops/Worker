@@ -92,3 +92,52 @@ DO $$ BEGIN
     CREATE POLICY "Service role can manage jobs" ON jobs FOR ALL USING (auth.role() = 'service_role');
   END IF;
 END $$;
+
+-- 4. HOUSING: Tabulka housing
+CREATE TABLE IF NOT EXISTS housing (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  external_id text NOT NULL,
+  source text NOT NULL DEFAULT 'flatfox',
+  title text NOT NULL,
+  description text,
+  address text,
+  city text,
+  zipcode text,
+  canton text,
+  latitude double precision,
+  longitude double precision,
+  price integer,
+  price_unit text DEFAULT 'monthly',
+  rooms numeric(3,1),
+  area_m2 integer,
+  object_type text,
+  is_furnished boolean DEFAULT false,
+  is_temporary boolean DEFAULT false,
+  available_from timestamptz,
+  url text,
+  image_url text,
+  agency_name text,
+  agency_contact text,
+  posted_at timestamptz,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(source, external_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_housing_source ON housing(source);
+CREATE INDEX IF NOT EXISTS idx_housing_canton ON housing(canton);
+CREATE INDEX IF NOT EXISTS idx_housing_city ON housing(city);
+CREATE INDEX IF NOT EXISTS idx_housing_price ON housing(price);
+CREATE INDEX IF NOT EXISTS idx_housing_rooms ON housing(rooms);
+CREATE INDEX IF NOT EXISTS idx_housing_posted_at ON housing(posted_at DESC);
+CREATE INDEX IF NOT EXISTS idx_housing_title_search ON housing USING gin(to_tsvector('simple', title));
+
+ALTER TABLE housing ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Anyone can view housing') THEN
+    CREATE POLICY "Anyone can view housing" ON housing FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Service role can manage housing') THEN
+    CREATE POLICY "Service role can manage housing" ON housing FOR ALL USING (auth.role() = 'service_role');
+  END IF;
+END $$;

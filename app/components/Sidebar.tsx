@@ -96,6 +96,12 @@ export default function Sidebar() {
           <span className="ml-auto text-[9px] bg-orange-500/15 text-orange-400 font-bold px-1.5 py-0.5 rounded">Nové</span>
         </Link>
 
+        <Link href="/bydleni" className={linkClass("/bydleni")}>
+          <span className="text-lg">🏠</span>
+          <span>Bydlení</span>
+          <span className="ml-auto text-[9px] bg-blue-500/15 text-blue-400 font-bold px-1.5 py-0.5 rounded">Nové</span>
+        </Link>
+
         <Link href="/kontakty" className={linkClass("/kontakty")}>
           <span className="text-lg">📇</span>
           <span>Kontakty</span>
