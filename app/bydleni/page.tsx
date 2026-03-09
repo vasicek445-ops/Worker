@@ -232,17 +232,11 @@ export default function Bydleni() {
             <div className="flex flex-col gap-3">
               {listings.map((listing) => (
                 <div key={listing.id} className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition">
-                  {/* Image */}
-                  {listing.image_url && (
-                    <div className="h-40 bg-gray-900 overflow-hidden">
-                      <img
-                        src={listing.image_url}
-                        alt={listing.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
+                  {/* Type banner */}
+                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 px-4 py-2.5 flex items-center justify-between border-b border-gray-800/50">
+                    <span className="text-white/70 text-xs font-medium">{listing.object_type || 'Byt'}</span>
+                    {listing.rooms && <span className="text-blue-400 text-xs font-bold">{listing.rooms} pokojů</span>}
+                  </div>
 
                   <div className="p-4">
                     {/* Header */}
