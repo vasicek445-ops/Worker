@@ -124,16 +124,16 @@ export async function GET(req: NextRequest) {
     // Residential density increases at higher offsets (newer listings are mostly commercial)
     const pageSize = 100
     const offsets = [
-      // Recent (low density ~3%)
-      0, 100, 200, 300, 400,
-      // Mid-range (~20%)
-      1000, 1500, 2000, 2500, 3000,
-      // High density (~50-70%)
-      5000, 6000, 7000, 8000, 9000,
-      10000, 11000, 12000, 13000, 14000,
-      15000, 16000, 17000, 18000, 19000,
-      20000, 21000, 22000, 23000, 24000,
-      25000, 27000, 29000, 31000, 33000,
+      // Recent (low density but fresh)
+      0, 200,
+      // Mid-range
+      1000, 2000, 3000,
+      // High density (~50-70% residential)
+      5000, 8000,
+      10000, 13000,
+      16000, 19000,
+      22000, 25000,
+      28000, 32000,
     ]
 
     for (const offset of offsets) {
