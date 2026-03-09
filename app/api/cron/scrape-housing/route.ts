@@ -6,8 +6,9 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// Swiss 4-digit ZIP to canton mapping (first 2 digits)
 const ZIPCODE_TO_CANTON: Record<string, string> = {
-  '1': 'VD', '10': 'VD', '11': 'VD', '12': 'GE', '13': 'VD',
+  '10': 'VD', '11': 'VD', '12': 'GE', '13': 'VD',
   '14': 'VD', '15': 'FR', '16': 'FR', '17': 'FR', '18': 'VS',
   '19': 'VS', '20': 'NE', '21': 'NE', '22': 'NE', '23': 'NE',
   '24': 'NE', '25': 'JU', '26': 'JU', '27': 'BE', '28': 'BE',
@@ -18,28 +19,20 @@ const ZIPCODE_TO_CANTON: Record<string, string> = {
   '50': 'AG', '51': 'AG', '52': 'ZH', '53': 'ZH', '54': 'AG',
   '55': 'AG', '56': 'AG', '57': 'AG', '58': 'AG', '59': 'AG',
   '60': 'LU', '61': 'LU', '62': 'OW', '63': 'NW', '64': 'UR',
-  '65': 'SZ', '66': 'GL', '67': 'SZ', '68': 'ZG', '69': 'SZ',
-  '70': 'TG', '71': 'TG', '72': 'SG', '73': 'SG', '74': 'SG',
-  '75': 'SG', '76': 'TG', '77': 'SG', '78': 'SH', '80': 'ZH',
-  '81': 'ZH', '82': 'ZH', '83': 'ZH', '84': 'ZH', '85': 'ZH',
-  '86': 'ZH', '87': 'ZH', '88': 'TG', '89': 'TG',
+  '65': 'TI', '66': 'TI', '67': 'SZ', '68': 'TI', '69': 'TI',
+  '70': 'GR', '71': 'GR', '72': 'GR', '73': 'GR', '74': 'GR',
+  '75': 'GR', '76': 'GR', '77': 'SG', '78': 'SH',
+  '80': 'ZH', '81': 'ZH', '82': 'ZH', '83': 'ZH', '84': 'ZH',
+  '85': 'ZH', '86': 'ZH', '87': 'ZH', '88': 'TG', '89': 'TG',
   '90': 'SG', '91': 'AR', '92': 'AI', '93': 'SG', '94': 'SG',
   '95': 'TG', '96': 'TG',
-  '65': 'TI', '66': 'TI', '68': 'TI', '69': 'TI',
-  '70': 'GR', '71': 'GR', '72': 'GR', '73': 'GR', '74': 'GR',
-  '75': 'GR', '76': 'GR',
 }
 
 function detectCantonFromZip(zipcode: string | number): string | null {
   const zip = String(zipcode)
   if (zip.length < 4) return null
-  // Try first 2 digits
   const prefix2 = zip.substring(0, 2)
-  if (ZIPCODE_TO_CANTON[prefix2]) return ZIPCODE_TO_CANTON[prefix2]
-  // Try first 1 digit
-  const prefix1 = zip.substring(0, 1)
-  if (ZIPCODE_TO_CANTON[prefix1]) return ZIPCODE_TO_CANTON[prefix1]
-  return null
+  return ZIPCODE_TO_CANTON[prefix2] || null
 }
 
 const CITY_TO_CANTON: Record<string, string> = {
