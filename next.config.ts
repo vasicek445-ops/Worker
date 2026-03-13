@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: '/', destination: '/landing.html' },
+      { source: '/ebook', destination: '/ebook.html' },
     ];
   },
 };
