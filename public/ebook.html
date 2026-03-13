@@ -860,28 +860,42 @@ body {
           </div>
           <div class="demo-cv-status" id="cv-status">Analyzuji pozici...</div>
         </div>
-        <!-- Step 3: Výsledek — realistické CV -->
+        <!-- Step 3: Výsledek — realistické CV s přepínáním -->
         <div id="cv-step3" style="display:none;">
-          <div class="demo-cv-result" style="position:relative;">
+          <!-- Toolbar pro přepínání -->
+          <div id="cv-toolbar" style="display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; align-items:center;">
+            <span style="font-size:11px; color:var(--text-dim); margin-right:4px;">Šablona:</span>
+            <span class="demo-filter cv-tpl-btn active" data-tpl="kreativ" style="font-size:11px; padding:3px 10px; cursor:pointer;">Kreativ</span>
+            <span class="demo-filter cv-tpl-btn" data-tpl="klassisch" style="font-size:11px; padding:3px 10px; cursor:pointer;">Klassisch</span>
+            <span class="demo-filter cv-tpl-btn" data-tpl="modern" style="font-size:11px; padding:3px 10px; cursor:pointer;">Modern</span>
+            <span class="demo-filter cv-tpl-btn" data-tpl="elegant" style="font-size:11px; padding:3px 10px; cursor:pointer;">Elegant</span>
+            <span style="font-size:11px; color:var(--text-dim); margin-left:8px;">Barva:</span>
+            <span class="cv-color-dot" data-color="#2563eb" style="width:18px; height:18px; border-radius:50%; background:#2563eb; cursor:pointer; border:2px solid var(--green);"></span>
+            <span class="cv-color-dot" data-color="#dc2626" style="width:18px; height:18px; border-radius:50%; background:#dc2626; cursor:pointer; border:2px solid transparent;"></span>
+            <span class="cv-color-dot" data-color="#059669" style="width:18px; height:18px; border-radius:50%; background:#059669; cursor:pointer; border:2px solid transparent;"></span>
+            <span class="cv-color-dot" data-color="#7c3aed" style="width:18px; height:18px; border-radius:50%; background:#7c3aed; cursor:pointer; border:2px solid transparent;"></span>
+            <span class="cv-color-dot" data-color="#d97706" style="width:18px; height:18px; border-radius:50%; background:#d97706; cursor:pointer; border:2px solid transparent;"></span>
+          </div>
+          <div class="demo-cv-result" id="cv-result-card" style="position:relative; transition: all 0.4s;">
             <!-- CV header s barevným pruhem -->
-            <div style="background:linear-gradient(135deg, #2563eb, #1d4ed8); padding:16px 20px; border-radius:10px 10px 0 0; margin:-20px -20px 16px -20px;">
+            <div id="cv-header-bar" style="background:linear-gradient(135deg, #2563eb, #1d4ed8); padding:16px 20px; border-radius:10px 10px 0 0; margin:-20px -20px 16px -20px; transition: background 0.4s;">
               <div style="display:flex; align-items:center; gap:16px;">
-                <div style="width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:white;">JN</div>
+                <img src="/images/founder-beanie.jpg" style="width:52px; height:52px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.3);" alt="Václav Kočka">
                 <div>
-                  <div class="demo-cv-name" style="color:white;">Jan Novák</div>
+                  <div class="demo-cv-name" style="color:white;">Václav Kočka</div>
                   <div style="color:rgba(255,255,255,0.7); font-size:12px;">Bauarbeiter / Construction Worker</div>
                 </div>
               </div>
             </div>
             <!-- Profil -->
             <div class="demo-cv-section">
-              <div class="demo-cv-label" style="color:#2563eb;">Profil</div>
+              <div class="demo-cv-label cv-accent" style="color:#2563eb;">Profil</div>
               <div class="demo-cv-text">Motivierter Bauarbeiter mit 2 Jahren Erfahrung im Hoch- und Tiefbau. Spezialisiert auf Abbrucharbeiten und Betonbau. Belastbar, teamfähig und bereit für neue Herausforderungen in der Schweiz.</div>
             </div>
             <!-- Berufserfahrung -->
             <div class="demo-cv-section">
-              <div class="demo-cv-label" style="color:#2563eb;">Berufserfahrung</div>
-              <div style="padding-left:12px; border-left:2px solid rgba(37,99,235,0.3);">
+              <div class="demo-cv-label cv-accent" style="color:#2563eb;">Berufserfahrung</div>
+              <div class="cv-exp-line" style="padding-left:12px; border-left:2px solid rgba(37,99,235,0.3); transition: border-color 0.4s;">
                 <div style="font-size:13px; font-weight:600;">Abbrucharbeiter · BauFirma GmbH, Zug</div>
                 <div style="font-size:11px; color:var(--text-dim); margin-bottom:4px;">03.2024 – Aktuell</div>
                 <div class="demo-cv-text">• Durchführung von Abbruch- und Rückbauarbeiten<br>• Bedienung von Baumaschinen und Werkzeugen<br>• Materialtransport und Baustellensicherung</div>
@@ -889,26 +903,26 @@ body {
             </div>
             <!-- Sprachen s vizuální úrovní -->
             <div class="demo-cv-section">
-              <div class="demo-cv-label" style="color:#2563eb;">Sprachen</div>
+              <div class="demo-cv-label cv-accent" style="color:#2563eb;">Sprachen</div>
               <div style="display:flex; flex-direction:column; gap:6px;">
                 <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
                   <span style="width:90px;">Tschechisch</span>
                   <div style="flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px;">
-                    <div style="width:100%; height:100%; background:#2563eb; border-radius:3px;"></div>
+                    <div class="cv-lang-bar" style="width:100%; height:100%; background:#2563eb; border-radius:3px; transition: background 0.4s;"></div>
                   </div>
                   <span style="color:var(--text-dim); width:30px;">C2</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
                   <span style="width:90px;">Deutsch</span>
                   <div style="flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px;">
-                    <div style="width:33%; height:100%; background:#2563eb; border-radius:3px;"></div>
+                    <div class="cv-lang-bar" style="width:33%; height:100%; background:#2563eb; border-radius:3px; transition: background 0.4s;"></div>
                   </div>
                   <span style="color:var(--text-dim); width:30px;">A2</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
                   <span style="width:90px;">Englisch</span>
                   <div style="flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px;">
-                    <div style="width:50%; height:100%; background:#2563eb; border-radius:3px;"></div>
+                    <div class="cv-lang-bar" style="width:50%; height:100%; background:#2563eb; border-radius:3px; transition: background 0.4s;"></div>
                   </div>
                   <span style="color:var(--text-dim); width:30px;">B1</span>
                 </div>
@@ -916,7 +930,7 @@ body {
             </div>
             <!-- Fachkenntnisse -->
             <div class="demo-cv-section" style="margin-bottom:0;">
-              <div class="demo-cv-label" style="color:#2563eb;">Fachkenntnisse</div>
+              <div class="demo-cv-label cv-accent" style="color:#2563eb;">Fachkenntnisse</div>
               <div style="display:flex; flex-wrap:wrap; gap:6px;">
                 <span class="demo-filter" style="font-size:11px; padding:3px 8px;">Abbrucharbeiten</span>
                 <span class="demo-filter" style="font-size:11px; padding:3px 8px;">Betonbau</span>
@@ -928,11 +942,10 @@ body {
             <!-- Akce -->
             <div style="display:flex; gap:8px; margin-top:16px; justify-content:center;">
               <span class="demo-filter active" style="font-size:11px;">📥 Stáhnout PDF</span>
-              <span class="demo-filter" style="font-size:11px;">✏️ Upravit</span>
-              <span class="demo-filter" style="font-size:11px;">🎨 Změnit šablonu</span>
+              <span class="demo-filter" style="font-size:11px;">✏️ Upravit data</span>
             </div>
             <div style="text-align:center; margin-top:8px;">
-              <span style="font-size:11px; color:var(--green);">✅ Vygenerováno za 12 sekund · Šablona Kreativ</span>
+              <span style="font-size:11px; color:var(--green);">✅ Vygenerováno za 12 sekund</span>
             </div>
           </div>
         </div>
@@ -1141,7 +1154,7 @@ const demoObserver = new IntersectionObserver((entries) => {
       if (id === 'demo-cv') {
         // Field 1: Jméno
         document.getElementById('cv-field-1').style.opacity = '1';
-        typeText('typed-cv-name', 'Jan Novák', 70, () => {
+        typeText('typed-cv-name', 'Václav Kočka', 70, () => {
           document.getElementById('cv-cursor-1').style.display = 'none';
           // Field 2: Pozice
           setTimeout(() => {
@@ -1241,6 +1254,86 @@ function resetDemo(type) {
 }
 
 document.querySelectorAll('.demo-body').forEach(el => demoObserver.observe(el));
+
+// ─── CV color/template switching ───
+function setCvColor(color) {
+  const header = document.getElementById('cv-header-bar');
+  if (header) header.style.background = `linear-gradient(135deg, ${color}, ${color}dd)`;
+  document.querySelectorAll('.cv-accent').forEach(el => el.style.color = color);
+  document.querySelectorAll('.cv-lang-bar').forEach(el => el.style.background = color);
+  const expLine = document.querySelector('.cv-exp-line');
+  if (expLine) expLine.style.borderColor = color + '50';
+  // Update dot borders
+  document.querySelectorAll('.cv-color-dot').forEach(dot => {
+    dot.style.borderColor = dot.dataset.color === color ? 'var(--green)' : 'transparent';
+  });
+}
+
+function setCvTemplate(tpl) {
+  const card = document.getElementById('cv-result-card');
+  const header = document.getElementById('cv-header-bar');
+  if (!card || !header) return;
+  // Reset
+  card.style.borderLeft = '';
+  header.style.display = '';
+  header.style.borderRadius = '10px 10px 0 0';
+  header.style.margin = '-20px -20px 16px -20px';
+  // Template variants
+  if (tpl === 'klassisch') {
+    header.style.borderRadius = '0';
+    card.style.borderLeft = '6px solid ' + (document.querySelector('.cv-color-dot[style*="border-color: var(--green)"]')?.dataset?.color || '#2563eb');
+  } else if (tpl === 'modern') {
+    header.style.borderRadius = '10px 10px 0 0';
+  } else if (tpl === 'elegant') {
+    header.style.borderRadius = '0';
+    header.style.margin = '-20px -20px 16px -20px';
+  } else if (tpl === 'kreativ') {
+    header.style.borderRadius = '10px 10px 0 0';
+  }
+  // Update buttons
+  document.querySelectorAll('.cv-tpl-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tpl === tpl);
+  });
+}
+
+// Click handlers
+document.addEventListener('click', (e) => {
+  const colorDot = e.target.closest('.cv-color-dot');
+  if (colorDot) setCvColor(colorDot.dataset.color);
+  const tplBtn = e.target.closest('.cv-tpl-btn');
+  if (tplBtn) setCvTemplate(tplBtn.dataset.tpl);
+});
+
+// Auto-cycle colors after CV is shown
+let cvColorCycleInterval = null;
+const cvColors = ['#2563eb', '#dc2626', '#059669', '#7c3aed', '#d97706'];
+const cvTemplates = ['kreativ', 'klassisch', 'modern', 'elegant'];
+
+function startCvCycle() {
+  let idx = 0;
+  cvColorCycleInterval = setInterval(() => {
+    idx++;
+    const colorIdx = idx % cvColors.length;
+    const tplIdx = idx % cvTemplates.length;
+    setCvColor(cvColors[colorIdx]);
+    if (idx % 2 === 0) setCvTemplate(cvTemplates[tplIdx]);
+  }, 2000);
+}
+function stopCvCycle() {
+  if (cvColorCycleInterval) { clearInterval(cvColorCycleInterval); cvColorCycleInterval = null; }
+}
+
+// Start cycle when step3 becomes visible
+const cvStep3Observer = new MutationObserver(() => {
+  const step3 = document.getElementById('cv-step3');
+  if (step3 && step3.style.display !== 'none') {
+    setTimeout(startCvCycle, 1500);
+  } else {
+    stopCvCycle();
+  }
+});
+const cvStep3El = document.getElementById('cv-step3');
+if (cvStep3El) cvStep3Observer.observe(cvStep3El, { attributes: true, attributeFilter: ['style'] });
 
 // ─── Smooth scroll ───
 document.querySelectorAll('a[href^="#"]').forEach(link => {
