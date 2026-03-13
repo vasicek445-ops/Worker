@@ -404,6 +404,167 @@ body {
   transform: translateY(0);
 }
 
+/* ─── Demo windows ─── */
+.demo-window {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.demo-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+}
+.demo-dots { display: flex; gap: 6px; }
+.demo-dots span {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+}
+.demo-dots span:first-child { background: #ff5f57; }
+.demo-dots span:nth-child(2) { background: #ffbd2e; }
+.demo-dots span:last-child { background: #28c840; }
+.demo-title { font-size: 13px; font-weight: 600; flex: 1; }
+.demo-badge {
+  font-size: 10px; font-weight: 700; color: var(--green);
+  background: var(--green-dim); padding: 3px 8px; border-radius: 6px;
+  animation: pulse-badge 2s infinite;
+}
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.demo-body { padding: 20px; min-height: 180px; }
+
+/* Search bar */
+.demo-search-bar {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.demo-search-icon { color: var(--text-dim); font-size: 16px; }
+.demo-typed { color: var(--text); }
+.demo-cursor {
+  color: var(--green);
+  animation: blink 0.8s infinite;
+  font-weight: 300;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Filters */
+.demo-filters {
+  display: flex; gap: 8px; margin: 12px 0;
+  transition: opacity 0.4s;
+}
+.demo-filter {
+  font-size: 12px; padding: 5px 12px; border-radius: 8px;
+  background: rgba(255,255,255,0.05); color: var(--text-dim);
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+.demo-filter.active {
+  background: var(--green-dim); color: var(--green);
+  border-color: rgba(57,255,110,0.3);
+}
+
+/* Results */
+.demo-results { display: flex; flex-direction: column; gap: 8px; }
+.demo-result-item {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.demo-result-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.demo-result-meta { font-size: 12px; color: var(--text-dim); }
+.demo-stat-bar {
+  font-size: 12px; color: var(--text-dim);
+  padding: 8px 0; text-align: center;
+  transition: opacity 0.4s;
+}
+
+/* Chat */
+.demo-chat-body {
+  display: flex; flex-direction: column; gap: 12px;
+  min-height: 200px;
+}
+.demo-chat-msg { display: flex; gap: 10px; transition: opacity 0.4s; }
+.demo-chat-msg.user { justify-content: flex-end; }
+.demo-chat-bubble {
+  max-width: 80%; padding: 12px 16px; border-radius: 14px;
+  font-size: 13px; line-height: 1.5;
+}
+.demo-chat-bubble.user {
+  background: var(--green-dim); color: var(--text);
+  border-bottom-right-radius: 4px;
+}
+.demo-chat-bubble.ai {
+  background: rgba(255,255,255,0.05); color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+.demo-chat-avatar {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, #39ff6e, #2bcc58);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px; color: #0a0a12;
+  flex-shrink: 0;
+}
+
+/* CV Generator */
+.demo-cv-btn {
+  background: linear-gradient(135deg, #39ff6e, #2bcc58);
+  color: #0a0a12; font-weight: 700; font-size: 14px;
+  padding: 12px 20px; border-radius: 10px;
+  text-align: center; cursor: default;
+  transition: opacity 0.4s;
+}
+.demo-cv-progress {
+  height: 6px; background: rgba(255,255,255,0.1);
+  border-radius: 3px; overflow: hidden; margin-bottom: 12px;
+}
+.demo-cv-progress-bar {
+  height: 100%; width: 0%; border-radius: 3px;
+  background: linear-gradient(90deg, #39ff6e, #2bcc58);
+  transition: width 0.3s;
+}
+.demo-cv-status {
+  font-size: 13px; color: var(--text-dim); text-align: center;
+}
+.demo-cv-result {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px;
+}
+.demo-cv-header { text-align: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.demo-cv-name { font-size: 18px; font-weight: 800; }
+.demo-cv-section { margin-bottom: 12px; }
+.demo-cv-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green); margin-bottom: 4px; }
+.demo-cv-text { font-size: 13px; color: var(--text-dim); }
+
+/* Agencies */
+.demo-agency-scroll { display: flex; flex-direction: column; gap: 8px; }
+.demo-agency-row {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.demo-agency-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.demo-agency-info { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
+.demo-agency-contact { font-size: 11px; color: rgba(57,255,110,0.6); }
+
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
   .section { padding: 60px 16px; }
@@ -562,125 +723,167 @@ body {
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════ -->
-<!-- SECTION 4: ŘEŠENÍ — LIVE DEMO -->
+<!-- SECTION 4: ŘEŠENÍ — INTERAKTIVNÍ DEMO -->
 <!-- ═══════════════════════════════════════════════════════════════════ -->
-<section class="section" id="solution">
+<section class="section" id="solution" style="min-height:auto; padding-top:60px; padding-bottom:60px;">
   <div class="glow-purple" style="top:-100px;right:-200px;"></div>
   <div class="container">
     <span class="section-label fade-in">Řešení</span>
-    <h2 class="section-title fade-in">Co Woker umí <span style="color:var(--green);">za tebe</span></h2>
-    <p class="section-desc fade-in">Všechno co jsem si musel zjistit sám za týdny, ty máš na pár kliknutí.</p>
+    <h2 class="section-title fade-in">Podívej se, co Woker umí <span style="color:var(--green);">za tebe</span></h2>
+    <p class="section-desc fade-in">Živé ukázky — přesně takhle to vypadá uvnitř.</p>
 
-    <div class="demo-grid">
-      <div class="demo-card fade-in">
-        <div class="icon">🔍</div>
-        <h4>Pracovní nabídky</h4>
-        <p>Agregované z 5 zdrojů — Arbeitnow, Jooble, Michael Page, Robert Half, jobs.ch. Filtruj podle kantonu, oboru, jazyka.</p>
-        <span class="stat">1 000+ nabídek denně</span>
+    <!-- ── DEMO 1: Hledání práce ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">🔍 Hledání práce</div>
+        <span class="demo-badge">LIVE</span>
       </div>
-
-      <div class="demo-card fade-in">
-        <div class="icon">🏠</div>
-        <h4>Hledání bydlení</h4>
-        <p>Byty z Flatfox s filtry podle ceny, lokality a počtu pokojů. Žádné scrollování desítek webů.</p>
-        <span class="stat">Aktualizace denně</span>
-      </div>
-
-      <div class="demo-card fade-in">
-        <div class="icon">📋</div>
-        <h4>1 007+ agentur</h4>
-        <p>Největší databáze švýcarských personálních agentur. Kontakty, specializace, hodnocení.</p>
-        <span class="stat">Přímé kontakty</span>
-      </div>
-
-      <div class="demo-card fade-in">
-        <div class="icon">🤖</div>
-        <h4>AI Asistent</h4>
-        <p>Zeptej se na cokoliv o práci a životě ve Švýcarsku. Odpověď během sekund, v češtině.</p>
-        <span class="stat">8 AI nástrojů</span>
-      </div>
-
-      <div class="demo-card fade-in">
-        <div class="icon">📄</div>
-        <h4>CV & průvodní dopis</h4>
-        <p>AI ti vygeneruje profesionální CV a průvodní dopis v němčině — přizpůsobené pozici.</p>
-        <span class="stat">Generuj za 30s</span>
-      </div>
-
-      <div class="demo-card fade-in">
-        <div class="icon">📚</div>
-        <h4>Průvodci</h4>
-        <p>Víza, pracovní povolení, pojištění, daně, důchod, řidičák — kompletní průvodci krok za krokem.</p>
-        <span class="stat">Vše na jednom místě</span>
-      </div>
-
-      <div class="demo-card fade-in">
-        <div class="icon">💰</div>
-        <h4>Daňová kalkulačka</h4>
-        <p>Spočítej si čistý plat ve Švýcarsku. Odvody, daně, pojištění — vše podle tvého kantonu.</p>
-        <span class="stat">Přesné výpočty</span>
-      </div>
-
-      <div class="demo-card fade-in">
-        <div class="icon">👥</div>
-        <h4>Komunita</h4>
-        <p>Sdílej zkušenosti s ostatními Čechy a Slováky ve Švýcarsku. Rady, tipy, podpora.</p>
-        <span class="stat">Aktivní členové</span>
+      <div class="demo-body" id="demo-jobs">
+        <div class="demo-search-bar">
+          <span class="demo-search-icon">⌕</span>
+          <span class="demo-typed" id="typed-job"></span><span class="demo-cursor">|</span>
+        </div>
+        <div class="demo-filters" id="job-filters" style="opacity:0;">
+          <span class="demo-filter active">Zürich</span>
+          <span class="demo-filter">Bern</span>
+          <span class="demo-filter">Basel</span>
+          <span class="demo-filter">Zug</span>
+        </div>
+        <div class="demo-results" id="job-results">
+          <div class="demo-result-item" style="opacity:0; transform:translateY(10px);">
+            <div class="demo-result-title">Bauarbeiter / Demolition Worker</div>
+            <div class="demo-result-meta">📍 Zürich · 💰 38 CHF/h · 🏢 Adecco</div>
+          </div>
+          <div class="demo-result-item" style="opacity:0; transform:translateY(10px);">
+            <div class="demo-result-title">Lagermitarbeiter / Warehouse</div>
+            <div class="demo-result-meta">📍 Zürich · 💰 28 CHF/h · 🏢 Randstad</div>
+          </div>
+          <div class="demo-result-item" style="opacity:0; transform:translateY(10px);">
+            <div class="demo-result-title">Elektriker / Electrician</div>
+            <div class="demo-result-meta">📍 Winterthur · 💰 42 CHF/h · 🏢 Manpower</div>
+          </div>
+          <div class="demo-result-item" style="opacity:0; transform:translateY(10px);">
+            <div class="demo-result-title">CNC Operator</div>
+            <div class="demo-result-meta">📍 Zürich · 💰 35 CHF/h · 🏢 Michael Page</div>
+          </div>
+        </div>
+        <div class="demo-stat-bar" id="job-stat" style="opacity:0;">
+          Nalezeno <strong style="color:var(--green);">247 nabídek</strong> pro Zürich
+        </div>
       </div>
     </div>
 
-    <!-- Srovnávací timeline -->
-    <div style="margin-top:60px;">
-      <h3 class="fade-in" style="font-size:22px; font-weight:700; margin-bottom:32px; text-align:center;">
-        Bez Wokeru vs. s Wokerem
-      </h3>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-        <!-- BEZ -->
-        <div class="fade-in" style="background:rgba(255,59,59,0.05); border:1px solid rgba(255,59,59,0.15); border-radius:16px; padding:24px;">
-          <h4 style="color:var(--red); margin-bottom:16px; font-size:14px; text-transform:uppercase; letter-spacing:1px;">Bez Wokeru</h4>
-          <div class="timeline">
-            <div class="timeline-item" style="--dot-color:var(--red);">
-              <h4>Týden 1–2</h4>
-              <p>Googluješ "práce Švýcarsko", scrolluješ Facebook skupiny</p>
-            </div>
-            <div class="timeline-item">
-              <h4>Týden 3–4</h4>
-              <p>Platíš za překlad CV, píšeš agenturám ručně</p>
-            </div>
-            <div class="timeline-item">
-              <h4>Týden 5–8</h4>
-              <p>Pořád bez odpovědi, zvažuješ návrat domů</p>
-            </div>
-            <div class="timeline-item">
-              <h4>Měsíc 3+</h4>
-              <p>Možná něco najdeš. Možná ne.</p>
-            </div>
-          </div>
+    <!-- ── DEMO 2: AI Asistent ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">🤖 AI Asistent</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body demo-chat-body" id="demo-chat">
+        <div class="demo-chat-msg user" id="chat-question" style="opacity:0;">
+          <div class="demo-chat-bubble user">Jaké doklady potřebuju pro práci ve Švýcarsku?</div>
         </div>
-        <!-- S -->
-        <div class="fade-in" style="background:var(--green-dim); border:1px solid rgba(57,255,110,0.15); border-radius:16px; padding:24px;">
-          <h4 style="color:var(--green); margin-bottom:16px; font-size:14px; text-transform:uppercase; letter-spacing:1px;">S Wokerem</h4>
-          <div class="timeline">
-            <div class="timeline-item">
-              <h4>Den 1</h4>
-              <p>Registrace zdarma, AI vygeneruje CV v němčině</p>
-            </div>
-            <div class="timeline-item">
-              <h4>Den 2–3</h4>
-              <p>Filtruješ nabídky, kontaktuješ agentury přímo</p>
-            </div>
-            <div class="timeline-item">
-              <h4>Týden 1–2</h4>
-              <p>První pohovory, bydlení nalezeno přes Woker</p>
-            </div>
-            <div class="timeline-item">
-              <h4>Měsíc 1</h4>
-              <p>Pracuješ, bydlíš, žiješ. Průvodci ti pomáhají s papírováním.</p>
-            </div>
+        <div class="demo-chat-msg ai" id="chat-answer" style="opacity:0;">
+          <div class="demo-chat-avatar">W</div>
+          <div class="demo-chat-bubble ai">
+            <span id="typed-answer"></span><span class="demo-cursor" id="chat-cursor">|</span>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- ── DEMO 3: CV Generátor ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">📄 CV Generátor</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-cv">
+        <div class="demo-cv-input" id="cv-step1">
+          <div style="margin-bottom:12px; font-size:13px; color:var(--text-dim);">Pozice na kterou se hlásíš:</div>
+          <div class="demo-search-bar" style="margin-bottom:12px;">
+            <span class="demo-typed" id="typed-cv"></span><span class="demo-cursor" id="cv-cursor">|</span>
+          </div>
+          <div class="demo-cv-btn" id="cv-generate-btn" style="opacity:0;">
+            Generovat CV v němčině →
+          </div>
+        </div>
+        <div id="cv-step2" style="display:none;">
+          <div class="demo-cv-progress">
+            <div class="demo-cv-progress-bar" id="cv-progress-bar"></div>
+          </div>
+          <div class="demo-cv-status" id="cv-status">Analyzuji pozici...</div>
+        </div>
+        <div id="cv-step3" style="display:none;">
+          <div class="demo-cv-result">
+            <div class="demo-cv-header">
+              <div class="demo-cv-name">Jan Novák</div>
+              <div class="demo-cv-pos" style="color:var(--green); font-size:13px;">Bauarbeiter / Construction Worker</div>
+            </div>
+            <div class="demo-cv-section">
+              <div class="demo-cv-label">Berufserfahrung</div>
+              <div class="demo-cv-text">2 Jahre Erfahrung im Bauwesen, Abbrucharbeiten und Betonbau...</div>
+            </div>
+            <div class="demo-cv-section">
+              <div class="demo-cv-label">Ausbildung</div>
+              <div class="demo-cv-text">Střední průmyslová škola stavební, Praha (2018–2022)</div>
+            </div>
+            <div class="demo-cv-section">
+              <div class="demo-cv-label">Sprachkenntnisse</div>
+              <div class="demo-cv-text">Tschechisch (Muttersprache) · Deutsch (A2) · Englisch (B1)</div>
+            </div>
+            <div style="text-align:center; margin-top:16px;">
+              <span class="demo-filter active" style="font-size:12px;">✅ Hotovo za 28 sekund</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 4: Databáze agentur ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">📋 Databáze 1 007 agentur</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-agencies">
+        <div class="demo-agency-scroll" id="agency-scroll">
+          <div class="demo-agency-row">
+            <div class="demo-agency-name">Adecco Schweiz</div>
+            <div class="demo-agency-info">📍 Zürich · 🏗️ Bau, Industrie · ⭐ 4.2</div>
+            <div class="demo-agency-contact">📞 +41 44 123 45 67 · 📧 info@adecco.ch</div>
+          </div>
+          <div class="demo-agency-row">
+            <div class="demo-agency-name">Randstad Schweiz</div>
+            <div class="demo-agency-info">📍 Bern · 🔧 Technik, Logistik · ⭐ 4.0</div>
+            <div class="demo-agency-contact">📞 +41 31 987 65 43 · 📧 jobs@randstad.ch</div>
+          </div>
+          <div class="demo-agency-row">
+            <div class="demo-agency-name">Manpower AG</div>
+            <div class="demo-agency-info">📍 Basel · 🏭 Produktion, Bau · ⭐ 3.9</div>
+            <div class="demo-agency-contact">📞 +41 61 222 33 44 · 📧 basel@manpower.ch</div>
+          </div>
+          <div class="demo-agency-row">
+            <div class="demo-agency-name">Michael Page</div>
+            <div class="demo-agency-info">📍 Zürich · 💼 Finance, IT · ⭐ 4.5</div>
+            <div class="demo-agency-contact">📞 +41 44 555 66 77 · 📧 zurich@michaelpage.ch</div>
+          </div>
+          <div class="demo-agency-row">
+            <div class="demo-agency-name">Robert Half</div>
+            <div class="demo-agency-info">📍 Genève · 📊 Accounting, IT · ⭐ 4.3</div>
+            <div class="demo-agency-contact">📞 +41 22 888 99 00 · 📧 geneva@roberthalf.ch</div>
+          </div>
+        </div>
+        <div class="demo-stat-bar" style="margin-top:12px;">
+          Zobrazuji <strong style="color:var(--green);">5 z 1 007</strong> agentur · <span style="color:var(--green);">Přímé kontakty</span> pro premium uživatele
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -775,6 +978,128 @@ weeksSlider.addEventListener('input', updateCalc);
 nightsSlider.addEventListener('input', updateCalc);
 
 updateCalc();
+
+// ─── Demo animations ───
+function typeText(elementId, text, speed, callback) {
+  const el = document.getElementById(elementId);
+  let i = 0;
+  el.textContent = '';
+  function type() {
+    if (i < text.length) {
+      el.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, speed);
+    } else if (callback) {
+      callback();
+    }
+  }
+  type();
+}
+
+function animateResults(containerId, delay) {
+  const items = document.querySelectorAll(`#${containerId} .demo-result-item`);
+  items.forEach((item, idx) => {
+    setTimeout(() => {
+      item.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+      item.style.opacity = '1';
+      item.style.transform = 'translateY(0)';
+    }, delay + idx * 200);
+  });
+}
+
+// Trigger demos when they scroll into view
+const demoObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !entry.target.dataset.animated) {
+      entry.target.dataset.animated = 'true';
+      const id = entry.target.id;
+
+      if (id === 'demo-jobs') {
+        typeText('typed-job', 'Zürich construction', 60, () => {
+          document.getElementById('job-filters').style.opacity = '1';
+          setTimeout(() => {
+            animateResults('job-results', 300);
+            setTimeout(() => {
+              document.getElementById('job-stat').style.opacity = '1';
+            }, 1200);
+          }, 400);
+        });
+        // Loop
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('jobs'); }, 12000);
+      }
+
+      if (id === 'demo-chat') {
+        const answer = 'Pro práci ve Švýcarsku potřebuješ:\n\n1. 🪪 Platný pas nebo občanský průkaz (EU)\n2. 📋 Povolení k pobytu (L nebo B permit)\n3. 🏥 Zdravotní pojištění (povinné do 3 měsíců)\n4. 🏦 Švýcarský bankovní účet\n5. 📍 Registrace na Einwohnerkontrolle\n\nWoker tě provede celým procesem krok za krokem.';
+        setTimeout(() => {
+          document.getElementById('chat-question').style.opacity = '1';
+          setTimeout(() => {
+            document.getElementById('chat-answer').style.opacity = '1';
+            typeText('typed-answer', answer, 15, () => {
+              document.getElementById('chat-cursor').style.display = 'none';
+            });
+          }, 800);
+        }, 300);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('chat'); }, 18000);
+      }
+
+      if (id === 'demo-cv') {
+        typeText('typed-cv', 'Bauarbeiter / Construction Worker', 50, () => {
+          setTimeout(() => {
+            document.getElementById('cv-generate-btn').style.opacity = '1';
+            setTimeout(() => {
+              document.getElementById('cv-step1').style.display = 'none';
+              document.getElementById('cv-step2').style.display = 'block';
+              let progress = 0;
+              const statuses = ['Analyzuji pozici...', 'Generuji Berufserfahrung...', 'Přidávám Sprachkenntnisse...', 'Formátuji CV...'];
+              const pInterval = setInterval(() => {
+                progress += 3;
+                document.getElementById('cv-progress-bar').style.width = progress + '%';
+                const sIdx = Math.min(Math.floor(progress / 25), statuses.length - 1);
+                document.getElementById('cv-status').textContent = statuses[sIdx];
+                if (progress >= 100) {
+                  clearInterval(pInterval);
+                  setTimeout(() => {
+                    document.getElementById('cv-step2').style.display = 'none';
+                    document.getElementById('cv-step3').style.display = 'block';
+                  }, 300);
+                }
+              }, 80);
+            }, 800);
+          }, 400);
+        });
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('cv'); }, 16000);
+      }
+
+    }
+  });
+}, { threshold: 0.3 });
+
+function resetDemo(type) {
+  if (type === 'jobs') {
+    document.getElementById('typed-job').textContent = '';
+    document.getElementById('job-filters').style.opacity = '0';
+    document.querySelectorAll('#job-results .demo-result-item').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(10px)';
+    });
+    document.getElementById('job-stat').style.opacity = '0';
+  }
+  if (type === 'chat') {
+    document.getElementById('chat-question').style.opacity = '0';
+    document.getElementById('chat-answer').style.opacity = '0';
+    document.getElementById('typed-answer').textContent = '';
+    document.getElementById('chat-cursor').style.display = '';
+  }
+  if (type === 'cv') {
+    document.getElementById('typed-cv').textContent = '';
+    document.getElementById('cv-generate-btn').style.opacity = '0';
+    document.getElementById('cv-step1').style.display = 'block';
+    document.getElementById('cv-step2').style.display = 'none';
+    document.getElementById('cv-step3').style.display = 'none';
+    document.getElementById('cv-progress-bar').style.width = '0%';
+  }
+}
+
+document.querySelectorAll('.demo-body').forEach(el => demoObserver.observe(el));
 
 // ─── Smooth scroll ───
 document.querySelectorAll('a[href^="#"]').forEach(link => {
