@@ -581,6 +581,78 @@ body {
 .demo-agency-info { font-size: 12px; color: var(--text-dim); margin-bottom: 2px; }
 .demo-agency-contact { font-size: 11px; color: rgba(57,255,110,0.6); }
 
+/* ─── AI Matching demo ─── */
+.match-profile-tag {
+  display: inline-block;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.4s;
+}
+.match-scan-ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid var(--green);
+  border-top-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  animation: matchSpin 1.2s linear infinite;
+}
+@keyframes matchSpin {
+  to { transform: rotate(360deg); }
+}
+.match-scan-icon {
+  font-size: 28px;
+  animation: matchPulse 1s ease-in-out infinite;
+}
+@keyframes matchPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+.match-result-row {
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.match-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.match-result-name { font-size: 14px; font-weight: 700; }
+.match-score-badge {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 8px;
+}
+.match-score-green { background: rgba(57,255,110,0.15); color: #39ff6e; }
+.match-score-blue { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.match-score-yellow { background: rgba(255,170,51,0.15); color: #ffaa33; }
+.match-result-location { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.match-result-reason { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.5; margin-bottom: 8px; }
+.match-result-actions { display: flex; gap: 10px; align-items: center; }
+.match-action-btn {
+  font-size: 11px;
+  background: var(--green-dim);
+  color: var(--green);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.match-action-link { font-size: 11px; color: var(--text-dim); }
+
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
   .section { padding: 60px 16px; }
@@ -1034,6 +1106,164 @@ body {
       </div>
     </div>
 
+    <!-- ── DEMO 5: AI Smart Matching ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">🎯 AI Smart Matching</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-matching">
+        <!-- Step 1: Profile summary -->
+        <div id="match-step1">
+          <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">Tvůj profil:</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+            <div class="match-profile-tag" id="match-tag-1" style="opacity:0;">🏗️ Stavebnictví</div>
+            <div class="match-profile-tag" id="match-tag-2" style="opacity:0;">👷 Bauarbeiter</div>
+            <div class="match-profile-tag" id="match-tag-3" style="opacity:0;">📍 Zürich</div>
+            <div class="match-profile-tag" id="match-tag-4" style="opacity:0;">🇩🇪 Němčina A2</div>
+            <div class="match-profile-tag" id="match-tag-5" style="opacity:0;">⏱️ 2 roky praxe</div>
+          </div>
+          <div class="demo-cv-btn" id="match-start-btn" style="opacity:0; font-size:13px; padding:10px 20px;">
+            🎯 Spustit AI Matching →
+          </div>
+        </div>
+        <!-- Step 2: AI scanning -->
+        <div id="match-step2" style="display:none;">
+          <div style="text-align:center; padding:20px 0;">
+            <div class="match-scan-ring" id="match-ring">
+              <div class="match-scan-icon">🎯</div>
+            </div>
+            <div id="match-scan-status" style="font-size:13px; color:var(--text-dim); margin-top:12px;">Načítám databázi 1 007 agentur...</div>
+            <div style="margin-top:12px; height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden;">
+              <div id="match-progress-bar" style="height:100%; width:0%; background:var(--green); border-radius:2px; transition:width 0.3s;"></div>
+            </div>
+            <div id="match-scan-count" style="font-size:11px; color:var(--green); margin-top:6px; opacity:0;">Analyzováno: <span id="match-count-num">0</span> / 1 007</div>
+          </div>
+        </div>
+        <!-- Step 3: Results -->
+        <div id="match-step3" style="display:none;">
+          <div style="font-size:12px; color:var(--green); margin-bottom:10px; font-weight:600;">✅ Nalezeno 4 nejlepší agentury pro tvůj profil</div>
+          <div id="match-results">
+            <div class="match-result-row" style="opacity:0; transform:translateY(10px);">
+              <div class="match-result-header">
+                <div class="match-result-name">Adecco Schweiz</div>
+                <div class="match-score-badge match-score-green">92%</div>
+              </div>
+              <div class="match-result-location">📍 Zürich · 🏗️ Bau, Industrie</div>
+              <div class="match-result-reason">Největší agentura v kantonu ZH s nejvíce nabídkami ve stavebnictví. Pravidelně hledají Bauarbeiter s vaší úrovní zkušeností.</div>
+              <div class="match-result-actions">
+                <span class="match-action-btn">📧 Přihlásit se jedním klikem</span>
+                <span class="match-action-link">🌐 adecco.ch</span>
+              </div>
+            </div>
+            <div class="match-result-row" style="opacity:0; transform:translateY(10px);">
+              <div class="match-result-header">
+                <div class="match-result-name">Manpower AG</div>
+                <div class="match-score-badge match-score-green">87%</div>
+              </div>
+              <div class="match-result-location">📍 Zürich · 🏭 Produktion, Bau</div>
+              <div class="match-result-reason">Silné zastoupení v oblasti stavebnictví v regionu Zürich. Spolupracuje s firmami hledajícími dělníky s A2 němčinou.</div>
+              <div class="match-result-actions">
+                <span class="match-action-btn">📧 Přihlásit se jedním klikem</span>
+                <span class="match-action-link">🌐 manpower.ch</span>
+              </div>
+            </div>
+            <div class="match-result-row" style="opacity:0; transform:translateY(10px);">
+              <div class="match-result-header">
+                <div class="match-result-name">Randstad Schweiz</div>
+                <div class="match-score-badge match-score-blue">81%</div>
+              </div>
+              <div class="match-result-location">📍 Winterthur · 🔧 Technik, Bau</div>
+              <div class="match-result-reason">Regionální kancelář blízko Zürichu, specializace na technické a stavební pozice. Dobrá volba pro rozšíření dosahu.</div>
+              <div class="match-result-actions">
+                <span class="match-action-btn">📧 Přihlásit se jedním klikem</span>
+                <span class="match-action-link">🌐 randstad.ch</span>
+              </div>
+            </div>
+            <div class="match-result-row" style="opacity:0; transform:translateY(10px);">
+              <div class="match-result-header">
+                <div class="match-result-name">Temptrend AG</div>
+                <div class="match-score-badge match-score-yellow">76%</div>
+              </div>
+              <div class="match-result-location">📍 Zürich · 🏗️ Bau, Handwerk</div>
+              <div class="match-result-reason">Menší agentura zaměřená na řemeslné a stavební pozice. Osobnější přístup a rychlejší zpracování přihlášek.</div>
+              <div class="match-result-actions">
+                <span class="match-action-btn">📧 Přihlásit se jedním klikem</span>
+                <span class="match-action-link">🌐 temptrend.ch</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-stat-bar" id="match-stat" style="margin-top:12px; opacity:0;">
+            AI vygeneruje <strong style="color:var(--green);">motivační dopis v němčině</strong> a odešle ho jedním klikem
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 6: Odeslání přihlášky ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">✉️ Přihláška jedním klikem</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-apply">
+        <!-- Step 1: Vybraná agentura + klik -->
+        <div id="apply-step1">
+          <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">Vybraná agentura z AI matchingu:</div>
+          <div id="apply-agency-card" style="opacity:0; padding:12px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-size:14px; font-weight:700;">Adecco Schweiz</div>
+                <div style="font-size:12px; color:var(--text-dim);">📍 Zürich · 🏗️ Bau, Industrie</div>
+              </div>
+              <div class="match-score-badge match-score-green">92%</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+            <div id="apply-cv-tag" style="opacity:0; font-size:12px; background:rgba(57,255,110,0.08); border:1px solid rgba(57,255,110,0.2); border-radius:8px; padding:6px 12px;">📄 CV připraveno — Bauarbeiter</div>
+            <div id="apply-lang-tag" style="opacity:0; font-size:12px; background:rgba(57,255,110,0.08); border:1px solid rgba(57,255,110,0.2); border-radius:8px; padding:6px 12px;">🇩🇪 Dopis v němčině</div>
+          </div>
+          <div class="demo-cv-btn" id="apply-send-btn" style="opacity:0; font-size:13px; padding:10px 20px;">
+            ✉️ Odeslat přihlášku →
+          </div>
+        </div>
+        <!-- Step 2: AI píše dopis -->
+        <div id="apply-step2" style="display:none;">
+          <div style="font-size:12px; color:var(--green); margin-bottom:10px; font-weight:600;">🤖 AI generuje motivační dopis v němčině...</div>
+          <div id="apply-letter" style="background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:12px; line-height:1.7; min-height:140px;">
+            <span id="typed-letter"></span><span class="demo-cursor" id="letter-cursor">|</span>
+          </div>
+          <div id="apply-progress" style="margin-top:10px; height:3px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden;">
+            <div id="apply-progress-bar" style="height:100%; width:0%; background:var(--green); border-radius:2px; transition:width 0.3s;"></div>
+          </div>
+        </div>
+        <!-- Step 3: Odesláno -->
+        <div id="apply-step3" style="display:none;">
+          <div style="text-align:center; padding:16px 0;">
+            <div id="apply-check" style="font-size:48px; opacity:0; transform:scale(0.5);">✅</div>
+            <div id="apply-sent-title" style="font-size:16px; font-weight:700; color:var(--green); margin-top:10px; opacity:0;">Přihláška odeslána!</div>
+            <div id="apply-sent-desc" style="font-size:12px; color:var(--text-dim); margin-top:6px; opacity:0;">Motivační dopis v němčině byl odeslán na info@adecco.ch</div>
+          </div>
+          <div id="apply-email-preview" style="opacity:0; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+              <div>
+                <div style="font-size:11px; color:var(--text-dim);">Od: Václav Kočka via Woker</div>
+                <div style="font-size:11px; color:var(--text-dim);">Komu: info@adecco.ch</div>
+              </div>
+              <div style="font-size:10px; color:var(--green); background:var(--green-dim); padding:2px 8px; border-radius:4px;">Doručeno ✓</div>
+            </div>
+            <div style="font-size:12px; font-weight:600; margin-bottom:4px;">Bewerbung als Bauarbeiter — Václav Kočka</div>
+            <div style="font-size:11px; color:var(--text-dim); line-height:1.5;">Sehr geehrte Damen und Herren, mit großem Interesse bewerbe ich mich als Bauarbeiter bei Adecco Schweiz in Zürich...</div>
+          </div>
+          <div class="demo-stat-bar" id="apply-stat" style="margin-top:12px; opacity:0;">
+            <strong style="color:var(--green);">Celý proces trval 12 sekund</strong> · AI napsalo profesionální dopis v Hochdeutsch
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -1054,7 +1284,7 @@ body {
     <a href="https://www.gowoker.com/login" class="cta-button">
       Vyzkoušej Woker zdarma →
     </a>
-    <p class="cta-sub">Žádná kreditka. 1 007 agentur. 8 AI nástrojů.</p>
+    <p class="cta-sub">Žádná kreditka. 1 007 agentur. 9 AI nástrojů.</p>
 
     <div style="margin-top:60px; padding-top:40px; border-top:1px solid var(--border);">
       <p style="font-size:13px; color:var(--text-dim);">
@@ -1192,6 +1422,128 @@ const demoObserver = new IntersectionObserver((entries) => {
         setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('chat'); }, 18000);
       }
 
+      if (id === 'demo-matching') {
+        // Step 1: Profile tags appear one by one
+        const tags = ['match-tag-1','match-tag-2','match-tag-3','match-tag-4','match-tag-5'];
+        tags.forEach((tagId, i) => {
+          setTimeout(() => {
+            const tag = document.getElementById(tagId);
+            tag.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+            tag.style.opacity = '1';
+          }, 300 + i * 250);
+        });
+        // Show button
+        setTimeout(() => {
+          document.getElementById('match-start-btn').style.transition = 'opacity 0.4s';
+          document.getElementById('match-start-btn').style.opacity = '1';
+        }, 1800);
+        // Auto-click after delay
+        setTimeout(() => {
+          document.getElementById('match-step1').style.display = 'none';
+          document.getElementById('match-step2').style.display = 'block';
+          document.getElementById('match-scan-count').style.opacity = '1';
+          // Progress bar + counter
+          let prog = 0;
+          const scanStatuses = ['Načítám databázi 1 007 agentur...', 'Filtruji kanton Zürich (127 agentur)...', 'AI analyzuje kompatibilitu...', 'Hodnotím zkušenosti a obor...', 'Vybírám TOP 4 shody...'];
+          const pInt = setInterval(() => {
+            prog += 3;
+            document.getElementById('match-progress-bar').style.width = Math.min(prog, 100) + '%';
+            document.getElementById('match-count-num').textContent = Math.min(Math.floor(prog * 10.07), 1007);
+            const sIdx = Math.min(Math.floor(prog / 20), scanStatuses.length - 1);
+            document.getElementById('match-scan-status').textContent = scanStatuses[sIdx];
+            if (prog >= 100) {
+              clearInterval(pInt);
+              document.getElementById('match-count-num').textContent = '1 007';
+              setTimeout(() => {
+                document.getElementById('match-step2').style.display = 'none';
+                document.getElementById('match-step3').style.display = 'block';
+                // Animate results
+                const rows = document.querySelectorAll('#match-results .match-result-row');
+                rows.forEach((row, idx) => {
+                  setTimeout(() => {
+                    row.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                  }, idx * 300);
+                });
+                setTimeout(() => {
+                  document.getElementById('match-stat').style.transition = 'opacity 0.4s';
+                  document.getElementById('match-stat').style.opacity = '1';
+                }, rows.length * 300 + 200);
+              }, 400);
+            }
+          }, 60);
+        }, 2800);
+        // Reset loop
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('matching'); }, 20000);
+      }
+
+      if (id === 'demo-apply') {
+        // Step 1: Show agency card
+        setTimeout(() => {
+          const card = document.getElementById('apply-agency-card');
+          card.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+          card.style.opacity = '1';
+        }, 300);
+        // Show tags
+        setTimeout(() => {
+          document.getElementById('apply-cv-tag').style.transition = 'opacity 0.4s';
+          document.getElementById('apply-cv-tag').style.opacity = '1';
+        }, 800);
+        setTimeout(() => {
+          document.getElementById('apply-lang-tag').style.transition = 'opacity 0.4s';
+          document.getElementById('apply-lang-tag').style.opacity = '1';
+        }, 1100);
+        // Show send button
+        setTimeout(() => {
+          document.getElementById('apply-send-btn').style.transition = 'opacity 0.4s';
+          document.getElementById('apply-send-btn').style.opacity = '1';
+        }, 1500);
+        // Auto-click → Step 2: AI writes letter
+        setTimeout(() => {
+          document.getElementById('apply-step1').style.display = 'none';
+          document.getElementById('apply-step2').style.display = 'block';
+          const letterText = 'Sehr geehrte Damen und Herren,\n\nmit großem Interesse bewerbe ich mich als Bauarbeiter bei Adecco Schweiz in Zürich. Ich verfüge über 2 Jahre Berufserfahrung im Bereich Abbruch und Hochbau.\n\nDerzeit arbeite ich an verschiedenen Bauprojekten in der Region Zug und bringe fundierte Kenntnisse in Abbrucharbeiten, Betonbau und Gerüstmontage mit.\n\nIch würde mich sehr über ein persönliches Gespräch freuen.\n\nMit freundlichen Grüßen,\nVáclav Kočka';
+          let prog = 0;
+          const pInt = setInterval(() => {
+            prog += 1.5;
+            document.getElementById('apply-progress-bar').style.width = Math.min(prog, 100) + '%';
+            if (prog >= 100) clearInterval(pInt);
+          }, 50);
+          typeText('typed-letter', letterText, 18, () => {
+            document.getElementById('letter-cursor').style.display = 'none';
+            // Step 3: Sent!
+            setTimeout(() => {
+              document.getElementById('apply-step2').style.display = 'none';
+              document.getElementById('apply-step3').style.display = 'block';
+              // Animate check
+              const check = document.getElementById('apply-check');
+              check.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+              check.style.opacity = '1';
+              check.style.transform = 'scale(1)';
+              setTimeout(() => {
+                document.getElementById('apply-sent-title').style.transition = 'opacity 0.4s';
+                document.getElementById('apply-sent-title').style.opacity = '1';
+              }, 300);
+              setTimeout(() => {
+                document.getElementById('apply-sent-desc').style.transition = 'opacity 0.4s';
+                document.getElementById('apply-sent-desc').style.opacity = '1';
+              }, 500);
+              setTimeout(() => {
+                document.getElementById('apply-email-preview').style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                document.getElementById('apply-email-preview').style.opacity = '1';
+              }, 800);
+              setTimeout(() => {
+                document.getElementById('apply-stat').style.transition = 'opacity 0.4s';
+                document.getElementById('apply-stat').style.opacity = '1';
+              }, 1200);
+            }, 600);
+          });
+        }, 2500);
+        // Reset loop
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('apply'); }, 22000);
+      }
+
       if (id === 'demo-cv') {
         // Field 1: Jméno
         document.getElementById('cv-field-1').style.opacity = '1';
@@ -1267,6 +1619,40 @@ function resetDemo(type) {
     document.getElementById('chat-answer').style.opacity = '0';
     document.getElementById('typed-answer').textContent = '';
     document.getElementById('chat-cursor').style.display = '';
+  }
+  if (type === 'matching') {
+    ['match-tag-1','match-tag-2','match-tag-3','match-tag-4','match-tag-5'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.opacity = '0';
+    });
+    document.getElementById('match-start-btn').style.opacity = '0';
+    document.getElementById('match-step1').style.display = 'block';
+    document.getElementById('match-step2').style.display = 'none';
+    document.getElementById('match-step3').style.display = 'none';
+    document.getElementById('match-progress-bar').style.width = '0%';
+    document.getElementById('match-scan-count').style.opacity = '0';
+    document.getElementById('match-stat').style.opacity = '0';
+    document.querySelectorAll('#match-results .match-result-row').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(10px)';
+    });
+  }
+  if (type === 'apply') {
+    document.getElementById('apply-agency-card').style.opacity = '0';
+    document.getElementById('apply-cv-tag').style.opacity = '0';
+    document.getElementById('apply-lang-tag').style.opacity = '0';
+    document.getElementById('apply-send-btn').style.opacity = '0';
+    document.getElementById('apply-step1').style.display = 'block';
+    document.getElementById('apply-step2').style.display = 'none';
+    document.getElementById('apply-step3').style.display = 'none';
+    document.getElementById('apply-progress-bar').style.width = '0%';
+    document.getElementById('typed-letter').textContent = '';
+    document.getElementById('letter-cursor').style.display = '';
+    document.getElementById('apply-check').style.opacity = '0';
+    document.getElementById('apply-check').style.transform = 'scale(0.5)';
+    document.getElementById('apply-sent-title').style.opacity = '0';
+    document.getElementById('apply-sent-desc').style.opacity = '0';
+    document.getElementById('apply-email-preview').style.opacity = '0';
+    document.getElementById('apply-stat').style.opacity = '0';
   }
   if (type === 'cv') {
     ['typed-cv-name','typed-cv-pos','typed-cv-exp'].forEach(id => {
