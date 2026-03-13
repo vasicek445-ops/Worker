@@ -3,9 +3,15 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../supabase";
 
 async function handlePostAuth(user: any, plan: string | null, isRecovery: boolean) {
-  if (user?.user_metadata?.full_name) {
-    await supabase.from("profiles").upsert({ id: user.id, full_name: user.user_metadata.full_name }, { onConflict: "id" });
-  }
+  const fullName = user?.user_metadata?.full_name
+    || user?.user_metadata?.name
+    || [user?.user_metadata?.given_name, user?.user_metadata?.family_name].filter(Boolean).join(" ")
+    || null;
+  await supabase.from("profiles").upsert({
+    id: user.id,
+    full_name: fullName,
+    avatar_url: user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null,
+  }, { onConflict: "id" });
 
   // Send welcome email for new users (only once)
   const welcomeSentKey = 'woker_welcome_sent';

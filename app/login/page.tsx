@@ -60,11 +60,17 @@ function LoginInner() {
     setMessage("");
 
     if (isRegister) {
+      const trimmedName = fullName.trim();
+      if (!trimmedName || !trimmedName.includes(" ")) {
+        setError("Zadej celé jméno a příjmení (např. Jan Novák)");
+        setLoading(false);
+        return;
+      }
       const { data: signUpData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: fullName },
+          data: { full_name: trimmedName },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
