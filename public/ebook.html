@@ -1930,9 +1930,13 @@ updateCalc();
 // ─── Demo animations ───
 function typeText(elementId, text, speed, callback) {
   const el = document.getElementById(elementId);
+  if (!el) return;
   let i = 0;
   el.textContent = '';
+  // Find parent demo-body to check visibility
+  const demoBody = el.closest('.demo-body');
   function type() {
+    if (demoBody && !demoBody.dataset.visible) return; // stop if not visible
     if (i < text.length) {
       el.textContent += text.charAt(i);
       i++;
@@ -1956,26 +1960,25 @@ function animateResults(containerId, delay) {
 }
 
 // Trigger demos when they scroll into view — loop while visible
-const demoLoopTimers = {};
+const demoTimers = {}; // stores setTimeout IDs per demo
 
 function startDemoLoop(el) {
   const id = el.id;
-  if (demoLoopTimers[id]) return;
-  function run() {
-    if (!el.dataset.visible) return;
-    el.dataset.animated = 'true';
-    runDemoAnimation(id);
-  }
-  run();
-  // Store reference so we can stop on exit
-  demoLoopTimers[id] = true;
+  if (el.dataset.animated) return;
+  el.dataset.animated = 'true';
+  runDemoAnimation(id);
 }
 
 function stopDemoLoop(el) {
   const id = el.id;
   el.dataset.visible = '';
   el.dataset.animated = '';
-  delete demoLoopTimers[id];
+  // Clear any pending timers for this demo
+  if (demoTimers[id]) {
+    demoTimers[id].forEach(t => clearTimeout(t));
+    delete demoTimers[id];
+  }
+  resetDemo(id.replace('demo-', ''));
 }
 
 const demoObserver = new IntersectionObserver((entries) => {
@@ -1992,19 +1995,24 @@ const demoObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.5 });
 
 function scheduleLoop(id, delay) {
-  setTimeout(() => {
+  const t = setTimeout(() => {
     const el = document.getElementById(id);
-    if (el && el.dataset.visible) {
-      resetDemo(id.replace('demo-', ''));
-      el.dataset.animated = '';
-      setTimeout(() => {
-        if (el.dataset.visible) {
-          el.dataset.animated = 'true';
-          runDemoAnimation(id);
-        }
-      }, 800);
-    }
+    if (!el || !el.dataset.visible) return;
+    resetDemo(id.replace('demo-', ''));
+    el.dataset.animated = '';
+    const t2 = setTimeout(() => {
+      if (el && el.dataset.visible) {
+        el.dataset.animated = 'true';
+        runDemoAnimation(id);
+      }
+    }, 800);
+    // Track the restart timer too
+    if (!demoTimers[id]) demoTimers[id] = [];
+    demoTimers[id].push(t2);
   }, delay);
+  // Track this timer
+  if (!demoTimers[id]) demoTimers[id] = [];
+  demoTimers[id].push(t);
 }
 
 function runDemoAnimation(id) {
