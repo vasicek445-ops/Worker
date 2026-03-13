@@ -1859,12 +1859,59 @@ function animateResults(containerId, delay) {
   });
 }
 
-// Trigger demos when they scroll into view
+// Trigger demos when they scroll into view — loop while visible
+const demoLoopTimers = {};
+
+function startDemoLoop(el) {
+  const id = el.id;
+  if (demoLoopTimers[id]) return;
+  function run() {
+    if (!el.dataset.visible) return;
+    el.dataset.animated = 'true';
+    runDemoAnimation(id);
+  }
+  run();
+  // Store reference so we can stop on exit
+  demoLoopTimers[id] = true;
+}
+
+function stopDemoLoop(el) {
+  const id = el.id;
+  el.dataset.visible = '';
+  el.dataset.animated = '';
+  delete demoLoopTimers[id];
+}
+
 const demoObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
-    if (entry.isIntersecting && !entry.target.dataset.animated) {
-      entry.target.dataset.animated = 'true';
-      const id = entry.target.id;
+    if (entry.isIntersecting) {
+      entry.target.dataset.visible = 'true';
+      if (!entry.target.dataset.animated) {
+        startDemoLoop(entry.target);
+      }
+    } else {
+      stopDemoLoop(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+function scheduleLoop(id, delay) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el && el.dataset.visible) {
+      resetDemo(id.replace('demo-', ''));
+      el.dataset.animated = '';
+      setTimeout(() => {
+        if (el.dataset.visible) {
+          el.dataset.animated = 'true';
+          runDemoAnimation(id);
+        }
+      }, 800);
+    }
+  }, delay);
+}
+
+function runDemoAnimation(id) {
 
       if (id === 'demo-jobs') {
         typeText('typed-job', 'Zürich construction', 60, () => {
@@ -1877,7 +1924,7 @@ const demoObserver = new IntersectionObserver((entries) => {
           }, 400);
         });
         // Loop
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('jobs'); }, 12000);
+        scheduleLoop('demo-jobs', 12000);
       }
 
       if (id === 'demo-chat') {
@@ -1891,7 +1938,7 @@ const demoObserver = new IntersectionObserver((entries) => {
             });
           }, 800);
         }, 300);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('chat'); }, 18000);
+        scheduleLoop('demo-chat', 18000);
       }
 
       if (id === 'demo-matching') {
@@ -1947,7 +1994,7 @@ const demoObserver = new IntersectionObserver((entries) => {
           }, 60);
         }, 2800);
         // Reset loop
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('matching'); }, 20000);
+        scheduleLoop('demo-matching', 20000);
       }
 
       if (id === 'demo-apply') {
@@ -2013,7 +2060,7 @@ const demoObserver = new IntersectionObserver((entries) => {
           });
         }, 2500);
         // Reset loop
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('apply'); }, 22000);
+        scheduleLoop('demo-apply', 22000);
       }
 
       if (id === 'demo-german') {
@@ -2029,7 +2076,7 @@ const demoObserver = new IntersectionObserver((entries) => {
           document.getElementById('german-stat').style.transition = 'opacity 0.4s';
           document.getElementById('german-stat').style.opacity = '1';
         }, 400 + phrases.length * 400 + 300);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('german'); }, 14000);
+        scheduleLoop('demo-german', 14000);
       }
 
       if (id === 'demo-jobanalysis') {
@@ -2052,7 +2099,7 @@ const demoObserver = new IntersectionObserver((entries) => {
             });
           }, 1200);
         });
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('jobanalysis'); }, 16000);
+        scheduleLoop('demo-jobanalysis', 16000);
       }
 
       if (id === 'demo-coverletter') {
@@ -2078,7 +2125,7 @@ const demoObserver = new IntersectionObserver((entries) => {
             }, 500);
           });
         }, 2200);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('coverletter'); }, 18000);
+        scheduleLoop('demo-coverletter', 18000);
       }
 
       if (id === 'demo-hremail') {
@@ -2097,7 +2144,7 @@ const demoObserver = new IntersectionObserver((entries) => {
             }, 300);
           });
         }, 1500);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('hremail'); }, 18000);
+        scheduleLoop('demo-hremail', 18000);
       }
 
       if (id === 'demo-interview') {
@@ -2113,7 +2160,7 @@ const demoObserver = new IntersectionObserver((entries) => {
           document.getElementById('interview-stat').style.transition = 'opacity 0.4s';
           document.getElementById('interview-stat').style.opacity = '1';
         }, 500 + qas.length * 600 + 300);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('interview'); }, 14000);
+        scheduleLoop('demo-interview', 14000);
       }
 
       if (id === 'demo-contract') {
@@ -2137,7 +2184,7 @@ const demoObserver = new IntersectionObserver((entries) => {
             }, i * 400);
           });
         }, 2000);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('contract'); }, 16000);
+        scheduleLoop('demo-contract', 16000);
       }
 
       if (id === 'demo-housing') {
@@ -2153,7 +2200,7 @@ const demoObserver = new IntersectionObserver((entries) => {
           document.getElementById('housing-stat').style.transition = 'opacity 0.4s';
           document.getElementById('housing-stat').style.opacity = '1';
         }, 400 + cards.length * 400 + 300);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('housing'); }, 12000);
+        scheduleLoop('demo-housing', 12000);
       }
 
       if (id === 'demo-community') {
@@ -2169,7 +2216,7 @@ const demoObserver = new IntersectionObserver((entries) => {
           document.getElementById('community-stat').style.transition = 'opacity 0.4s';
           document.getElementById('community-stat').style.opacity = '1';
         }, 400 + posts.length * 500 + 300);
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('community'); }, 12000);
+        scheduleLoop('demo-community', 12000);
       }
 
       if (id === 'demo-cv') {
@@ -2226,12 +2273,9 @@ const demoObserver = new IntersectionObserver((entries) => {
             });
           }, 300);
         });
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('cv'); }, 22000);
+        scheduleLoop('demo-cv', 22000);
       }
-
-    }
-  });
-}, { threshold: 0.5 });
+}
 
 function resetDemo(type) {
   if (type === 'jobs') {
