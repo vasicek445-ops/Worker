@@ -523,6 +523,22 @@ body {
 }
 
 /* CV Generator */
+/* CV Form fields */
+.demo-cv-form { display: flex; flex-direction: column; gap: 10px; }
+.demo-cv-form-row {
+  display: flex; align-items: center; gap: 12px;
+  transition: opacity 0.4s;
+}
+.demo-cv-form-label {
+  font-size: 12px; color: var(--text-dim); width: 90px; flex-shrink: 0;
+}
+.demo-cv-form-input {
+  flex: 1; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; color: var(--text);
+  min-height: 32px;
+}
+
 .demo-cv-btn {
   background: linear-gradient(135deg, #39ff6e, #2bcc58);
   color: #0a0a12; font-weight: 700; font-size: 14px;
@@ -798,45 +814,125 @@ body {
     <div class="demo-window fade-in" style="margin-bottom:40px;">
       <div class="demo-topbar">
         <div class="demo-dots"><span></span><span></span><span></span></div>
-        <div class="demo-title">📄 CV Generátor</div>
+        <div class="demo-title">📄 CV Generátor — profesionální životopis v němčině</div>
         <span class="demo-badge">LIVE</span>
       </div>
       <div class="demo-body" id="demo-cv">
-        <div class="demo-cv-input" id="cv-step1">
-          <div style="margin-bottom:12px; font-size:13px; color:var(--text-dim);">Pozice na kterou se hlásíš:</div>
-          <div class="demo-search-bar" style="margin-bottom:12px;">
-            <span class="demo-typed" id="typed-cv"></span><span class="demo-cursor" id="cv-cursor">|</span>
+        <!-- Step 1: Formulář se vyplňuje -->
+        <div id="cv-step1">
+          <div class="demo-cv-form">
+            <div class="demo-cv-form-row" id="cv-field-1" style="opacity:0;">
+              <span class="demo-cv-form-label">Jméno *</span>
+              <div class="demo-cv-form-input"><span id="typed-cv-name"></span><span class="demo-cursor" id="cv-cursor-1">|</span></div>
+            </div>
+            <div class="demo-cv-form-row" id="cv-field-2" style="opacity:0;">
+              <span class="demo-cv-form-label">Pozice *</span>
+              <div class="demo-cv-form-input"><span id="typed-cv-pos"></span><span class="demo-cursor" id="cv-cursor-2" style="display:none;">|</span></div>
+            </div>
+            <div class="demo-cv-form-row" id="cv-field-3" style="opacity:0;">
+              <span class="demo-cv-form-label">Zkušenosti *</span>
+              <div class="demo-cv-form-input" style="font-size:12px; color:var(--text-dim);"><span id="typed-cv-exp"></span><span class="demo-cursor" id="cv-cursor-3" style="display:none;">|</span></div>
+            </div>
+            <div class="demo-cv-form-row" id="cv-field-4" style="opacity:0;">
+              <span class="demo-cv-form-label">Němčina *</span>
+              <div class="demo-cv-form-input"><span id="cv-german" style="color:var(--green);">A2 — základy</span></div>
+            </div>
           </div>
-          <div class="demo-cv-btn" id="cv-generate-btn" style="opacity:0;">
-            Generovat CV v němčině →
+          <!-- Šablony -->
+          <div id="cv-templates" style="opacity:0; margin-top:16px;">
+            <div style="font-size:12px; color:var(--text-dim); margin-bottom:8px;">Vyber šablonu:</div>
+            <div style="display:flex; gap:8px;">
+              <span class="demo-filter" id="tpl-1">Klassisch</span>
+              <span class="demo-filter" id="tpl-2">Modern</span>
+              <span class="demo-filter active" id="tpl-3">Kreativ</span>
+              <span class="demo-filter" id="tpl-4">Elegant</span>
+              <span class="demo-filter" id="tpl-5">Minimal</span>
+            </div>
+          </div>
+          <div class="demo-cv-btn" id="cv-generate-btn" style="opacity:0; margin-top:16px;">
+            Generovat profesionální CV →
           </div>
         </div>
+        <!-- Step 2: Progress -->
         <div id="cv-step2" style="display:none;">
           <div class="demo-cv-progress">
             <div class="demo-cv-progress-bar" id="cv-progress-bar"></div>
           </div>
           <div class="demo-cv-status" id="cv-status">Analyzuji pozici...</div>
         </div>
+        <!-- Step 3: Výsledek — realistické CV -->
         <div id="cv-step3" style="display:none;">
-          <div class="demo-cv-result">
-            <div class="demo-cv-header">
-              <div class="demo-cv-name">Jan Novák</div>
-              <div class="demo-cv-pos" style="color:var(--green); font-size:13px;">Bauarbeiter / Construction Worker</div>
+          <div class="demo-cv-result" style="position:relative;">
+            <!-- CV header s barevným pruhem -->
+            <div style="background:linear-gradient(135deg, #2563eb, #1d4ed8); padding:16px 20px; border-radius:10px 10px 0 0; margin:-20px -20px 16px -20px;">
+              <div style="display:flex; align-items:center; gap:16px;">
+                <div style="width:48px; height:48px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:white;">JN</div>
+                <div>
+                  <div class="demo-cv-name" style="color:white;">Jan Novák</div>
+                  <div style="color:rgba(255,255,255,0.7); font-size:12px;">Bauarbeiter / Construction Worker</div>
+                </div>
+              </div>
             </div>
+            <!-- Profil -->
             <div class="demo-cv-section">
-              <div class="demo-cv-label">Berufserfahrung</div>
-              <div class="demo-cv-text">2 Jahre Erfahrung im Bauwesen, Abbrucharbeiten und Betonbau...</div>
+              <div class="demo-cv-label" style="color:#2563eb;">Profil</div>
+              <div class="demo-cv-text">Motivierter Bauarbeiter mit 2 Jahren Erfahrung im Hoch- und Tiefbau. Spezialisiert auf Abbrucharbeiten und Betonbau. Belastbar, teamfähig und bereit für neue Herausforderungen in der Schweiz.</div>
             </div>
+            <!-- Berufserfahrung -->
             <div class="demo-cv-section">
-              <div class="demo-cv-label">Ausbildung</div>
-              <div class="demo-cv-text">Střední průmyslová škola stavební, Praha (2018–2022)</div>
+              <div class="demo-cv-label" style="color:#2563eb;">Berufserfahrung</div>
+              <div style="padding-left:12px; border-left:2px solid rgba(37,99,235,0.3);">
+                <div style="font-size:13px; font-weight:600;">Abbrucharbeiter · BauFirma GmbH, Zug</div>
+                <div style="font-size:11px; color:var(--text-dim); margin-bottom:4px;">03.2024 – Aktuell</div>
+                <div class="demo-cv-text">• Durchführung von Abbruch- und Rückbauarbeiten<br>• Bedienung von Baumaschinen und Werkzeugen<br>• Materialtransport und Baustellensicherung</div>
+              </div>
             </div>
+            <!-- Sprachen s vizuální úrovní -->
             <div class="demo-cv-section">
-              <div class="demo-cv-label">Sprachkenntnisse</div>
-              <div class="demo-cv-text">Tschechisch (Muttersprache) · Deutsch (A2) · Englisch (B1)</div>
+              <div class="demo-cv-label" style="color:#2563eb;">Sprachen</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+                  <span style="width:90px;">Tschechisch</span>
+                  <div style="flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px;">
+                    <div style="width:100%; height:100%; background:#2563eb; border-radius:3px;"></div>
+                  </div>
+                  <span style="color:var(--text-dim); width:30px;">C2</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+                  <span style="width:90px;">Deutsch</span>
+                  <div style="flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px;">
+                    <div style="width:33%; height:100%; background:#2563eb; border-radius:3px;"></div>
+                  </div>
+                  <span style="color:var(--text-dim); width:30px;">A2</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; font-size:12px;">
+                  <span style="width:90px;">Englisch</span>
+                  <div style="flex:1; height:6px; background:rgba(255,255,255,0.1); border-radius:3px;">
+                    <div style="width:50%; height:100%; background:#2563eb; border-radius:3px;"></div>
+                  </div>
+                  <span style="color:var(--text-dim); width:30px;">B1</span>
+                </div>
+              </div>
             </div>
-            <div style="text-align:center; margin-top:16px;">
-              <span class="demo-filter active" style="font-size:12px;">✅ Hotovo za 28 sekund</span>
+            <!-- Fachkenntnisse -->
+            <div class="demo-cv-section" style="margin-bottom:0;">
+              <div class="demo-cv-label" style="color:#2563eb;">Fachkenntnisse</div>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <span class="demo-filter" style="font-size:11px; padding:3px 8px;">Abbrucharbeiten</span>
+                <span class="demo-filter" style="font-size:11px; padding:3px 8px;">Betonbau</span>
+                <span class="demo-filter" style="font-size:11px; padding:3px 8px;">Baumaschinen</span>
+                <span class="demo-filter" style="font-size:11px; padding:3px 8px;">Teamarbeit</span>
+                <span class="demo-filter" style="font-size:11px; padding:3px 8px;">Belastbarkeit</span>
+              </div>
+            </div>
+            <!-- Akce -->
+            <div style="display:flex; gap:8px; margin-top:16px; justify-content:center;">
+              <span class="demo-filter active" style="font-size:11px;">📥 Stáhnout PDF</span>
+              <span class="demo-filter" style="font-size:11px;">✏️ Upravit</span>
+              <span class="demo-filter" style="font-size:11px;">🎨 Změnit šablonu</span>
+            </div>
+            <div style="text-align:center; margin-top:8px;">
+              <span style="font-size:11px; color:var(--green);">✅ Vygenerováno za 12 sekund · Šablona Kreativ</span>
             </div>
           </div>
         </div>
@@ -1043,31 +1139,60 @@ const demoObserver = new IntersectionObserver((entries) => {
       }
 
       if (id === 'demo-cv') {
-        typeText('typed-cv', 'Bauarbeiter / Construction Worker', 50, () => {
+        // Field 1: Jméno
+        document.getElementById('cv-field-1').style.opacity = '1';
+        typeText('typed-cv-name', 'Jan Novák', 70, () => {
+          document.getElementById('cv-cursor-1').style.display = 'none';
+          // Field 2: Pozice
           setTimeout(() => {
-            document.getElementById('cv-generate-btn').style.opacity = '1';
-            setTimeout(() => {
-              document.getElementById('cv-step1').style.display = 'none';
-              document.getElementById('cv-step2').style.display = 'block';
-              let progress = 0;
-              const statuses = ['Analyzuji pozici...', 'Generuji Berufserfahrung...', 'Přidávám Sprachkenntnisse...', 'Formátuji CV...'];
-              const pInterval = setInterval(() => {
-                progress += 3;
-                document.getElementById('cv-progress-bar').style.width = progress + '%';
-                const sIdx = Math.min(Math.floor(progress / 25), statuses.length - 1);
-                document.getElementById('cv-status').textContent = statuses[sIdx];
-                if (progress >= 100) {
-                  clearInterval(pInterval);
+            document.getElementById('cv-field-2').style.opacity = '1';
+            document.getElementById('cv-cursor-2').style.display = '';
+            typeText('typed-cv-pos', 'Bauarbeiter / Stavební dělník', 50, () => {
+              document.getElementById('cv-cursor-2').style.display = 'none';
+              // Field 3: Zkušenosti
+              setTimeout(() => {
+                document.getElementById('cv-field-3').style.opacity = '1';
+                document.getElementById('cv-cursor-3').style.display = '';
+                typeText('typed-cv-exp', '2 roky demolice a stavby, BauFirma Zug', 30, () => {
+                  document.getElementById('cv-cursor-3').style.display = 'none';
+                  // Field 4: Němčina
                   setTimeout(() => {
-                    document.getElementById('cv-step2').style.display = 'none';
-                    document.getElementById('cv-step3').style.display = 'block';
+                    document.getElementById('cv-field-4').style.opacity = '1';
+                    // Templates
+                    setTimeout(() => {
+                      document.getElementById('cv-templates').style.opacity = '1';
+                      // Generate button
+                      setTimeout(() => {
+                        document.getElementById('cv-generate-btn').style.opacity = '1';
+                        // Click → Progress
+                        setTimeout(() => {
+                          document.getElementById('cv-step1').style.display = 'none';
+                          document.getElementById('cv-step2').style.display = 'block';
+                          let progress = 0;
+                          const statuses = ['Analyzuji pozici...', 'Překládám do němčiny...', 'Generuji Berufserfahrung...', 'Přidávám Sprachkenntnisse...', 'Vytvářím PDF...'];
+                          const pInterval = setInterval(() => {
+                            progress += 2;
+                            document.getElementById('cv-progress-bar').style.width = progress + '%';
+                            const sIdx = Math.min(Math.floor(progress / 20), statuses.length - 1);
+                            document.getElementById('cv-status').textContent = statuses[sIdx];
+                            if (progress >= 100) {
+                              clearInterval(pInterval);
+                              setTimeout(() => {
+                                document.getElementById('cv-step2').style.display = 'none';
+                                document.getElementById('cv-step3').style.display = 'block';
+                              }, 300);
+                            }
+                          }, 60);
+                        }, 800);
+                      }, 500);
+                    }, 400);
                   }, 300);
-                }
-              }, 80);
-            }, 800);
-          }, 400);
+                });
+              }, 300);
+            });
+          }, 300);
         });
-        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('cv'); }, 16000);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('cv'); }, 22000);
       }
 
     }
@@ -1090,7 +1215,23 @@ function resetDemo(type) {
     document.getElementById('chat-cursor').style.display = '';
   }
   if (type === 'cv') {
-    document.getElementById('typed-cv').textContent = '';
+    ['typed-cv-name','typed-cv-pos','typed-cv-exp'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '';
+    });
+    ['cv-field-1','cv-field-2','cv-field-3','cv-field-4'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.opacity = '0';
+    });
+    ['cv-cursor-1'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
+    ['cv-cursor-2','cv-cursor-3'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    document.getElementById('cv-templates').style.opacity = '0';
     document.getElementById('cv-generate-btn').style.opacity = '0';
     document.getElementById('cv-step1').style.display = 'block';
     document.getElementById('cv-step2').style.display = 'none';
