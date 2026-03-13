@@ -653,6 +653,82 @@ body {
 }
 .match-action-link { font-size: 11px; color: var(--text-dim); }
 
+/* ─── German phrases ─── */
+.german-phrase-row {
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.german-phrase-de { font-size: 14px; font-weight: 600; color: #f0f0f5; }
+.german-phrase-cs { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.german-phrase-context { font-size: 11px; color: rgba(57,255,110,0.6); margin-top: 4px; }
+
+/* ─── Job analysis ─── */
+.ja-section {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ja-section-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: rgba(255,255,255,0.7); }
+.ja-flags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ja-flag {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+.ja-flag.green { background: rgba(57,255,110,0.1); color: #39ff6e; }
+.ja-flag.red { background: rgba(255,107,107,0.1); color: #ff6b6b; }
+
+/* ─── Interview ─── */
+.interview-qa {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.interview-q { font-size: 13px; font-weight: 600; color: #f0f0f5; margin-bottom: 6px; }
+.interview-a { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+.interview-label { color: var(--green); font-weight: 600; font-size: 11px; display: block; margin-bottom: 2px; }
+
+/* ─── Contract ─── */
+.contract-item {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Housing ─── */
+.housing-card {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ─── Community ─── */
+.community-post {
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
   .section { padding: 60px 16px; }
@@ -1264,6 +1340,402 @@ body {
       </div>
     </div>
 
+    <!-- ── DEMO 7: Němčina pro práci ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">🇩🇪 Němčina pro práci</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-german">
+        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+          <span class="demo-filter active" id="ger-level-a2">A2</span>
+          <span class="demo-filter" id="ger-level-b1">B1</span>
+          <span class="demo-filter" id="ger-level-b2">B2</span>
+          <span style="flex:1;"></span>
+          <span style="font-size:12px; color:var(--text-dim); align-self:center;">Profese: Bauarbeiter</span>
+        </div>
+        <div id="german-phrases">
+          <div class="german-phrase-row" style="opacity:0; transform:translateY(8px);">
+            <div class="german-phrase-de">„Wo soll ich das Material hinbringen?"</div>
+            <div class="german-phrase-cs">Kam mám odnést materiál?</div>
+            <div class="german-phrase-context">📍 Na stavbě — ptáš se vedoucího</div>
+          </div>
+          <div class="german-phrase-row" style="opacity:0; transform:translateY(8px);">
+            <div class="german-phrase-de">„Ich brauche einen Helm und Sicherheitsschuhe."</div>
+            <div class="german-phrase-cs">Potřebuju helmu a bezpečnostní boty.</div>
+            <div class="german-phrase-context">📍 Ochranné pomůcky — první den</div>
+          </div>
+          <div class="german-phrase-row" style="opacity:0; transform:translateY(8px);">
+            <div class="german-phrase-de">„Wann ist die Mittagspause?"</div>
+            <div class="german-phrase-cs">Kdy je obědová pauza?</div>
+            <div class="german-phrase-context">📍 Denní rutina — kolega</div>
+          </div>
+          <div class="german-phrase-row" style="opacity:0; transform:translateY(8px);">
+            <div class="german-phrase-de">„Das Gerüst muss noch gesichert werden."</div>
+            <div class="german-phrase-cs">Lešení se musí ještě zajistit.</div>
+            <div class="german-phrase-context">📍 Bezpečnost — hlášení vedoucímu</div>
+          </div>
+          <div class="german-phrase-row" style="opacity:0; transform:translateY(8px);">
+            <div class="german-phrase-de">„Können Sie mir zeigen, wie das funktioniert?"</div>
+            <div class="german-phrase-cs">Můžete mi ukázat, jak to funguje?</div>
+            <div class="german-phrase-context">📍 Nový stroj — ptáš se kolegy</div>
+          </div>
+        </div>
+        <div class="demo-stat-bar" id="german-stat" style="margin-top:12px; opacity:0;">
+          AI generuje fráze <strong style="color:var(--green);">přesně pro tvoji profesi</strong> a úroveň němčiny
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 8: AI analýza inzerátu ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">📋 AI analýza inzerátu</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-jobanalysis">
+        <!-- Step 1: Job URL input -->
+        <div id="ja-step1">
+          <div style="font-size:12px; color:var(--text-dim); margin-bottom:8px;">Vlož odkaz na inzerát:</div>
+          <div class="demo-search-bar" style="margin-bottom:12px;">
+            <span class="demo-search-icon">🔗</span>
+            <span id="typed-ja-url" style="font-size:12px;"></span><span class="demo-cursor" id="ja-cursor">|</span>
+          </div>
+          <div class="demo-cv-btn" id="ja-analyze-btn" style="opacity:0; font-size:13px; padding:10px 20px;">
+            📋 Analyzovat inzerát →
+          </div>
+        </div>
+        <!-- Step 2: Results -->
+        <div id="ja-step2" style="display:none;">
+          <div style="font-size:12px; color:var(--green); margin-bottom:10px; font-weight:600;">✅ Analýza dokončena</div>
+          <div id="ja-results">
+            <div class="ja-section" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">💰 Odhad platu</div>
+              <div style="font-size:20px; font-weight:700; color:var(--green);">4 800 – 5 400 CHF/měs</div>
+              <div style="font-size:11px; color:var(--text-dim);">Na základě pozice, regionu a požadované kvalifikace</div>
+            </div>
+            <div class="ja-section" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">✅ Zelené vlajky</div>
+              <div class="ja-flags">
+                <span class="ja-flag green">Přímý zaměstnavatel</span>
+                <span class="ja-flag green">Ubytování zajištěno</span>
+                <span class="ja-flag green">Cestovní náhrady</span>
+              </div>
+            </div>
+            <div class="ja-section" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">⚠️ Červené vlajky</div>
+              <div class="ja-flags">
+                <span class="ja-flag red">Zkušební doba 6 měsíců</span>
+                <span class="ja-flag red">Práce o víkendech</span>
+              </div>
+            </div>
+            <div class="ja-section" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">🎤 Otázky na pohovor</div>
+              <div style="font-size:12px; color:var(--text-dim); line-height:1.6;">
+                1. Haben Sie Erfahrung mit Abbrucharbeiten?<br>
+                2. Welche Maschinen können Sie bedienen?<br>
+                3. Sind Sie bereit, am Wochenende zu arbeiten?
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 9: AI motivační dopis ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">📝 AI motivační dopis</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-coverletter">
+        <div id="cl-step1">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+            <div class="match-profile-tag" id="cl-tag-1" style="opacity:0;">👷 Bauarbeiter</div>
+            <div class="match-profile-tag" id="cl-tag-2" style="opacity:0;">🏢 Adecco Schweiz</div>
+            <div class="match-profile-tag" id="cl-tag-3" style="opacity:0;">📍 Zürich</div>
+          </div>
+          <div class="demo-cv-btn" id="cl-generate-btn" style="opacity:0; font-size:13px; padding:10px 20px;">
+            📝 Generovat Bewerbungsschreiben →
+          </div>
+        </div>
+        <div id="cl-step2" style="display:none;">
+          <div style="font-size:12px; color:var(--green); margin-bottom:8px; font-weight:600;">🤖 AI píše Bewerbungsschreiben...</div>
+          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:12px; line-height:1.7; font-style:italic; color:rgba(255,255,255,0.7);">
+            <span id="typed-cl"></span><span class="demo-cursor" id="cl-cursor">|</span>
+          </div>
+        </div>
+        <div id="cl-step3" style="display:none;">
+          <div style="font-size:12px; color:var(--green); margin-bottom:8px; font-weight:600;">✅ Bewerbungsschreiben hotový</div>
+          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:12px; line-height:1.7;">
+            <p style="margin:0 0 8px;"><strong>Sehr geehrte Damen und Herren,</strong></p>
+            <p style="margin:0 0 8px; color:rgba(255,255,255,0.65);">mit großem Interesse bewerbe ich mich als Bauarbeiter bei Adecco Schweiz in Zürich. Durch meine zweijährige Berufserfahrung im Bereich Abbruch und Hochbau bringe ich die nötigen Fähigkeiten für diese Position mit.</p>
+            <p style="margin:0 0 8px; color:rgba(255,255,255,0.65);">Zu meinen Stärken zählen Teamfähigkeit, körperliche Belastbarkeit und Zuverlässigkeit. Ich bin motiviert, meine Karriere in der Schweiz weiterzuentwickeln.</p>
+            <p style="margin:0; color:rgba(255,255,255,0.65);">Ich freue mich auf ein persönliches Gespräch.<br><strong>Mit freundlichen Grüßen, Václav Kočka</strong></p>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <span class="match-action-btn">📋 Kopírovat</span>
+            <span class="match-action-btn">📥 Stáhnout PDF</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 10: AI email pro HR ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">💬 AI email pro HR</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-hremail">
+        <div id="hr-step1">
+          <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">Typ emailu:</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+            <span class="demo-filter active" id="hr-type-1">Dotaz na pozici</span>
+            <span class="demo-filter" id="hr-type-2">Follow-up</span>
+            <span class="demo-filter" id="hr-type-3">Poděkování</span>
+          </div>
+          <div class="demo-cv-btn" id="hr-generate-btn" style="opacity:0; font-size:13px; padding:10px 20px;">
+            💬 Generovat email →
+          </div>
+        </div>
+        <div id="hr-step2" style="display:none;">
+          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px; padding:16px; font-size:12px;">
+            <div style="margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border);">
+              <div style="color:var(--text-dim); font-size:11px;">Komu: hr@adecco.ch</div>
+              <div style="color:var(--text-dim); font-size:11px;">Předmět: <strong style="color:var(--text);">Anfrage zur Stelle als Bauarbeiter — Václav Kočka</strong></div>
+            </div>
+            <div style="line-height:1.7; color:rgba(255,255,255,0.7);">
+              <span id="typed-hr"></span><span class="demo-cursor" id="hr-cursor">|</span>
+            </div>
+          </div>
+          <div class="demo-stat-bar" id="hr-stat" style="margin-top:10px; opacity:0;">
+            Profesionální <strong style="color:var(--green);">Hochdeutsch</strong> · připraveno k odeslání
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 11: AI příprava na pohovor ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">🎤 AI příprava na pohovor</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-interview">
+        <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">Pozice: <strong style="color:var(--text);">Bauarbeiter</strong> · Firma: <strong style="color:var(--text);">Adecco Schweiz</strong></div>
+        <div id="interview-questions">
+          <div class="interview-qa" style="opacity:0; transform:translateY(8px);">
+            <div class="interview-q">❓ „Erzählen Sie uns von Ihrer Berufserfahrung."</div>
+            <div class="interview-a">
+              <span class="interview-label">💡 Doporučená odpověď:</span>
+              „Ich habe zwei Jahre Erfahrung im Hochbau und Abbruch. Bei meiner letzten Firma war ich für Betonarbeiten und Gerüstmontage verantwortlich."
+            </div>
+          </div>
+          <div class="interview-qa" style="opacity:0; transform:translateY(8px);">
+            <div class="interview-q">❓ „Warum möchten Sie in der Schweiz arbeiten?"</div>
+            <div class="interview-a">
+              <span class="interview-label">💡 Doporučená odpověď:</span>
+              „Die Schweiz bietet hervorragende Arbeitsbedingungen und ich möchte meine Fähigkeiten in einem internationalen Umfeld weiterentwickeln."
+            </div>
+          </div>
+          <div class="interview-qa" style="opacity:0; transform:translateY(8px);">
+            <div class="interview-q">❓ „Welche Maschinen können Sie bedienen?"</div>
+            <div class="interview-a">
+              <span class="interview-label">💡 Doporučená odpověď:</span>
+              „Ich kann Bagger, Radlader und Betonmischer bedienen. Außerdem habe ich Erfahrung mit Presslufthämmern und Bohrmaschinen."
+            </div>
+          </div>
+        </div>
+        <div class="demo-stat-bar" id="interview-stat" style="margin-top:12px; opacity:0;">
+          AI generuje otázky <strong style="color:var(--green);">přímo pro tvoji pozici</strong> s odpověďmi v němčině
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 12: AI analýza smlouvy ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">📑 AI analýza smlouvy</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-contract">
+        <div id="contract-step1">
+          <div style="font-size:12px; color:var(--text-dim); margin-bottom:10px;">Nahrát pracovní smlouvu (PDF/foto):</div>
+          <div id="contract-upload" style="opacity:0; border:2px dashed var(--border); border-radius:10px; padding:24px; text-align:center; cursor:pointer;">
+            <div style="font-size:28px; margin-bottom:8px;">📄</div>
+            <div style="font-size:13px; color:var(--text-dim);">Arbeitsvertrag_Adecco.pdf</div>
+            <div style="font-size:11px; color:var(--green); margin-top:4px;">✓ Nahráno</div>
+          </div>
+          <div class="demo-cv-btn" id="contract-analyze-btn" style="opacity:0; margin-top:12px; font-size:13px; padding:10px 20px;">
+            📑 Analyzovat smlouvu →
+          </div>
+        </div>
+        <div id="contract-step2" style="display:none;">
+          <div style="font-size:12px; color:var(--green); margin-bottom:10px; font-weight:600;">✅ Analýza smlouvy</div>
+          <div id="contract-results">
+            <div class="contract-item" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">📊 Celkové hodnocení</div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="font-size:28px; font-weight:800; color:var(--green);">7.2/10</div>
+                <div style="font-size:12px; color:var(--text-dim);">Standardní smlouva s několika body k jednání</div>
+              </div>
+            </div>
+            <div class="contract-item" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">🔍 Překlad klíčových bodů</div>
+              <div style="font-size:12px; color:var(--text-dim); line-height:1.6;">
+                <div style="margin-bottom:4px;">• <strong style="color:var(--text);">Probezeit:</strong> 3 měsíce → <span style="color:var(--green);">✓ Standard</span></div>
+                <div style="margin-bottom:4px;">• <strong style="color:var(--text);">Kündigungsfrist:</strong> 1 měsíc → <span style="color:var(--green);">✓ Standard</span></div>
+                <div style="margin-bottom:4px;">• <strong style="color:var(--text);">Arbeitszeit:</strong> 45h/týden → <span style="color:var(--orange);">⚠ Nad průměrem (42h)</span></div>
+                <div>• <strong style="color:var(--text);">Ferienanspruch:</strong> 4 týdny → <span style="color:var(--green);">✓ Zákonné minimum</span></div>
+              </div>
+            </div>
+            <div class="contract-item" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">⚠️ Na co si dát pozor</div>
+              <div class="ja-flags">
+                <span class="ja-flag red">Konkurrenzverbot — 12 měsíců</span>
+                <span class="ja-flag red">Überstunden — bez příplatku</span>
+              </div>
+            </div>
+            <div class="contract-item" style="opacity:0; transform:translateY(8px);">
+              <div class="ja-section-title">💡 Doporučení k vyjednávání</div>
+              <div style="font-size:12px; color:var(--text-dim); line-height:1.6;">
+                „Vyjednejte příplatek za přesčasy (Überstundenzuschlag) min. 25% a zkrácení Konkurrenzverbot na 6 měsíců."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 13: Bydlení ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">🏠 Hledání bydlení</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-housing">
+        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+          <span class="demo-filter active">Zürich</span>
+          <span class="demo-filter">Bern</span>
+          <span class="demo-filter">Basel</span>
+          <span class="demo-filter">Zug</span>
+        </div>
+        <div id="housing-results">
+          <div class="housing-card" style="opacity:0; transform:translateY(8px);">
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+              <div>
+                <div style="font-size:14px; font-weight:700;">2.5 Zimmer Wohnung</div>
+                <div style="font-size:12px; color:var(--text-dim);">📍 Zürich-Altstetten · 🚇 5 min Tram</div>
+              </div>
+              <div style="font-size:16px; font-weight:700; color:var(--green);">1 450 CHF</div>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <span class="ja-flag green" style="font-size:10px;">Möbliert</span>
+              <span class="ja-flag green" style="font-size:10px;">Sofort verfügbar</span>
+            </div>
+          </div>
+          <div class="housing-card" style="opacity:0; transform:translateY(8px);">
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+              <div>
+                <div style="font-size:14px; font-weight:700;">WG-Zimmer in 4er WG</div>
+                <div style="font-size:12px; color:var(--text-dim);">📍 Zürich-Oerlikon · 🚇 2 min S-Bahn</div>
+              </div>
+              <div style="font-size:16px; font-weight:700; color:var(--green);">780 CHF</div>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <span class="ja-flag green" style="font-size:10px;">Möbliert</span>
+              <span class="ja-flag green" style="font-size:10px;">Ab 1. April</span>
+            </div>
+          </div>
+          <div class="housing-card" style="opacity:0; transform:translateY(8px);">
+            <div style="display:flex; justify-content:space-between; align-items:start;">
+              <div>
+                <div style="font-size:14px; font-weight:700;">Studio Apartment</div>
+                <div style="font-size:12px; color:var(--text-dim);">📍 Zürich-Wiedikon · 🚇 8 min HB</div>
+              </div>
+              <div style="font-size:16px; font-weight:700; color:var(--green);">1 200 CHF</div>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <span class="ja-flag green" style="font-size:10px;">Unmöbliert</span>
+              <span class="ja-flag green" style="font-size:10px;">Sofort verfügbar</span>
+            </div>
+          </div>
+        </div>
+        <div class="demo-stat-bar" id="housing-stat" style="margin-top:12px; opacity:0;">
+          <strong style="color:var(--green);">47 bytů</strong> v Zürichu · AI vytvoří Bewerbungsdossier pro pronajímatele
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DEMO 14: Komunita ── -->
+    <div class="demo-window fade-in" style="margin-bottom:40px;">
+      <div class="demo-topbar">
+        <div class="demo-dots"><span></span><span></span><span></span></div>
+        <div class="demo-title">👥 Komunita</div>
+        <span class="demo-badge">LIVE</span>
+      </div>
+      <div class="demo-body" id="demo-community">
+        <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+          <span class="demo-filter active">Sdílené bydlení</span>
+          <span class="demo-filter">Tipy</span>
+          <span class="demo-filter">Otázky</span>
+          <span class="demo-filter">Nápady</span>
+        </div>
+        <div id="community-posts">
+          <div class="community-post" style="opacity:0; transform:translateY(8px);">
+            <div style="display:flex; gap:10px; align-items:start;">
+              <div style="width:32px; height:32px; border-radius:50%; background:rgba(57,255,110,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">M</div>
+              <div style="flex:1;">
+                <div style="font-size:13px; font-weight:600;">Martin K. <span style="color:var(--text-dim); font-weight:400; font-size:11px;">· před 2 hod</span></div>
+                <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">Hledám spolubydlícího v Zürichu od dubna. WG 3+1, blízko Hardbrücke, 850 CHF/os. Kdo má zájem? 🏠</div>
+                <div style="display:flex; gap:12px; margin-top:6px; font-size:11px; color:var(--text-dim);">
+                  <span>👍 12</span>
+                  <span>💬 5 odpovědí</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="community-post" style="opacity:0; transform:translateY(8px);">
+            <div style="display:flex; gap:10px; align-items:start;">
+              <div style="width:32px; height:32px; border-radius:50%; background:rgba(96,165,250,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">P</div>
+              <div style="flex:1;">
+                <div style="font-size:13px; font-weight:600;">Petra H. <span style="color:var(--text-dim); font-weight:400; font-size:11px;">· před 5 hod</span></div>
+                <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">Tip: zdravotní pojištění přes Groupe Mutuel mi vyšlo na 198 CHF/měs. Návod v sekci Nástroje → Pojištění 💡</div>
+                <div style="display:flex; gap:12px; margin-top:6px; font-size:11px; color:var(--text-dim);">
+                  <span>👍 28</span>
+                  <span>💬 11 odpovědí</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="community-post" style="opacity:0; transform:translateY(8px);">
+            <div style="display:flex; gap:10px; align-items:start;">
+              <div style="width:32px; height:32px; border-radius:50%; background:rgba(255,170,51,0.15); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;">J</div>
+              <div style="flex:1;">
+                <div style="font-size:13px; font-weight:600;">Jakub N. <span style="color:var(--text-dim); font-weight:400; font-size:11px;">· včera</span></div>
+                <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">Právě mi přišla smlouva z Manpower! Děkuju Wokeru za smart matching, bez toho bych je nikdy nekontaktoval 🎉</div>
+                <div style="display:flex; gap:12px; margin-top:6px; font-size:11px; color:var(--text-dim);">
+                  <span>👍 45</span>
+                  <span>💬 8 odpovědí</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-stat-bar" id="community-stat" style="margin-top:12px; opacity:0;">
+          <strong style="color:var(--green);">Sdílej zkušenosti</strong>, najdi parťáka na bydlení, ušetři na pojištění
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -1544,6 +2016,162 @@ const demoObserver = new IntersectionObserver((entries) => {
         setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('apply'); }, 22000);
       }
 
+      if (id === 'demo-german') {
+        const phrases = document.querySelectorAll('#german-phrases .german-phrase-row');
+        phrases.forEach((p, i) => {
+          setTimeout(() => {
+            p.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+            p.style.opacity = '1';
+            p.style.transform = 'translateY(0)';
+          }, 400 + i * 400);
+        });
+        setTimeout(() => {
+          document.getElementById('german-stat').style.transition = 'opacity 0.4s';
+          document.getElementById('german-stat').style.opacity = '1';
+        }, 400 + phrases.length * 400 + 300);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('german'); }, 14000);
+      }
+
+      if (id === 'demo-jobanalysis') {
+        typeText('typed-ja-url', 'jobs.ch/de/stelle/bauarbeiter-zurich-ad83f', 40, () => {
+          document.getElementById('ja-cursor').style.display = 'none';
+          setTimeout(() => {
+            document.getElementById('ja-analyze-btn').style.transition = 'opacity 0.4s';
+            document.getElementById('ja-analyze-btn').style.opacity = '1';
+          }, 300);
+          setTimeout(() => {
+            document.getElementById('ja-step1').style.display = 'none';
+            document.getElementById('ja-step2').style.display = 'block';
+            const sections = document.querySelectorAll('#ja-results .ja-section');
+            sections.forEach((s, i) => {
+              setTimeout(() => {
+                s.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                s.style.opacity = '1';
+                s.style.transform = 'translateY(0)';
+              }, i * 400);
+            });
+          }, 1200);
+        });
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('jobanalysis'); }, 16000);
+      }
+
+      if (id === 'demo-coverletter') {
+        const clTags = ['cl-tag-1','cl-tag-2','cl-tag-3'];
+        clTags.forEach((t, i) => {
+          setTimeout(() => {
+            document.getElementById(t).style.transition = 'opacity 0.4s';
+            document.getElementById(t).style.opacity = '1';
+          }, 300 + i * 300);
+        });
+        setTimeout(() => {
+          document.getElementById('cl-generate-btn').style.transition = 'opacity 0.4s';
+          document.getElementById('cl-generate-btn').style.opacity = '1';
+        }, 1400);
+        setTimeout(() => {
+          document.getElementById('cl-step1').style.display = 'none';
+          document.getElementById('cl-step2').style.display = 'block';
+          typeText('typed-cl', 'Sehr geehrte Damen und Herren, mit großem Interesse bewerbe ich mich als Bauarbeiter bei Adecco Schweiz in Zürich. Durch meine zweijährige Berufserfahrung im Bereich Abbruch und Hochbau bringe ich die nötigen Fähigkeiten mit...', 18, () => {
+            document.getElementById('cl-cursor').style.display = 'none';
+            setTimeout(() => {
+              document.getElementById('cl-step2').style.display = 'none';
+              document.getElementById('cl-step3').style.display = 'block';
+            }, 500);
+          });
+        }, 2200);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('coverletter'); }, 18000);
+      }
+
+      if (id === 'demo-hremail') {
+        setTimeout(() => {
+          document.getElementById('hr-generate-btn').style.transition = 'opacity 0.4s';
+          document.getElementById('hr-generate-btn').style.opacity = '1';
+        }, 600);
+        setTimeout(() => {
+          document.getElementById('hr-step1').style.display = 'none';
+          document.getElementById('hr-step2').style.display = 'block';
+          typeText('typed-hr', 'Sehr geehrte Damen und Herren,\n\nich habe Ihre Stellenanzeige für einen Bauarbeiter in Zürich gesehen und möchte mich erkundigen, ob die Position noch verfügbar ist.\n\nIch verfüge über 2 Jahre Erfahrung im Hochbau und bringe Kenntnisse in Betonarbeiten und Gerüstmontage mit. Mein Lebenslauf liegt dieser E-Mail bei.\n\nIch freue mich auf Ihre Rückmeldung.\n\nMit freundlichen Grüßen,\nVáclav Kočka', 15, () => {
+            document.getElementById('hr-cursor').style.display = 'none';
+            setTimeout(() => {
+              document.getElementById('hr-stat').style.transition = 'opacity 0.4s';
+              document.getElementById('hr-stat').style.opacity = '1';
+            }, 300);
+          });
+        }, 1500);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('hremail'); }, 18000);
+      }
+
+      if (id === 'demo-interview') {
+        const qas = document.querySelectorAll('#interview-questions .interview-qa');
+        qas.forEach((qa, i) => {
+          setTimeout(() => {
+            qa.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+            qa.style.opacity = '1';
+            qa.style.transform = 'translateY(0)';
+          }, 500 + i * 600);
+        });
+        setTimeout(() => {
+          document.getElementById('interview-stat').style.transition = 'opacity 0.4s';
+          document.getElementById('interview-stat').style.opacity = '1';
+        }, 500 + qas.length * 600 + 300);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('interview'); }, 14000);
+      }
+
+      if (id === 'demo-contract') {
+        setTimeout(() => {
+          document.getElementById('contract-upload').style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+          document.getElementById('contract-upload').style.opacity = '1';
+        }, 400);
+        setTimeout(() => {
+          document.getElementById('contract-analyze-btn').style.transition = 'opacity 0.4s';
+          document.getElementById('contract-analyze-btn').style.opacity = '1';
+        }, 1000);
+        setTimeout(() => {
+          document.getElementById('contract-step1').style.display = 'none';
+          document.getElementById('contract-step2').style.display = 'block';
+          const items = document.querySelectorAll('#contract-results .contract-item');
+          items.forEach((item, i) => {
+            setTimeout(() => {
+              item.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+              item.style.opacity = '1';
+              item.style.transform = 'translateY(0)';
+            }, i * 400);
+          });
+        }, 2000);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('contract'); }, 16000);
+      }
+
+      if (id === 'demo-housing') {
+        const cards = document.querySelectorAll('#housing-results .housing-card');
+        cards.forEach((c, i) => {
+          setTimeout(() => {
+            c.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+            c.style.opacity = '1';
+            c.style.transform = 'translateY(0)';
+          }, 400 + i * 400);
+        });
+        setTimeout(() => {
+          document.getElementById('housing-stat').style.transition = 'opacity 0.4s';
+          document.getElementById('housing-stat').style.opacity = '1';
+        }, 400 + cards.length * 400 + 300);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('housing'); }, 12000);
+      }
+
+      if (id === 'demo-community') {
+        const posts = document.querySelectorAll('#community-posts .community-post');
+        posts.forEach((p, i) => {
+          setTimeout(() => {
+            p.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+            p.style.opacity = '1';
+            p.style.transform = 'translateY(0)';
+          }, 400 + i * 500);
+        });
+        setTimeout(() => {
+          document.getElementById('community-stat').style.transition = 'opacity 0.4s';
+          document.getElementById('community-stat').style.opacity = '1';
+        }, 400 + posts.length * 500 + 300);
+        setTimeout(() => { entry.target.dataset.animated = ''; resetDemo('community'); }, 12000);
+      }
+
       if (id === 'demo-cv') {
         // Field 1: Jméno
         document.getElementById('cv-field-1').style.opacity = '1';
@@ -1653,6 +2281,68 @@ function resetDemo(type) {
     document.getElementById('apply-sent-desc').style.opacity = '0';
     document.getElementById('apply-email-preview').style.opacity = '0';
     document.getElementById('apply-stat').style.opacity = '0';
+  }
+  if (type === 'german') {
+    document.querySelectorAll('#german-phrases .german-phrase-row').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(8px)';
+    });
+    document.getElementById('german-stat').style.opacity = '0';
+  }
+  if (type === 'jobanalysis') {
+    document.getElementById('typed-ja-url').textContent = '';
+    document.getElementById('ja-cursor').style.display = '';
+    document.getElementById('ja-analyze-btn').style.opacity = '0';
+    document.getElementById('ja-step1').style.display = 'block';
+    document.getElementById('ja-step2').style.display = 'none';
+    document.querySelectorAll('#ja-results .ja-section').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(8px)';
+    });
+  }
+  if (type === 'coverletter') {
+    ['cl-tag-1','cl-tag-2','cl-tag-3'].forEach(id => {
+      document.getElementById(id).style.opacity = '0';
+    });
+    document.getElementById('cl-generate-btn').style.opacity = '0';
+    document.getElementById('cl-step1').style.display = 'block';
+    document.getElementById('cl-step2').style.display = 'none';
+    document.getElementById('cl-step3').style.display = 'none';
+    document.getElementById('typed-cl').textContent = '';
+    document.getElementById('cl-cursor').style.display = '';
+  }
+  if (type === 'hremail') {
+    document.getElementById('hr-generate-btn').style.opacity = '0';
+    document.getElementById('hr-step1').style.display = 'block';
+    document.getElementById('hr-step2').style.display = 'none';
+    document.getElementById('typed-hr').textContent = '';
+    document.getElementById('hr-cursor').style.display = '';
+    document.getElementById('hr-stat').style.opacity = '0';
+  }
+  if (type === 'interview') {
+    document.querySelectorAll('#interview-questions .interview-qa').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(8px)';
+    });
+    document.getElementById('interview-stat').style.opacity = '0';
+  }
+  if (type === 'contract') {
+    document.getElementById('contract-upload').style.opacity = '0';
+    document.getElementById('contract-analyze-btn').style.opacity = '0';
+    document.getElementById('contract-step1').style.display = 'block';
+    document.getElementById('contract-step2').style.display = 'none';
+    document.querySelectorAll('#contract-results .contract-item').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(8px)';
+    });
+  }
+  if (type === 'housing') {
+    document.querySelectorAll('#housing-results .housing-card').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(8px)';
+    });
+    document.getElementById('housing-stat').style.opacity = '0';
+  }
+  if (type === 'community') {
+    document.querySelectorAll('#community-posts .community-post').forEach(el => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(8px)';
+    });
+    document.getElementById('community-stat').style.opacity = '0';
   }
   if (type === 'cv') {
     ['typed-cv-name','typed-cv-pos','typed-cv-exp'].forEach(id => {
