@@ -213,7 +213,9 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
     if (!letterText) return NextResponse.json({ error: 'Letter generation failed' }, { status: 500 })
 
     // Use saved CV from CV generator if available, otherwise generate basic Lebenslauf
-    const cvHtml = profile.saved_cv_html || generateLebenslaufHtml(profile, user.email || '')
+    let cvHtml = profile.saved_cv_html || generateLebenslaufHtml(profile, user.email || '')
+    // Strip any script tags for security
+    cvHtml = cvHtml.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/on\w+="[^"]*"/gi, '')
 
     // Build email HTML (motivation letter)
     const emailHtml = `<!DOCTYPE html>

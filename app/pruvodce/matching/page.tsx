@@ -199,7 +199,20 @@ export default function SmartMatching() {
                 </div>
               ))}
             </div>
-            <Link href="/profil" className="text-[#39ff6e]/60 hover:text-[#39ff6e] text-xs mt-3 inline-block no-underline transition">Upravit profil →</Link>
+            <div className="flex items-center justify-between mt-3">
+              <Link href="/profil" className="text-[#39ff6e]/60 hover:text-[#39ff6e] text-xs no-underline transition">Upravit profil →</Link>
+              {profile.saved_cv_html ? (
+                <span className="text-[#39ff6e]/60 text-xs flex items-center gap-1.5">
+                  <Image src="/images/3d/document.png" alt="" width={14} height={14} />
+                  CV uloženo
+                </span>
+              ) : (
+                <Link href="/pruvodce/sablony/cv" className="text-amber-400/60 hover:text-amber-400 text-xs no-underline transition flex items-center gap-1.5">
+                  <Image src="/images/3d/document.png" alt="" width={14} height={14} className="opacity-50" />
+                  Vytvořit CV →
+                </Link>
+              )}
+            </div>
           </div>
         ) : (
           <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-amber-500/15 p-6 mb-5 text-center relative overflow-hidden">
