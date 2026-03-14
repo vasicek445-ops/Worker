@@ -30,6 +30,8 @@ export default function SmartMatching() {
   const [toast, setToast] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [cached, setCached] = useState(false)
+  const [matchInfo, setMatchInfo] = useState<{ excluded: number; pool: number } | null>(null)
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 4000) }
 
@@ -54,10 +56,12 @@ export default function SmartMatching() {
     load()
   }, [])
 
-  const runMatching = async () => {
+  const runMatching = async (forceRefresh = false) => {
     setMatching(true)
     setError(null)
     setMatches([])
+    setCached(false)
+    setMatchInfo(null)
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Not authenticated')
@@ -68,12 +72,15 @@ export default function SmartMatching() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
+        body: JSON.stringify({ forceRefresh }),
       })
 
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Matching failed')
 
       setMatches(data.matches || [])
+      setCached(data.cached || false)
+      if (data.excluded || data.pool) setMatchInfo({ excluded: data.excluded || 0, pool: data.pool || 0 })
       if (data.matches?.length === 0) setError('Nenašli jsme žádné agentury pro tvůj profil.')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -245,8 +252,8 @@ export default function SmartMatching() {
                 <Image src="/images/3d/star.png" alt="" width={22} height={22} className="drop-shadow-lg" />
                 Nalezeno {matches.length} agentur
               </h2>
-              <button onClick={runMatching} disabled={matching} className="text-[#39ff6e]/60 text-xs font-medium hover:text-[#39ff6e] transition">
-                {matching ? 'Hledám...' : 'Hledat znovu'}
+              <button onClick={() => runMatching(true)} disabled={matching} className="text-[#39ff6e]/60 text-xs font-medium hover:text-[#39ff6e] transition">
+                {matching ? 'Hledám...' : 'Nové hledání'}
               </button>
             </div>
 
@@ -329,8 +336,14 @@ export default function SmartMatching() {
 
             {/* Summary */}
             <div className="bg-[#111120]/80 backdrop-blur-sm border border-white/[0.06] rounded-2xl p-5 mt-5 text-center">
+              {cached && (
+                <p className="text-white/20 text-xs m-0 mb-2">
+                  Výsledky z cache · <button onClick={() => runMatching(true)} className="text-[#39ff6e]/50 hover:text-[#39ff6e] underline transition">Hledat znovu</button>
+                </p>
+              )}
               <p className="text-white/40 text-sm m-0">
                 Odesláno: <span className="text-[#39ff6e] font-bold">{appliedIds.size}</span> přihlášek
+                {matchInfo && <span className="text-white/20 ml-2">· Prohledáno {matchInfo.pool} agentur{matchInfo.excluded > 0 && ` · ${matchInfo.excluded} vyloučeno`}</span>}
               </p>
               <Link href="/prihlasky" className="text-[#39ff6e]/60 hover:text-[#39ff6e] text-xs mt-2 inline-block no-underline transition">
                 Zobrazit všechny přihlášky →
