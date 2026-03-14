@@ -301,7 +301,7 @@ export default function CVSablona() {
             </div>
           </div>
 
-          <CVPreview data={cvData} photo={photo} template={template} accentColor={accentColor} onSave={handleSaveCV} saving={saving} />
+          <CVPreview data={cvData} photo={photo} template={template} accentColor={accentColor} onSave={handleSaveCV} saving={saving} saved={saved} />
           {saved && (
             <div className="bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20 rounded-xl p-3 mt-3 text-center">
               <span className="text-[#39ff6e]/80 text-sm">CV uloženo — bude se automaticky přikládat k přihláškám přes Smart Matching</span>

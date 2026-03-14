@@ -27,6 +27,7 @@ interface CVPreviewProps {
   accentColor: string
   onSave?: (html: string) => void
   saving?: boolean
+  saved?: boolean
 }
 
 /* ═══ PARAMETRIC TEMPLATE SYSTEM ═══ */
@@ -391,7 +392,7 @@ function isColorDark(hex: string): boolean {
   return (r * 299 + g * 587 + b * 114) / 1000 < 128
 }
 
-export default function CVPreview({ data, photo, template, accentColor, onSave, saving }: CVPreviewProps) {
+export default function CVPreview({ data, photo, template, accentColor, onSave, saving, saved }: CVPreviewProps) {
   const cvRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
 
@@ -430,9 +431,15 @@ export default function CVPreview({ data, photo, template, accentColor, onSave, 
           {downloading ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Generuji PDF...</span>) : '📥 Stáhnout jako PDF'}
         </button>
         {onSave && (
-          <button onClick={() => { if (cvRef.current) onSave(cvRef.current.innerHTML) }} disabled={saving} className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
-            {saving ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />Ukládám...</span>) : '💾 Uložit pro přihlášky'}
-          </button>
+          saved ? (
+            <div className="flex-1 bg-[#39ff6e]/10 border border-[#39ff6e]/30 text-[#39ff6e] font-bold py-3 px-6 rounded-xl text-center">
+              ✓ Uloženo pro přihlášky
+            </div>
+          ) : (
+            <button onClick={() => { if (cvRef.current) onSave(cvRef.current.innerHTML) }} disabled={saving} className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+              {saving ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />Ukládám...</span>) : '💾 Uložit pro přihlášky'}
+            </button>
+          )
         )}
       </div>
       <div className="bg-white rounded-2xl overflow-hidden shadow-2xl" style={{ overflowX: 'auto' }}>
