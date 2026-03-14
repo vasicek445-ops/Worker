@@ -23,10 +23,346 @@ interface CVData {
 interface CVPreviewProps {
   data: CVData
   photo: string | null
-  template: 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal' | 'executive' | 'swiss' | 'timeline' | 'corporate' | 'bold' | 'compact' | 'dark' | 'infographic' | 'zweispaltig' | 'nordic'
+  template: string
   accentColor: string
 }
 
+/* ═══ PARAMETRIC TEMPLATE SYSTEM ═══ */
+interface TplConfig {
+  layout: 'sidebar-l' | 'sidebar-r' | 'top' | 'two-col' | 'single'
+  headerBg: 'dark' | 'accent' | 'gradient' | 'light' | 'white'
+  photoShape: 'circle' | 'square' | 'rounded'
+  font: 'sans' | 'serif' | 'modern'
+  sectionStyle: 'underline' | 'dot' | 'border-left' | 'card' | 'plain' | 'gradient-line'
+  sidebarW?: string
+  compact?: boolean
+  darkMode?: boolean
+  headerHeight?: 'tall' | 'normal' | 'slim'
+  taskBullet?: string
+}
+
+const PARAM_TEMPLATES: Record<string, TplConfig> = {
+  // Professional series
+  'pro-classic': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'pro-light': { layout: 'sidebar-l', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'pro-serif': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'serif', sectionStyle: 'underline' },
+  'pro-square': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'square', font: 'sans', sectionStyle: 'underline' },
+  'pro-rounded': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'rounded', font: 'sans', sectionStyle: 'underline' },
+  'pro-gradient': { layout: 'sidebar-l', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'pro-compact': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', compact: true },
+  'pro-cards': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'card' },
+  'pro-dots': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'dot' },
+  'pro-slim': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', headerHeight: 'slim' },
+  // Right sidebar series
+  'right-classic': { layout: 'sidebar-r', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'right-dark': { layout: 'sidebar-r', headerBg: 'accent', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'right-serif': { layout: 'sidebar-r', headerBg: 'light', photoShape: 'rounded', font: 'serif', sectionStyle: 'border-left' },
+  'right-gradient': { layout: 'sidebar-r', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line' },
+  'right-modern': { layout: 'sidebar-r', headerBg: 'light', photoShape: 'square', font: 'modern', sectionStyle: 'plain' },
+  'right-compact': { layout: 'sidebar-r', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', compact: true },
+  'right-cards': { layout: 'sidebar-r', headerBg: 'accent', photoShape: 'rounded', font: 'sans', sectionStyle: 'card' },
+  'right-dots': { layout: 'sidebar-r', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'dot' },
+  // Top header series
+  'top-dark': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'top-gradient': { layout: 'top', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'top-accent': { layout: 'top', headerBg: 'accent', photoShape: 'rounded', font: 'sans', sectionStyle: 'border-left' },
+  'top-serif': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'serif', sectionStyle: 'plain' },
+  'top-modern': { layout: 'top', headerBg: 'gradient', photoShape: 'square', font: 'modern', sectionStyle: 'gradient-line' },
+  'top-compact': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', compact: true },
+  'top-cards': { layout: 'top', headerBg: 'accent', photoShape: 'circle', font: 'sans', sectionStyle: 'card' },
+  'top-light': { layout: 'top', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'top-slim': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', headerHeight: 'slim' },
+  'top-dots': { layout: 'top', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'dot' },
+  // Two column series
+  'twin-classic': { layout: 'two-col', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'twin-dark': { layout: 'two-col', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'twin-serif': { layout: 'two-col', headerBg: 'light', photoShape: 'circle', font: 'serif', sectionStyle: 'border-left' },
+  'twin-modern': { layout: 'two-col', headerBg: 'gradient', photoShape: 'square', font: 'modern', sectionStyle: 'gradient-line' },
+  'twin-compact': { layout: 'two-col', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', compact: true },
+  'twin-cards': { layout: 'two-col', headerBg: 'light', photoShape: 'rounded', font: 'sans', sectionStyle: 'card' },
+  'twin-accent': { layout: 'two-col', headerBg: 'accent', photoShape: 'circle', font: 'sans', sectionStyle: 'plain' },
+  'twin-dots': { layout: 'two-col', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'dot' },
+  // Single column series
+  'single-classic': { layout: 'single', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'single-dark': { layout: 'single', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'single-serif': { layout: 'single', headerBg: 'light', photoShape: 'circle', font: 'serif', sectionStyle: 'border-left' },
+  'single-modern': { layout: 'single', headerBg: 'gradient', photoShape: 'square', font: 'modern', sectionStyle: 'gradient-line' },
+  'single-compact': { layout: 'single', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', compact: true },
+  'single-cards': { layout: 'single', headerBg: 'light', photoShape: 'rounded', font: 'sans', sectionStyle: 'card' },
+  'single-gradient': { layout: 'single', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'underline' },
+  'single-accent': { layout: 'single', headerBg: 'accent', photoShape: 'circle', font: 'sans', sectionStyle: 'plain' },
+  // Dark mode series
+  'dark-sidebar': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', darkMode: true },
+  'dark-right': { layout: 'sidebar-r', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', darkMode: true },
+  'dark-top': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line', darkMode: true },
+  'dark-twin': { layout: 'two-col', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', darkMode: true },
+  'dark-single': { layout: 'single', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', darkMode: true },
+  'dark-serif': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'serif', sectionStyle: 'border-left', darkMode: true },
+  'dark-modern': { layout: 'top', headerBg: 'gradient', photoShape: 'square', font: 'modern', sectionStyle: 'gradient-line', darkMode: true },
+  'dark-compact': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', darkMode: true, compact: true },
+  'dark-cards': { layout: 'top', headerBg: 'dark', photoShape: 'rounded', font: 'sans', sectionStyle: 'card', darkMode: true },
+  'dark-gradient': { layout: 'sidebar-r', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line', darkMode: true },
+  // Serif series
+  'serif-classic': { layout: 'sidebar-l', headerBg: 'light', photoShape: 'circle', font: 'serif', sectionStyle: 'plain' },
+  'serif-top': { layout: 'top', headerBg: 'light', photoShape: 'circle', font: 'serif', sectionStyle: 'plain' },
+  'serif-single': { layout: 'single', headerBg: 'light', photoShape: 'circle', font: 'serif', sectionStyle: 'underline' },
+  'serif-dark': { layout: 'sidebar-l', headerBg: 'dark', photoShape: 'rounded', font: 'serif', sectionStyle: 'border-left' },
+  'serif-twin': { layout: 'two-col', headerBg: 'light', photoShape: 'circle', font: 'serif', sectionStyle: 'plain' },
+  // Modern series
+  'modern-square': { layout: 'top', headerBg: 'light', photoShape: 'square', font: 'modern', sectionStyle: 'gradient-line' },
+  'modern-dark': { layout: 'top', headerBg: 'dark', photoShape: 'square', font: 'modern', sectionStyle: 'gradient-line' },
+  'modern-sidebar': { layout: 'sidebar-l', headerBg: 'gradient', photoShape: 'square', font: 'modern', sectionStyle: 'card' },
+  'modern-twin': { layout: 'two-col', headerBg: 'light', photoShape: 'square', font: 'modern', sectionStyle: 'gradient-line' },
+  'modern-single': { layout: 'single', headerBg: 'gradient', photoShape: 'square', font: 'modern', sectionStyle: 'plain' },
+  // Card series
+  'card-light': { layout: 'top', headerBg: 'light', photoShape: 'rounded', font: 'sans', sectionStyle: 'card' },
+  'card-dark': { layout: 'top', headerBg: 'dark', photoShape: 'rounded', font: 'sans', sectionStyle: 'card' },
+  'card-sidebar': { layout: 'sidebar-l', headerBg: 'accent', photoShape: 'rounded', font: 'sans', sectionStyle: 'card' },
+  'card-single': { layout: 'single', headerBg: 'light', photoShape: 'rounded', font: 'sans', sectionStyle: 'card' },
+  'card-serif': { layout: 'top', headerBg: 'light', photoShape: 'rounded', font: 'serif', sectionStyle: 'card' },
+  // Gradient series
+  'grad-sidebar': { layout: 'sidebar-l', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line' },
+  'grad-top': { layout: 'top', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line' },
+  'grad-right': { layout: 'sidebar-r', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line' },
+  'grad-twin': { layout: 'two-col', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line' },
+  'grad-serif': { layout: 'sidebar-l', headerBg: 'gradient', photoShape: 'circle', font: 'serif', sectionStyle: 'gradient-line' },
+  'grad-dark': { layout: 'top', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line', darkMode: true },
+  // Compact series
+  'compact-sidebar': { layout: 'sidebar-l', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'plain', compact: true },
+  'compact-top': { layout: 'top', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'plain', compact: true },
+  'compact-twin': { layout: 'two-col', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'plain', compact: true },
+  'compact-dark-top': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'plain', compact: true },
+  'compact-single': { layout: 'single', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'plain', compact: true },
+  // Dot bullet series
+  'dots-sidebar': { layout: 'sidebar-l', headerBg: 'accent', photoShape: 'circle', font: 'sans', sectionStyle: 'dot', taskBullet: '●' },
+  'dots-top': { layout: 'top', headerBg: 'light', photoShape: 'circle', font: 'sans', sectionStyle: 'dot', taskBullet: '●' },
+  'dots-serif': { layout: 'sidebar-l', headerBg: 'light', photoShape: 'circle', font: 'serif', sectionStyle: 'dot', taskBullet: '●' },
+  'dots-dark': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'dot', taskBullet: '●', darkMode: true },
+  // Arrow bullet series
+  'arrow-top': { layout: 'top', headerBg: 'accent', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', taskBullet: '→' },
+  'arrow-sidebar': { layout: 'sidebar-l', headerBg: 'gradient', photoShape: 'circle', font: 'sans', sectionStyle: 'underline', taskBullet: '→' },
+  'arrow-dark': { layout: 'top', headerBg: 'dark', photoShape: 'circle', font: 'sans', sectionStyle: 'gradient-line', taskBullet: '→', darkMode: true },
+}
+
+const FONTS: Record<string, string> = {
+  sans: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+  serif: "'Georgia', 'Times New Roman', serif",
+  modern: "'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif",
+}
+
+/* eslint-disable react-hooks/static-components */
+function ParametricT({ data, photo, c, cfg }: { data: CVData; photo: string | null; c: string; cfg: TplConfig }) {
+  const p = data.personalData
+  const dark = cfg.darkMode
+  const bg = dark ? '#1a1a2e' : '#fff'
+  const text = dark ? '#e0e0e0' : '#333'
+  const textMuted = dark ? 'rgba(255,255,255,0.5)' : '#888'
+  const textLight = dark ? 'rgba(255,255,255,0.35)' : '#aaa'
+  const border = dark ? 'rgba(255,255,255,0.08)' : '#eee'
+  const cardBg = dark ? 'rgba(255,255,255,0.04)' : '#fafbfc'
+  const fs = cfg.compact ? '8.5pt' : '9.5pt'
+  const lh = cfg.compact ? '1.35' : '1.45'
+  const pad = cfg.compact ? '22px' : '28px'
+  const fontFamily = FONTS[cfg.font]
+  const photoR = cfg.photoShape === 'circle' ? '50%' : cfg.photoShape === 'rounded' ? '12px' : '4px'
+  const photoSize = cfg.compact ? '70px' : '90px'
+
+  const headerBgColor = cfg.headerBg === 'dark' ? (dark ? '#0d0d1a' : '#1a1a2e')
+    : cfg.headerBg === 'accent' ? c
+    : cfg.headerBg === 'gradient' ? undefined : (dark ? '#1a1a2e' : '#fff')
+  const headerBgGrad = cfg.headerBg === 'gradient' ? `linear-gradient(135deg, ${c}, ${hexToRgba(c, 0.7)})` : undefined
+  const headerTextColor = (cfg.headerBg === 'dark' || cfg.headerBg === 'accent' || cfg.headerBg === 'gradient') ? '#fff' : (dark ? '#fff' : '#1a1a1a')
+  const headerMuted = (cfg.headerBg === 'dark' || cfg.headerBg === 'accent' || cfg.headerBg === 'gradient') ? 'rgba(255,255,255,0.6)' : textMuted
+
+  const bullet = cfg.taskBullet || (cfg.sectionStyle === 'dot' ? '●' : cfg.sectionStyle === 'card' ? '▸' : '–')
+
+  // Section header renderer
+  const SH = ({ t }: { t: string }) => {
+    if (cfg.sectionStyle === 'gradient-line') return <div style={{ marginBottom: cfg.compact ? '6px' : '12px', marginTop: cfg.compact ? '10px' : '16px' }}><h2 style={{ fontSize: cfg.compact ? '8pt' : '10pt', fontWeight: 700, color: dark ? c : c, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>{t}</h2><div style={{ height: '2px', background: `linear-gradient(90deg, ${c}, transparent)`, width: '60px' }} /></div>
+    if (cfg.sectionStyle === 'card') return <div style={{ marginBottom: cfg.compact ? '6px' : '10px', marginTop: cfg.compact ? '10px' : '14px' }}><h2 style={{ fontSize: cfg.compact ? '8pt' : '10pt', fontWeight: 700, color: dark ? '#fff' : '#1a1a1a', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '4px' }}>{t}</h2><div style={{ height: '2px', backgroundColor: c, width: '25px', borderRadius: '2px' }} /></div>
+    if (cfg.sectionStyle === 'dot') return <div style={{ marginBottom: cfg.compact ? '6px' : '10px', marginTop: cfg.compact ? '10px' : '14px', display: 'flex', alignItems: 'center', gap: '8px' }}><div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: c }} /><h2 style={{ fontSize: cfg.compact ? '8pt' : '10pt', fontWeight: 700, color: dark ? '#fff' : '#1a1a1a', textTransform: 'uppercase', letterSpacing: '1.5px' }}>{t}</h2></div>
+    if (cfg.sectionStyle === 'border-left') return <div style={{ marginBottom: cfg.compact ? '6px' : '12px', marginTop: cfg.compact ? '10px' : '16px', paddingLeft: '10px', borderLeft: `3px solid ${c}` }}><h2 style={{ fontSize: cfg.compact ? '8pt' : '10pt', fontWeight: 700, color: dark ? '#fff' : '#1a1a1a', textTransform: 'uppercase', letterSpacing: '2px' }}>{t}</h2></div>
+    if (cfg.sectionStyle === 'plain') return <div style={{ marginBottom: cfg.compact ? '6px' : '10px', marginTop: cfg.compact ? '10px' : '16px' }}><h2 style={{ fontSize: cfg.compact ? '8pt' : '10pt', fontWeight: 600, color: c, textTransform: 'uppercase', letterSpacing: '3px' }}>{t}</h2></div>
+    // default: underline
+    return <div style={{ marginBottom: cfg.compact ? '6px' : '12px', marginTop: cfg.compact ? '10px' : '16px' }}><h2 style={{ fontSize: cfg.compact ? '8pt' : '10pt', fontWeight: 700, color: c, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>{t}</h2><div style={{ height: '2px', backgroundColor: c, width: '35px' }} /></div>
+  }
+
+  // Photo component
+  const Photo = ({ size, light }: { size?: string; light?: boolean }) => {
+    const s = size || photoSize
+    if (!photo) return light ? <div style={{ width: s, height: s, borderRadius: photoR, backgroundColor: 'rgba(255,255,255,0.1)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '24pt', color: 'rgba(255,255,255,0.3)' }}>👤</span></div> : null
+    return <div style={{ width: s, height: s, borderRadius: photoR, overflow: 'hidden', border: `2px solid ${light ? 'rgba(255,255,255,0.3)' : hexToRgba(c, 0.4)}`, flexShrink: 0 }}><img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
+  }
+
+  // Experience list
+  const Exps = () => <>{data.experience.map((exp, i) => (
+    <div key={i} style={{ marginBottom: cfg.compact ? '10px' : '16px', ...(cfg.sectionStyle === 'card' ? { padding: cfg.compact ? '8px 10px' : '12px 14px', backgroundColor: cardBg, borderRadius: '6px', border: `1px solid ${border}` } : cfg.sectionStyle === 'border-left' ? { paddingLeft: '12px', borderLeft: `2px solid ${i === 0 ? c : border}` } : {}) }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <h3 style={{ fontSize: cfg.compact ? '9pt' : '10.5pt', fontWeight: 700, margin: 0, color: dark ? '#fff' : '#2c3e50' }}>{exp.title}</h3>
+        <span style={{ fontSize: cfg.compact ? '7pt' : '8pt', color: c, fontWeight: 600, whiteSpace: 'nowrap', marginLeft: '8px' }}>{exp.period}</span>
+      </div>
+      <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: textMuted, margin: '1px 0 5px', fontStyle: 'italic' }}>{exp.company}{exp.location ? ` · ${exp.location}` : ''}</p>
+      {exp.tasks.map((t, j) => <div key={j} style={{ display: 'flex', gap: '6px', marginBottom: '2px' }}><span style={{ color: c, fontSize: cfg.compact ? '6pt' : '7pt', marginTop: '3px', flexShrink: 0 }}>{bullet}</span><span style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: dark ? 'rgba(255,255,255,0.65)' : '#555' }}>{t}</span></div>)}
+    </div>
+  ))}</>
+
+  const Edus = () => <>{data.education.map((edu, i) => (
+    <div key={i} style={{ marginBottom: cfg.compact ? '6px' : '12px', ...(cfg.sectionStyle === 'border-left' ? { paddingLeft: '12px', borderLeft: `2px solid ${border}` } : {}) }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <h3 style={{ fontSize: cfg.compact ? '9pt' : '10.5pt', fontWeight: 700, margin: 0, color: dark ? '#fff' : '#2c3e50' }}>{edu.degree}</h3>
+        <span style={{ fontSize: cfg.compact ? '7pt' : '8pt', color: c, whiteSpace: 'nowrap' }}>{edu.period}</span>
+      </div>
+      <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: textMuted, margin: '1px 0 0' }}>{edu.school}{edu.location ? ` · ${edu.location}` : ''}</p>
+    </div>
+  ))}</>
+
+  // Sidebar content
+  const SidebarContent = ({ light }: { light?: boolean }) => (
+    <div style={{ padding: `${pad} 20px` }}>
+      <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+        <Photo size={cfg.compact ? '70px' : '90px'} light={light} />
+        {cfg.layout === 'sidebar-l' || cfg.layout === 'sidebar-r' ? <>
+          <h1 style={{ fontSize: cfg.compact ? '14pt' : '17pt', fontWeight: 700, margin: '10px 0 2px', color: light ? '#fff' : text }}>{p.name}</h1>
+          <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: light ? 'rgba(255,255,255,0.6)' : c, margin: 0, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 500 }}>{data.experience[0]?.title || 'Fachkraft'}</p>
+        </> : null}
+      </div>
+      <div style={{ height: '1px', backgroundColor: light ? 'rgba(255,255,255,0.1)' : border, margin: '0 0 14px' }} />
+      <p style={{ fontSize: '7pt', textTransform: 'uppercase', letterSpacing: '2px', color: light ? 'rgba(255,255,255,0.4)' : textLight, margin: '0 0 8px' }}>Kontakt</p>
+      {p.address && <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: light ? '#ddd' : '#666', margin: '0 0 4px' }}>{p.address}</p>}
+      <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: light ? '#ddd' : '#666', margin: '0 0 4px' }}>{p.phone}</p>
+      <p style={{ fontSize: cfg.compact ? '7pt' : '8pt', color: light ? '#ddd' : '#666', margin: '0 0 12px', wordBreak: 'break-all' }}>{p.email}</p>
+      <div style={{ height: '1px', backgroundColor: light ? 'rgba(255,255,255,0.1)' : border, margin: '0 0 14px' }} />
+      <p style={{ fontSize: '7pt', textTransform: 'uppercase', letterSpacing: '2px', color: light ? 'rgba(255,255,255,0.4)' : textLight, margin: '0 0 8px' }}>Info</p>
+      <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: light ? '#ddd' : '#666', margin: '0 0 3px' }}>{p.birthdate}</p>
+      <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: light ? '#ddd' : '#666', margin: '0 0 10px' }}>{p.nationality}</p>
+      {p.drivingLicense && p.drivingLicense !== 'žádný' && <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: light ? '#ddd' : '#666', margin: '0 0 10px' }}>Führerschein: {p.drivingLicense}</p>}
+      <div style={{ height: '1px', backgroundColor: light ? 'rgba(255,255,255,0.1)' : border, margin: '0 0 14px' }} />
+      <p style={{ fontSize: '7pt', textTransform: 'uppercase', letterSpacing: '2px', color: light ? 'rgba(255,255,255,0.4)' : textLight, margin: '0 0 8px' }}>Sprachen</p>
+      <LangBars langs={data.languages} c={c} light={light} />
+      {data.skills.soft.length > 0 && <>
+        <div style={{ height: '1px', backgroundColor: light ? 'rgba(255,255,255,0.1)' : border, margin: '10px 0 14px' }} />
+        <p style={{ fontSize: '7pt', textTransform: 'uppercase', letterSpacing: '2px', color: light ? 'rgba(255,255,255,0.4)' : textLight, margin: '0 0 8px' }}>Kompetenzen</p>
+        <SoftList skills={data.skills.soft} c={c} light={light} />
+      </>}
+    </div>
+  )
+
+  // Main content (experience, education, skills)
+  const MainContent = () => (
+    <div style={{ padding: `${pad} ${pad} ${pad} ${cfg.layout === 'sidebar-l' ? '26px' : pad}` }}>
+      {data.profil && <><SH t="Profil" /><p style={{ fontSize: cfg.compact ? '8pt' : '9pt', color: dark ? 'rgba(255,255,255,0.6)' : '#666', lineHeight: '1.6', marginBottom: cfg.compact ? '14px' : '20px' }}>{data.profil}</p></>}
+      <SH t="Berufserfahrung" /><Exps />
+      <SH t="Ausbildung" /><Edus />
+      {data.skills.technical.length > 0 && <><SH t="Fachkenntnisse" /><SkillPills skills={data.skills.technical} c={c} /><div style={{ marginBottom: cfg.compact ? '10px' : '20px' }} /></>}
+      {data.certifications && data.certifications.length > 0 && <><SH t="Zertifikate" />{data.certifications.map((x, i) => <p key={i} style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: dark ? 'rgba(255,255,255,0.5)' : '#555', margin: '0 0 3px' }}>{bullet} {x}</p>)}</>}
+      <p style={{ fontSize: '8pt', color: dark ? 'rgba(255,255,255,0.2)' : '#ccc', fontStyle: 'italic', marginTop: '16px' }}>Referenzen auf Anfrage erhältlich</p>
+    </div>
+  )
+
+  // Header for top/two-col/single layouts
+  const TopHeader = () => (
+    <div style={{ padding: `${cfg.headerHeight === 'slim' ? '18px' : pad} 35px`, backgroundColor: headerBgColor, background: headerBgGrad, display: 'flex', alignItems: 'center', gap: '20px' }}>
+      <Photo light={cfg.headerBg !== 'light' && cfg.headerBg !== 'white'} />
+      <div style={{ flex: 1 }}>
+        <h1 style={{ fontSize: cfg.compact ? '20pt' : '24pt', fontWeight: 700, color: headerTextColor, margin: '0 0 2px' }}>{p.name}</h1>
+        <p style={{ fontSize: cfg.compact ? '9pt' : '10pt', color: cfg.headerBg === 'light' || cfg.headerBg === 'white' ? c : 'rgba(255,255,255,0.8)', margin: '0 0 8px', fontWeight: 500, letterSpacing: '1.5px', textTransform: 'uppercase' }}>{data.experience[0]?.title || 'Fachkraft'}</p>
+        <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: headerMuted }}>
+          {p.address && <span>{p.address}</span>}<span>{p.phone}</span><span>{p.email}</span>
+          <span>{p.birthdate} · {p.nationality}</span>
+          {p.drivingLicense && p.drivingLicense !== 'žádný' && <span>Kat. {p.drivingLicense}</span>}
+        </div>
+      </div>
+    </div>
+  )
+
+  const sideW = cfg.sidebarW || (cfg.compact ? '68mm' : '75mm')
+  const isLightSidebar = cfg.headerBg === 'light' || cfg.headerBg === 'white'
+  const sidebarBg = isLightSidebar ? hexToRgba(c, 0.05) : c
+
+  // LAYOUT: sidebar left
+  if (cfg.layout === 'sidebar-l') return (
+    <div style={{ width: W, minHeight: '297mm', display: 'flex', fontFamily, fontSize: fs, lineHeight: lh }}>
+      <div style={{ width: sideW, backgroundColor: sidebarBg, flexShrink: 0 }}><SidebarContent light={!isLightSidebar} /></div>
+      <div style={{ flex: 1, backgroundColor: bg }}><MainContent /></div>
+    </div>
+  )
+
+  // LAYOUT: sidebar right
+  if (cfg.layout === 'sidebar-r') return (
+    <div style={{ width: W, minHeight: '297mm', display: 'flex', fontFamily, fontSize: fs, lineHeight: lh }}>
+      <div style={{ flex: 1, backgroundColor: bg }}><MainContent /></div>
+      <div style={{ width: sideW, backgroundColor: sidebarBg, flexShrink: 0 }}><SidebarContent light={!isLightSidebar} /></div>
+    </div>
+  )
+
+  // LAYOUT: two columns
+  if (cfg.layout === 'two-col') return (
+    <div style={{ width: W, minHeight: '297mm', fontFamily, fontSize: fs, lineHeight: lh, backgroundColor: bg }}>
+      <TopHeader />
+      {cfg.headerBg !== 'white' && <div style={{ height: '3px', backgroundColor: c }} />}
+      {data.profil && <div style={{ padding: `12px 35px`, backgroundColor: cardBg }}><p style={{ fontSize: cfg.compact ? '8pt' : '9pt', color: dark ? 'rgba(255,255,255,0.6)' : '#666', lineHeight: '1.6', margin: 0 }}>{data.profil}</p></div>}
+      <div style={{ display: 'flex', padding: `20px 35px`, gap: '24px' }}>
+        <div style={{ flex: 1 }}>
+          <SH t="Berufserfahrung" /><Exps />
+          {data.certifications && data.certifications.length > 0 && <><SH t="Zertifikate" />{data.certifications.map((x, i) => <p key={i} style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: dark ? 'rgba(255,255,255,0.5)' : '#555', margin: '0 0 3px' }}>{bullet} {x}</p>)}</>}
+        </div>
+        <div style={{ width: '1px', backgroundColor: border }} />
+        <div style={{ flex: 1 }}>
+          <SH t="Ausbildung" /><Edus />
+          <SH t="Sprachen" /><LangBars langs={data.languages} c={c} light={dark} />
+          {data.skills.technical.length > 0 && <><SH t="Fachkenntnisse" /><SkillPills skills={data.skills.technical} c={c} /><div style={{ marginBottom: '14px' }} /></>}
+          {data.skills.soft.length > 0 && <><SH t="Kompetenzen" /><SoftList skills={data.skills.soft} c={c} light={dark} /></>}
+        </div>
+      </div>
+    </div>
+  )
+
+  // LAYOUT: single column
+  if (cfg.layout === 'single') return (
+    <div style={{ width: W, minHeight: '297mm', fontFamily, fontSize: fs, lineHeight: lh, backgroundColor: bg }}>
+      <TopHeader />
+      {cfg.headerBg !== 'white' && <div style={{ height: '2px', backgroundColor: c }} />}
+      <div style={{ padding: `20px 35px` }}>
+        {data.profil && <><SH t="Profil" /><p style={{ fontSize: cfg.compact ? '8pt' : '9.5pt', color: dark ? 'rgba(255,255,255,0.6)' : '#666', lineHeight: '1.65', marginBottom: '18px' }}>{data.profil}</p></>}
+        <SH t="Berufserfahrung" /><Exps />
+        <SH t="Ausbildung" /><Edus />
+        <div style={{ display: 'flex', gap: '24px' }}>
+          <div style={{ flex: 1 }}><SH t="Sprachen" /><LangBars langs={data.languages} c={c} light={dark} /></div>
+          {data.skills.technical.length > 0 && <div style={{ flex: 1 }}><SH t="Fachkenntnisse" /><SkillPills skills={data.skills.technical} c={c} /></div>}
+          {data.skills.soft.length > 0 && <div style={{ flex: 1 }}><SH t="Kompetenzen" /><SoftList skills={data.skills.soft} c={c} light={dark} /></div>}
+        </div>
+        {data.certifications && data.certifications.length > 0 && <><SH t="Zertifikate" />{data.certifications.map((x, i) => <p key={i} style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: dark ? 'rgba(255,255,255,0.5)' : '#555', margin: '0 0 3px' }}>{bullet} {x}</p>)}</>}
+        <p style={{ fontSize: '8pt', color: dark ? 'rgba(255,255,255,0.2)' : '#ccc', fontStyle: 'italic', marginTop: '16px' }}>Referenzen auf Anfrage erhältlich</p>
+      </div>
+    </div>
+  )
+
+  // LAYOUT: top (default) - top header + two-part body
+  return (
+    <div style={{ width: W, minHeight: '297mm', fontFamily, fontSize: fs, lineHeight: lh, backgroundColor: bg }}>
+      <TopHeader />
+      {cfg.headerBg !== 'white' && <div style={{ height: '3px', backgroundColor: c }} />}
+      {data.profil && <div style={{ padding: '14px 35px', backgroundColor: cardBg, borderBottom: `1px solid ${border}` }}><p style={{ fontSize: cfg.compact ? '8pt' : '9.5pt', color: dark ? 'rgba(255,255,255,0.6)' : '#555', lineHeight: '1.6', margin: 0 }}>{data.profil}</p></div>}
+      <div style={{ display: 'flex', padding: `20px 35px`, gap: '28px' }}>
+        <div style={{ flex: 1 }}>
+          <SH t="Berufserfahrung" /><Exps />
+          <SH t="Ausbildung" /><Edus />
+          {data.certifications && data.certifications.length > 0 && <><SH t="Zertifikate" />{data.certifications.map((x, i) => <p key={i} style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: dark ? 'rgba(255,255,255,0.5)' : '#555', margin: '0 0 3px' }}>{bullet} {x}</p>)}</>}
+        </div>
+        <div style={{ width: '155px', flexShrink: 0 }}>
+          <SH t="Sprachen" /><LangBars langs={data.languages} c={c} light={dark} />
+          {data.skills.technical.length > 0 && <><SH t="Fachkenntnisse" /><SkillPills skills={data.skills.technical} c={c} /></>}
+          {data.skills.soft.length > 0 && <><SH t="Kompetenzen" /><SoftList skills={data.skills.soft} c={c} light={dark} /></>}
+          <div style={{ marginTop: '12px', fontSize: '7.5pt', color: textLight }}>{p.birthdate}<br />{p.nationality}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* eslint-enable react-hooks/static-components */
+
+/* ═══ HELPERS ═══ */
 function getLvl(level: string): number {
   const l = level.toLowerCase()
   if (l.includes('mutter') || l.includes('c2')) return 5
@@ -66,8 +402,9 @@ export default function CVPreview({ data, photo, template, accentColor }: CVPrev
     finally { setDownloading(false) }
   }
 
-  const T = { klassisch: KlassischT, modern: ModernT, kreativ: KreativT, elegant: ElegantT, minimal: MinimalT, executive: ExecutiveT, swiss: SwissT, timeline: TimelineT, corporate: CorporateT, bold: BoldT, compact: CompactT, dark: DarkT, infographic: InfographicT, zweispaltig: ZweispaltigT, nordic: NordicT }
-  const Template = T[template]
+  const handcrafted: Record<string, React.FC<{data: CVData; photo: string | null; c: string}>> = { klassisch: KlassischT, modern: ModernT, kreativ: KreativT, elegant: ElegantT, minimal: MinimalT, executive: ExecutiveT, swiss: SwissT, timeline: TimelineT, corporate: CorporateT, bold: BoldT, compact: CompactT, dark: DarkT, infographic: InfographicT, zweispaltig: ZweispaltigT, nordic: NordicT }
+  const HandcraftedTemplate = handcrafted[template]
+  const paramCfg = PARAM_TEMPLATES[template]
 
   return (
     <div>
@@ -77,7 +414,11 @@ export default function CVPreview({ data, photo, template, accentColor }: CVPrev
         </button>
       </div>
       <div className="bg-white rounded-2xl overflow-hidden shadow-2xl" style={{ overflowX: 'auto' }}>
-        <div ref={cvRef}><Template data={data} photo={photo} c={accentColor} /></div>
+        <div ref={cvRef}>
+          {HandcraftedTemplate ? <HandcraftedTemplate data={data} photo={photo} c={accentColor} />
+          : paramCfg ? <ParametricT data={data} photo={photo} c={accentColor} cfg={paramCfg} />
+          : <KlassischT data={data} photo={photo} c={accentColor} />}
+        </div>
       </div>
       <p className="text-gray-500 text-xs text-center mt-4">💡 PDF ve formátu A4</p>
     </div>

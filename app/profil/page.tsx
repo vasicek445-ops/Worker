@@ -8,7 +8,9 @@ import { useLanguage } from '../../lib/i18n/LanguageContext'
 export default function Profil() {
   const { isActive, loading: subLoading } = useSubscription()
   const { locale, setLocale } = useLanguage()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = useState<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -119,8 +121,10 @@ export default function Profil() {
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
       const avatarUrl = publicUrl + '?t=' + Date.now()
       await supabase.from('profiles').update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({ ...prev, avatar_url: avatarUrl }))
       showToast('Fotka nahrána!')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')) }
     finally { setUploading(false) }
   }
@@ -129,9 +133,11 @@ export default function Profil() {
     if (!user || !editName.trim()) return
     try {
       await supabase.from('profiles').update({ full_name: editName.trim(), updated_at: new Date().toISOString() }).eq('id', user.id)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({ ...prev, full_name: editName.trim() }))
       setEditingName(false)
       showToast('Jméno uloženo!')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) { showToast('Chyba') }
   }
 
@@ -166,6 +172,7 @@ export default function Profil() {
       if (error) throw error
       showToast('Potvrzovací email odeslán na ' + newEmail)
       setNewEmail('')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')) }
     finally { setEmailSaving(false) }
   }
@@ -181,6 +188,7 @@ export default function Profil() {
       setShowPasswordChange(false)
       setNewPassword('')
       setConfirmPassword('')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')) }
     finally { setPasswordSaving(false) }
   }
@@ -197,6 +205,7 @@ export default function Profil() {
       if (!res.ok) throw new Error('Chyba při mazání')
       await supabase.auth.signOut()
       window.location.href = '/login'
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')); setDeleting(false) }
   }
 
@@ -211,6 +220,7 @@ export default function Profil() {
         ridicky_prukaz: ridickyPrukaz, dalsi_jazyky: dalsiJazyky, profile_complete: isComplete,
         updated_at: new Date().toISOString(),
       }).eq('id', user.id)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({ ...prev, obor, pozice, preferovany_kanton: preferovanyKanton, nemcina_uroven: nemcinaUroven, zkusenosti, vzdelani, dovednosti, telefon, adresa, datum_narozeni: datumNarozeni, ridicky_prukaz: ridickyPrukaz, dalsi_jazyky: dalsiJazyky, profile_complete: isComplete }))
       showToast(isComplete ? 'Pracovní profil uložen! Můžeš spustit Smart Matching.' : 'Profil uložen! Vyplň všechna povinná pole pro Smart Matching.')
     } catch { showToast('Chyba při ukládání') }
@@ -229,6 +239,21 @@ export default function Profil() {
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString('cs-CZ', { month: 'long', year: 'numeric' }) : ''
   const currentLang = LANGUAGES.find(l => l.code === locale) || LANGUAGES[0]
 
+  const profileFields = [
+    { label: 'Jméno', filled: !!(profile?.full_name || editName.trim()) },
+    { label: 'Fotka', filled: !!profile?.avatar_url },
+    { label: 'Obor', filled: !!obor },
+    { label: 'Cílová pozice', filled: !!pozice },
+    { label: 'Preferovaný kanton', filled: !!preferovanyKanton },
+    { label: 'Úroveň němčiny', filled: !!nemcinaUroven },
+    { label: 'Pracovní zkušenosti', filled: !!zkusenosti },
+    { label: 'Telefon', filled: !!telefon },
+    { label: 'Datum narození', filled: !!datumNarozeni },
+  ]
+  const filledCount = profileFields.filter(f => f.filled).length
+  const completionPct = Math.round((filledCount / profileFields.length) * 100)
+  const missingFields = profileFields.filter(f => !f.filled)
+
   return (
     <>
       <style jsx global>{'@import url(https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap)'}</style>
@@ -246,6 +271,44 @@ export default function Profil() {
         <div className="max-w-xl mx-auto relative z-10">
           {/* Header */}
           <h1 className="text-2xl font-extrabold text-white mb-6 tracking-tight">Můj profil</h1>
+
+          {/* Profile Completion */}
+          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white/70 text-sm font-semibold">
+                Tvůj profil je vyplněný na <span className={completionPct >= 80 ? 'text-[#39ff6e]' : completionPct >= 50 ? 'text-blue-400' : 'text-orange-400'}>{completionPct}%</span>
+              </span>
+              <span className="text-white/25 text-xs">{filledCount}/{profileFields.length} polí</span>
+            </div>
+            <div className="w-full h-2 bg-white/[0.06] rounded-full overflow-hidden mb-3">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${completionPct}%`,
+                  background: completionPct >= 80
+                    ? 'linear-gradient(90deg, #2bcc58, #39ff6e)'
+                    : completionPct >= 50
+                    ? 'linear-gradient(90deg, #3b82f6, #39ff6e)'
+                    : 'linear-gradient(90deg, #f97316, #3b82f6)',
+                }}
+              />
+            </div>
+            {missingFields.length > 0 && (
+              <div>
+                <p className="text-white/25 text-[11px] mb-1.5">Chybí vyplnit:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {missingFields.map(f => (
+                    <span key={f.label} className="text-[11px] bg-white/[0.04] border border-white/[0.07] text-white/40 px-2 py-0.5 rounded-full">
+                      {f.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {missingFields.length === 0 && (
+              <p className="text-[#39ff6e] text-[11px] font-medium">Profil je kompletní!</p>
+            )}
+          </div>
 
           {/* Avatar Card */}
           <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-6 mb-4">
@@ -466,6 +529,7 @@ export default function Profil() {
                 <span className="text-white/40 text-sm">Jazyk aplikace</span>
                 <select
                   value={locale}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onChange={(e) => setLocale(e.target.value as any)}
                   className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 appearance-none cursor-pointer"
                 >

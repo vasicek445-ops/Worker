@@ -12,22 +12,122 @@ const FIELD_OPTIONS = {
   german: ['Žádná – teprve se učím', 'Základy (A1)', 'Základní komunikace (A2)', 'Dorozumím se (B1)', 'Dobrá úroveň (B2)', 'Plynulá (C1/C2)'],
 }
 
-const TEMPLATES = [
-  { id: 'klassisch' as const, name: 'Klassisch', desc: 'Tmavý sidebar', icon: '🏢' },
-  { id: 'modern' as const, name: 'Modern', desc: 'Čistý, elegantní', icon: '✨' },
-  { id: 'kreativ' as const, name: 'Kreativ', desc: 'Výrazný banner', icon: '🎨' },
-  { id: 'elegant' as const, name: 'Elegant', desc: 'Jemný, sofistikovaný', icon: '💎' },
-  { id: 'minimal' as const, name: 'Minimal', desc: 'Čistá typografie', icon: '📐' },
-  { id: 'executive' as const, name: 'Executive', desc: 'Tmavá hlavička', icon: '👔' },
-  { id: 'swiss' as const, name: 'Swiss', desc: 'Formální, tabulkový', icon: '🇨🇭' },
-  { id: 'timeline' as const, name: 'Timeline', desc: 'Vizuální časová osa', icon: '📊' },
-  { id: 'corporate' as const, name: 'Corporate', desc: 'Pravý sidebar', icon: '🏛️' },
-  { id: 'bold' as const, name: 'Bold', desc: 'Výrazný, gradient', icon: '🔥' },
-  { id: 'compact' as const, name: 'Compact', desc: 'Hustý, víc obsahu', icon: '📋' },
-  { id: 'dark' as const, name: 'Dark', desc: 'Tmavý motiv', icon: '🌙' },
-  { id: 'infographic' as const, name: 'Infographic', desc: 'Grafické prvky', icon: '📈' },
-  { id: 'zweispaltig' as const, name: 'Zwei-Spalten', desc: 'Dva rovné sloupce', icon: '📰' },
-  { id: 'nordic' as const, name: 'Nordic', desc: 'Skandinávský styl', icon: '❄️' },
+const TEMPLATES: Array<{ id: string; name: string; desc: string; icon: string; category?: string }> = [
+  // Handcrafted
+  { id: 'klassisch', name: 'Klassisch', desc: 'Tmavý sidebar', icon: '🏢', category: 'Populární' },
+  { id: 'modern', name: 'Modern', desc: 'Čistý, elegantní', icon: '✨', category: 'Populární' },
+  { id: 'kreativ', name: 'Kreativ', desc: 'Výrazný banner', icon: '🎨', category: 'Populární' },
+  { id: 'elegant', name: 'Elegant', desc: 'Jemný, sofistikovaný', icon: '💎', category: 'Populární' },
+  { id: 'minimal', name: 'Minimal', desc: 'Čistá typografie', icon: '📐', category: 'Populární' },
+  { id: 'executive', name: 'Executive', desc: 'Tmavá hlavička', icon: '👔', category: 'Populární' },
+  { id: 'swiss', name: 'Swiss', desc: 'Formální, tabulkový', icon: '🇨🇭', category: 'Populární' },
+  { id: 'timeline', name: 'Timeline', desc: 'Vizuální časová osa', icon: '📊', category: 'Populární' },
+  { id: 'corporate', name: 'Corporate', desc: 'Pravý sidebar', icon: '🏛️', category: 'Populární' },
+  { id: 'bold', name: 'Bold', desc: 'Výrazný, gradient', icon: '🔥', category: 'Populární' },
+  { id: 'compact', name: 'Compact', desc: 'Hustý, víc obsahu', icon: '📋', category: 'Populární' },
+  { id: 'dark', name: 'Dark', desc: 'Tmavý motiv', icon: '🌙', category: 'Populární' },
+  { id: 'infographic', name: 'Infographic', desc: 'Grafické prvky', icon: '📈', category: 'Populární' },
+  { id: 'zweispaltig', name: 'Zwei-Spalten', desc: 'Dva rovné sloupce', icon: '📰', category: 'Populární' },
+  { id: 'nordic', name: 'Nordic', desc: 'Skandinávský styl', icon: '❄️', category: 'Populární' },
+  // Professional series
+  { id: 'pro-classic', name: 'Pro Classic', desc: 'Profesionální sidebar', icon: '💼', category: 'Profesionální' },
+  { id: 'pro-light', name: 'Pro Light', desc: 'Světlý sidebar', icon: '☀️', category: 'Profesionální' },
+  { id: 'pro-serif', name: 'Pro Serif', desc: 'Patkové písmo', icon: '📖', category: 'Profesionální' },
+  { id: 'pro-square', name: 'Pro Square', desc: 'Čtvercová fotka', icon: '⬛', category: 'Profesionální' },
+  { id: 'pro-rounded', name: 'Pro Rounded', desc: 'Zaoblená fotka', icon: '🔲', category: 'Profesionální' },
+  { id: 'pro-gradient', name: 'Pro Gradient', desc: 'Gradientový sidebar', icon: '🌈', category: 'Profesionální' },
+  { id: 'pro-compact', name: 'Pro Compact', desc: 'Kompaktní sidebar', icon: '📦', category: 'Profesionální' },
+  { id: 'pro-cards', name: 'Pro Cards', desc: 'Kartičkové sekce', icon: '🃏', category: 'Profesionální' },
+  { id: 'pro-dots', name: 'Pro Dots', desc: 'Tečkové nadpisy', icon: '⚫', category: 'Profesionální' },
+  { id: 'pro-slim', name: 'Pro Slim', desc: 'Štíhlá hlavička', icon: '📏', category: 'Profesionální' },
+  // Right sidebar series
+  { id: 'right-classic', name: 'Right Classic', desc: 'Pravý svetlý', icon: '▶️', category: 'Pravý panel' },
+  { id: 'right-dark', name: 'Right Dark', desc: 'Pravý barevný', icon: '◀️', category: 'Pravý panel' },
+  { id: 'right-serif', name: 'Right Serif', desc: 'Pravý patkový', icon: '📓', category: 'Pravý panel' },
+  { id: 'right-gradient', name: 'Right Gradient', desc: 'Pravý gradient', icon: '🎆', category: 'Pravý panel' },
+  { id: 'right-modern', name: 'Right Modern', desc: 'Pravý moderní', icon: '🔷', category: 'Pravý panel' },
+  { id: 'right-compact', name: 'Right Compact', desc: 'Pravý kompakt', icon: '📎', category: 'Pravý panel' },
+  { id: 'right-cards', name: 'Right Cards', desc: 'Pravý kartičky', icon: '🎴', category: 'Pravý panel' },
+  { id: 'right-dots', name: 'Right Dots', desc: 'Pravý tečky', icon: '🔘', category: 'Pravý panel' },
+  // Top header series
+  { id: 'top-dark', name: 'Top Dark', desc: 'Tmavá hlavička', icon: '⬆️', category: 'Horní hlavička' },
+  { id: 'top-gradient', name: 'Top Gradient', desc: 'Gradient hlavička', icon: '🌅', category: 'Horní hlavička' },
+  { id: 'top-accent', name: 'Top Accent', desc: 'Barevná hlavička', icon: '🎯', category: 'Horní hlavička' },
+  { id: 'top-serif', name: 'Top Serif', desc: 'Patkový horní', icon: '📜', category: 'Horní hlavička' },
+  { id: 'top-modern', name: 'Top Modern', desc: 'Moderní horní', icon: '🔺', category: 'Horní hlavička' },
+  { id: 'top-compact', name: 'Top Compact', desc: 'Kompaktní horní', icon: '📌', category: 'Horní hlavička' },
+  { id: 'top-cards', name: 'Top Cards', desc: 'Kartičky horní', icon: '🎪', category: 'Horní hlavička' },
+  { id: 'top-light', name: 'Top Light', desc: 'Světlá hlavička', icon: '💡', category: 'Horní hlavička' },
+  { id: 'top-slim', name: 'Top Slim', desc: 'Štíhlá hlavička', icon: '➖', category: 'Horní hlavička' },
+  { id: 'top-dots', name: 'Top Dots', desc: 'Tečkový horní', icon: '🔵', category: 'Horní hlavička' },
+  // Two column series
+  { id: 'twin-classic', name: 'Twin Classic', desc: 'Dva sloupce', icon: '📑', category: 'Dva sloupce' },
+  { id: 'twin-dark', name: 'Twin Dark', desc: 'Tmavé dva sloupce', icon: '📋', category: 'Dva sloupce' },
+  { id: 'twin-serif', name: 'Twin Serif', desc: 'Patkové dva sl.', icon: '📘', category: 'Dva sloupce' },
+  { id: 'twin-modern', name: 'Twin Modern', desc: 'Moderní dva sl.', icon: '📊', category: 'Dva sloupce' },
+  { id: 'twin-compact', name: 'Twin Compact', desc: 'Kompaktní dva sl.', icon: '🗂️', category: 'Dva sloupce' },
+  { id: 'twin-cards', name: 'Twin Cards', desc: 'Kartičky dva sl.', icon: '🗃️', category: 'Dva sloupce' },
+  { id: 'twin-accent', name: 'Twin Accent', desc: 'Barevné dva sl.', icon: '🎨', category: 'Dva sloupce' },
+  { id: 'twin-dots', name: 'Twin Dots', desc: 'Tečkové dva sl.', icon: '⚪', category: 'Dva sloupce' },
+  // Single column series
+  { id: 'single-classic', name: 'Single Classic', desc: 'Jednosloupec', icon: '📄', category: 'Jednosloupec' },
+  { id: 'single-dark', name: 'Single Dark', desc: 'Tmavý jednosloupec', icon: '🖤', category: 'Jednosloupec' },
+  { id: 'single-serif', name: 'Single Serif', desc: 'Patkový jednosloupec', icon: '📕', category: 'Jednosloupec' },
+  { id: 'single-modern', name: 'Single Modern', desc: 'Moderní jednosloupec', icon: '🔹', category: 'Jednosloupec' },
+  { id: 'single-compact', name: 'Single Compact', desc: 'Kompaktní jednosloupec', icon: '📍', category: 'Jednosloupec' },
+  { id: 'single-cards', name: 'Single Cards', desc: 'Kartičky jednosloupec', icon: '🎫', category: 'Jednosloupec' },
+  { id: 'single-gradient', name: 'Single Gradient', desc: 'Gradient jednosloupec', icon: '🌊', category: 'Jednosloupec' },
+  { id: 'single-accent', name: 'Single Accent', desc: 'Barevný jednosloupec', icon: '🔶', category: 'Jednosloupec' },
+  // Dark mode series
+  { id: 'dark-sidebar', name: 'Dark Sidebar', desc: 'Tmavý + sidebar', icon: '🌑', category: 'Tmavý motiv' },
+  { id: 'dark-right', name: 'Dark Right', desc: 'Tmavý + pravý', icon: '🌒', category: 'Tmavý motiv' },
+  { id: 'dark-top', name: 'Dark Top', desc: 'Tmavý + horní', icon: '🌓', category: 'Tmavý motiv' },
+  { id: 'dark-twin', name: 'Dark Twin', desc: 'Tmavý + dva sl.', icon: '🌔', category: 'Tmavý motiv' },
+  { id: 'dark-single', name: 'Dark Single', desc: 'Tmavý + jeden sl.', icon: '🌕', category: 'Tmavý motiv' },
+  { id: 'dark-serif', name: 'Dark Serif', desc: 'Tmavý + patkový', icon: '🌖', category: 'Tmavý motiv' },
+  { id: 'dark-modern', name: 'Dark Modern', desc: 'Tmavý + moderní', icon: '🌗', category: 'Tmavý motiv' },
+  { id: 'dark-compact', name: 'Dark Compact', desc: 'Tmavý kompaktní', icon: '🌘', category: 'Tmavý motiv' },
+  { id: 'dark-cards', name: 'Dark Cards', desc: 'Tmavé kartičky', icon: '🃏', category: 'Tmavý motiv' },
+  { id: 'dark-gradient', name: 'Dark Gradient', desc: 'Tmavý gradient', icon: '🎇', category: 'Tmavý motiv' },
+  // Serif series
+  { id: 'serif-classic', name: 'Serif Classic', desc: 'Patkový klasik', icon: '📚', category: 'Patkové' },
+  { id: 'serif-top', name: 'Serif Top', desc: 'Patkový horní', icon: '📖', category: 'Patkové' },
+  { id: 'serif-single', name: 'Serif Single', desc: 'Patkový jeden sl.', icon: '📗', category: 'Patkové' },
+  { id: 'serif-dark', name: 'Serif Dark', desc: 'Patkový tmavý', icon: '📙', category: 'Patkové' },
+  { id: 'serif-twin', name: 'Serif Twin', desc: 'Patkový dva sl.', icon: '📔', category: 'Patkové' },
+  // Modern series
+  { id: 'modern-square', name: 'Modern Square', desc: 'Čtvercový moderní', icon: '🟦', category: 'Moderní' },
+  { id: 'modern-dark', name: 'Modern Dark', desc: 'Tmavý moderní', icon: '🟪', category: 'Moderní' },
+  { id: 'modern-sidebar', name: 'Modern Sidebar', desc: 'Moderní sidebar', icon: '🟩', category: 'Moderní' },
+  { id: 'modern-twin', name: 'Modern Twin', desc: 'Moderní dva sl.', icon: '🟨', category: 'Moderní' },
+  { id: 'modern-single', name: 'Modern Single', desc: 'Moderní jeden sl.', icon: '🟧', category: 'Moderní' },
+  // Card series
+  { id: 'card-light', name: 'Card Light', desc: 'Světlé karty', icon: '🪧', category: 'Kartičky' },
+  { id: 'card-dark', name: 'Card Dark', desc: 'Tmavé karty', icon: '🏷️', category: 'Kartičky' },
+  { id: 'card-sidebar', name: 'Card Sidebar', desc: 'Karty + sidebar', icon: '🏷️', category: 'Kartičky' },
+  { id: 'card-single', name: 'Card Single', desc: 'Karty jednosloupec', icon: '🏷️', category: 'Kartičky' },
+  { id: 'card-serif', name: 'Card Serif', desc: 'Karty patkové', icon: '🏷️', category: 'Kartičky' },
+  // Gradient series
+  { id: 'grad-sidebar', name: 'Grad Sidebar', desc: 'Gradient sidebar', icon: '🌈', category: 'Gradient' },
+  { id: 'grad-top', name: 'Grad Top', desc: 'Gradient horní', icon: '🌅', category: 'Gradient' },
+  { id: 'grad-right', name: 'Grad Right', desc: 'Gradient pravý', icon: '🌇', category: 'Gradient' },
+  { id: 'grad-twin', name: 'Grad Twin', desc: 'Gradient dva sl.', icon: '🌄', category: 'Gradient' },
+  { id: 'grad-serif', name: 'Grad Serif', desc: 'Gradient patkový', icon: '🌆', category: 'Gradient' },
+  { id: 'grad-dark', name: 'Grad Dark', desc: 'Gradient tmavý', icon: '🌃', category: 'Gradient' },
+  // Compact series
+  { id: 'compact-sidebar', name: 'Kompakt Sidebar', desc: 'Kompakt sidebar', icon: '📐', category: 'Kompaktní' },
+  { id: 'compact-top', name: 'Kompakt Top', desc: 'Kompakt horní', icon: '📏', category: 'Kompaktní' },
+  { id: 'compact-twin', name: 'Kompakt Twin', desc: 'Kompakt dva sl.', icon: '📎', category: 'Kompaktní' },
+  { id: 'compact-dark-top', name: 'Kompakt Dark', desc: 'Kompakt tmavý', icon: '📌', category: 'Kompaktní' },
+  { id: 'compact-single', name: 'Kompakt Single', desc: 'Kompakt jeden sl.', icon: '📍', category: 'Kompaktní' },
+  // Dot/Arrow series
+  { id: 'dots-sidebar', name: 'Dots Sidebar', desc: 'Tečky sidebar', icon: '⚫', category: 'Speciální' },
+  { id: 'dots-top', name: 'Dots Top', desc: 'Tečky horní', icon: '🔴', category: 'Speciální' },
+  { id: 'dots-serif', name: 'Dots Serif', desc: 'Tečky patkový', icon: '🟤', category: 'Speciální' },
+  { id: 'dots-dark', name: 'Dots Dark', desc: 'Tečky tmavý', icon: '🟣', category: 'Speciální' },
+  { id: 'arrow-top', name: 'Arrow Top', desc: 'Šipky horní', icon: '➡️', category: 'Speciální' },
+  { id: 'arrow-sidebar', name: 'Arrow Sidebar', desc: 'Šipky sidebar', icon: '↗️', category: 'Speciální' },
+  { id: 'arrow-dark', name: 'Arrow Dark', desc: 'Šipky tmavý', icon: '⬆️', category: 'Speciální' },
 ]
 
 const QUICK_COLORS = [
@@ -38,7 +138,7 @@ const QUICK_COLORS = [
   '#1c1c1c', '#2c3e50', '#b9770e',
 ]
 
-type TemplateType = 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal' | 'executive' | 'swiss' | 'timeline' | 'corporate' | 'bold' | 'compact' | 'dark' | 'infographic' | 'zweispaltig' | 'nordic'
+type TemplateType = string
 
 export default function CVSablona() {
   const { isActive, loading } = useSubscription()
@@ -52,6 +152,7 @@ export default function CVSablona() {
   const [accentColor, setAccentColor] = useState('#2c3e50')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [prefilled, setPrefilled] = useState(false)
+  const [category, setCategory] = useState('Populární')
 
   // Auto-prefill from user profile
   useEffect(() => {
@@ -192,7 +293,7 @@ export default function CVSablona() {
           <span className="text-3xl">📄</span>
           <div>
             <h1 className="text-white text-xl font-bold">Životopis – švýcarský formát</h1>
-            <p className="text-gray-400 text-xs">15 profesionálních stylů · libovolná barva · fotka · PDF ke stažení</p>
+            <p className="text-gray-400 text-xs">{TEMPLATES.length} profesionálních stylů · libovolná barva · fotka · PDF ke stažení</p>
           </div>
         </div>
 
@@ -208,14 +309,24 @@ export default function CVSablona() {
 
             {/* Step 1: Template */}
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-2 block">1. Vyber styl šablony</label>
-              <div className="grid grid-cols-5 gap-2">
-                {TEMPLATES.map((t) => (
+              <label className="text-gray-300 text-sm font-medium mb-2 block">1. Vyber styl šablony <span className="text-gray-600 font-normal">({TEMPLATES.length} stylů)</span></label>
+              {/* Category filter */}
+              <div className="flex gap-1.5 mb-2 flex-wrap">
+                {Array.from(new Set(TEMPLATES.map(t => t.category || 'Ostatní'))).map((cat) => (
+                  <button key={cat} onClick={() => setCategory(cat)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition ${category === cat ? 'bg-[#E8302A] text-white' : 'bg-[#1A1A1A] text-gray-500 hover:text-white border border-gray-800'}`}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+              {/* Template grid */}
+              <div className="grid grid-cols-5 gap-1.5 max-h-[220px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#333 transparent' }}>
+                {TEMPLATES.filter(t => (t.category || 'Ostatní') === category).map((t) => (
                   <button key={t.id} onClick={() => setTemplate(t.id)}
-                    className={`p-2.5 rounded-xl border text-center transition ${template === t.id ? 'border-[#E8302A] bg-[#E8302A]/10' : 'border-gray-800 bg-[#1A1A1A] hover:border-gray-600'}`}>
-                    <span className="text-lg block">{t.icon}</span>
-                    <span className="text-white text-xs font-semibold block">{t.name}</span>
-                    <span className="text-gray-500 text-[10px] leading-tight">{t.desc}</span>
+                    className={`p-2 rounded-xl border text-center transition ${template === t.id ? 'border-[#E8302A] bg-[#E8302A]/10' : 'border-gray-800 bg-[#1A1A1A] hover:border-gray-600'}`}>
+                    <span className="text-sm block">{t.icon}</span>
+                    <span className="text-white text-[10px] font-semibold block truncate">{t.name}</span>
+                    <span className="text-gray-500 text-[8px] leading-tight block truncate">{t.desc}</span>
                   </button>
                 ))}
               </div>
