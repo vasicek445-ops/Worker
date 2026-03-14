@@ -83,6 +83,13 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
         <div className="fixed w-[800px] h-[800px] rounded-full blur-[180px] pointer-events-none z-0 opacity-15 -top-[300px] -right-[200px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
         <div className="fixed w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none z-0 opacity-10 top-[400px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
         <div className="fixed w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none z-0 opacity-10 bottom-[100px] right-[100px]" style={{ background: "radial-gradient(circle, rgba(232,48,42,0.15), transparent 70%)" }} />
+        {/* Global dot grid pattern */}
+        <svg className="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-[0.015]" xmlns="http://www.w3.org/2000/svg">
+          <pattern id="globalGrid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.8" fill="white"/>
+          </pattern>
+          <rect width="100%" height="100%" fill="url(#globalGrid)"/>
+        </svg>
 
         <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -116,6 +123,24 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
 
           {/* ═══ HERO CARD ═══ */}
           <div className="mt-5 rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
+            {/* Decorative mountain silhouette */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <svg className="absolute bottom-0 left-0 w-full h-[60%] opacity-[0.04]" viewBox="0 0 1200 300" preserveAspectRatio="none">
+                <path d="M0,300 L0,200 L80,180 L150,120 L200,160 L280,80 L340,140 L400,60 L460,130 L520,90 L580,150 L650,40 L720,120 L780,70 L840,130 L900,50 L960,110 L1020,80 L1080,140 L1140,100 L1200,160 L1200,300 Z" fill="white"/>
+              </svg>
+              {/* Dot grid pattern */}
+              <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+                <pattern id="heroGrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+                  <circle cx="1" cy="1" r="1" fill="white"/>
+                </pattern>
+                <rect width="100%" height="100%" fill="url(#heroGrid)"/>
+              </svg>
+              {/* Floating sparkles */}
+              <div className="absolute top-8 right-[15%] w-1.5 h-1.5 bg-[#39ff6e] rounded-full animate-pulse opacity-40" />
+              <div className="absolute top-16 right-[25%] w-1 h-1 bg-blue-400 rounded-full animate-pulse opacity-30" style={{ animationDelay: "0.5s" }} />
+              <div className="absolute top-12 right-[35%] w-1 h-1 bg-purple-400 rounded-full animate-pulse opacity-25" style={{ animationDelay: "1s" }} />
+              <div className="absolute bottom-20 left-[10%] w-1 h-1 bg-[#39ff6e] rounded-full animate-pulse opacity-20" style={{ animationDelay: "1.5s" }} />
+            </div>
             <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(100,60,255,0.1), transparent 60%)" }} />
             <div className="relative p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
@@ -136,23 +161,30 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
                   </p>
                   <div className="flex flex-wrap gap-3">
                     <Link href={isProfileComplete ? "/pruvodce/matching" : "/profil"}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold text-sm py-3 px-6 rounded-xl no-underline shadow-[0_4px_24px_rgba(57,255,110,0.3)] hover:shadow-[0_4px_32px_rgba(57,255,110,0.5)] transition-all">
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold text-sm py-3 px-6 rounded-xl no-underline shadow-[0_4px_24px_rgba(57,255,110,0.3)] hover:shadow-[0_4px_32px_rgba(57,255,110,0.5)] transition-all hover:scale-[1.03]">
                       {isProfileComplete ? "🎯 Spustit Matching" : "👤 Dokončit profil"}
                     </Link>
                     <Link href="/pruvodce/sablony/cv"
-                      className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-sm text-white font-bold text-sm py-3 px-6 rounded-xl no-underline border border-white/[0.08] hover:bg-white/[0.1] transition-all">
+                      className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-sm text-white font-bold text-sm py-3 px-6 rounded-xl no-underline border border-white/[0.08] hover:bg-white/[0.1] hover:scale-[1.03] transition-all">
                       📄 Vytvořit CV
                     </Link>
                   </div>
                 </div>
 
-                {/* Profile progress ring */}
+                {/* Profile progress ring with glow */}
                 <div className="hidden sm:flex flex-col items-center gap-3">
                   <div className="relative w-28 h-28">
-                    <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+                    <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ background: `conic-gradient(#39ff6e ${profilePercent}%, transparent ${profilePercent}%)` }} />
+                    <svg className="w-28 h-28 -rotate-90 relative" viewBox="0 0 100 100">
                       <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="#39ff6e" strokeWidth="6" strokeLinecap="round"
+                      <circle cx="50" cy="50" r="42" fill="none" stroke="url(#progressGrad)" strokeWidth="6" strokeLinecap="round"
                         strokeDasharray={`${profilePercent * 2.64} 264`} className="transition-all duration-1000" />
+                      <defs>
+                        <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#39ff6e" />
+                          <stop offset="100%" stopColor="#2bcc58" />
+                        </linearGradient>
+                      </defs>
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-2xl font-extrabold text-white">{profilePercent}%</span>
@@ -167,26 +199,42 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
           {/* ═══ STATS ROW ═══ */}
           <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { value: jobCount.toLocaleString(), label: "Nabídek práce", icon: "💼", color: "from-orange-500/20 to-orange-500/5", glow: "shadow-orange-500/10" },
-              { value: housingCount.toLocaleString(), label: "Nabídek bydlení", icon: "🏠", color: "from-cyan-500/20 to-cyan-500/5", glow: "shadow-cyan-500/10" },
-              { value: agencyCount.toLocaleString(), label: "Agentur", icon: "🏢", color: "from-purple-500/20 to-purple-500/5", glow: "shadow-purple-500/10" },
-              { value: appCount.toString(), label: "Tvých přihlášek", icon: "✉️", color: "from-[#39ff6e]/20 to-[#39ff6e]/5", glow: "shadow-[#39ff6e]/10" },
+              { value: jobCount.toLocaleString(), label: "Nabídek práce", color: "from-orange-500/20 to-orange-500/5", glow: "shadow-orange-500/10", accent: "#f97316",
+                svg: <svg viewBox="0 0 40 40" className="w-10 h-10"><rect x="6" y="12" width="28" height="20" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M14 12V8a6 6 0 0112 0v4" fill="none" stroke="currentColor" strokeWidth="1.5"/><circle cx="20" cy="23" r="2.5" fill="currentColor" opacity="0.6"/></svg> },
+              { value: housingCount.toLocaleString(), label: "Nabídek bydlení", color: "from-cyan-500/20 to-cyan-500/5", glow: "shadow-cyan-500/10", accent: "#06b6d4",
+                svg: <svg viewBox="0 0 40 40" className="w-10 h-10"><path d="M6 20L20 8l14 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><rect x="10" y="20" width="20" height="14" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/><rect x="16" y="26" width="8" height="8" rx="1" fill="currentColor" opacity="0.3"/></svg> },
+              { value: agencyCount.toLocaleString(), label: "Agentur", color: "from-purple-500/20 to-purple-500/5", glow: "shadow-purple-500/10", accent: "#a855f7",
+                svg: <svg viewBox="0 0 40 40" className="w-10 h-10"><rect x="8" y="10" width="24" height="24" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5"/><line x1="8" y1="18" x2="32" y2="18" stroke="currentColor" strokeWidth="1.5"/><line x1="8" y1="26" x2="32" y2="26" stroke="currentColor" strokeWidth="1"/><line x1="20" y1="18" x2="20" y2="34" stroke="currentColor" strokeWidth="1"/></svg> },
+              { value: appCount.toString(), label: "Tvých přihlášek", color: "from-[#39ff6e]/20 to-[#39ff6e]/5", glow: "shadow-[#39ff6e]/10", accent: "#39ff6e",
+                svg: <svg viewBox="0 0 40 40" className="w-10 h-10"><rect x="6" y="8" width="28" height="20" rx="3" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M6 12l14 9 14-9" fill="none" stroke="currentColor" strokeWidth="1.5"/><circle cx="32" cy="28" r="6" fill="currentColor" opacity="0.15" stroke="currentColor" strokeWidth="1.5"/><path d="M30 28h4M32 26v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> },
             ].map((s, i) => (
-              <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 border border-white/[0.06] backdrop-blur-sm shadow-lg ${s.glow}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl">{s.icon}</span>
-                  <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#39ff6e]/60" />
+              <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 border border-white/[0.06] backdrop-blur-sm shadow-lg ${s.glow} relative overflow-hidden group hover:scale-[1.03] transition-all`}>
+                {/* Background decoration */}
+                <div className="absolute -right-3 -top-3 w-20 h-20 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition" style={{ background: s.accent }} />
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-2">
+                    <div style={{ color: s.accent }} className="opacity-70">
+                      {s.svg}
+                    </div>
+                    <div className="flex gap-0.5">
+                      <div className="w-1 h-1 rounded-full opacity-40" style={{ background: s.accent }} />
+                      <div className="w-1 h-3 rounded-full opacity-30" style={{ background: s.accent }} />
+                      <div className="w-1 h-2 rounded-full opacity-50" style={{ background: s.accent }} />
+                    </div>
                   </div>
+                  <div className="text-2xl font-extrabold text-white tracking-tight">{s.value}</div>
+                  <div className="text-[11px] text-white/35 mt-0.5 font-medium">{s.label}</div>
                 </div>
-                <div className="text-2xl font-extrabold text-white tracking-tight">{s.value}</div>
-                <div className="text-[11px] text-white/35 mt-0.5 font-medium">{s.label}</div>
               </div>
             ))}
           </div>
 
           {/* ═══ PROGRESS TRACKER ═══ */}
-          <div className="mt-5 bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5">
+          <div className="mt-5 bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 relative overflow-hidden">
+            {/* Subtle chevron pattern */}
+            <svg className="absolute right-0 top-0 w-48 h-full opacity-[0.02]" viewBox="0 0 100 80" preserveAspectRatio="none">
+              <path d="M60 0L80 40L60 80M40 0L60 40L40 80M20 0L40 40L20 80" fill="none" stroke="white" strokeWidth="2"/>
+            </svg>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-sm">🚀</span>
               <span className="text-sm font-bold text-white">Tvoje cesta do Švýcarska</span>
@@ -320,23 +368,58 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
           {/* ═══ BOTTOM ROW ═══ */}
           <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-            {/* Explore tiles */}
-            {[
-              { icon: "🏠", title: "Bydlení", desc: `${housingCount.toLocaleString()} nabídek`, href: "/bydleni", gradient: "from-cyan-500/15 to-cyan-500/5", border: "border-cyan-500/15" },
-              { icon: "📇", title: "Agentury", desc: `${agencyCount.toLocaleString()} kontaktů`, href: "/kontakty", gradient: "from-purple-500/15 to-purple-500/5", border: "border-purple-500/15" },
-              { icon: "💬", title: "Komunita", desc: "Spolubydlení a tipy", href: "/komunita", gradient: "from-pink-500/15 to-pink-500/5", border: "border-pink-500/15" },
-            ].map((tile, i) => (
-              <Link key={i} href={tile.href} className={`bg-gradient-to-br ${tile.gradient} rounded-2xl p-5 border ${tile.border} no-underline group hover:scale-[1.02] transition-all backdrop-blur-sm`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-3xl">{tile.icon}</span>
-                    <p className="text-base font-bold text-white m-0 mt-3 group-hover:text-[#39ff6e] transition">{tile.title}</p>
-                    <p className="text-[11px] text-white/35 m-0 mt-1">{tile.desc}</p>
-                  </div>
-                  <span className="text-white/10 group-hover:text-white/30 transition text-2xl">→</span>
+            {/* Bydlení */}
+            <Link href="/bydleni" className="bg-gradient-to-br from-cyan-500/15 to-cyan-500/5 rounded-2xl p-5 border border-cyan-500/15 no-underline group hover:scale-[1.02] transition-all backdrop-blur-sm relative overflow-hidden">
+              <svg className="absolute right-2 bottom-2 w-24 h-24 opacity-[0.06] group-hover:opacity-[0.12] transition" viewBox="0 0 100 100">
+                <path d="M15 55L50 25L85 55" fill="none" stroke="currentColor" strokeWidth="3" className="text-cyan-300"/>
+                <rect x="22" y="55" width="56" height="35" rx="4" fill="none" stroke="currentColor" strokeWidth="3" className="text-cyan-300"/>
+                <rect x="38" y="65" width="24" height="25" rx="2" fill="currentColor" opacity="0.3" className="text-cyan-300"/>
+                <rect x="28" y="62" width="8" height="8" rx="1" fill="currentColor" opacity="0.2" className="text-cyan-300"/>
+                <rect x="64" y="62" width="8" height="8" rx="1" fill="currentColor" opacity="0.2" className="text-cyan-300"/>
+              </svg>
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-3">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-cyan-400"><path d="M3 12L12 4l9 8" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/><rect x="5" y="12" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.5"/><rect x="9" y="16" width="6" height="6" rx="1" fill="currentColor" opacity="0.3"/></svg>
                 </div>
-              </Link>
-            ))}
+                <p className="text-base font-bold text-white m-0 group-hover:text-cyan-300 transition">Bydlení</p>
+                <p className="text-[11px] text-white/35 m-0 mt-1">{housingCount.toLocaleString()} nabídek</p>
+              </div>
+            </Link>
+
+            {/* Agentury */}
+            <Link href="/kontakty" className="bg-gradient-to-br from-purple-500/15 to-purple-500/5 rounded-2xl p-5 border border-purple-500/15 no-underline group hover:scale-[1.02] transition-all backdrop-blur-sm relative overflow-hidden">
+              <svg className="absolute right-2 bottom-2 w-24 h-24 opacity-[0.06] group-hover:opacity-[0.12] transition" viewBox="0 0 100 100">
+                <circle cx="50" cy="35" r="14" fill="none" stroke="currentColor" strokeWidth="3" className="text-purple-300"/>
+                <path d="M25 80c0-14 11-25 25-25s25 11 25 25" fill="none" stroke="currentColor" strokeWidth="3" className="text-purple-300"/>
+                <circle cx="78" cy="30" r="8" fill="currentColor" opacity="0.15" className="text-purple-300"/>
+                <circle cx="22" cy="30" r="8" fill="currentColor" opacity="0.15" className="text-purple-300"/>
+              </svg>
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-3">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-purple-400"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+                </div>
+                <p className="text-base font-bold text-white m-0 group-hover:text-purple-300 transition">Agentury</p>
+                <p className="text-[11px] text-white/35 m-0 mt-1">{agencyCount.toLocaleString()} kontaktů</p>
+              </div>
+            </Link>
+
+            {/* Komunita */}
+            <Link href="/komunita" className="bg-gradient-to-br from-pink-500/15 to-pink-500/5 rounded-2xl p-5 border border-pink-500/15 no-underline group hover:scale-[1.02] transition-all backdrop-blur-sm relative overflow-hidden">
+              <svg className="absolute right-2 bottom-2 w-24 h-24 opacity-[0.06] group-hover:opacity-[0.12] transition" viewBox="0 0 100 100">
+                <rect x="15" y="20" width="45" height="30" rx="8" fill="currentColor" opacity="0.15" className="text-pink-300"/>
+                <rect x="40" y="50" width="45" height="30" rx="8" fill="currentColor" opacity="0.1" className="text-pink-300"/>
+                <circle cx="25" cy="35" r="3" fill="currentColor" opacity="0.4" className="text-pink-300"/>
+                <circle cx="37" cy="35" r="3" fill="currentColor" opacity="0.4" className="text-pink-300"/>
+                <circle cx="49" cy="35" r="3" fill="currentColor" opacity="0.4" className="text-pink-300"/>
+              </svg>
+              <div className="relative">
+                <div className="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-3">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-pink-400"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" fill="none" stroke="currentColor" strokeWidth="1.5"/></svg>
+                </div>
+                <p className="text-base font-bold text-white m-0 group-hover:text-pink-300 transition">Komunita</p>
+                <p className="text-[11px] text-white/35 m-0 mt-1">Spolubydlení a tipy</p>
+              </div>
+            </Link>
           </div>
 
           {/* ═══ GUIDES ROW ═══ */}
@@ -350,14 +433,19 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {[
-                { icon: "📋", title: t.guides.permits_title, desc: t.guides.permits_desc, href: "/pruvodce/povoleni", tag: t.tags.important, tagColor: "text-red-400 bg-red-500/10" },
-                { icon: "🏥", title: t.guides.insurance_title, desc: t.guides.insurance_desc, href: "/pruvodce/pojisteni", tag: t.tags.popular, tagColor: "text-blue-400 bg-blue-500/10" },
-                { icon: "💰", title: t.guides.tax_title, desc: t.guides.tax_desc, href: "/pruvodce/dane", tag: t.tags.new_tag, tagColor: "text-green-400 bg-green-500/10" },
+                { title: t.guides.permits_title, desc: t.guides.permits_desc, href: "/pruvodce/povoleni", tag: t.tags.important, tagColor: "text-red-400 bg-red-500/10", iconColor: "text-red-400 bg-red-500/10 border-red-500/20",
+                  svg: <svg viewBox="0 0 24 24" className="w-5 h-5"><rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M9 7h6M9 11h6M9 15h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> },
+                { title: t.guides.insurance_title, desc: t.guides.insurance_desc, href: "/pruvodce/pojisteni", tag: t.tags.popular, tagColor: "text-blue-400 bg-blue-500/10", iconColor: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+                  svg: <svg viewBox="0 0 24 24" className="w-5 h-5"><path d="M12 2L4 6v5c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V6L12 2z" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+                { title: t.guides.tax_title, desc: t.guides.tax_desc, href: "/pruvodce/dane", tag: t.tags.new_tag, tagColor: "text-green-400 bg-green-500/10", iconColor: "text-green-400 bg-green-500/10 border-green-500/20",
+                  svg: <svg viewBox="0 0 24 24" className="w-5 h-5"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5 1-2.5 2.25S10.5 12.5 12 13s2.5 1.25 2.5 2.25S13.5 17 12 17c-1 0-2-.5-2.5-1.5M12 7v1M12 16v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg> },
               ].map((g, i) => (
-                <Link key={i} href={g.href} className="flex items-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] rounded-xl p-3.5 border border-white/[0.04] hover:border-white/[0.08] no-underline transition-all">
-                  <span className="text-2xl">{g.icon}</span>
+                <Link key={i} href={g.href} className="flex items-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] rounded-xl p-3.5 border border-white/[0.04] hover:border-white/[0.08] no-underline transition-all group">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center border flex-shrink-0 ${g.iconColor}`}>
+                    {g.svg}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-white m-0 truncate">{g.title}</p>
+                    <p className="text-[13px] font-semibold text-white m-0 truncate group-hover:text-[#39ff6e] transition">{g.title}</p>
                     <p className="text-[10px] text-white/30 m-0 mt-0.5 truncate">{g.desc}</p>
                   </div>
                   <span className={`text-[9px] font-bold py-1 px-2 rounded-md whitespace-nowrap ${g.tagColor}`}>{g.tag}</span>
