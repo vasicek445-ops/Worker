@@ -114,13 +114,15 @@ export default function Profil() {
     if (file.size > 2 * 1024 * 1024) { showToast('Max velikost je 2 MB'); return }
     setUploading(true)
     try {
-      const ext = file.name.split('.').pop()
-      const path = user.id + '/avatar.' + ext
-      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      const path = `${user.id}/avatar`
+      // Remove old avatar first to avoid stale cache
+      await supabase.storage.from('avatars').remove([path])
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type })
       if (uploadError) throw uploadError
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
       const avatarUrl = publicUrl + '?t=' + Date.now()
-      await supabase.from('profiles').update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id)
+      const { error: updateError } = await supabase.from('profiles').update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id)
+      if (updateError) throw updateError
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({ ...prev, avatar_url: avatarUrl }))
       showToast('Fotka nahrána!')
@@ -316,12 +318,16 @@ export default function Profil() {
               <div className="relative">
                 <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="relative group">
                   {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="Avatar" className="w-20 h-20 rounded-full object-cover border-2 border-white/[0.08] group-hover:border-[#39ff6e]/40 transition" />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-400 flex items-center justify-center text-white font-black text-3xl border-2 border-white/[0.08] group-hover:border-[#39ff6e]/40 transition">
-                      {userInitial}
-                    </div>
-                  )}
+                    <img
+                      src={profile.avatar_url}
+                      alt="Avatar"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-white/[0.08] group-hover:border-[#39ff6e]/40 transition"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }}
+                    />
+                  ) : null}
+                  <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-400 flex items-center justify-center text-white font-black text-3xl border-2 border-white/[0.08] group-hover:border-[#39ff6e]/40 transition ${profile?.avatar_url ? 'hidden' : ''}`}>
+                    {userInitial}
+                  </div>
                   <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                     <span className="text-white text-lg">📷</span>
                   </div>
