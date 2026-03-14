@@ -5,7 +5,9 @@ import Link from "next/link";
 import { supabase } from "../supabase";
 
 export default function Prihlasky() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [applications, setApplications] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [smartApps, setSmartApps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,13 +16,16 @@ export default function Prihlasky() {
       // 1. Load localStorage applications (legacy)
       const applied = JSON.parse(localStorage.getItem("woker_applied") || "[]");
       if (applied.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const ids = applied.map((a: any) => a.id);
         const { data } = await supabase
           .from("Nabídky")
           .select("*")
           .in("id", ids);
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const merged = (data || []).map((job: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const app = applied.find((a: any) => a.id === job.id);
           return { ...job, appliedDate: app?.date, status: app?.status || "Odesláno" };
         });
@@ -44,6 +49,7 @@ export default function Prihlasky() {
     loadApplications();
   }, []);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const statusColors: any = {
     "Odesláno": "bg-blue-500/10 text-blue-400 border-blue-500/30",
     "sent": "bg-blue-500/10 text-blue-400 border-blue-500/30",
@@ -55,6 +61,7 @@ export default function Prihlasky() {
     "rejected": "bg-red-500/10 text-red-400 border-red-500/30",
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const statusLabels: any = {
     sent: "Odesláno",
     delivered: "Doručeno",
@@ -118,6 +125,7 @@ export default function Prihlasky() {
             {smartApps.length > 0 && (
               <>
                 <h3 className="text-white/40 text-[10px] font-bold uppercase tracking-wider mt-2">Smart Matching</h3>
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {smartApps.map((app: any) => (
                   <div
                     key={app.id}
@@ -165,6 +173,7 @@ export default function Prihlasky() {
                 {smartApps.length > 0 && (
                   <h3 className="text-white/40 text-[10px] font-bold uppercase tracking-wider mt-4">Ruční přihlášky</h3>
                 )}
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {applications.map((job: any) => (
                   <div
                     key={job.id}
@@ -206,33 +215,6 @@ export default function Prihlasky() {
         )}
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#0E0E0E] border-t border-gray-800 px-6 py-3">
-        <div className="max-w-2xl mx-auto flex justify-between items-center">
-          {[
-            { name: "Discover", icon: "🔍", href: "/dashboard", active: false },
-            { name: "Uložené", icon: "🔖", href: "/ulozene", active: false },
-            { name: "Průvodce", icon: "📋", href: "/pruvodce", active: false },
-            { name: "Přihlášky", icon: "✉️", href: "/prihlasky", active: true },
-            { name: "Profil", icon: "👤", href: "/profil", active: false },
-          ].map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="flex flex-col items-center gap-1"
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span
-                className={`text-xs ${
-                  item.active ? "text-[#E8302A] font-bold" : "text-gray-600"
-                }`}
-              >
-                {item.name}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </div>
     </main>
   );
 }

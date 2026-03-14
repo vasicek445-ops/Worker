@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "../supabase";
 
 export default function Ulozene() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -60,6 +61,7 @@ export default function Ulozene() {
           </div>
         ) : (
           <div className="flex flex-col gap-3">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {jobs.map((job: any) => (
               <div
                 key={job.id}
@@ -111,33 +113,6 @@ export default function Ulozene() {
         )}
       </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#0E0E0E] border-t border-gray-800 px-6 py-3">
-        <div className="max-w-2xl mx-auto flex justify-between items-center">
-          {[
-            { name: "Discover", icon: "🔍", href: "/dashboard", active: false },
-            { name: "Uložené", icon: "🔖", href: "/ulozene", active: true },
-            { name: "Průvodce", icon: "📋", href: "/pruvodce", active: false },
-            { name: "Přihlášky", icon: "✉️", href: "/prihlasky", active: false },
-            { name: "Profil", icon: "👤", href: "/profil", active: false },
-          ].map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="flex flex-col items-center gap-1"
-            >
-              <span className="text-lg">{item.icon}</span>
-              <span
-                className={`text-xs ${
-                  item.active ? "text-[#E8302A] font-bold" : "text-gray-600"
-                }`}
-              >
-                {item.name}
-              </span>
-            </Link>
-          ))}
-        </div>
-      </div>
     </main>
   );
 }
