@@ -115,17 +115,21 @@ export default function Profil() {
     setUploading(true)
     try {
       const path = `${user.id}/avatar`
-      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type })
+      console.log('[Avatar] Uploading to path:', path)
+      const { error: uploadError, data: uploadData } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type })
+      console.log('[Avatar] Upload result:', { uploadError, uploadData })
       if (uploadError) throw uploadError
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
       const avatarUrl = publicUrl + '?t=' + Date.now()
-      const { error: updateError } = await supabase.from('profiles').update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id)
+      console.log('[Avatar] Public URL:', avatarUrl)
+      const { error: updateError, data: updateData } = await supabase.from('profiles').update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id).select()
+      console.log('[Avatar] DB update result:', { updateError, updateData })
       if (updateError) throw updateError
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({ ...prev, avatar_url: avatarUrl }))
       showToast('Fotka nahrána!')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) { showToast('Chyba: ' + (err.message || 'Zkus to znovu')) }
+    } catch (err: any) { console.error('[Avatar] Error:', err); showToast('Chyba: ' + (err.message || 'Zkus to znovu')) }
     finally { setUploading(false) }
   }
 
