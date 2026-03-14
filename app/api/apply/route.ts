@@ -92,7 +92,9 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
       }],
     })
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const letterBlock = letterResponse.content.find((b: any) => b.type === 'text')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const letterText = letterBlock ? (letterBlock as any).text : ''
 
     if (!letterText) return NextResponse.json({ error: 'Letter generation failed' }, { status: 500 })
@@ -113,9 +115,10 @@ ${profile.adresa ? `Adresse: ${profile.adresa}` : ''}
 
     // Send email via Resend
     await resend.emails.send({
-      from: `${candidateName} via Woker <vaclav@gowoker.com>`,
+      from: `${candidateName} – Bewerbung <bewerbung@gowoker.com>`,
       to: agency.email,
       replyTo: user.email!,
+      bcc: user.email!,
       subject: `Bewerbung als ${profile.pozice} - ${candidateName}`,
       html: emailHtml,
     })
@@ -133,6 +136,7 @@ ${profile.adresa ? `Adresse: ${profile.adresa}` : ''}
     })
 
     return NextResponse.json({ success: true, letterPreview: letterText.substring(0, 200) + '...' })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Apply error:', error)
     return NextResponse.json({ error: error.message || 'Application error' }, { status: 500 })
