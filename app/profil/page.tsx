@@ -115,8 +115,6 @@ export default function Profil() {
     setUploading(true)
     try {
       const path = `${user.id}/avatar`
-      // Remove old avatar first to avoid stale cache
-      await supabase.storage.from('avatars').remove([path])
       const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type })
       if (uploadError) throw uploadError
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
