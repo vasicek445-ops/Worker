@@ -218,7 +218,7 @@ export default function SmartMatching() {
         {/* Match Button */}
         {profileComplete && matches.length === 0 && (
           <button
-            onClick={runMatching}
+            onClick={() => runMatching()}
             disabled={matching}
             className="w-full relative overflow-hidden bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] active:scale-[0.98] text-base mb-6"
           >
