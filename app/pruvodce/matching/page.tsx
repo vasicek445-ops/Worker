@@ -240,7 +240,7 @@ export default function SmartMatching() {
         {error && (
           <div className="bg-red-500/[0.06] border border-red-500/20 rounded-2xl p-4 mb-6 text-center">
             <p className="text-red-400 text-sm m-0">{error}</p>
-            <button onClick={runMatching} className="text-red-400/60 text-xs mt-2 hover:text-red-400 transition underline">Zkusit znovu</button>
+            <button onClick={() => runMatching()} className="text-red-400/60 text-xs mt-2 hover:text-red-400 transition underline">Zkusit znovu</button>
           </div>
         )}
 
