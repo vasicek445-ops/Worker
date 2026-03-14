@@ -77,6 +77,8 @@ export default function Profil() {
       if (!user) { window.location.href = '/login'; return }
       setUser(user)
       const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+      console.log('[Profile Load] avatar_url from DB:', profileData?.avatar_url)
+      console.log('[Profile Load] user.user_metadata:', user.user_metadata)
       if (profileData) {
         setProfile(profileData)
         setEditName(profileData.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || '')
@@ -123,8 +125,12 @@ export default function Profil() {
       const avatarUrl = publicUrl + '?t=' + Date.now()
       console.log('[Avatar] Public URL:', avatarUrl)
       const { error: updateError, data: updateData } = await supabase.from('profiles').update({ avatar_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id).select()
-      console.log('[Avatar] DB update result:', { updateError, updateData })
+      console.log('[Avatar] DB update result:', { updateError, updateData, count: updateData?.length })
       if (updateError) throw updateError
+      if (!updateData || updateData.length === 0) {
+        console.error('[Avatar] RLS blocked update! No rows returned.')
+        throw new Error('Aktualizace profilu selhala (RLS)')
+      }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       setProfile((prev: any) => ({ ...prev, avatar_url: avatarUrl }))
       showToast('Fotka nahrána!')
