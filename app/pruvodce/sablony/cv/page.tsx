@@ -23,6 +23,11 @@ const TEMPLATES = [
   { id: 'timeline' as const, name: 'Timeline', desc: 'Vizuální časová osa', icon: '📊' },
   { id: 'corporate' as const, name: 'Corporate', desc: 'Pravý sidebar', icon: '🏛️' },
   { id: 'bold' as const, name: 'Bold', desc: 'Výrazný, gradient', icon: '🔥' },
+  { id: 'compact' as const, name: 'Compact', desc: 'Hustý, víc obsahu', icon: '📋' },
+  { id: 'dark' as const, name: 'Dark', desc: 'Tmavý motiv', icon: '🌙' },
+  { id: 'infographic' as const, name: 'Infographic', desc: 'Grafické prvky', icon: '📈' },
+  { id: 'zweispaltig' as const, name: 'Zwei-Spalten', desc: 'Dva rovné sloupce', icon: '📰' },
+  { id: 'nordic' as const, name: 'Nordic', desc: 'Skandinávský styl', icon: '❄️' },
 ]
 
 const QUICK_COLORS = [
@@ -33,7 +38,7 @@ const QUICK_COLORS = [
   '#1c1c1c', '#2c3e50', '#b9770e',
 ]
 
-type TemplateType = 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal' | 'executive' | 'swiss' | 'timeline' | 'corporate' | 'bold'
+type TemplateType = 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal' | 'executive' | 'swiss' | 'timeline' | 'corporate' | 'bold' | 'compact' | 'dark' | 'infographic' | 'zweispaltig' | 'nordic'
 
 export default function CVSablona() {
   const { isActive, loading } = useSubscription()
@@ -187,7 +192,7 @@ export default function CVSablona() {
           <span className="text-3xl">📄</span>
           <div>
             <h1 className="text-white text-xl font-bold">Životopis – švýcarský formát</h1>
-            <p className="text-gray-400 text-xs">10 profesionálních stylů · libovolná barva · fotka · PDF ke stažení</p>
+            <p className="text-gray-400 text-xs">15 profesionálních stylů · libovolná barva · fotka · PDF ke stažení</p>
           </div>
         </div>
 
