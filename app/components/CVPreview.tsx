@@ -389,6 +389,11 @@ export default function CVPreview({ data, photo, template, accentColor }: CVPrev
     setDownloading(true)
     try {
       const html2pdf = (await import('html2pdf.js')).default
+      const el = cvRef.current
+      // Temporarily remove minHeight so content fits naturally without creating blank page 2
+      const inner = el.firstElementChild as HTMLElement | null
+      const origMinH = inner?.style.minHeight || ''
+      if (inner) inner.style.minHeight = 'auto'
       await html2pdf().set({
         margin: 0,
         filename: `Lebenslauf_${data.personalData.name.replace(/\s+/g, '_')}.pdf`,
@@ -397,7 +402,8 @@ export default function CVPreview({ data, photo, template, accentColor }: CVPrev
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any).from(cvRef.current).save()
+      } as any).from(el).save()
+      if (inner) inner.style.minHeight = origMinH
     } catch { alert('Chyba při generování PDF.') }
     finally { setDownloading(false) }
   }
