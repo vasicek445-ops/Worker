@@ -23,7 +23,7 @@ interface CVData {
 interface CVPreviewProps {
   data: CVData
   photo: string | null
-  template: 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal'
+  template: 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal' | 'executive' | 'swiss' | 'timeline' | 'corporate' | 'bold'
   accentColor: string
 }
 
@@ -57,14 +57,16 @@ export default function CVPreview({ data, photo, template, accentColor }: CVPrev
         margin: 0,
         filename: `Lebenslauf_${data.personalData.name.replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 794 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any).from(cvRef.current).save()
     } catch { alert('Chyba při generování PDF.') }
     finally { setDownloading(false) }
   }
 
-  const T = { klassisch: KlassischT, modern: ModernT, kreativ: KreativT, elegant: ElegantT, minimal: MinimalT }
+  const T = { klassisch: KlassischT, modern: ModernT, kreativ: KreativT, elegant: ElegantT, minimal: MinimalT, executive: ExecutiveT, swiss: SwissT, timeline: TimelineT, corporate: CorporateT, bold: BoldT }
   const Template = T[template]
 
   return (
@@ -230,7 +232,7 @@ function KreativT({ data, photo, c }: { data: CVData; photo: string | null; c: s
           </div>
         </div>
       </div>
-      {data.profil && <div style={{ padding: '16px 35px', backgroundColor: '#f8f9fa', borderBottom: `2px solid ${c}` }}><p style={{ fontSize: '9.5pt', color: '#555', lineHeight: '1.6', margin: 0 }}>"{data.profil}"</p></div>}
+      {data.profil && <div style={{ padding: '16px 35px', backgroundColor: '#f8f9fa', borderBottom: `2px solid ${c}` }}><p style={{ fontSize: '9.5pt', color: '#555', lineHeight: '1.6', margin: 0 }}>&laquo;{data.profil}&raquo;</p></div>}
       <div style={{ display: 'flex', padding: '24px 35px', gap: '30px' }}>
         <div style={{ flex: 1 }}>
           <KrH t="Berufserfahrung" c={c} />
@@ -421,6 +423,295 @@ function MinimalT({ data, photo, c }: { data: CVData; photo: string | null; c: s
   )
 }
 
+/* ═══ TEMPLATE 6: EXECUTIVE – dark header band ═══ */
+function ExecutiveT({ data, photo, c }: { data: CVData; photo: string | null; c: string }) {
+  const p = data.personalData
+  return (
+    <div style={{ width: W, minHeight: '297mm', fontFamily: F, fontSize: '9.5pt', lineHeight: '1.45', backgroundColor: '#fff' }}>
+      {/* Dark header */}
+      <div style={{ backgroundColor: '#1a1a2e', padding: '30px 35px', display: 'flex', alignItems: 'center', gap: '24px' }}>
+        {photo && <div style={{ width: '85px', height: '85px', borderRadius: '50%', overflow: 'hidden', border: `3px solid ${c}`, flexShrink: 0 }}><img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>}
+        <div style={{ flex: 1 }}>
+          <h1 style={{ fontSize: '26pt', fontWeight: 700, color: '#fff', margin: '0 0 4px', letterSpacing: '1px' }}>{p.name}</h1>
+          <p style={{ fontSize: '11pt', color: c, margin: '0 0 10px', fontWeight: 600, letterSpacing: '2px', textTransform: 'uppercase' }}>{data.experience[0]?.title || 'Fachkraft'}</p>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '8.5pt', color: 'rgba(255,255,255,0.6)' }}>
+            {p.address && <span>{p.address}</span>}<span>{p.phone}</span><span>{p.email}</span>
+            <span>{p.birthdate} · {p.nationality}</span>
+          </div>
+        </div>
+      </div>
+      {/* Accent line */}
+      <div style={{ height: '4px', background: `linear-gradient(90deg, ${c}, ${hexToRgba(c, 0.3)})` }} />
+      {/* Profile */}
+      {data.profil && <div style={{ padding: '18px 35px', backgroundColor: '#f8f9fa' }}><p style={{ fontSize: '9.5pt', color: '#555', lineHeight: '1.65', margin: 0 }}>{data.profil}</p></div>}
+      {/* Body */}
+      <div style={{ display: 'flex', padding: '24px 35px', gap: '30px' }}>
+        <div style={{ flex: 1 }}>
+          <ExecH t="Berufserfahrung" c={c} />
+          {data.experience.map((exp, i) => (
+            <div key={i} style={{ marginBottom: '16px', paddingBottom: '14px', borderBottom: i < data.experience.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: 0, color: '#1a1a2e' }}>{exp.title}</h3>
+                <span style={{ fontSize: '8pt', color: c, fontWeight: 600 }}>{exp.period}</span>
+              </div>
+              <p style={{ fontSize: '8.5pt', color: '#888', margin: '2px 0 6px' }}>{exp.company}{exp.location ? ` · ${exp.location}` : ''}</p>
+              {exp.tasks.map((t, j) => <div key={j} style={{ display: 'flex', gap: '6px', marginBottom: '3px' }}><span style={{ color: c, fontSize: '8pt', flexShrink: 0 }}>▸</span><span style={{ fontSize: '8.5pt', color: '#555' }}>{t}</span></div>)}
+            </div>
+          ))}
+          <ExecH t="Ausbildung" c={c} /><EduList data={data} c={c} />
+          {data.certifications && data.certifications.length > 0 && <><ExecH t="Zertifikate" c={c} />{data.certifications.map((x, i) => <p key={i} style={{ fontSize: '8.5pt', color: '#555', margin: '0 0 4px' }}>▸ {x}</p>)}</>}
+        </div>
+        <div style={{ width: '160px', flexShrink: 0 }}>
+          <ExecH t="Sprachen" c={c} /><LangBars langs={data.languages} c={c} />
+          {data.skills.technical.length > 0 && <><ExecH t="Fachkenntnisse" c={c} /><SkillPills skills={data.skills.technical} c={c} /></>}
+          {data.skills.soft.length > 0 && <><ExecH t="Soft Skills" c={c} /><SoftList skills={data.skills.soft} c={c} /></>}
+          {p.drivingLicense && p.drivingLicense !== 'žádný' && <div style={{ marginTop: '14px', fontSize: '8pt', color: '#999' }}>Führerschein: {p.drivingLicense}</div>}
+        </div>
+      </div>
+      <div style={{ padding: '10px 35px', borderTop: '1px solid #eee' }}><p style={{ fontSize: '8pt', color: '#ccc', margin: 0 }}>Referenzen auf Anfrage erhältlich</p></div>
+    </div>
+  )
+}
+
+/* ═══ TEMPLATE 7: SWISS – formal, structured, Swiss style ═══ */
+function SwissT({ data, photo, c }: { data: CVData; photo: string | null; c: string }) {
+  const p = data.personalData
+  return (
+    <div style={{ width: W, minHeight: '297mm', fontFamily: F, fontSize: '9.5pt', lineHeight: '1.5', backgroundColor: '#fff', padding: '30px 35px' }}>
+      {/* Header with Swiss cross accent */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: '8pt', color: c, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '3px', margin: '0 0 4px' }}>Lebenslauf</p>
+          <h1 style={{ fontSize: '28pt', fontWeight: 800, color: '#1a1a1a', margin: '0 0 2px' }}>{p.name}</h1>
+          <p style={{ fontSize: '10pt', color: '#666', margin: '0 0 8px', letterSpacing: '1px' }}>{data.experience[0]?.title || 'Fachkraft'}</p>
+        </div>
+        {photo && <div style={{ width: '90px', height: '90px', borderRadius: '6px', overflow: 'hidden', border: `2px solid ${hexToRgba(c, 0.3)}`, flexShrink: 0 }}><img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>}
+      </div>
+      {/* Contact bar */}
+      <div style={{ display: 'flex', gap: '20px', padding: '10px 14px', backgroundColor: hexToRgba(c, 0.06), borderRadius: '6px', marginBottom: '20px', fontSize: '8.5pt', color: '#666', border: `1px solid ${hexToRgba(c, 0.12)}` }}>
+        {p.address && <span>{p.address}</span>}<span>{p.phone}</span><span>{p.email}</span>
+        <span>{p.birthdate}</span><span>{p.nationality}</span>
+        {p.drivingLicense && p.drivingLicense !== 'žádný' && <span>Kat. {p.drivingLicense}</span>}
+      </div>
+      {/* Profil */}
+      {data.profil && <div style={{ marginBottom: '20px' }}><SwissH t="Profil" c={c} /><p style={{ fontSize: '9.5pt', color: '#555', lineHeight: '1.65', margin: 0 }}>{data.profil}</p></div>}
+      {/* Experience as table-like layout */}
+      <SwissH t="Berufserfahrung" c={c} />
+      {data.experience.map((exp, i) => (
+        <div key={i} style={{ display: 'flex', gap: '20px', marginBottom: '16px' }}>
+          <div style={{ width: '85px', flexShrink: 0, textAlign: 'right' }}>
+            <span style={{ fontSize: '8pt', color: c, fontWeight: 600 }}>{exp.period}</span>
+          </div>
+          <div style={{ flex: 1, paddingLeft: '16px', borderLeft: `2px solid ${hexToRgba(c, 0.2)}` }}>
+            <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: 0, color: '#1a1a1a' }}>{exp.title}</h3>
+            <p style={{ fontSize: '8.5pt', color: '#888', margin: '1px 0 5px' }}>{exp.company}{exp.location ? `, ${exp.location}` : ''}</p>
+            {exp.tasks.map((t, j) => <p key={j} style={{ fontSize: '8.5pt', color: '#555', margin: '0 0 2px' }}>– {t}</p>)}
+          </div>
+        </div>
+      ))}
+      {/* Education */}
+      <SwissH t="Ausbildung" c={c} />
+      {data.education.map((edu, i) => (
+        <div key={i} style={{ display: 'flex', gap: '20px', marginBottom: '12px' }}>
+          <div style={{ width: '85px', flexShrink: 0, textAlign: 'right' }}>
+            <span style={{ fontSize: '8pt', color: c, fontWeight: 600 }}>{edu.period}</span>
+          </div>
+          <div style={{ flex: 1, paddingLeft: '16px', borderLeft: `2px solid ${hexToRgba(c, 0.2)}` }}>
+            <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: 0, color: '#1a1a1a' }}>{edu.degree}</h3>
+            <p style={{ fontSize: '8.5pt', color: '#888', margin: '1px 0 0' }}>{edu.school}{edu.location ? `, ${edu.location}` : ''}</p>
+          </div>
+        </div>
+      ))}
+      {/* Bottom grid */}
+      <div style={{ display: 'flex', gap: '30px', marginTop: '8px' }}>
+        <div style={{ flex: 1 }}>
+          <SwissH t="Sprachen" c={c} /><LangBars langs={data.languages} c={c} />
+        </div>
+        <div style={{ flex: 1 }}>
+          {data.skills.technical.length > 0 && <><SwissH t="Fachkenntnisse" c={c} /><SkillPills skills={data.skills.technical} c={c} /></>}
+        </div>
+        <div style={{ flex: 1 }}>
+          {data.skills.soft.length > 0 && <><SwissH t="Kompetenzen" c={c} /><SoftList skills={data.skills.soft} c={c} /></>}
+        </div>
+      </div>
+      {data.certifications && data.certifications.length > 0 && <div style={{ marginTop: '14px' }}><SwissH t="Zertifikate" c={c} /><div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>{data.certifications.map((x, i) => <span key={i} style={{ fontSize: '8pt', color: '#555', backgroundColor: '#f5f5f5', padding: '3px 10px', borderRadius: '4px' }}>{x}</span>)}</div></div>}
+      <div style={{ marginTop: '20px', textAlign: 'center' }}><p style={{ fontSize: '8pt', color: '#ccc', margin: 0 }}>Referenzen auf Anfrage erhältlich</p></div>
+    </div>
+  )
+}
+
+/* ═══ TEMPLATE 8: TIMELINE – visual timeline left ═══ */
+function TimelineT({ data, photo, c }: { data: CVData; photo: string | null; c: string }) {
+  const p = data.personalData
+  return (
+    <div style={{ width: W, minHeight: '297mm', fontFamily: F, fontSize: '9.5pt', lineHeight: '1.45', backgroundColor: '#fff' }}>
+      {/* Header */}
+      <div style={{ padding: '30px 35px 20px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+        {photo && <div style={{ width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', border: `3px solid ${c}`, flexShrink: 0 }}><img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>}
+        <div>
+          <h1 style={{ fontSize: '26pt', fontWeight: 700, color: '#1a1a1a', margin: '0 0 2px' }}>{p.name}</h1>
+          <p style={{ fontSize: '10pt', color: c, margin: 0, fontWeight: 500, letterSpacing: '2px', textTransform: 'uppercase' }}>{data.experience[0]?.title || 'Fachkraft'}</p>
+        </div>
+      </div>
+      {/* Contact row */}
+      <div style={{ padding: '0 35px 20px', display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '8.5pt', color: '#888' }}>
+        {p.address && <span>{p.address}</span>}<span>{p.phone}</span><span>{p.email}</span>
+        <span>{p.birthdate} · {p.nationality}</span>
+        {p.drivingLicense && p.drivingLicense !== 'žádný' && <span>Führerschein {p.drivingLicense}</span>}
+      </div>
+      <div style={{ height: '2px', backgroundColor: c, margin: '0 35px' }} />
+      {/* Profile */}
+      {data.profil && <div style={{ padding: '16px 35px' }}><p style={{ fontSize: '9.5pt', color: '#666', lineHeight: '1.6', margin: 0 }}>{data.profil}</p></div>}
+      {/* Experience timeline */}
+      <div style={{ padding: '10px 35px 0' }}>
+        <TlH t="Berufserfahrung" c={c} />
+        <div style={{ position: 'relative', paddingLeft: '30px', marginLeft: '8px' }}>
+          {/* Timeline line */}
+          <div style={{ position: 'absolute', left: '8px', top: 0, bottom: 0, width: '2px', backgroundColor: hexToRgba(c, 0.2) }} />
+          {data.experience.map((exp, i) => (
+            <div key={i} style={{ marginBottom: '18px', position: 'relative' }}>
+              <div style={{ position: 'absolute', left: '-26px', top: '4px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: i === 0 ? c : '#fff', border: `2px solid ${c}` }} />
+              <span style={{ fontSize: '8pt', color: c, fontWeight: 600 }}>{exp.period}</span>
+              <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: '2px 0 1px', color: '#1a1a1a' }}>{exp.title}</h3>
+              <p style={{ fontSize: '8.5pt', color: '#888', margin: '0 0 5px', fontStyle: 'italic' }}>{exp.company}{exp.location ? ` · ${exp.location}` : ''}</p>
+              {exp.tasks.map((t, j) => <p key={j} style={{ fontSize: '8.5pt', color: '#555', margin: '0 0 2px', paddingLeft: '10px' }}>· {t}</p>)}
+            </div>
+          ))}
+        </div>
+        {/* Education timeline */}
+        <TlH t="Ausbildung" c={c} />
+        <div style={{ position: 'relative', paddingLeft: '30px', marginLeft: '8px' }}>
+          <div style={{ position: 'absolute', left: '8px', top: 0, bottom: 0, width: '2px', backgroundColor: hexToRgba(c, 0.2) }} />
+          {data.education.map((edu, i) => (
+            <div key={i} style={{ marginBottom: '14px', position: 'relative' }}>
+              <div style={{ position: 'absolute', left: '-26px', top: '4px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: '#fff', border: `2px solid ${hexToRgba(c, 0.4)}` }} />
+              <span style={{ fontSize: '8pt', color: c, fontWeight: 600 }}>{edu.period}</span>
+              <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: '2px 0 0', color: '#1a1a1a' }}>{edu.degree}</h3>
+              <p style={{ fontSize: '8.5pt', color: '#888', margin: '1px 0 0' }}>{edu.school}{edu.location ? ` · ${edu.location}` : ''}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Bottom sections */}
+      <div style={{ display: 'flex', gap: '24px', padding: '10px 35px 20px' }}>
+        <div style={{ flex: 1 }}><TlH t="Sprachen" c={c} /><LangBars langs={data.languages} c={c} /></div>
+        {data.skills.technical.length > 0 && <div style={{ flex: 1 }}><TlH t="Fachkenntnisse" c={c} /><SkillPills skills={data.skills.technical} c={c} /></div>}
+        {data.skills.soft.length > 0 && <div style={{ flex: 1 }}><TlH t="Kompetenzen" c={c} /><SoftList skills={data.skills.soft} c={c} /></div>}
+      </div>
+      {data.certifications && data.certifications.length > 0 && <div style={{ padding: '0 35px 10px' }}><TlH t="Zertifikate" c={c} />{data.certifications.map((x, i) => <span key={i} style={{ fontSize: '8pt', color: '#555', marginRight: '8px' }}>• {x}</span>)}</div>}
+      <div style={{ padding: '10px 35px', borderTop: '1px solid #eee' }}><p style={{ fontSize: '8pt', color: '#ccc', margin: 0 }}>Referenzen auf Anfrage erhältlich</p></div>
+    </div>
+  )
+}
+
+/* ═══ TEMPLATE 9: CORPORATE – right sidebar ═══ */
+function CorporateT({ data, photo, c }: { data: CVData; photo: string | null; c: string }) {
+  const p = data.personalData
+  return (
+    <div style={{ width: W, minHeight: '297mm', display: 'flex', fontFamily: F, fontSize: '9.5pt', lineHeight: '1.45' }}>
+      {/* Main content left */}
+      <div style={{ flex: 1, padding: '30px 28px 28px 35px', color: '#333', backgroundColor: '#fff' }}>
+        <h1 style={{ fontSize: '26pt', fontWeight: 800, color: '#1a1a1a', margin: '0 0 2px' }}>{p.name}</h1>
+        <p style={{ fontSize: '10pt', color: c, margin: '0 0 14px', fontWeight: 600, letterSpacing: '1.5px', textTransform: 'uppercase' }}>{data.experience[0]?.title || 'Fachkraft'}</p>
+        {data.profil && <div style={{ marginBottom: '20px', padding: '12px 14px', backgroundColor: '#fafbfc', borderRadius: '6px', borderLeft: `3px solid ${c}` }}><p style={{ fontSize: '9pt', color: '#666', lineHeight: '1.6', margin: 0 }}>{data.profil}</p></div>}
+        <CorpH t="Berufserfahrung" c={c} /><ExpList data={data} c={c} />
+        <CorpH t="Ausbildung" c={c} /><EduList data={data} c={c} />
+        {data.skills.technical.length > 0 && <><CorpH t="Fachkenntnisse" c={c} /><SkillPills skills={data.skills.technical} c={c} /><div style={{ marginBottom: '20px' }} /></>}
+        {data.certifications && data.certifications.length > 0 && <><CorpH t="Zertifikate" c={c} />{data.certifications.map((x, i) => <p key={i} style={{ fontSize: '8.5pt', color: '#555', margin: '0 0 4px' }}>• {x}</p>)}</>}
+      </div>
+      {/* Right sidebar */}
+      <div style={{ width: '72mm', backgroundColor: hexToRgba(c, 0.04), borderLeft: `1px solid ${hexToRgba(c, 0.1)}`, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '28px 20px 20px', textAlign: 'center' }}>
+          {photo ? <div style={{ width: '95px', height: '95px', borderRadius: '12px', overflow: 'hidden', margin: '0 auto 14px', border: `2px solid ${hexToRgba(c, 0.3)}` }}><img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
+          : <div style={{ width: '95px', height: '95px', borderRadius: '12px', margin: '0 auto 14px', backgroundColor: hexToRgba(c, 0.08), display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ fontSize: '28pt', color: hexToRgba(c, 0.3) }}>👤</span></div>}
+        </div>
+        <div style={{ height: '1px', backgroundColor: hexToRgba(c, 0.1), margin: '0 20px' }} />
+        <div style={{ padding: '16px 20px' }}>
+          <h2 style={{ fontSize: '8pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '10px', color: c }}>Kontakt</h2>
+          {p.address && <p style={{ fontSize: '8.5pt', color: '#666', margin: '0 0 5px' }}>{p.address}</p>}
+          <p style={{ fontSize: '8.5pt', color: '#666', margin: '0 0 5px' }}>{p.phone}</p>
+          <p style={{ fontSize: '8pt', color: '#666', margin: 0, wordBreak: 'break-all' }}>{p.email}</p>
+        </div>
+        <div style={{ height: '1px', backgroundColor: hexToRgba(c, 0.1), margin: '0 20px' }} />
+        <div style={{ padding: '16px 20px' }}>
+          <h2 style={{ fontSize: '8pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px', color: c }}>Persönliche Daten</h2>
+          <p style={{ fontSize: '8.5pt', color: '#666', margin: '0 0 3px' }}>{p.birthdate}</p>
+          <p style={{ fontSize: '8.5pt', color: '#666', margin: '0 0 3px' }}>{p.nationality}</p>
+          {p.drivingLicense && p.drivingLicense !== 'žádný' && <p style={{ fontSize: '8.5pt', color: '#666', margin: 0 }}>Kat. {p.drivingLicense}</p>}
+        </div>
+        <div style={{ height: '1px', backgroundColor: hexToRgba(c, 0.1), margin: '0 20px' }} />
+        <div style={{ padding: '16px 20px' }}>
+          <h2 style={{ fontSize: '8pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '10px', color: c }}>Sprachen</h2>
+          <LangBars langs={data.languages} c={c} />
+        </div>
+        <div style={{ height: '1px', backgroundColor: hexToRgba(c, 0.1), margin: '0 20px' }} />
+        {data.skills.soft.length > 0 && <div style={{ padding: '16px 20px' }}>
+          <h2 style={{ fontSize: '8pt', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px', color: c }}>Soft Skills</h2>
+          <SoftList skills={data.skills.soft} c={c} />
+        </div>}
+      </div>
+    </div>
+  )
+}
+
+/* ═══ TEMPLATE 10: BOLD – large typography, gradient accents ═══ */
+function BoldT({ data, photo, c }: { data: CVData; photo: string | null; c: string }) {
+  const p = data.personalData
+  const lighter = hexToRgba(c, 0.15)
+  return (
+    <div style={{ width: W, minHeight: '297mm', fontFamily: F, fontSize: '9.5pt', lineHeight: '1.45', backgroundColor: '#fff', padding: '0' }}>
+      {/* Big header */}
+      <div style={{ padding: '35px 35px 25px', background: `linear-gradient(135deg, ${c}, ${hexToRgba(c, 0.7)})`, display: 'flex', alignItems: 'center', gap: '22px' }}>
+        {photo && <div style={{ width: '95px', height: '95px', borderRadius: '50%', overflow: 'hidden', border: '4px solid rgba(255,255,255,0.3)', flexShrink: 0 }}><img src={photo} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>}
+        <div>
+          <h1 style={{ fontSize: '32pt', fontWeight: 900, color: '#fff', margin: '0 0 4px', letterSpacing: '-0.5px' }}>{p.name}</h1>
+          <p style={{ fontSize: '13pt', color: 'rgba(255,255,255,0.85)', margin: 0, fontWeight: 300, letterSpacing: '4px', textTransform: 'uppercase' }}>{data.experience[0]?.title || 'Fachkraft'}</p>
+        </div>
+      </div>
+      {/* Contact strip */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', padding: '10px 35px', backgroundColor: '#1a1a1a', fontSize: '8.5pt', color: 'rgba(255,255,255,0.7)' }}>
+        {p.address && <span>{p.address}</span>}<span>{p.phone}</span><span>{p.email}</span>
+        <span>{p.birthdate}</span><span>{p.nationality}</span>
+      </div>
+      {/* Profile */}
+      {data.profil && <div style={{ padding: '20px 35px', backgroundColor: lighter }}><p style={{ fontSize: '10pt', color: '#444', lineHeight: '1.7', margin: 0, textAlign: 'center' }}>{data.profil}</p></div>}
+      {/* Body */}
+      <div style={{ padding: '24px 35px' }}>
+        <BoldH t="Berufserfahrung" c={c} />
+        {data.experience.map((exp, i) => (
+          <div key={i} style={{ marginBottom: '18px', padding: '14px 16px', backgroundColor: i === 0 ? lighter : 'transparent', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <h3 style={{ fontSize: '11pt', fontWeight: 800, margin: 0, color: '#1a1a1a' }}>{exp.title}</h3>
+              <span style={{ fontSize: '8pt', color: '#fff', backgroundColor: c, padding: '2px 10px', borderRadius: '10px', fontWeight: 600 }}>{exp.period}</span>
+            </div>
+            <p style={{ fontSize: '9pt', color: c, margin: '3px 0 7px', fontWeight: 600 }}>{exp.company}{exp.location ? ` · ${exp.location}` : ''}</p>
+            {exp.tasks.map((t, j) => <p key={j} style={{ fontSize: '8.5pt', color: '#555', margin: '0 0 3px', paddingLeft: '12px' }}>→ {t}</p>)}
+          </div>
+        ))}
+        <BoldH t="Ausbildung" c={c} />
+        {data.education.map((edu, i) => (
+          <div key={i} style={{ marginBottom: '12px', paddingLeft: '14px', borderLeft: `3px solid ${c}` }}>
+            <h3 style={{ fontSize: '10.5pt', fontWeight: 700, margin: 0, color: '#1a1a1a' }}>{edu.degree}</h3>
+            <p style={{ fontSize: '8.5pt', color: '#888', margin: '1px 0 0' }}>{edu.school}{edu.location ? ` · ${edu.location}` : ''} <span style={{ color: c, fontWeight: 600 }}>{edu.period}</span></p>
+          </div>
+        ))}
+        {/* Skills grid */}
+        <div style={{ display: 'flex', gap: '20px', marginTop: '16px' }}>
+          <div style={{ flex: 1 }}><BoldH t="Sprachen" c={c} /><LangBars langs={data.languages} c={c} /></div>
+          <div style={{ flex: 1 }}>
+            {data.skills.technical.length > 0 && <><BoldH t="Fachkenntnisse" c={c} /><SkillPills skills={data.skills.technical} c={c} filled /></>}
+          </div>
+          <div style={{ flex: 1 }}>
+            {data.skills.soft.length > 0 && <><BoldH t="Stärken" c={c} /><SoftList skills={data.skills.soft} c={c} /></>}
+          </div>
+        </div>
+        {data.certifications && data.certifications.length > 0 && <div style={{ marginTop: '14px' }}><BoldH t="Zertifikate" c={c} /><SkillPills skills={data.certifications} c={c} /></div>}
+      </div>
+      <div style={{ textAlign: 'center', padding: '10px 35px', borderTop: '2px solid #eee' }}><p style={{ fontSize: '8pt', color: '#ccc', margin: 0 }}>Referenzen auf Anfrage erhältlich</p></div>
+    </div>
+  )
+}
+
 /* ═══ SECTION HEADERS ═══ */
 function SectionH({ t, c }: { t: string; c: string }) {
   return <div style={{ marginBottom: '14px' }}><h2 style={{ fontSize: '11pt', fontWeight: 700, color: c, textTransform: 'uppercase', letterSpacing: '2.5px', marginBottom: '4px' }}>{t}</h2><div style={{ height: '2.5px', backgroundColor: c, width: '40px', borderRadius: '2px' }} /></div>
@@ -437,6 +728,21 @@ function ElegH({ t, c }: { t: string; c: string }) {
 function MinH({ t, c }: { t: string; c: string }) {
   return <div style={{ marginBottom: '10px', marginTop: '14px' }}><h2 style={{ fontSize: '8pt', fontWeight: 700, color: c, textTransform: 'uppercase', letterSpacing: '3px' }}>{t}</h2></div>
 }
+function ExecH({ t, c }: { t: string; c: string }) {
+  return <div style={{ marginBottom: '12px', marginTop: '16px' }}><h2 style={{ fontSize: '10pt', fontWeight: 700, color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '5px' }}>{t}</h2><div style={{ height: '2px', background: `linear-gradient(90deg, ${c}, transparent)`, width: '60px' }} /></div>
+}
+function SwissH({ t, c }: { t: string; c: string }) {
+  return <div style={{ marginBottom: '12px', marginTop: '16px' }}><h2 style={{ fontSize: '9pt', fontWeight: 700, color: c, textTransform: 'uppercase', letterSpacing: '2.5px', marginBottom: '6px' }}>{t}</h2><div style={{ height: '1px', backgroundColor: hexToRgba(c, 0.2), width: '100%' }} /></div>
+}
+function TlH({ t, c }: { t: string; c: string }) {
+  return <div style={{ marginBottom: '12px', marginTop: '14px' }}><h2 style={{ fontSize: '10pt', fontWeight: 700, color: '#1a1a1a', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '4px' }}>{t}</h2><div style={{ height: '2px', backgroundColor: c, width: '35px', borderRadius: '1px' }} /></div>
+}
+function CorpH({ t, c }: { t: string; c: string }) {
+  return <div style={{ marginBottom: '12px', marginTop: '16px' }}><h2 style={{ fontSize: '10pt', fontWeight: 700, color: c, textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '5px' }}>{t}</h2><div style={{ height: '2px', backgroundColor: c, width: '30px' }} /></div>
+}
+function BoldH({ t, c }: { t: string; c: string }) {
+  return <div style={{ marginBottom: '14px', marginTop: '18px' }}><h2 style={{ fontSize: '12pt', fontWeight: 900, color: '#1a1a1a', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>{t}</h2><div style={{ height: '4px', backgroundColor: c, width: '40px', borderRadius: '2px' }} /></div>
+}
 
 /* ═══ SHARED LISTS ═══ */
 function ExpList({ data, c }: { data: CVData; c: string }) {
@@ -452,7 +758,7 @@ function ExpList({ data, c }: { data: CVData; c: string }) {
   ))}</div>
 }
 
-function EduList({ data, c }: { data: CVData; c: string }) {
+function EduList({ data }: { data: CVData; c: string }) {
   return <div style={{ marginBottom: '24px' }}>{data.education.map((edu, i) => (
     <div key={i} style={{ marginBottom: '12px', paddingLeft: '14px', borderLeft: '2px solid #e0e0e0' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>

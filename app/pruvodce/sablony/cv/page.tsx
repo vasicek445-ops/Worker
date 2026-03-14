@@ -18,47 +18,28 @@ const TEMPLATES = [
   { id: 'kreativ' as const, name: 'Kreativ', desc: 'Výrazný banner', icon: '🎨' },
   { id: 'elegant' as const, name: 'Elegant', desc: 'Jemný, sofistikovaný', icon: '💎' },
   { id: 'minimal' as const, name: 'Minimal', desc: 'Čistá typografie', icon: '📐' },
+  { id: 'executive' as const, name: 'Executive', desc: 'Tmavá hlavička', icon: '👔' },
+  { id: 'swiss' as const, name: 'Swiss', desc: 'Formální, tabulkový', icon: '🇨🇭' },
+  { id: 'timeline' as const, name: 'Timeline', desc: 'Vizuální časová osa', icon: '📊' },
+  { id: 'corporate' as const, name: 'Corporate', desc: 'Pravý sidebar', icon: '🏛️' },
+  { id: 'bold' as const, name: 'Bold', desc: 'Výrazný, gradient', icon: '🔥' },
 ]
 
-const COLOR_PALETTE = [
-  // Row 1: Blues
-  { value: '#1a3a5c', name: 'Námořní' },
-  { value: '#1a5276', name: 'Královská' },
-  { value: '#2471a3', name: 'Oceán' },
-  { value: '#2e86c1', name: 'Azurová' },
-  { value: '#5dade2', name: 'Nebeská' },
-  // Row 2: Greens
-  { value: '#0e4429', name: 'Tmavě zelená' },
-  { value: '#1e8449', name: 'Smaragdová' },
-  { value: '#27ae60', name: 'Zelená' },
-  { value: '#2ecc71', name: 'Mátová' },
-  { value: '#58d68d', name: 'Světle zelená' },
-  // Row 3: Reds & Warm
-  { value: '#641e16', name: 'Bordó' },
-  { value: '#922b21', name: 'Vínová' },
-  { value: '#c0392b', name: 'Červená' },
-  { value: '#e74c3c', name: 'Jasně červená' },
-  { value: '#ec7063', name: 'Korálová' },
-  // Row 4: Purples
-  { value: '#4a235a', name: 'Tmavě fialová' },
-  { value: '#6c3483', name: 'Fialová' },
-  { value: '#8e44ad', name: 'Ametyst' },
-  { value: '#a569bd', name: 'Levandule' },
-  { value: '#c39bd3', name: 'Světle fialová' },
-  // Row 5: Neutrals & Gold
-  { value: '#1c1c1c', name: 'Černá' },
-  { value: '#2c3e50', name: 'Antracit' },
-  { value: '#566573', name: 'Ocel' },
-  { value: '#7d6608', name: 'Tmavě zlatá' },
-  { value: '#b9770e', name: 'Zlatá' },
+const QUICK_COLORS = [
+  '#1a3a5c', '#2471a3', '#5dade2',
+  '#0e4429', '#1e8449', '#2ecc71',
+  '#641e16', '#c0392b', '#e74c3c',
+  '#4a235a', '#8e44ad', '#c39bd3',
+  '#1c1c1c', '#2c3e50', '#b9770e',
 ]
 
-type TemplateType = 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal'
+type TemplateType = 'klassisch' | 'modern' | 'kreativ' | 'elegant' | 'minimal' | 'executive' | 'swiss' | 'timeline' | 'corporate' | 'bold'
 
 export default function CVSablona() {
   const { isActive, loading } = useSubscription()
   const [formData, setFormData] = useState<Record<string, string>>({})
   const [photo, setPhoto] = useState<string | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [cvData, setCvData] = useState<any | null>(null)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -67,21 +48,49 @@ export default function CVSablona() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [prefilled, setPrefilled] = useState(false)
 
+  // Auto-prefill from user profile
   useEffect(() => {
     if (prefilled) return
-    try {
-      const params = new URLSearchParams(window.location.search)
-      const p = params.get('prefill')
-      if (p) {
-        const data = JSON.parse(decodeURIComponent(p))
-        setFormData(prev => ({
-          ...prev,
-          ...(data.position && { position: data.position }),
-          ...(data.skills && { skills: data.skills }),
-        }))
-        setPrefilled(true)
-      }
-    } catch {}
+    const loadProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+        if (profile) {
+          const prefillData: Record<string, string> = {}
+          if (profile.full_name) prefillData.name = profile.full_name
+          if (profile.datum_narozeni) prefillData.birthdate = profile.datum_narozeni
+          if (profile.telefon) prefillData.phone = profile.telefon
+          if (user.email) prefillData.email = user.email
+          if (profile.adresa) prefillData.address = profile.adresa
+          if (profile.ridicky_prukaz) prefillData.driving = profile.ridicky_prukaz
+          if (profile.pozice) prefillData.position = profile.pozice
+          if (profile.obor) prefillData.field = profile.obor
+          if (profile.zkusenosti) prefillData.experience_detail = profile.zkusenosti
+          if (profile.vzdelani) prefillData.education = profile.vzdelani
+          if (profile.nemcina_uroven) prefillData.german = profile.nemcina_uroven
+          if (profile.dalsi_jazyky) prefillData.other_languages = profile.dalsi_jazyky
+          if (profile.dovednosti) prefillData.skills = profile.dovednosti
+          setFormData(prev => ({ ...prev, ...prefillData }))
+          // Use profile avatar as default photo
+          if (profile.avatar_url && !photo) setPhoto(profile.avatar_url)
+        }
+        // Also check URL prefill params
+        const params = new URLSearchParams(window.location.search)
+        const p = params.get('prefill')
+        if (p) {
+          const data = JSON.parse(decodeURIComponent(p))
+          setFormData(prev => ({
+            ...prev,
+            ...(data.position && { position: data.position }),
+            ...(data.skills && { skills: data.skills }),
+          }))
+        }
+      } catch {}
+      setPrefilled(true)
+    }
+    loadProfile()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefilled])
 
   const handleChange = (name: string, value: string) => setFormData((prev) => ({ ...prev, [name]: value }))
@@ -110,6 +119,7 @@ export default function CVSablona() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Generování selhalo')
       setCvData(data.cvData)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) { setError(err.message || 'Něco se pokazilo') }
     finally { setGenerating(false) }
   }
@@ -126,12 +136,9 @@ export default function CVSablona() {
 
           {/* Template + color switcher */}
           <div className="bg-[#1A1A1A] rounded-xl p-4 mb-6 border border-gray-800">
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3">
               <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Styl šablony</span>
-              <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Barva</span>
-            </div>
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex gap-1.5 flex-wrap" style={{ maxWidth: '320px' }}>
+              <div className="flex gap-1.5 flex-wrap mt-2">
                 {TEMPLATES.map((t) => (
                   <button key={t.id} onClick={() => setTemplate(t.id)}
                     className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${template === t.id ? 'bg-white text-black' : 'bg-[#252525] text-gray-400 hover:text-white'}`}>
@@ -139,12 +146,23 @@ export default function CVSablona() {
                   </button>
                 ))}
               </div>
-              <div className="grid grid-cols-5 gap-1.5">
-                {COLOR_PALETTE.map((c) => (
-                  <button key={c.value} onClick={() => setAccentColor(c.value)} title={c.name}
-                    className="w-6 h-6 rounded-full transition-transform hover:scale-125"
-                    style={{ backgroundColor: c.value, border: accentColor === c.value ? '2px solid #fff' : '2px solid transparent', boxShadow: accentColor === c.value ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none' }} />
-                ))}
+            </div>
+            <div className="border-t border-gray-800 pt-3">
+              <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Barva</span>
+              <div className="flex items-center gap-3 mt-2">
+                <div className="flex flex-wrap gap-1.5">
+                  {QUICK_COLORS.map((c) => (
+                    <button key={c} onClick={() => setAccentColor(c)}
+                      className="w-6 h-6 rounded-full transition-transform hover:scale-125"
+                      style={{ backgroundColor: c, border: accentColor === c ? '2px solid #fff' : '2px solid transparent', boxShadow: accentColor === c ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none' }} />
+                  ))}
+                </div>
+                <input
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="w-8 h-8 rounded-full cursor-pointer border-0 p-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-2 [&::-webkit-color-swatch]:border-gray-600"
+                />
               </div>
             </div>
           </div>
@@ -169,12 +187,19 @@ export default function CVSablona() {
           <span className="text-3xl">📄</span>
           <div>
             <h1 className="text-white text-xl font-bold">Životopis – švýcarský formát</h1>
-            <p className="text-gray-400 text-xs">5 profesionálních stylů · 25 barev · fotka · PDF ke stažení</p>
+            <p className="text-gray-400 text-xs">10 profesionálních stylů · libovolná barva · fotka · PDF ke stažení</p>
           </div>
         </div>
 
         <PaywallOverlay isLocked={!isActive && !loading} title="AI šablony jsou součástí Premium" description="Získej profesionální CV ve švýcarském formátu">
           <div className="space-y-4">
+
+            {/* Profile prefill banner */}
+            {prefilled && Object.keys(formData).length > 2 && (
+              <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 flex items-center gap-2">
+                <span className="text-green-400 text-sm">✓ Údaje vyplněny z tvého profilu. Uprav co potřebuješ.</span>
+              </div>
+            )}
 
             {/* Step 1: Template */}
             <div>
@@ -191,20 +216,41 @@ export default function CVSablona() {
               </div>
             </div>
 
-            {/* Step 2: Color palette */}
+            {/* Step 2: Color picker */}
             <div>
               <label className="text-gray-300 text-sm font-medium mb-2 block">2. Vyber barvu</label>
               <div className="bg-[#1A1A1A] rounded-xl p-3 border border-gray-800">
-                <div className="grid grid-cols-5 gap-2">
-                  {COLOR_PALETTE.map((c) => (
-                    <button key={c.value} onClick={() => setAccentColor(c.value)} title={c.name}
-                      className="group relative w-full aspect-square rounded-lg transition-transform hover:scale-105"
-                      style={{ backgroundColor: c.value, border: accentColor === c.value ? '3px solid #E8302A' : '3px solid transparent', boxShadow: accentColor === c.value ? '0 0 0 2px rgba(232,48,42,0.3)' : 'none' }}>
-                      {accentColor === c.value && (
-                        <span className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold">✓</span>
-                      )}
-                    </button>
+                {/* Quick preset colors */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {QUICK_COLORS.map((c) => (
+                    <button key={c} onClick={() => setAccentColor(c)}
+                      className="w-7 h-7 rounded-full transition-transform hover:scale-110 flex-shrink-0"
+                      style={{ backgroundColor: c, border: accentColor === c ? '2.5px solid #fff' : '2.5px solid transparent', boxShadow: accentColor === c ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none' }} />
                   ))}
+                </div>
+                {/* Custom color picker */}
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <input
+                      type="color"
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
+                      className="w-10 h-10 rounded-full cursor-pointer border-0 p-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-2 [&::-webkit-color-swatch]:border-gray-600 [&::-moz-color-swatch]:rounded-full [&::-moz-color-swatch]:border-2 [&::-moz-color-swatch]:border-gray-600"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-500 text-[10px] mb-1">Vlastní barva</p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={accentColor}
+                        onChange={(e) => { if (/^#[0-9a-fA-F]{0,6}$/.test(e.target.value)) setAccentColor(e.target.value) }}
+                        className="bg-[#252525] border border-gray-700 rounded-lg px-2.5 py-1 text-white text-xs font-mono w-20 focus:border-gray-500 focus:outline-none"
+                        maxLength={7}
+                      />
+                      <div className="h-6 w-16 rounded-md" style={{ backgroundColor: accentColor }} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -233,9 +279,22 @@ export default function CVSablona() {
               <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Celé jméno *" className="col-span-2 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
               <input type="text" value={formData.birthdate || ''} onChange={(e) => handleChange('birthdate', e.target.value)} placeholder="Datum narození *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
               <input type="text" value={formData.phone || ''} onChange={(e) => handleChange('phone', e.target.value)} placeholder="Telefon *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <input type="text" value={formData.email || ''} onChange={(e) => handleChange('email', e.target.value)} placeholder="Email *" className="col-span-2 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
+              <input type="text" value={formData.email || ''} onChange={(e) => handleChange('email', e.target.value)} placeholder="Email *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
+              <select value={formData.nationality || ''} onChange={(e) => handleChange('nationality', e.target.value)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:border-gray-600 focus:outline-none transition appearance-none">
+                <option value="">Národnost</option>
+                <option value="Česká">Česká</option>
+                <option value="Slovenská">Slovenská</option>
+                <option value="Polská">Polská</option>
+                <option value="Ukrajinská">Ukrajinská</option>
+                <option value="Rumunská">Rumunská</option>
+                <option value="Maďarská">Maďarská</option>
+                <option value="Italská">Italská</option>
+                <option value="Portugalská">Portugalská</option>
+                <option value="Španělská">Španělská</option>
+                <option value="Řecká">Řecká</option>
+              </select>
               <input type="text" value={formData.address || ''} onChange={(e) => handleChange('address', e.target.value)} placeholder="Adresa" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <input type="text" value={formData.driving || ''} onChange={(e) => handleChange('driving', e.target.value)} placeholder="Řidičský průkaz" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
+              <input type="text" value={formData.driving || ''} onChange={(e) => handleChange('driving', e.target.value)} placeholder="Řidičský průkaz (B, C...)" className="col-span-2 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
             </div>
 
             {/* Step 5 */}

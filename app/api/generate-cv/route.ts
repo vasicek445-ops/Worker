@@ -11,58 +11,65 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const SYSTEM_PROMPT = `Jsi expert na tvorbu životopisů (Lebenslauf) pro švýcarský pracovní trh. Vytváříš BOHATÉ, PROFESIONÁLNÍ životopisy, které by obstály i vedle šablon z Canvy.
+const SYSTEM_PROMPT = `Du bist ein Experte für die Erstellung von Lebensläufen (CV) für den Schweizer Arbeitsmarkt. Du erstellst REICHHALTIGE, PROFESSIONELLE Lebensläufe, die neben Canva-Vorlagen bestehen können.
 
-TVŮJ ÚKOL: Na základě údajů od uživatele (v češtině) vytvoříš STRUKTUROVANÝ JSON životopis v NĚMČINĚ.
+DEINE AUFGABE: Erstelle aus den Benutzerdaten (auf Tschechisch) einen STRUKTURIERTEN JSON-Lebenslauf auf DEUTSCH.
 
-KLÍČOVÁ PRAVIDLA PRO KVALITU:
-1. PROFIL sekce (3-4 věty): Napiš poutavý profesní profil ve třetí osobě. Zdůrazni klíčové silné stránky, roky zkušeností a hlavní kompetence. Musí znít sebevědomě ale ne arogantně.
-2. ZKUŠENOSTI: U každé pozice napiš 3-4 KONKRÉTNÍ činnosti (ne obecné). Použij akční slovesa (durchführen, koordinieren, sicherstellen, optimieren, betreuen). Pokud uživatel napíše málo, ROZŠIŘ a vylepši na základě typických činností v oboru.
-3. DOVEDNOSTI: Rozděl na technical (oborové, konkrétní) a soft (osobnostní). Vždy přidej alespoň 4-5 technických a 4-5 soft skills i když uživatel zadal méně. Doplň relevantní skills pro daný obor.
-4. JAZYKY: Vždy přidej správné německé názvy úrovní.
-5. VZDĚLÁNÍ: Přelož názvy škol a oborů do němčiny, ale ponech název instituce v originále pokud je to vlastní jméno.
+QUALITÄTSREGELN:
+1. PROFIL (3-4 Sätze): Schreibe ein überzeugendes berufliches Profil in der dritten Person. Betone Schlüsselstärken, Jahre der Erfahrung und Kernkompetenzen. Selbstbewusst, aber nicht arrogant. Verwende branchenspezifische Begriffe die in der Schweiz üblich sind.
+2. BERUFSERFAHRUNG: Schreibe 3-5 KONKRETE Tätigkeiten pro Position (keine allgemeinen). Verwende Aktionsverben: durchführen, koordinieren, sicherstellen, optimieren, betreuen, implementieren, leiten, analysieren. Falls der Benutzer wenig schreibt, ERWEITERE basierend auf typischen Tätigkeiten in der Branche. Beginne jede Tätigkeit mit einem starken Verb.
+3. KOMPETENZEN: Aufteilen in technical (fachlich, konkret, branchenspezifisch) und soft (persönliche Eigenschaften). Mindestens 5-7 technische und 5-7 Soft Skills. Ergänze relevante Skills für die Branche. Verwende Schweizer Fachbegriffe wo möglich.
+4. SPRACHEN: Immer mit korrekten deutschen Bezeichnungen der Stufen. Tschechisch immer als "Muttersprache" einordnen.
+5. AUSBILDUNG: Übersetze Schulnamen und Fachrichtungen ins Deutsche, behalte aber Eigennamen. Füge den Abschlusstyp hinzu (Lehrabschluss, Berufsmatura, Fachausweis etc.)
+6. ZERTIFIKATE: Ergänze branchenübliche Schweizer Zertifikate die für die Position relevant sind (z.B. SUVA-Kurse, SIZ, SVEB etc.)
 
-ODPOVĚZ POUZE VALIDNÍM JSON (žádný jiný text!):
+WICHTIG FÜR SCHWEIZER MARKT:
+- Verwende Schweizer Hochdeutsch (z.B. "Strasse" statt "Straße")
+- Verwende Begriffe die in der Schweiz üblich sind
+- Formuliere Tätigkeiten ergebnisorientiert
+- Profil sollte die Motivation für die Arbeit in der Schweiz subtil betonen
+
+ANTWORTE NUR MIT VALIDEM JSON (kein anderer Text!):
 
 {
-  "profil": "3-4 věty profesního profilu v němčině. Motivující, konkrétní, profesionální.",
+  "profil": "3-4 Sätze berufliches Profil auf Deutsch. Motivierend, konkret, professionell.",
   "personalData": {
     "name": "string",
     "birthdate": "string",
-    "nationality": "string (v němčině)",
+    "nationality": "string (auf Deutsch)",
     "address": "string",
     "phone": "string",
     "email": "string",
-    "drivingLicense": "string nebo null"
+    "drivingLicense": "string oder null"
   },
   "experience": [
     {
-      "period": "MM.YYYY – MM.YYYY (nebo 'Aktuell' pro současné)",
-      "title": "název pozice v němčině",
-      "company": "název firmy",
-      "location": "město, země",
-      "tasks": ["konkrétní činnost 1 s akčním slovesem", "činnost 2", "činnost 3", "činnost 4"]
+      "period": "MM.YYYY – MM.YYYY (oder 'Aktuell' für aktuelle Position)",
+      "title": "Positionsbezeichnung auf Deutsch",
+      "company": "Firmenname",
+      "location": "Stadt, Land",
+      "tasks": ["Konkrete Tätigkeit 1 mit Aktionsverb", "Tätigkeit 2", "Tätigkeit 3", "Tätigkeit 4"]
     }
   ],
   "education": [
     {
       "period": "YYYY – YYYY",
-      "school": "název školy",
-      "degree": "titul/obor v němčině",
-      "location": "město, země"
+      "school": "Schulname",
+      "degree": "Abschluss/Fachrichtung auf Deutsch",
+      "location": "Stadt, Land"
     }
   ],
   "languages": [
     {
-      "language": "název jazyka v němčině",
-      "level": "úroveň (Muttersprache / A1 Anfänger / A2 Grundkenntnisse / B1 Fortgeschritten / B2 Fließend / C1 Verhandlungssicher / C2 Muttersprachliches Niveau)"
+      "language": "Sprachname auf Deutsch",
+      "level": "Stufe (Muttersprache / A1 Anfänger / A2 Grundkenntnisse / B1 Fortgeschritten / B2 Fliessend / C1 Verhandlungssicher / C2 Muttersprachliches Niveau)"
     }
   ],
   "skills": {
-    "technical": ["min 4-5 oborových dovedností"],
-    "soft": ["min 4-5 osobnostních vlastností v němčině"]
+    "technical": ["min 5-7 fachliche Kompetenzen"],
+    "soft": ["min 5-7 persönliche Eigenschaften auf Deutsch"]
   },
-  "certifications": ["certifikáty, kurzy, oprávnění – pokud relevantní, jinak prázdné pole"]
+  "certifications": ["Zertifikate, Kurse, Berechtigungen – branchenrelevant, sonst leeres Array"]
 }`
 
 export async function POST(req: NextRequest) {
@@ -85,56 +92,71 @@ export async function POST(req: NextRequest) {
     const { formData } = await req.json()
     if (!formData || typeof formData !== 'object') return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
 
-    const userMessage = `Vytvoř bohatý strukturovaný JSON životopis pro:
+    const userMessage = `Erstelle einen reichhaltigen strukturierten JSON-Lebenslauf für:
 
-Jméno: ${formData.name}
-Datum narození: ${formData.birthdate}
-Národnost: ${formData.nationality || 'Česká'}
-Adresa: ${formData.address || 'Česká republika'}
+Name: ${formData.name}
+Geburtsdatum: ${formData.birthdate}
+Nationalität: ${formData.nationality || 'Tschechisch'}
+Adresse: ${formData.address || 'Tschechische Republik'}
 Telefon: ${formData.phone}
-Email: ${formData.email}
-Řidičský průkaz: ${formData.driving || 'žádný'}
-Cílová pozice: ${formData.position}
-Obor: ${formData.field}
+E-Mail: ${formData.email}
+Führerschein: ${formData.driving || 'keiner'}
+Zielposition: ${formData.position}
+Branche: ${formData.field}
 
-PRACOVNÍ ZKUŠENOSTI (rozšiř a vylepši popisy):
+BERUFSERFAHRUNG (erweitere und verbessere die Beschreibungen, min. 3-5 Tätigkeiten pro Position):
 ${formData.experience_detail}
 
-VZDĚLÁNÍ:
+AUSBILDUNG:
 ${formData.education}
 
-JAZYKY:
-Čeština: rodilý mluvčí
-Němčina: ${formData.german}
-${formData.other_languages ? 'Další jazyky: ' + formData.other_languages : ''}
+SPRACHEN:
+Tschechisch: Muttersprache
+Deutsch: ${formData.german}
+${formData.other_languages ? 'Weitere Sprachen: ' + formData.other_languages : ''}
 
-DOVEDNOSTI (doplň relevantní pro obor):
+KOMPETENZEN (ergänze branchenrelevante):
 ${formData.skills}
 
-DŮLEŽITÉ: Rozšiř každou pozici na 3-4 konkrétní činnosti s akčními slovesy. Napiš motivující profil. Doplň skills pokud jich je málo. Odpověz POUZE validním JSON.`
+WICHTIG: Erweitere jede Position auf 3-5 konkrete Tätigkeiten mit Aktionsverben. Schreibe ein motivierendes Profil. Ergänze Skills wenn zu wenig. Antworte NUR mit validem JSON.`
 
-    const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 3000,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userMessage }],
-    })
+    const generateCV = async (): Promise<string> => {
+      const response = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 4096,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userMessage }],
+      })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    let text = textBlock ? (textBlock as any).text : ''
-    if (!text) return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
-
-    text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
-
-    let cvData
-    try {
-      cvData = JSON.parse(text)
-    } catch (parseError) {
-      console.error('JSON parse error:', text)
-      return NextResponse.json({ error: 'AI generated invalid data. Try again.' }, { status: 500 })
+      const textBlock = response.content.find((block: { type: string }) => block.type === 'text')
+      const text = textBlock && 'text' in textBlock ? textBlock.text : ''
+      if (!text) throw new Error('Generation failed')
+      return text
     }
 
-    return NextResponse.json({ cvData, usage: { input: response.usage.input_tokens, output: response.usage.output_tokens } })
+    let cvData
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        let text = await generateCV()
+        text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
+        // Remove any leading/trailing non-JSON text
+        const jsonStart = text.indexOf('{')
+        const jsonEnd = text.lastIndexOf('}')
+        if (jsonStart !== -1 && jsonEnd !== -1) {
+          text = text.substring(jsonStart, jsonEnd + 1)
+        }
+        cvData = JSON.parse(text)
+        break
+      } catch {
+        if (attempt === 2) {
+          console.error('JSON parse error after retries')
+          return NextResponse.json({ error: 'AI generated invalid data. Try again.' }, { status: 500 })
+        }
+      }
+    }
+
+    return NextResponse.json({ cvData })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Generate CV error:', error)
     return NextResponse.json({ error: error.message || 'Generation error' }, { status: 500 })
