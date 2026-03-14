@@ -2,15 +2,22 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../supabase";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handlePostAuth(user: any, plan: string | null, isRecovery: boolean) {
   const fullName = user?.user_metadata?.full_name
     || user?.user_metadata?.name
     || [user?.user_metadata?.given_name, user?.user_metadata?.family_name].filter(Boolean).join(" ")
     || null;
+  // Check if profile already exists with a custom avatar
+  const { data: existing } = await supabase.from("profiles").select("avatar_url").eq("id", user.id).single();
+  const googleAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  // Only set avatar from Google if user hasn't uploaded a custom one
+  const keepAvatar = existing?.avatar_url && !existing.avatar_url.includes('googleusercontent.com')
+    ? existing.avatar_url : (existing?.avatar_url || googleAvatar);
   await supabase.from("profiles").upsert({
     id: user.id,
     full_name: fullName,
-    avatar_url: user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null,
+    avatar_url: keepAvatar,
   }, { onConflict: "id" });
 
   // Send welcome email for new users (only once)
