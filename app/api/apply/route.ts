@@ -244,7 +244,6 @@ Im Anhang finden Sie meinen Lebenslauf.
         {
           filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.html`,
           content: Buffer.from(cvHtml).toString('base64'),
-          type: 'text/html',
         },
       ],
     })
