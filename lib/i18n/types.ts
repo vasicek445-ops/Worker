@@ -55,6 +55,49 @@ export interface Translation {
     cta: string;
     disclaimer: string;
   };
+  home: {
+    hero_headline: string;
+    hero_sub: string;
+    hero_cta: string;
+    hero_cta2: string;
+    hero_trial: string;
+    stat_salary: string;
+    stat_salary_label: string;
+    stat_agencies: string;
+    stat_agencies_label: string;
+    stat_ai: string;
+    stat_ai_label: string;
+    stat_time: string;
+    stat_time_label: string;
+    interest_title: string;
+    interest_agencies: string;
+    interest_agencies_desc: string;
+    interest_ai: string;
+    interest_ai_desc: string;
+    interest_guides: string;
+    interest_guides_desc: string;
+    interest_jobs: string;
+    interest_jobs_desc: string;
+    interest_housing: string;
+    interest_housing_desc: string;
+    interest_assistant: string;
+    interest_assistant_desc: string;
+    desire_title: string;
+    desire_testimonial1: string;
+    desire_testimonial1_author: string;
+    desire_testimonial2: string;
+    desire_testimonial2_author: string;
+    desire_testimonial3: string;
+    desire_testimonial3_author: string;
+    desire_salary_title: string;
+    desire_salary_desc: string;
+    desire_compare: string;
+    action_title: string;
+    action_desc: string;
+    action_cta: string;
+    action_features: string;
+    footer_copy: string;
+  };
 }
 
 export const LOCALES: { code: Locale; flag: string; name: string }[] = [
