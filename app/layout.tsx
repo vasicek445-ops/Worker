@@ -45,6 +45,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0a0a12" />
+        <meta name="trustpilot-one-time-domain-verification-id" content="3d5c0f39-baa2-4aef-a607-cba4e23fdbee" />
       </head>
       <body className="bg-[#0a0a0c]">
         {/* Facebook Pixel */}
