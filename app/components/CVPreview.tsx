@@ -175,6 +175,8 @@ function ParametricT({ data, photo, c, cfg }: { data: CVData; photo: string | nu
   const headerMuted = (cfg.headerBg === 'dark' || cfg.headerBg === 'accent' || cfg.headerBg === 'gradient') ? 'rgba(255,255,255,0.6)' : textMuted
 
   const bullet = cfg.taskBullet || (cfg.sectionStyle === 'dot' ? '●' : cfg.sectionStyle === 'card' ? '▸' : '–')
+  const accentText = dark ? c : isColorDark(c) ? hexToRgba(c, 0.7) : c
+  const accentTextBright = isColorDark(c) && !dark ? '#555' : c
 
   // Section header renderer
   const SH = ({ t }: { t: string }) => {
@@ -198,19 +200,19 @@ function ParametricT({ data, photo, c, cfg }: { data: CVData; photo: string | nu
   const Exps = () => <>{data.experience.map((exp, i) => (
     <div key={i} style={{ marginBottom: cfg.compact ? '10px' : '16px', ...(cfg.sectionStyle === 'card' ? { padding: cfg.compact ? '8px 10px' : '12px 14px', backgroundColor: cardBg, borderRadius: '6px', border: `1px solid ${border}` } : cfg.sectionStyle === 'border-left' ? { paddingLeft: '12px', borderLeft: `2px solid ${i === 0 ? c : border}` } : {}) }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h3 style={{ fontSize: cfg.compact ? '9pt' : '10.5pt', fontWeight: 700, margin: 0, color: dark ? '#fff' : '#2c3e50' }}>{exp.title}</h3>
-        <span style={{ fontSize: cfg.compact ? '7pt' : '8pt', color: c, fontWeight: 600, whiteSpace: 'nowrap', marginLeft: '8px' }}>{exp.period}</span>
+        <h3 style={{ fontSize: cfg.compact ? '9pt' : '10.5pt', fontWeight: 700, margin: 0, color: dark ? '#fff' : '#2c3e50', flex: 1, minWidth: 0 }}>{exp.title}</h3>
+        <span style={{ fontSize: cfg.compact ? '7pt' : '8pt', color: accentTextBright, fontWeight: 600, whiteSpace: 'nowrap', marginLeft: '8px', flexShrink: 0 }}>{exp.period}</span>
       </div>
       <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: textMuted, margin: '1px 0 5px', fontStyle: 'italic' }}>{exp.company}{exp.location ? ` · ${exp.location}` : ''}</p>
-      {exp.tasks.map((t, j) => <div key={j} style={{ display: 'flex', gap: '6px', marginBottom: '2px' }}><span style={{ color: c, fontSize: cfg.compact ? '6pt' : '7pt', marginTop: '3px', flexShrink: 0 }}>{bullet}</span><span style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: dark ? 'rgba(255,255,255,0.65)' : '#555' }}>{t}</span></div>)}
+      {exp.tasks.map((t, j) => <div key={j} style={{ display: 'flex', gap: '6px', marginBottom: '2px' }}><span style={{ color: accentText, fontSize: cfg.compact ? '6pt' : '7pt', marginTop: '3px', flexShrink: 0 }}>{bullet}</span><span style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: dark ? 'rgba(255,255,255,0.65)' : '#555' }}>{t}</span></div>)}
     </div>
   ))}</>
 
   const Edus = () => <>{data.education.map((edu, i) => (
     <div key={i} style={{ marginBottom: cfg.compact ? '6px' : '12px', ...(cfg.sectionStyle === 'border-left' ? { paddingLeft: '12px', borderLeft: `2px solid ${border}` } : {}) }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <h3 style={{ fontSize: cfg.compact ? '9pt' : '10.5pt', fontWeight: 700, margin: 0, color: dark ? '#fff' : '#2c3e50' }}>{edu.degree}</h3>
-        <span style={{ fontSize: cfg.compact ? '7pt' : '8pt', color: c, whiteSpace: 'nowrap' }}>{edu.period}</span>
+        <h3 style={{ fontSize: cfg.compact ? '9pt' : '10.5pt', fontWeight: 700, margin: 0, color: dark ? '#fff' : '#2c3e50', flex: 1, minWidth: 0 }}>{edu.degree}</h3>
+        <span style={{ fontSize: cfg.compact ? '7pt' : '8pt', color: accentTextBright, whiteSpace: 'nowrap', marginLeft: '8px', flexShrink: 0 }}>{edu.period}</span>
       </div>
       <p style={{ fontSize: cfg.compact ? '7.5pt' : '8.5pt', color: textMuted, margin: '1px 0 0' }}>{edu.school}{edu.location ? ` · ${edu.location}` : ''}</p>
     </div>
@@ -380,6 +382,13 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
+function isColorDark(hex: string): boolean {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return (r * 299 + g * 587 + b * 114) / 1000 < 128
+}
+
 export default function CVPreview({ data, photo, template, accentColor }: CVPreviewProps) {
   const cvRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
@@ -464,8 +473,12 @@ function LangDots({ langs, c }: { langs: CVData['languages']; c: string }) {
 }
 
 function SkillPills({ skills, c, filled }: { skills: string[]; c: string; filled?: boolean }) {
+  const dark = isColorDark(c)
+  const pillBg = filled ? c : hexToRgba(c, dark ? 0.15 : 0.08)
+  const pillColor = filled ? '#fff' : dark ? hexToRgba(c, 1) : c
+  const pillTextStyle = dark && !filled ? { filter: 'brightness(1.8)' } : {}
   return <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-    {skills.map((s, i) => <span key={i} style={{ fontSize: '7.5pt', backgroundColor: filled ? c : hexToRgba(c, 0.08), color: filled ? '#fff' : c, padding: '4px 10px', borderRadius: '14px', fontWeight: 500, border: filled ? 'none' : `1px solid ${hexToRgba(c, 0.2)}` }}>{s}</span>)}
+    {skills.map((s, i) => <span key={i} style={{ fontSize: '7.5pt', backgroundColor: pillBg, color: pillColor, padding: '4px 10px', borderRadius: '14px', fontWeight: 500, border: filled ? 'none' : `1px solid ${hexToRgba(c, dark ? 0.3 : 0.2)}`, ...pillTextStyle }}>{s}</span>)}
   </div>
 }
 
