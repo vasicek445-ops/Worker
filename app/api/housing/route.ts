@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
     const minRooms = parseFloat(searchParams.get('minRooms') || '0')
     const objectType = searchParams.get('type') || ''
     const furnished = searchParams.get('furnished') || ''
+    const sort = searchParams.get('sort') || 'newest'
     const page = parseInt(searchParams.get('page') || '1')
     const limit = 20
     const offset = (page - 1) * limit
@@ -46,9 +47,19 @@ export async function GET(req: NextRequest) {
       query = query.eq('is_furnished', true)
     }
 
-    query = query
-      .order('posted_at', { ascending: false, nullsFirst: false })
-      .range(offset, offset + limit - 1)
+    if (sort === 'price_asc') {
+      query = query.order('price', { ascending: true, nullsFirst: false })
+    } else if (sort === 'price_desc') {
+      query = query.order('price', { ascending: false, nullsFirst: false })
+    } else if (sort === 'rooms_desc') {
+      query = query.order('rooms', { ascending: false, nullsFirst: false })
+    } else if (sort === 'area_desc') {
+      query = query.order('area_m2', { ascending: false, nullsFirst: false })
+    } else {
+      query = query.order('posted_at', { ascending: false, nullsFirst: false })
+    }
+
+    query = query.range(offset, offset + limit - 1)
 
     const { data, count, error } = await query
 
@@ -60,6 +71,7 @@ export async function GET(req: NextRequest) {
       page,
       totalPages: Math.ceil((count || 0) / limit),
     })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Housing API error:', error)
     return NextResponse.json({ error: error.message || 'Failed to fetch housing' }, { status: 500 })

@@ -83,6 +83,7 @@ const RESIDENTIAL_TYPES = new Set([
   'GRANNY_FLAT', 'CASTLE',
 ])
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isResidential(listing: any): boolean {
   if (RESIDENTIAL_CATEGORIES.has(listing.object_category)) return true
   if (RESIDENTIAL_TYPES.has(listing.object_type)) return true
@@ -154,10 +155,8 @@ export async function GET(req: NextRequest) {
         const results = data.results || []
         if (results.length === 0) break
 
-        let residentialOnPage = 0
         for (const listing of results) {
           if (!isResidential(listing)) continue
-          residentialOnPage++
 
           const pk = String(listing.pk)
           if (seenIds.has(pk)) continue
@@ -201,7 +200,7 @@ export async function GET(req: NextRequest) {
               is_temporary: listing.is_temporary || false,
               available_from: availableFrom,
               url: `https://flatfox.ch${listing.url || `/en/flat/${listing.slug}/${pk}/`}`,
-              image_url: null,
+              image_url: listing.cover_image?.url || listing.images?.[0]?.url || (listing.image_url ? `https://flatfox.ch${listing.image_url}` : null),
               agency_name: [agency.name, agency.name_2].filter(Boolean).join(' - ') || null,
               agency_contact: [agency.street, agency.zipcode, agency.city].filter(Boolean).join(', ') || null,
               posted_at: postedAt,
@@ -250,6 +249,7 @@ export async function GET(req: NextRequest) {
       cleaned,
       timestamp: new Date().toISOString(),
     })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Housing scrape cron error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

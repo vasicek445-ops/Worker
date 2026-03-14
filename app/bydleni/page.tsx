@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import AppShell from '../components/AppShell'
+import Image from 'next/image'
+import { supabase } from '../supabase'
 
 type Listing = {
   id: string
@@ -43,6 +44,14 @@ const PRICE_RANGES = [
   { label: 'Do 3000 CHF', value: '3000' },
 ]
 
+const SORT_OPTIONS = [
+  { label: 'Nejnovější', value: 'newest' },
+  { label: 'Cena ↑', value: 'price_asc' },
+  { label: 'Cena ↓', value: 'price_desc' },
+  { label: 'Pokoje ↓', value: 'rooms_desc' },
+  { label: 'Plocha ↓', value: 'area_desc' },
+]
+
 export default function Bydleni() {
   const [listings, setListings] = useState<Listing[]>([])
   const [total, setTotal] = useState(0)
@@ -54,7 +63,35 @@ export default function Bydleni() {
   const [maxPrice, setMaxPrice] = useState('')
   const [minRooms, setMinRooms] = useState('')
   const [furnished, setFurnished] = useState(false)
+  const [sort, setSort] = useState('newest')
   const [searchInput, setSearchInput] = useState('')
+  const [saved, setSaved] = useState<string[]>([])
+  const [profileLoaded, setProfileLoaded] = useState(false)
+
+  // Load saved listings & auto-fill canton from profile
+  useEffect(() => {
+    const s = JSON.parse(localStorage.getItem('woker_saved_housing') || '[]')
+    setSaved(s)
+
+    const loadProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('preferovany_kanton').eq('id', user.id).single()
+        if (profile?.preferovany_kanton && !profileLoaded) {
+          const cantonMap: Record<string, string> = {
+            'Zürich': 'ZH', 'Bern': 'BE', 'Luzern': 'LU', 'Basel': 'BS', 'St. Gallen': 'SG',
+            'Aargau': 'AG', 'Solothurn': 'SO', 'Thurgau': 'TG', 'Zug': 'ZG', 'Schaffhausen': 'SH',
+            'Graubünden': 'GR', 'Ticino': 'TI', 'Vaud': 'VD', 'Valais': 'VS', 'Genève': 'GE', 'Fribourg': 'FR', 'Jura': 'JU',
+          }
+          const code = cantonMap[profile.preferovany_kanton] || Object.entries(CANTONS).find(([, name]) => name === profile.preferovany_kanton)?.[0]
+          if (code) setCanton(code)
+          setProfileLoaded(true)
+        }
+      }
+    }
+    loadProfile()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const fetchListings = useCallback(async () => {
     setLoading(true)
@@ -65,6 +102,7 @@ export default function Bydleni() {
       if (maxPrice) params.set('maxPrice', maxPrice)
       if (minRooms) params.set('minRooms', minRooms)
       if (furnished) params.set('furnished', 'true')
+      if (sort !== 'newest') params.set('sort', sort)
       params.set('page', page.toString())
 
       const res = await fetch(`/api/housing?${params}`)
@@ -77,7 +115,7 @@ export default function Bydleni() {
     } finally {
       setLoading(false)
     }
-  }, [search, canton, maxPrice, minRooms, furnished, page])
+  }, [search, canton, maxPrice, minRooms, furnished, sort, page])
 
   useEffect(() => {
     fetchListings()
@@ -90,20 +128,22 @@ export default function Bydleni() {
   }
 
   const clearFilters = () => {
-    setSearch('')
-    setSearchInput('')
-    setCanton('')
-    setMaxPrice('')
-    setMinRooms('')
-    setFurnished(false)
-    setPage(1)
+    setSearch(''); setSearchInput(''); setCanton(''); setMaxPrice('')
+    setMinRooms(''); setFurnished(false); setSort('newest'); setPage(1)
+  }
+
+  const toggleSaved = (id: string) => {
+    const updated = saved.includes(id) ? saved.filter(s => s !== id) : [...saved, id]
+    setSaved(updated)
+    localStorage.setItem('woker_saved_housing', JSON.stringify(updated))
   }
 
   const hasFilters = search || canton || maxPrice || minRooms || furnished
 
+  const [now] = useState(() => Date.now())
   function timeAgo(dateStr: string | null): string {
     if (!dateStr) return ''
-    const diff = Date.now() - new Date(dateStr).getTime()
+    const diff = now - new Date(dateStr).getTime()
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
     if (days === 0) return 'Dnes'
     if (days === 1) return 'Včera'
@@ -115,66 +155,67 @@ export default function Bydleni() {
   function formatDate(dateStr: string | null): string {
     if (!dateStr) return 'Ihned'
     const d = new Date(dateStr)
-    return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short', year: 'numeric' })
+    return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short' })
   }
 
+  const selectClass = "bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#39ff6e]/30 appearance-none flex-shrink-0 transition"
+
   return (
-    <AppShell>
-      <main className="min-h-screen bg-[#0E0E0E] pb-24">
-        <div className="px-5 pt-6 pb-4">
-          <Link href="/dashboard" className="text-gray-500 hover:text-white text-sm mb-4 inline-block no-underline">← Zpět</Link>
-          <h1 className="text-white text-2xl font-black mb-1">🏠 Bydlení ve Švýcarsku</h1>
-          <p className="text-gray-500 text-sm">
-            {total} aktuálních nabídek bydlení
-          </p>
+    <main className="min-h-screen bg-[#0a0a12] pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+      {/* Ambient glow */}
+      <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] right-[10%]" style={{ background: "radial-gradient(circle, rgba(6,182,212,0.3), transparent 70%)" }} />
+      <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-8 bottom-[200px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6">
+        {/* Header */}
+        <div className="pt-6 pb-4">
+          <Link href="/dashboard" className="text-white/30 hover:text-white text-sm mb-4 inline-block no-underline transition">← Zpět</Link>
+          <div className="flex items-center gap-3 mb-1">
+            <Image src="/images/3d/house.png" alt="" width={36} height={36} className="drop-shadow-lg" />
+            <div>
+              <h1 className="text-white text-2xl font-extrabold m-0 tracking-tight">Bydlení ve Švýcarsku</h1>
+              <p className="text-white/30 text-sm m-0">
+                {total.toLocaleString()} aktuálních nabídek
+                {canton && <span className="text-cyan-400"> · {CANTONS[canton]}</span>}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Search */}
-        <div className="px-5 mb-4">
+        <div className="mb-4">
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Hledej město, adresu..."
-              className="flex-1 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gray-600 placeholder-gray-600"
+              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 placeholder-white/20 transition"
             />
-            <button type="submit" className="bg-[#E8302A] text-white px-5 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition">
-              🔍
+            <button type="submit" className="bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] px-5 py-3 rounded-xl text-sm font-extrabold hover:shadow-[0_4px_20px_rgba(57,255,110,0.3)] hover:scale-[1.03] transition-all">
+              Hledat
             </button>
           </form>
         </div>
 
         {/* Filters */}
-        <div className="px-5 mb-4 flex flex-col gap-2">
+        <div className="mb-5 flex flex-col gap-2">
           <div className="flex gap-2 overflow-x-auto pb-1">
-            <select
-              value={canton}
-              onChange={(e) => { setCanton(e.target.value); setPage(1) }}
-              className="bg-[#1A1A1A] border border-gray-800 rounded-lg px-3 py-2 text-white text-xs focus:outline-none appearance-none flex-shrink-0"
-            >
+            <select value={canton} onChange={(e) => { setCanton(e.target.value); setPage(1) }} className={selectClass}>
               <option value="">Všechny kantony</option>
               {Object.entries(CANTONS).map(([code, name]) => (
                 <option key={code} value={code}>{name}</option>
               ))}
             </select>
 
-            <select
-              value={maxPrice}
-              onChange={(e) => { setMaxPrice(e.target.value); setPage(1) }}
-              className="bg-[#1A1A1A] border border-gray-800 rounded-lg px-3 py-2 text-white text-xs focus:outline-none appearance-none flex-shrink-0"
-            >
+            <select value={maxPrice} onChange={(e) => { setMaxPrice(e.target.value); setPage(1) }} className={selectClass}>
               <option value="">Max. cena</option>
               {PRICE_RANGES.map(r => (
                 <option key={r.value} value={r.value}>{r.label}</option>
               ))}
             </select>
 
-            <select
-              value={minRooms}
-              onChange={(e) => { setMinRooms(e.target.value); setPage(1) }}
-              className="bg-[#1A1A1A] border border-gray-800 rounded-lg px-3 py-2 text-white text-xs focus:outline-none appearance-none flex-shrink-0"
-            >
+            <select value={minRooms} onChange={(e) => { setMinRooms(e.target.value); setPage(1) }} className={selectClass}>
               <option value="">Pokoje</option>
               <option value="1">1+</option>
               <option value="1.5">1.5+</option>
@@ -187,178 +228,201 @@ export default function Bydleni() {
 
             <button
               onClick={() => { setFurnished(!furnished); setPage(1) }}
-              className={`px-3 py-2 rounded-lg text-xs font-medium border flex-shrink-0 transition ${
+              className={`px-3 py-2.5 rounded-xl text-xs font-semibold border flex-shrink-0 transition ${
                 furnished
-                  ? 'bg-[#E8302A]/10 text-[#E8302A] border-[#E8302A]/30'
-                  : 'bg-[#1A1A1A] text-gray-400 border-gray-800'
+                  ? 'bg-[#39ff6e]/10 text-[#39ff6e] border-[#39ff6e]/30'
+                  : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
               }`}
             >
-              🪑 Zařízeno
+              Zařízeno
             </button>
+
+            <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(1) }} className={selectClass}>
+              {SORT_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </div>
 
           {hasFilters && (
-            <button onClick={clearFilters} className="text-gray-500 text-xs hover:text-white transition self-start">
-              ✕ Vymazat filtry
+            <button onClick={clearFilters} className="text-white/30 text-xs hover:text-white transition self-start">
+              Vymazat filtry
             </button>
           )}
         </div>
 
         {/* Listings */}
-        <div className="px-5">
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-4 animate-pulse">
-                  <div className="h-32 bg-gray-800 rounded-xl mb-3" />
-                  <div className="h-4 bg-gray-800 rounded w-3/4 mb-3" />
-                  <div className="h-3 bg-gray-800 rounded w-1/2 mb-2" />
-                  <div className="h-3 bg-gray-800 rounded w-1/3" />
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden animate-pulse">
+                <div className="h-40 bg-white/[0.04]" />
+                <div className="p-4 space-y-2">
+                  <div className="h-5 bg-white/[0.06] rounded w-1/2" />
+                  <div className="h-3 bg-white/[0.04] rounded w-3/4" />
+                  <div className="h-3 bg-white/[0.04] rounded w-1/3" />
                 </div>
-              ))}
-            </div>
-          ) : listings.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="text-5xl mb-4">🏠</div>
-              <h3 className="text-white font-bold text-lg mb-2">Žádné nabídky nenalezeny</h3>
-              <p className="text-gray-500 text-sm mb-4">Zkus změnit filtry nebo hledaný výraz</p>
-              {hasFilters && (
-                <button onClick={clearFilters} className="text-[#E8302A] text-sm font-bold">
-                  Vymazat filtry
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {listings.map((listing) => (
-                <div key={listing.id} className="bg-[#1A1A1A] border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition">
-                  {/* Type banner */}
-                  <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 px-4 py-2.5 flex items-center justify-between border-b border-gray-800/50">
-                    <span className="text-white/70 text-xs font-medium">{listing.object_type || 'Byt'}</span>
-                    {listing.rooms && <span className="text-blue-400 text-xs font-bold">{listing.rooms} pokojů</span>}
-                  </div>
-
-                  <div className="p-4">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1 mr-3">
-                        <h4 className="text-white font-bold text-base leading-tight mb-1">
-                          {listing.price ? `CHF ${listing.price.toLocaleString()}` : 'Cena na dotaz'}
-                          {listing.price_unit === 'monthly' && <span className="text-gray-500 font-normal text-sm">/měsíc</span>}
-                        </h4>
-                        <p className="text-gray-400 text-sm">{listing.address || `${listing.city}${listing.zipcode ? ` ${listing.zipcode}` : ''}`}</p>
-                      </div>
-                      {listing.posted_at && (
-                        <span className="text-gray-600 text-[10px] flex-shrink-0">{timeAgo(listing.posted_at)}</span>
-                      )}
+              </div>
+            ))}
+          </div>
+        ) : listings.length === 0 ? (
+          <div className="text-center py-20">
+            <Image src="/images/3d/house.png" alt="" width={64} height={64} className="mx-auto mb-4 opacity-40" />
+            <h3 className="text-white font-bold text-lg mb-2">Žádné nabídky nenalezeny</h3>
+            <p className="text-white/30 text-sm mb-4">Zkus změnit filtry nebo hledaný výraz</p>
+            {hasFilters && (
+              <button onClick={clearFilters} className="text-[#39ff6e] text-sm font-bold hover:text-[#39ff6e]/80 transition">
+                Vymazat filtry
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {listings.map((listing) => (
+              <div key={listing.id} className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden hover:border-white/[0.12] hover:bg-white/[0.04] transition-all group">
+                {/* Image / Placeholder */}
+                <div className="relative h-40 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 overflow-hidden">
+                  {listing.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Image src="/images/3d/house.png" alt="" width={48} height={48} className="opacity-20" />
                     </div>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {listing.rooms && (
-                        <span className="bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-full px-2.5 py-0.5 text-[11px]">
-                          🛏️ {listing.rooms} pokojů
-                        </span>
-                      )}
-                      {listing.area_m2 && (
-                        <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-2.5 py-0.5 text-[11px]">
-                          📐 {listing.area_m2} m²
-                        </span>
-                      )}
-                      {listing.object_type && (
-                        <span className="bg-purple-500/10 text-purple-400 border border-purple-500/30 rounded-full px-2.5 py-0.5 text-[11px]">
-                          {listing.object_type}
-                        </span>
-                      )}
-                      {listing.canton && (
-                        <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-2.5 py-0.5 text-[11px]">
-                          📍 {CANTONS[listing.canton] || listing.canton}
-                        </span>
-                      )}
-                      {listing.is_furnished && (
-                        <span className="bg-green-500/10 text-green-400 border border-green-500/30 rounded-full px-2.5 py-0.5 text-[11px]">
-                          🪑 Zařízeno
-                        </span>
-                      )}
-                      {listing.is_temporary && (
-                        <span className="bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-full px-2.5 py-0.5 text-[11px]">
-                          ⏰ Dočasné
-                        </span>
-                      )}
-                      {listing.available_from && (
-                        <span className="bg-[#111] border border-gray-800 text-gray-400 rounded-full px-2.5 py-0.5 text-[11px]">
-                          📅 Od {formatDate(listing.available_from)}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Agency info */}
-                    {listing.agency_name && (
-                      <div className="bg-[#111] border border-gray-800 rounded-xl px-3 py-2 mb-3">
-                        <p className="text-gray-300 text-xs font-medium m-0">🏢 {listing.agency_name}</p>
-                        {listing.agency_contact && (
-                          <p className="text-gray-500 text-[10px] m-0 mt-0.5">{listing.agency_contact}</p>
-                        )}
-                      </div>
+                  )}
+                  {/* Overlay badges */}
+                  <div className="absolute top-2 left-2 flex gap-1.5">
+                    {listing.object_type && (
+                      <span className="bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
+                        {listing.object_type}
+                      </span>
                     )}
+                    {listing.is_furnished && (
+                      <span className="bg-[#39ff6e]/20 backdrop-blur-sm text-[#39ff6e] text-[10px] font-bold px-2 py-1 rounded-lg">
+                        Zařízeno
+                      </span>
+                    )}
+                  </div>
+                  {/* Save button */}
+                  <button
+                    onClick={() => toggleSaved(listing.id)}
+                    className={`absolute top-2 right-2 w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+                      saved.includes(listing.id)
+                        ? 'bg-[#39ff6e]/20 backdrop-blur-sm text-[#39ff6e]'
+                        : 'bg-black/40 backdrop-blur-sm text-white/50 hover:text-white opacity-0 group-hover:opacity-100'
+                    }`}
+                  >
+                    {saved.includes(listing.id) ? '★' : '☆'}
+                  </button>
+                  {/* Time badge */}
+                  {listing.posted_at && (
+                    <span className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white/70 text-[9px] font-medium px-2 py-1 rounded-lg">
+                      {timeAgo(listing.posted_at)}
+                    </span>
+                  )}
+                </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      {listing.url && (
-                        <a
-                          href={listing.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-[#E8302A] text-white text-center py-2.5 rounded-xl text-sm font-bold no-underline hover:opacity-90 transition"
-                        >
-                          Zobrazit nabídku →
-                        </a>
-                      )}
-                      <Link
-                        href="/pruvodce/sablony/bydleni"
-                        className="bg-[#111] border border-gray-800 text-gray-400 py-2.5 px-4 rounded-xl text-sm font-medium no-underline hover:border-gray-600 transition"
-                      >
-                        🤖 AI dopis
-                      </Link>
-                    </div>
+                <div className="p-4">
+                  {/* Price */}
+                  <div className="flex items-baseline justify-between mb-1.5">
+                    <h4 className="text-white font-extrabold text-lg m-0 tracking-tight">
+                      {listing.price ? `CHF ${listing.price.toLocaleString()}` : 'Na dotaz'}
+                      {listing.price_unit === 'monthly' && <span className="text-white/30 font-normal text-sm">/m</span>}
+                    </h4>
+                    {listing.rooms && (
+                      <span className="text-cyan-400 text-xs font-bold">{listing.rooms} pok.</span>
+                    )}
+                  </div>
+
+                  {/* Address */}
+                  <p className="text-white/40 text-sm m-0 mb-2.5 truncate">
+                    {listing.address || listing.city}
+                    {listing.canton && ` · ${CANTONS[listing.canton] || listing.canton}`}
+                  </p>
+
+                  {/* Quick stats */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {listing.area_m2 && (
+                      <span className="bg-white/[0.04] border border-white/[0.06] text-white/40 rounded-lg px-2 py-0.5 text-[10px] font-medium">
+                        {listing.area_m2} m²
+                      </span>
+                    )}
+                    {listing.is_temporary && (
+                      <span className="bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-lg px-2 py-0.5 text-[10px] font-medium">
+                        Dočasné
+                      </span>
+                    )}
+                    {listing.available_from && (
+                      <span className="bg-white/[0.04] border border-white/[0.06] text-white/40 rounded-lg px-2 py-0.5 text-[10px] font-medium">
+                        Od {formatDate(listing.available_from)}
+                      </span>
+                    )}
+                    {listing.agency_name && (
+                      <span className="bg-white/[0.04] border border-white/[0.06] text-white/30 rounded-lg px-2 py-0.5 text-[10px] font-medium truncate max-w-[150px]">
+                        {listing.agency_name}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    {listing.url && (
+                      <a href={listing.url} target="_blank" rel="noopener noreferrer"
+                        className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(57,255,110,0.25)] hover:scale-[1.02] transition-all">
+                        Zobrazit
+                      </a>
+                    )}
+                    <Link href="/pruvodce/sablony/bydleni"
+                      className="bg-white/[0.04] border border-white/[0.06] text-white/40 hover:text-white py-2.5 px-3.5 rounded-xl text-sm font-medium no-underline hover:bg-white/[0.08] transition flex items-center gap-1.5">
+                      <Image src="/images/3d/document.png" alt="" width={14} height={14} />
+                      AI dopis
+                    </Link>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="bg-[#1A1A1A] border border-gray-800 text-white px-4 py-2 rounded-xl text-sm disabled:opacity-30 hover:border-gray-600 transition"
-              >
-                ← Předchozí
-              </button>
-              <span className="text-gray-500 text-sm">{page} / {totalPages}</span>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="bg-[#1A1A1A] border border-gray-800 text-white px-4 py-2 rounded-xl text-sm disabled:opacity-30 hover:border-gray-600 transition"
-              >
-                Další →
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+              className="bg-white/[0.04] border border-white/[0.06] text-white px-4 py-2.5 rounded-xl text-sm disabled:opacity-20 hover:bg-white/[0.08] transition">
+              ← Předchozí
+            </button>
+            <span className="text-white/30 text-sm">{page} / {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+              className="bg-white/[0.04] border border-white/[0.06] text-white px-4 py-2.5 rounded-xl text-sm disabled:opacity-20 hover:bg-white/[0.08] transition">
+              Další →
+            </button>
+          </div>
+        )}
 
-        {/* AI Housing Dossier CTA */}
-        <div className="px-5 mt-6">
-          <Link href="/pruvodce/sablony/bydleni" className="block no-underline">
-            <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-2xl p-4 text-center">
-              <p className="text-blue-400 text-sm font-bold m-0">🤖 Potřebuješ napsat dopis pronajímateli?</p>
-              <p className="text-gray-500 text-xs m-0 mt-1">AI ti vygeneruje Bewerbungsdossier v němčině + checklist dokumentů</p>
+        {/* AI Dossier CTA */}
+        <div className="mt-6">
+          <Link href="/pruvodce/sablony/bydleni" className="block no-underline group">
+            <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
+              <Image src="/images/3d/house.png" alt="" width={80} height={80} className="absolute -right-2 -top-2 opacity-[0.08] group-hover:opacity-[0.15] transition" />
+              <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%)" }} />
+              <div className="relative flex items-center gap-4">
+                <Image src="/images/3d/document.png" alt="" width={36} height={36} className="drop-shadow-lg" />
+                <div>
+                  <p className="text-white font-bold text-sm m-0 group-hover:text-[#39ff6e] transition">Potřebuješ napsat dopis pronajímateli?</p>
+                  <p className="text-white/30 text-xs m-0 mt-0.5">AI vygeneruje Bewerbungsdossier v němčině + checklist dokumentů</p>
+                </div>
+              </div>
             </div>
           </Link>
         </div>
-      </main>
-    </AppShell>
+
+        {/* Saved count */}
+        {saved.length > 0 && (
+          <div className="mt-4 text-center">
+            <span className="text-white/20 text-xs">★ {saved.length} {saved.length === 1 ? 'nabídka uložena' : 'nabídek uloženo'}</span>
+          </div>
+        )}
+      </div>
+    </main>
   )
 }
