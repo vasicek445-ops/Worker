@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
 import CVPreview from '../../../components/CVPreview'
@@ -230,32 +231,45 @@ export default function CVSablona() {
     finally { setGenerating(false) }
   }
 
+  const inputClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition-all"
+  const selectClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:border-[#39ff6e]/40 focus:outline-none transition-all appearance-none"
+
   // ─── RESULT VIEW ───
   if (cvData) {
     return (
-      <main className="min-h-screen bg-[#0E0E0E] px-4 py-6 pb-24">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <Link href="/pruvodce/sablony" className="text-gray-500 hover:text-white text-sm">← Zpět na šablony</Link>
-            <button onClick={() => setCvData(null)} className="text-gray-400 hover:text-white text-sm px-3 py-1 border border-gray-700 rounded-lg transition">✏️ Upravit údaje</button>
+      <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+        {/* Ambient effects */}
+        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+        <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-10 bottom-[200px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
+
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="flex items-center justify-between mb-5">
+            <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white text-sm no-underline transition">← Zpět</Link>
+            <button onClick={() => setCvData(null)} className="text-white/40 hover:text-white text-xs px-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Upravit údaje</button>
           </div>
 
           {/* Template + color switcher */}
-          <div className="bg-[#1A1A1A] rounded-xl p-4 mb-6 border border-gray-800">
-            <div className="mb-3">
-              <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Styl šablony</span>
-              <div className="flex gap-1.5 flex-wrap mt-2">
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-6">
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Image src="/images/3d/document.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Styl šablony</span>
+              </div>
+              <div className="flex gap-1.5 flex-wrap">
                 {TEMPLATES.map((t) => (
                   <button key={t.id} onClick={() => setTemplate(t.id)}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${template === t.id ? 'bg-white text-black' : 'bg-[#252525] text-gray-400 hover:text-white'}`}>
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${template === t.id ? 'bg-[#39ff6e]/15 text-[#39ff6e] border border-[#39ff6e]/30' : 'bg-white/[0.03] text-white/40 hover:text-white/60 border border-white/[0.06]'}`}>
                     {t.icon} {t.name}
                   </button>
                 ))}
               </div>
             </div>
-            <div className="border-t border-gray-800 pt-3">
-              <span className="text-gray-400 text-xs font-medium uppercase tracking-wider">Barva</span>
-              <div className="flex items-center gap-3 mt-2">
+            <div className="border-t border-white/[0.06] pt-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Image src="/images/3d/gem.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Barva</span>
+              </div>
+              <div className="flex items-center gap-3">
                 <div className="flex flex-wrap gap-1.5">
                   {QUICK_COLORS.map((c) => (
                     <button key={c} onClick={() => setAccentColor(c)}
@@ -267,7 +281,7 @@ export default function CVSablona() {
                   type="color"
                   value={accentColor}
                   onChange={(e) => setAccentColor(e.target.value)}
-                  className="w-8 h-8 rounded-full cursor-pointer border-0 p-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-2 [&::-webkit-color-swatch]:border-gray-600"
+                  className="w-8 h-8 rounded-full cursor-pointer border-0 p-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-2 [&::-webkit-color-swatch]:border-white/20"
                 />
               </div>
             </div>
@@ -275,8 +289,8 @@ export default function CVSablona() {
 
           <CVPreview data={cvData} photo={photo} template={template} accentColor={accentColor} />
 
-          <button onClick={() => { setCvData(null); setFormData({}); setPhoto(null) }} className="w-full text-gray-400 hover:text-white text-sm py-3 mt-4 transition">
-            🔄 Vygenerovat nový životopis
+          <button onClick={() => { setCvData(null); setFormData({}); setPhoto(null) }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
+            Vytvořit nový životopis
           </button>
         </div>
       </main>
@@ -285,177 +299,243 @@ export default function CVSablona() {
 
   // ─── FORM VIEW ───
   return (
-    <main className="min-h-screen bg-[#0E0E0E] px-4 py-6 pb-24">
-      <div className="max-w-2xl mx-auto">
-        <Link href="/pruvodce/sablony" className="text-gray-500 hover:text-white mb-6 inline-block text-sm">← Zpět na šablony</Link>
+    <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+      {/* Ambient effects */}
+      <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] right-[10%]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+      <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-8 bottom-[100px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
 
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-3xl">📄</span>
-          <div>
-            <h1 className="text-white text-xl font-bold">Životopis – švýcarský formát</h1>
-            <p className="text-gray-400 text-xs">{TEMPLATES.length} profesionálních stylů · libovolná barva · fotka · PDF ke stažení</p>
+      <div className="max-w-2xl mx-auto relative z-10">
+        <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white mb-6 inline-block text-sm no-underline transition">← Zpět na šablony</Link>
+
+        {/* Hero header */}
+        <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
+          <Image src="/images/3d/document.png" alt="" width={120} height={120} className="absolute -right-4 -bottom-4 opacity-[0.08]" />
+          <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(100,60,255,0.1), transparent 60%)" }} />
+          {/* Dot pattern */}
+          <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+            <pattern id="cvGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <circle cx="1" cy="1" r="0.8" fill="white"/>
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#cvGrid)"/>
+          </svg>
+          <div className="relative flex items-center gap-4">
+            <Image src="/images/3d/document.png" alt="" width={56} height={56} className="drop-shadow-[0_4px_20px_rgba(57,255,110,0.3)]" />
+            <div>
+              <h1 className="text-white text-2xl font-extrabold m-0 tracking-tight">AI Životopis</h1>
+              <p className="text-white/35 text-sm m-0 mt-1">{TEMPLATES.length} profesionálních stylů · libovolná barva · fotka · PDF ke stažení</p>
+            </div>
           </div>
         </div>
 
         <PaywallOverlay isLocked={!isActive && !loading} title="AI šablony jsou součástí Premium" description="Získej profesionální CV ve švýcarském formátu">
-          <div className="space-y-4">
+          <div className="space-y-5">
 
             {/* Profile prefill banner */}
             {prefilled && Object.keys(formData).length > 2 && (
-              <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 flex items-center gap-2">
-                <span className="text-green-400 text-sm">✓ Údaje vyplněny z tvého profilu. Uprav co potřebuješ.</span>
+              <div className="bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20 rounded-xl p-3 flex items-center gap-2">
+                <Image src="/images/3d/key.png" alt="" width={18} height={18} />
+                <span className="text-[#39ff6e]/80 text-sm">Údaje vyplněny z profilu. Uprav co potřebuješ.</span>
               </div>
             )}
 
             {/* Step 1: Template */}
-            <div>
-              <label className="text-gray-300 text-sm font-medium mb-2 block">1. Vyber styl šablony <span className="text-gray-600 font-normal">({TEMPLATES.length} stylů)</span></label>
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Image src="/images/3d/target.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">1. Styl šablony</span>
+                <span className="text-white/20 text-xs font-normal ml-1">({TEMPLATES.length} stylů)</span>
+              </div>
               {/* Category filter */}
-              <div className="flex gap-1.5 mb-2 flex-wrap">
+              <div className="flex gap-1.5 mb-3 flex-wrap">
                 {Array.from(new Set(TEMPLATES.map(t => t.category || 'Ostatní'))).map((cat) => (
                   <button key={cat} onClick={() => setCategory(cat)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition ${category === cat ? 'bg-[#E8302A] text-white' : 'bg-[#1A1A1A] text-gray-500 hover:text-white border border-gray-800'}`}>
+                    className={`px-3 py-1.5 rounded-xl text-[10px] font-semibold transition-all ${category === cat ? 'bg-[#39ff6e]/15 text-[#39ff6e] border border-[#39ff6e]/30 shadow-[0_0_10px_rgba(57,255,110,0.1)]' : 'bg-white/[0.03] text-white/30 hover:text-white/50 border border-white/[0.06]'}`}>
                     {cat}
                   </button>
                 ))}
               </div>
               {/* Template grid */}
-              <div className="grid grid-cols-5 gap-1.5 max-h-[220px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#333 transparent' }}>
+              <div className="grid grid-cols-5 gap-1.5 max-h-[220px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
                 {TEMPLATES.filter(t => (t.category || 'Ostatní') === category).map((t) => (
                   <button key={t.id} onClick={() => setTemplate(t.id)}
-                    className={`p-2 rounded-xl border text-center transition ${template === t.id ? 'border-[#E8302A] bg-[#E8302A]/10' : 'border-gray-800 bg-[#1A1A1A] hover:border-gray-600'}`}>
+                    className={`p-2.5 rounded-xl border text-center transition-all ${template === t.id ? 'border-[#39ff6e]/40 bg-[#39ff6e]/[0.08] shadow-[0_0_15px_rgba(57,255,110,0.08)]' : 'border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.12]'}`}>
                     <span className="text-sm block">{t.icon}</span>
-                    <span className="text-white text-[10px] font-semibold block truncate">{t.name}</span>
-                    <span className="text-gray-500 text-[8px] leading-tight block truncate">{t.desc}</span>
+                    <span className="text-white text-[10px] font-semibold block truncate mt-0.5">{t.name}</span>
+                    <span className="text-white/25 text-[8px] leading-tight block truncate">{t.desc}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Step 2: Color picker */}
-            <div>
-              <label className="text-gray-300 text-sm font-medium mb-2 block">2. Vyber barvu</label>
-              <div className="bg-[#1A1A1A] rounded-xl p-3 border border-gray-800">
-                {/* Quick preset colors */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {QUICK_COLORS.map((c) => (
-                    <button key={c} onClick={() => setAccentColor(c)}
-                      className="w-7 h-7 rounded-full transition-transform hover:scale-110 flex-shrink-0"
-                      style={{ backgroundColor: c, border: accentColor === c ? '2.5px solid #fff' : '2.5px solid transparent', boxShadow: accentColor === c ? '0 0 0 2px rgba(255,255,255,0.3)' : 'none' }} />
-                  ))}
-                </div>
-                {/* Custom color picker */}
-                <div className="flex items-center gap-3">
-                  <div className="relative">
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Image src="/images/3d/gem.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">2. Barva</span>
+              </div>
+              {/* Quick preset colors */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {QUICK_COLORS.map((c) => (
+                  <button key={c} onClick={() => setAccentColor(c)}
+                    className="w-8 h-8 rounded-full transition-all hover:scale-110 flex-shrink-0"
+                    style={{ backgroundColor: c, border: accentColor === c ? '2.5px solid #fff' : '2.5px solid transparent', boxShadow: accentColor === c ? '0 0 0 2px rgba(255,255,255,0.3), 0 0 15px rgba(57,255,110,0.15)' : 'none' }} />
+                ))}
+              </div>
+              {/* Custom color picker */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={accentColor}
+                  onChange={(e) => setAccentColor(e.target.value)}
+                  className="w-10 h-10 rounded-full cursor-pointer border-0 p-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-2 [&::-webkit-color-swatch]:border-white/20 [&::-moz-color-swatch]:rounded-full [&::-moz-color-swatch]:border-2 [&::-moz-color-swatch]:border-white/20"
+                />
+                <div className="flex-1">
+                  <p className="text-white/25 text-[10px] mb-1">Vlastní barva</p>
+                  <div className="flex items-center gap-2">
                     <input
-                      type="color"
+                      type="text"
                       value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="w-10 h-10 rounded-full cursor-pointer border-0 p-0 bg-transparent [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-2 [&::-webkit-color-swatch]:border-gray-600 [&::-moz-color-swatch]:rounded-full [&::-moz-color-swatch]:border-2 [&::-moz-color-swatch]:border-gray-600"
+                      onChange={(e) => { if (/^#[0-9a-fA-F]{0,6}$/.test(e.target.value)) setAccentColor(e.target.value) }}
+                      className="bg-white/[0.03] border border-white/[0.08] rounded-lg px-2.5 py-1 text-white text-xs font-mono w-20 focus:border-[#39ff6e]/40 focus:outline-none"
+                      maxLength={7}
                     />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-gray-500 text-[10px] mb-1">Vlastní barva</p>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={accentColor}
-                        onChange={(e) => { if (/^#[0-9a-fA-F]{0,6}$/.test(e.target.value)) setAccentColor(e.target.value) }}
-                        className="bg-[#252525] border border-gray-700 rounded-lg px-2.5 py-1 text-white text-xs font-mono w-20 focus:border-gray-500 focus:outline-none"
-                        maxLength={7}
-                      />
-                      <div className="h-6 w-16 rounded-md" style={{ backgroundColor: accentColor }} />
-                    </div>
+                    <div className="h-6 w-16 rounded-lg" style={{ backgroundColor: accentColor }} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Step 3: Photo */}
-            <div>
-              <label className="text-gray-300 text-sm font-medium mb-1.5 block">3. Fotka (volitelné)</label>
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Image src="/images/3d/star.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">3. Fotka (volitelné)</span>
+              </div>
               <div className="flex items-center gap-4">
-                <div onClick={() => fileInputRef.current?.click()} className="w-16 h-16 rounded-xl bg-[#1A1A1A] border border-gray-800 flex items-center justify-center cursor-pointer hover:border-gray-600 transition overflow-hidden flex-shrink-0">
-                  {photo ? <img src={photo} alt="Foto" className="w-full h-full object-cover" /> : <span className="text-gray-600 text-xl">📷</span>}
+                <div onClick={() => fileInputRef.current?.click()} className="w-16 h-16 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center cursor-pointer hover:border-[#39ff6e]/30 transition-all overflow-hidden flex-shrink-0 hover:shadow-[0_0_15px_rgba(57,255,110,0.08)]">
+                  {photo ? <img src={photo} alt="Foto" className="w-full h-full object-cover" /> : <span className="text-white/20 text-xl">+</span>}
                 </div>
                 <div>
-                  <button onClick={() => fileInputRef.current?.click()} className="text-[#E8302A] text-sm font-medium hover:opacity-80 transition">{photo ? 'Změnit' : 'Nahrát fotku'}</button>
-                  {photo && <button onClick={() => setPhoto(null)} className="text-gray-500 text-xs ml-3 hover:text-white transition">Odstranit</button>}
-                  <p className="text-gray-600 text-xs mt-0.5">JPG/PNG, max 5 MB</p>
+                  <button onClick={() => fileInputRef.current?.click()} className="text-[#39ff6e]/80 text-sm font-medium hover:text-[#39ff6e] transition">{photo ? 'Změnit' : 'Nahrát fotku'}</button>
+                  {photo && <button onClick={() => setPhoto(null)} className="text-white/30 text-xs ml-3 hover:text-white transition">Odstranit</button>}
+                  <p className="text-white/20 text-xs mt-0.5">JPG/PNG, max 5 MB</p>
                 </div>
                 <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoUpload} className="hidden" />
               </div>
             </div>
 
-            <div className="h-px bg-gray-800 my-2" />
-
             {/* Step 4: Personal */}
-            <label className="text-gray-300 text-sm font-medium block">4. Osobní údaje</label>
-            <div className="grid grid-cols-2 gap-3">
-              <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Celé jméno *" className="col-span-2 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <input type="text" value={formData.birthdate || ''} onChange={(e) => handleChange('birthdate', e.target.value)} placeholder="Datum narození *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <input type="text" value={formData.phone || ''} onChange={(e) => handleChange('phone', e.target.value)} placeholder="Telefon *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <input type="text" value={formData.email || ''} onChange={(e) => handleChange('email', e.target.value)} placeholder="Email *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <select value={formData.nationality || ''} onChange={(e) => handleChange('nationality', e.target.value)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:border-gray-600 focus:outline-none transition appearance-none">
-                <option value="">Národnost</option>
-                <option value="Česká">Česká</option>
-                <option value="Slovenská">Slovenská</option>
-                <option value="Polská">Polská</option>
-                <option value="Ukrajinská">Ukrajinská</option>
-                <option value="Rumunská">Rumunská</option>
-                <option value="Maďarská">Maďarská</option>
-                <option value="Italská">Italská</option>
-                <option value="Portugalská">Portugalská</option>
-                <option value="Španělská">Španělská</option>
-                <option value="Řecká">Řecká</option>
-              </select>
-              <input type="text" value={formData.address || ''} onChange={(e) => handleChange('address', e.target.value)} placeholder="Adresa" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <input type="text" value={formData.driving || ''} onChange={(e) => handleChange('driving', e.target.value)} placeholder="Řidičský průkaz (B, C...)" className="col-span-2 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Image src="/images/3d/key.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">4. Osobní údaje</span>
+              </div>
+              <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Celé jméno *" className={inputClass} />
+              <div className="grid grid-cols-2 gap-3">
+                <input type="text" value={formData.birthdate || ''} onChange={(e) => handleChange('birthdate', e.target.value)} placeholder="Datum narození *" className={inputClass} />
+                <input type="text" value={formData.phone || ''} onChange={(e) => handleChange('phone', e.target.value)} placeholder="Telefon *" className={inputClass} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input type="text" value={formData.email || ''} onChange={(e) => handleChange('email', e.target.value)} placeholder="Email *" className={inputClass} />
+                <select value={formData.nationality || ''} onChange={(e) => handleChange('nationality', e.target.value)} className={selectClass}>
+                  <option value="">Národnost</option>
+                  <option value="Česká">Česká</option>
+                  <option value="Slovenská">Slovenská</option>
+                  <option value="Polská">Polská</option>
+                  <option value="Ukrajinská">Ukrajinská</option>
+                  <option value="Rumunská">Rumunská</option>
+                  <option value="Maďarská">Maďarská</option>
+                  <option value="Italská">Italská</option>
+                  <option value="Portugalská">Portugalská</option>
+                  <option value="Španělská">Španělská</option>
+                  <option value="Řecká">Řecká</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input type="text" value={formData.address || ''} onChange={(e) => handleChange('address', e.target.value)} placeholder="Adresa" className={inputClass} />
+                <input type="text" value={formData.driving || ''} onChange={(e) => handleChange('driving', e.target.value)} placeholder="Řidičský průkaz (B, C...)" className={inputClass} />
+              </div>
             </div>
 
-            {/* Step 5 */}
-            <label className="text-gray-300 text-sm font-medium block">5. Cílová pozice</label>
-            <div className="grid grid-cols-2 gap-3">
-              <input type="text" value={formData.position || ''} onChange={(e) => handleChange('position', e.target.value)} placeholder="Pozice *" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-              <select value={formData.field || ''} onChange={(e) => handleChange('field', e.target.value)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:border-gray-600 focus:outline-none transition appearance-none">
-                <option value="">Obor *</option>
-                {FIELD_OPTIONS.fields.map((o) => <option key={o} value={o}>{o}</option>)}
-              </select>
+            {/* Step 5: Position */}
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Image src="/images/3d/briefcase.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">5. Cílová pozice</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input type="text" value={formData.position || ''} onChange={(e) => handleChange('position', e.target.value)} placeholder="Pozice *" className={inputClass} />
+                <select value={formData.field || ''} onChange={(e) => handleChange('field', e.target.value)} className={selectClass}>
+                  <option value="">Obor *</option>
+                  {FIELD_OPTIONS.fields.map((o) => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
             </div>
 
-            {/* Step 6 */}
-            <label className="text-gray-300 text-sm font-medium block">6. Pracovní zkušenosti</label>
-            <textarea value={formData.experience_detail || ''} onChange={(e) => handleChange('experience_detail', e.target.value)} placeholder={'Napiš zkušenosti – AI je rozšíří:\n2019–2024: Zedník, StavbyPraha – hrubé stavby\n2017–2019: Pomocný dělník, XY firma'} rows={4} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
-
-            {/* Step 7 */}
-            <label className="text-gray-300 text-sm font-medium block">7. Vzdělání</label>
-            <textarea value={formData.education || ''} onChange={(e) => handleChange('education', e.target.value)} placeholder={'2014–2017: SOU stavební, Praha – výuční list'} rows={2} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
-
-            {/* Step 8 */}
-            <label className="text-gray-300 text-sm font-medium block">8. Jazyky</label>
-            <div className="grid grid-cols-2 gap-3">
-              <select value={formData.german || ''} onChange={(e) => handleChange('german', e.target.value)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:border-gray-600 focus:outline-none transition appearance-none">
-                <option value="">Úroveň němčiny *</option>
-                {FIELD_OPTIONS.german.map((o) => <option key={o} value={o}>{o}</option>)}
-              </select>
-              <input type="text" value={formData.other_languages || ''} onChange={(e) => handleChange('other_languages', e.target.value)} placeholder="Další jazyky" className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
+            {/* Step 6: Experience */}
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Image src="/images/3d/rocket.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">6. Pracovní zkušenosti</span>
+              </div>
+              <textarea value={formData.experience_detail || ''} onChange={(e) => handleChange('experience_detail', e.target.value)} placeholder={'Napiš zkušenosti – AI je rozšíří:\n2019–2024: Zedník, StavbyPraha – hrubé stavby\n2017–2019: Pomocný dělník, XY firma'} rows={4} className={`${inputClass} resize-none`} />
             </div>
 
-            {/* Step 9 */}
-            <label className="text-gray-300 text-sm font-medium block">9. Dovednosti</label>
-            <textarea value={formData.skills || ''} onChange={(e) => handleChange('skills', e.target.value)} placeholder="svařování, jeřáb, práce ve výškách... (AI doplní)" rows={2} className="w-full bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition resize-none" />
+            {/* Step 7: Education */}
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Image src="/images/3d/document.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">7. Vzdělání</span>
+              </div>
+              <textarea value={formData.education || ''} onChange={(e) => handleChange('education', e.target.value)} placeholder={'2014–2017: SOU stavební, Praha – výuční list'} rows={2} className={`${inputClass} resize-none`} />
+            </div>
 
-            {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3"><p className="text-red-400 text-sm">⚠️ {error}</p></div>}
+            {/* Step 8: Languages */}
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Image src="/images/3d/speech.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">8. Jazyky</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <select value={formData.german || ''} onChange={(e) => handleChange('german', e.target.value)} className={selectClass}>
+                  <option value="">Úroveň němčiny *</option>
+                  {FIELD_OPTIONS.german.map((o) => <option key={o} value={o}>{o}</option>)}
+                </select>
+                <input type="text" value={formData.other_languages || ''} onChange={(e) => handleChange('other_languages', e.target.value)} placeholder="Další jazyky" className={inputClass} />
+              </div>
+            </div>
 
-            <button onClick={handleSubmit} disabled={generating} className="w-full bg-[#E8302A] text-white font-bold py-3.5 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed mt-2">
+            {/* Step 9: Skills */}
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Image src="/images/3d/target.png" alt="" width={18} height={18} />
+                <span className="text-white/50 text-xs font-bold uppercase tracking-wider">9. Dovednosti</span>
+              </div>
+              <textarea value={formData.skills || ''} onChange={(e) => handleChange('skills', e.target.value)} placeholder="svařování, jeřáb, práce ve výškách... (AI doplní)" rows={2} className={`${inputClass} resize-none`} />
+            </div>
+
+            {error && (
+              <div className="bg-red-500/[0.06] border border-red-500/20 rounded-xl p-4">
+                <p className="text-red-400 text-sm m-0">⚠️ {error}</p>
+              </div>
+            )}
+
+            {/* Submit button */}
+            <button onClick={handleSubmit} disabled={generating}
+              className="w-full relative overflow-hidden bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] active:scale-[0.98]">
               {generating ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="flex items-center justify-center gap-2.5">
+                  <span className="w-5 h-5 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />
                   AI generuje profesionální CV...
                 </span>
-              ) : '🚀 Vygenerovat profesionální CV'}
+              ) : (
+                <span className="flex items-center justify-center gap-2.5">
+                  <Image src="/images/3d/document.png" alt="" width={22} height={22} />
+                  Vygenerovat profesionální CV
+                </span>
+              )}
             </button>
-            <p className="text-gray-600 text-xs text-center">AI přeloží do němčiny, rozšíří texty a vytvoří vizuální PDF</p>
+            <p className="text-white/20 text-xs text-center">AI přeloží do němčiny, rozšíří texty a vytvoří vizuální PDF</p>
           </div>
         </PaywallOverlay>
       </div>
