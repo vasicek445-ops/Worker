@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
@@ -40,6 +40,49 @@ export default function BydleniPage() {
   const [showCz, setShowCz] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('letter')
+
+  // Auto-fill from user profile
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session?.user?.id) return
+        const { data: profile } = await supabase.from('profiles').select('full_name, pozice, preferovany_kanton, datum_narozeni, obor').eq('id', session.user.id).single()
+        if (!profile) return
+
+        const cantonToRegion: Record<string, string> = {
+          'ZH': 'Zürich', 'BE': 'Bern', 'BS': 'Basel', 'BL': 'Basel', 'LU': 'Luzern',
+          'SG': 'St. Gallen', 'AG': 'Aargau', 'SO': 'Solothurn', 'TG': 'Thurgau',
+          'ZG': 'Zug', 'SH': 'Schaffhausen', 'GR': 'Graubünden',
+          'VS': 'Wallis / Valais', 'VD': 'Waadt / Vaud', 'GE': 'Genf / Genève', 'TI': 'Ticino',
+        }
+
+        const prefill: Record<string, string> = {}
+        if (profile.full_name) prefill.name = profile.full_name
+        if (profile.pozice) prefill.position = profile.pozice
+        if (profile.preferovany_kanton) {
+          const region = cantonToRegion[profile.preferovany_kanton]
+          if (region) prefill.region = region
+        }
+        if (profile.datum_narozeni) {
+          const birth = new Date(profile.datum_narozeni)
+          const today = new Date()
+          let age = today.getFullYear() - birth.getFullYear()
+          if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--
+          if (age > 0 && age < 120) prefill.age = String(age)
+        }
+
+        if (Object.keys(prefill).length > 0) {
+          setFormData(prev => {
+            const merged = { ...prefill }
+            for (const [k, v] of Object.entries(prev)) { if (v) merged[k] = v }
+            return merged
+          })
+        }
+      } catch {}
+    }
+    loadProfile()
+  }, [])
 
   const handleChange = (name: string, value: string) => setFormData(prev => ({ ...prev, [name]: value }))
 
