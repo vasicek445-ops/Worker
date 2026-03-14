@@ -279,23 +279,6 @@ export default function PojisteniPage() {
         </Link>
       </div>
 
-      {/* Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#0a0a0c]/85 backdrop-blur-xl border-t border-white/[0.06] px-2 py-2 pb-3 z-[100]">
-        <div className="max-w-lg mx-auto flex justify-around items-center">
-          {[
-            { icon: "🏠", label: "Přehled", href: "/dashboard", active: false },
-            { icon: "📇", label: "Kontakty", href: "/kontakty", active: false },
-            { icon: "📖", label: "Průvodce", href: "/pruvodce", active: true },
-            { icon: "💼", label: "Pozice", href: "/nabidka", active: false },
-            { icon: "👤", label: "Profil", href: "/profil", active: false },
-          ].map((item) => (
-            <Link key={item.label} href={item.href} className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-[10px] transition-all duration-150 ${item.active ? "bg-red-500/[0.08]" : ""}`}>
-              <span className={`text-xl transition-all duration-150 ${item.active ? "" : "grayscale opacity-50"}`}>{item.icon}</span>
-              <span className={`text-[10px] tracking-wide transition-all duration-150 ${item.active ? "text-red-500 font-semibold" : "text-gray-600 font-medium"}`}>{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </div>
     </main>
   );
 }
