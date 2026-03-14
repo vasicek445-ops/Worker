@@ -3,18 +3,33 @@ import DashboardContent from "../components/DashboardContent";
 
 export const dynamic = 'force-dynamic';
 
-async function getAgencyCount() {
-  const { count } = await supabase.from("agencies").select("*", { count: "exact", head: true });
-  return count || 0;
-}
+async function getDashboardData() {
+  const [
+    { count: agencyCount },
+    { count: jobCount },
+    { count: housingCount },
+  ] = await Promise.all([
+    supabase.from("agencies").select("*", { count: "exact", head: true }),
+    supabase.from("jobs").select("*", { count: "exact", head: true }),
+    supabase.from("housing").select("*", { count: "exact", head: true }),
+  ]);
 
-async function getAgencyPreview() {
-  const { data } = await supabase.from("agencies").select("name, city, canton, language_region").limit(5);
-  return data || [];
+  // Get 6 latest jobs for preview
+  const { data: latestJobs } = await supabase
+    .from("jobs")
+    .select("id, title, company, canton, salary_text, created_at, source")
+    .order("created_at", { ascending: false })
+    .limit(6);
+
+  return {
+    agencyCount: agencyCount || 0,
+    jobCount: jobCount || 0,
+    housingCount: housingCount || 0,
+    latestJobs: latestJobs || [],
+  };
 }
 
 export default async function Dashboard() {
-  const agencyCount = await getAgencyCount();
-  const agencies = await getAgencyPreview();
-  return <DashboardContent agencyCount={agencyCount} agencies={agencies} />;
+  const data = await getDashboardData();
+  return <DashboardContent {...data} />;
 }
