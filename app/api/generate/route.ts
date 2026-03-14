@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
     }
 
-    const { type, formData } = await req.json()
+    const { type, formData, stream: wantStream } = await req.json()
 
     if (!type || !PROMPTS[type]) {
       return NextResponse.json({ error: 'Invalid document type' }, { status: 400 })
@@ -108,6 +108,45 @@ export async function POST(req: NextRequest) {
 
     const userMessage = buildUserMessage(type, formData)
 
+    // Streaming mode
+    if (wantStream) {
+      const stream = await anthropic.messages.stream({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 2048,
+        system: PROMPTS[type],
+        messages: [{ role: 'user', content: userMessage }],
+      })
+
+      const encoder = new TextEncoder()
+
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const event of stream) {
+              if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
+                )
+              }
+            }
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+            controller.close()
+          } catch (err) {
+            controller.error(err)
+          }
+        },
+      })
+
+      return new Response(readable, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        },
+      })
+    }
+
+    // Non-streaming fallback
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 2048,
@@ -115,8 +154,8 @@ export async function POST(req: NextRequest) {
       messages: [{ role: 'user', content: userMessage }],
     })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    const text = textBlock ? (textBlock as any).text : ''
+    const textBlock = response.content.find((block) => block.type === 'text')
+    const text = textBlock && textBlock.type === 'text' ? textBlock.text : ''
 
     if (!text) {
       return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
@@ -129,10 +168,10 @@ export async function POST(req: NextRequest) {
         output: response.usage.output_tokens,
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Generate API error:', error)
     return NextResponse.json(
-      { error: error.message || 'Generation error' },
+      { error: error instanceof Error ? error.message : 'Generation error' },
       { status: 500 }
     )
   }

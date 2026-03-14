@@ -173,11 +173,17 @@ Co Woker nabízí:
 📌 AI asistent Wokee (to jsi ty) – dostupný 24/7
 📌 Přímé kontakty na personalisty – bez prostředníků
 
-Když se uživatel ptá na konkrétní agentury nebo kontakty, řekni mu, že je najde v databázi na platformě Woker (v sekci Kontakty).`
+Když se uživatel ptá na konkrétní agentury nebo kontakty, řekni mu, že je najde v databázi na platformě Woker (v sekci Kontakty).
+
+SUGGESTION CHIPS:
+Na konci KAŽDÉ odpovědi přidej řádek s 2-3 krátkými navazujícími otázkami ve formátu:
+[CHIPS: otázka1 | otázka2 | otázka3]
+Tyto otázky musí navazovat na kontext rozhovoru a být krátké (max 5 slov).
+Příklad: [CHIPS: A co zdravotní pojištění? | Kolik stojí bydlení? | Jaké agentury doporučuješ?]`
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json()
+    const { messages, stream: wantStream } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Invalid messages' }, { status: 400 })
@@ -185,30 +191,72 @@ export async function POST(req: NextRequest) {
 
     const recentMessages = messages.slice(-10)
 
+    // Streaming mode
+    if (wantStream) {
+      const stream = await anthropic.messages.stream({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1024,
+        system: SYSTEM_PROMPT,
+        messages: recentMessages.map((m: { role: string; content: string }) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+      })
+
+      const encoder = new TextEncoder()
+
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const event of stream) {
+              if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ text: event.delta.text })}\n\n`)
+                )
+              }
+            }
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+            controller.close()
+          } catch (err) {
+            controller.error(err)
+          }
+        },
+      })
+
+      return new Response(readable, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          Connection: 'keep-alive',
+        },
+      })
+    }
+
+    // Non-streaming fallback
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
-      messages: recentMessages.map((m: any) => ({
-        role: m.role,
+      messages: recentMessages.map((m: { role: string; content: string }) => ({
+        role: m.role as 'user' | 'assistant',
         content: m.content,
       })),
     })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    const text = textBlock ? (textBlock as any).text : 'Promiň, něco se mi zamotalo. Zkus to znovu! 🔄'
+    const textBlock = response.content.find((block) => block.type === 'text')
+    const text = textBlock && textBlock.type === 'text' ? textBlock.text : 'Promiň, něco se mi zamotalo. Zkus to znovu! 🔄'
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       response: text,
       usage: {
         input: response.usage.input_tokens,
         output: response.usage.output_tokens,
       }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Chat API error:', error)
     return NextResponse.json(
-      { error: error.message || 'AI assistant error' },
+      { error: error instanceof Error ? error.message : 'AI assistant error' },
       { status: 500 }
     )
   }
