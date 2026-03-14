@@ -154,6 +154,8 @@ export default function CVSablona() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [prefilled, setPrefilled] = useState(false)
   const [category, setCategory] = useState('Populární')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
   // Auto-prefill from user profile
   useEffect(() => {
@@ -231,6 +233,18 @@ export default function CVSablona() {
     finally { setGenerating(false) }
   }
 
+  const handleSaveCV = async (html: string) => {
+    setSaving(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      await supabase.from('profiles').update({ saved_cv_html: html }).eq('id', user.id)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch {}
+    finally { setSaving(false) }
+  }
+
   const inputClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition-all"
   const selectClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:border-[#39ff6e]/40 focus:outline-none transition-all appearance-none"
 
@@ -287,7 +301,12 @@ export default function CVSablona() {
             </div>
           </div>
 
-          <CVPreview data={cvData} photo={photo} template={template} accentColor={accentColor} />
+          <CVPreview data={cvData} photo={photo} template={template} accentColor={accentColor} onSave={handleSaveCV} saving={saving} />
+          {saved && (
+            <div className="bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20 rounded-xl p-3 mt-3 text-center">
+              <span className="text-[#39ff6e]/80 text-sm">CV uloženo — bude se automaticky přikládat k přihláškám přes Smart Matching</span>
+            </div>
+          )}
 
           <button onClick={() => { setCvData(null); setFormData({}); setPhoto(null) }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
             Vytvořit nový životopis

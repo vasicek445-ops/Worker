@@ -25,6 +25,8 @@ interface CVPreviewProps {
   photo: string | null
   template: string
   accentColor: string
+  onSave?: (html: string) => void
+  saving?: boolean
 }
 
 /* ═══ PARAMETRIC TEMPLATE SYSTEM ═══ */
@@ -389,7 +391,7 @@ function isColorDark(hex: string): boolean {
   return (r * 299 + g * 587 + b * 114) / 1000 < 128
 }
 
-export default function CVPreview({ data, photo, template, accentColor }: CVPreviewProps) {
+export default function CVPreview({ data, photo, template, accentColor, onSave, saving }: CVPreviewProps) {
   const cvRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
 
@@ -427,6 +429,11 @@ export default function CVPreview({ data, photo, template, accentColor }: CVPrev
         <button onClick={handleDownload} disabled={downloading} className="flex-1 bg-[#E8302A] text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
           {downloading ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Generuji PDF...</span>) : '📥 Stáhnout jako PDF'}
         </button>
+        {onSave && (
+          <button onClick={() => { if (cvRef.current) onSave(cvRef.current.innerHTML) }} disabled={saving} className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+            {saving ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />Ukládám...</span>) : '💾 Uložit pro přihlášky'}
+          </button>
+        )}
       </div>
       <div className="bg-white rounded-2xl overflow-hidden shadow-2xl" style={{ overflowX: 'auto' }}>
         <div ref={cvRef}>
