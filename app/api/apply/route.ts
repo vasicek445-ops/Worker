@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
+import chromium from '@sparticuz/chromium'
+import puppeteer from 'puppeteer-core'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -138,6 +140,8 @@ ${skillsList ? `
 </html>`
 }
 
+export const maxDuration = 60
+
 export async function POST(req: NextRequest) {
   try {
     // Auth check
@@ -214,10 +218,39 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
 
     // Use saved CV from CV generator if available, otherwise generate basic Lebenslauf
     let cvHtml: string | null = null
+    let cvPdfBase64: string | null = null
     if (attachCv) {
       cvHtml = (profile.saved_cv_html || generateLebenslaufHtml(profile, user.email || '')) as string
       // Strip any script tags for security
       cvHtml = cvHtml.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/on\w+="[^"]*"/gi, '')
+
+      // Wrap innerHTML in full HTML document if needed
+      const fullHtml = cvHtml.trim().startsWith('<!DOCTYPE') || cvHtml.trim().startsWith('<html')
+        ? cvHtml
+        : `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8"><title>Lebenslauf – ${candidateName}</title>
+<style>body{margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;}</style>
+</head>
+<body>${cvHtml}</body>
+</html>`
+
+      // Convert HTML to PDF using Chromium
+      const browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: { width: 794, height: 1123 },
+        executablePath: await chromium.executablePath(),
+        headless: true,
+      })
+      const page = await browser.newPage()
+      await page.setContent(fullHtml, { waitUntil: 'networkidle0' })
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' },
+      })
+      await browser.close()
+      cvPdfBase64 = Buffer.from(pdfBuffer).toString('base64')
     }
 
     // Build email HTML (motivation letter)
@@ -232,12 +265,12 @@ Email: ${user.email}<br>
 ${profile.telefon ? `Tel: ${profile.telefon}<br>` : ''}
 ${profile.adresa ? `Adresse: ${profile.adresa}` : ''}
 </p>
-${cvHtml ? `<p style="font-size:11px;color:#aaa;margin-top:15px;">
+${cvPdfBase64 ? `<p style="font-size:11px;color:#aaa;margin-top:15px;">
 Im Anhang finden Sie meinen Lebenslauf.
 </p>` : ''}
 </body></html>`
 
-    // Send email with optional CV attachment
+    // Send email with optional PDF CV attachment
     await resend.emails.send({
       from: `${candidateName} – Bewerbung <bewerbung@gowoker.com>`,
       to: agency.email,
@@ -245,11 +278,11 @@ Im Anhang finden Sie meinen Lebenslauf.
       bcc: user.email!,
       subject: `Bewerbung als ${profile.pozice} - ${candidateName}`,
       html: emailHtml,
-      ...(cvHtml ? {
+      ...(cvPdfBase64 ? {
         attachments: [
           {
-            filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.html`,
-            content: Buffer.from(cvHtml).toString('base64'),
+            filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.pdf`,
+            content: cvPdfBase64,
           },
         ],
       } : {}),
