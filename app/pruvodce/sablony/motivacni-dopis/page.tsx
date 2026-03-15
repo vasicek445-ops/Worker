@@ -74,6 +74,7 @@ export default function MotivacniDopis() {
           if (profile.nemcina_uroven) prefillData.german = profile.nemcina_uroven
           if (profile.dovednosti) prefillData.skills = profile.dovednosti
           setFormData(prev => ({ ...prev, ...prefillData }))
+          if (profile.avatar_url && !photo) setPhoto(profile.avatar_url)
         }
         // URL prefill params
         const params = new URLSearchParams(window.location.search)
