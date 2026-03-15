@@ -12,13 +12,23 @@ const NOISE_PATTERNS = [
   /^(Menü|Menu|Navigation|Suche|Search|Filter|Sortieren|Sort)$/,
   /^(Facebook|Twitter|LinkedIn|Instagram|YouTube|Xing|TikTok|Pinterest|Teilen|Share)$/i,
   /^(Zurück|Back|Weiter|Next|Mehr erfahren|Learn more|Alle (Stellen|Jobs)|See all)$/i,
-  /^(Jetzt bewerben|Apply now|Bewerbung|Merken|Save|Speichern|Drucken|Print)$/i,
+  /^(Jetzt bewerben|Apply now|Bewerbung starten|Merken|Save|Speichern|Drucken|Print)$/i,
   // Footer-like content
   /^(©|Copyright|\d{4}\s+(All rights|Alle Rechte))/,
   /^(Folge uns|Follow us|Newsletter|Blog|FAQ|Hilfe|Help|Sitemap)$/i,
   // Cookie banners
   /^(Wir verwenden Cookies|We use cookies|Diese Website|This website uses)/i,
   /^(Akzeptieren|Accept|Ablehnen|Decline|Einstellungen|Settings|Alle akzeptieren)$/i,
+  // Form/CTA noise
+  /^(Spare Zeit|Schnell, einfach|Noch Fragen|Dein Wissensdurst)/i,
+  /^(Montag|Dienstag|Mittwoch|Donnerstag|Freitag|Samstag|Sonntag)[-–]\w/i,
+  /^\d+x mehr|^E-Mail \*|^Telefon \*|erforderliche Felder/i,
+  /^Bewerbungsunterlagen Lebenslauf/i,
+  /^\d{2}\s*\/\s*\d{2}\s*\/\s*\d{4}$/,
+  /^„|^"|^\*\s*zeigt/,
+  /^\+41\s/,
+  /^(info|kontakt|office|bewerbung|jobs)[\._@(]/i,
+  /^\d{2}\s*[-–]\s*MINUTEN/i,
 ]
 
 // Lines that are likely job content (German job posting keywords)
@@ -55,6 +65,30 @@ function isNoiseLine(line: string): boolean {
   }
 
   return false
+}
+
+function deduplicateContent(text: string): string {
+  const paragraphs = text.split('\n\n')
+  if (paragraphs.length < 4) return text
+
+  // Find duplicate paragraphs (content that appears more than once)
+  const seen = new Map<string, number>()
+  const result: string[] = []
+
+  for (const para of paragraphs) {
+    const normalized = para.trim().toLowerCase().replace(/\s+/g, ' ')
+    if (normalized.length < 20) {
+      result.push(para)
+      continue
+    }
+    const count = seen.get(normalized) || 0
+    if (count === 0) {
+      result.push(para)
+    }
+    seen.set(normalized, count + 1)
+  }
+
+  return result.join('\n\n')
 }
 
 function extractJobContent(html: string): string {
@@ -152,6 +186,9 @@ function extractJobContent(html: string): string {
   }
 
   text = cleanLines.join('\n').replace(/\n{3,}/g, '\n\n').trim()
+
+  // Deduplicate: if the same content block appears twice, keep only the first
+  text = deduplicateContent(text)
 
   // If we haven't seen any job content markers, the extraction might have missed
   // the content — return what we have but warn it might be low quality
