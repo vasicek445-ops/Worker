@@ -102,17 +102,25 @@ ${contractText ? `--- SMLOUVA ---\n${contractText.substring(0, 8000)}\n--- KONEC
 
 DŮLEŽITÉ:`
 
-    const userContent: any[] = []
+    const userContent: Anthropic.MessageCreateParams['messages'][0]['content'] = []
     
     if (contractImage) {
       // Support multiple images
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
       const images = Array.isArray(contractImage) ? contractImage : [contractImage]
       for (const img of images) {
-        const match = img.match(/^data:(image\/\w+);base64,(.+)$/)
+        const match = img.match(/^data:(image\/[\w+.-]+);base64,(.+)$/)
         if (match) {
+          // Normalize media type to Anthropic-accepted values
+          let mediaType = match[1].toLowerCase()
+          if (!ALLOWED_TYPES.includes(mediaType)) {
+            // Map common variants: image/jpg → image/jpeg, anything else → image/jpeg
+            if (mediaType === 'image/jpg') mediaType = 'image/jpeg'
+            else mediaType = 'image/jpeg' // safe fallback for HEIC, TIFF, etc.
+          }
           userContent.push({
             type: 'image',
-            source: { type: 'base64', media_type: match[1], data: match[2] },
+            source: { type: 'base64', media_type: mediaType, data: match[2] },
           })
         }
       }
@@ -137,8 +145,8 @@ DŮLEŽITÉ:`
       messages: [{ role: 'user', content: userContent }],
     })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    let text = textBlock ? (textBlock as any).text : ''
+    const textBlock = response.content.find((block) => block.type === 'text')
+    let text = textBlock && textBlock.type === 'text' ? textBlock.text : ''
     if (!text) return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
 
     text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
@@ -160,8 +168,8 @@ DŮLEŽITÉ:`
     }
 
     return NextResponse.json({ contractData, usage: { input: response.usage.input_tokens, output: response.usage.output_tokens } })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Analyze contract error:', error)
-    return NextResponse.json({ error: error.message || 'Analysis error' }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Analysis error' }, { status: 500 })
   }
 }
