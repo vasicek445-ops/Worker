@@ -16,6 +16,12 @@ KLÍČOVÁ PRAVIDLA:
 4. TIPY musí být specifické pro švýcarský pracovní trh.
 5. Vše přizpůsob úrovni němčiny uživatele — pokud je A2, drž odpovědi jednodušší.
 
+DŮLEŽITÉ — NEVYMÝŠLEJ:
+- NIKDY nevymýšlej názvy certifikátů, kurzů, strojů, značek ani konkrétních firem. Použij POUZE to co kandidát skutečně napsal.
+- Pokud není zadána konkrétní firma, NEPIŠ pochvalné věty typu "Ihre Firma ist führend" ani nevymýšlej detaily o firmě.
+- Ve vzorových odpovědích používej pouze dovednosti a zkušenosti které kandidát uvedl. Nepřidávej kvalifikace které neuvedl.
+- Platové tipy musí být realistické pro švýcarský trh — uváděj skutečné rozsahy.
+
 ODPOVĚZ POUZE VALIDNÍM JSON (žádný jiný text!):
 
 {
@@ -88,8 +94,8 @@ DŮLEŽITÉ:
       messages: [{ role: 'user', content: userMessage }],
     })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    let text = textBlock ? (textBlock as any).text : ''
+    const textBlock = response.content.find((block) => block.type === 'text')
+    let text = textBlock && textBlock.type === 'text' ? textBlock.text : ''
     if (!text) return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
 
     // Clean up and extract JSON
@@ -103,7 +109,7 @@ DŮLEŽITÉ:
     let interviewData
     try {
       interviewData = JSON.parse(text)
-    } catch (parseError) {
+    } catch {
       console.error('JSON parse error, attempting fix...')
       // Try to fix common JSON issues
       try {
@@ -116,8 +122,8 @@ DŮLEŽITÉ:
     }
 
     return NextResponse.json({ interviewData, usage: { input: response.usage.input_tokens, output: response.usage.output_tokens } })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Generate interview error:', error)
-    return NextResponse.json({ error: error.message || 'Generation error' }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Generation error' }, { status: 500 })
   }
 }
