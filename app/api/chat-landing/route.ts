@@ -5,7 +5,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
-const SALES_SYSTEM_PROMPT = `Jsi Wokee – AI průvodce prací ve Švýcarsku na platformě Woker. Tvým úkolem je POMÁHAT návštěvníkům a přirozeně je vést k registraci/Premium.
+const SALES_SYSTEM_PROMPT = `Jsi Wooky – AI průvodce prací ve Švýcarsku na platformě Woker. Tvým úkolem je POMÁHAT návštěvníkům a přirozeně je vést k registraci/Premium.
 
 ═══════════════════════════════
 KRITICKÁ PRAVIDLA FORMÁTOVÁNÍ
@@ -181,9 +181,9 @@ Když se uživatel ptá na cokoliv, co by mohl řešit některý z těchto nást
   Co dělá: Učí tě fráze a slovíčka specifické pro tvůj obor. Ne obecnou němčinu, ale přesně to, co budeš potřebovat v práci.
   Proč je to lepší: Místo kurzu za 500 CHF máš personalizovaného učitele, který zná slovník tvého oboru.
 
-🤖 9. AI ASISTENT 24/7 (Wokee)
+🤖 9. AI ASISTENT 24/7 (Wooky)
   Co dělá: Odpovídá na jakýkoliv dotaz o práci ve Švýcarsku. Povolení, daně, pojištění, bydlení, platy — cokoliv.
-  Proč je to lepší než ChatGPT: Wokee je natrénovaný na reálná švýcarská data. Nehalucinuje, nezná zastaralé informace, a když si není jistý, řekne to.
+  Proč je to lepší než ChatGPT: Wooky je natrénovaný na reálná švýcarská data. Nehalucinuje, nezná zastaralé informace, a když si není jistý, řekne to.
 
 💬 10. AI KOMUNITA
   Co dělá: Expert odpovídá na dotazy komunity. Najdi spolubydlení, sdílej tipy, hlasuj o nových funkcích.
@@ -197,7 +197,7 @@ Když se uživatel ptá proč nepoužít ChatGPT nebo Gemini:
   Příklady halucinací: špatné výše spoluúčasti, neexistující formuláře, zastaralé sazby daní, rady pro Německo místo Švýcarska.
   Nemají aktuální data o platech, pojišťovnách, kantonálních pravidlech.
   Neumí vygenerovat CV ve švýcarském formátu, analyzovat smlouvu v němčině, nebo připravit na švýcarský pohovor.
-  Wokee je specializovaný POUZE na Švýcarsko a říká na rovinu když neví.
+  Wooky je specializovaný POUZE na Švýcarsko a říká na rovinu když neví.
 
 O WOKERU:
 📌 1 007 ověřených kontaktů na firmy a agentury
@@ -221,14 +221,14 @@ export async function POST(req: NextRequest) {
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 768,
       system: SALES_SYSTEM_PROMPT,
-      messages: recentMessages.map((m: any) => ({
-        role: m.role,
+      messages: recentMessages.map((m: { role: string; content: string }) => ({
+        role: m.role as 'user' | 'assistant',
         content: m.content,
       })),
     })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    const text = textBlock ? (textBlock as any).text : 'Promiň, něco se mi zamotalo. Zkus to znovu! 🔄'
+    const textBlock = response.content.find((block) => block.type === 'text')
+    const text = textBlock && textBlock.type === 'text' ? textBlock.text : 'Promiň, něco se mi zamotalo. Zkus to znovu!'
 
     return NextResponse.json({
       response: text,
@@ -237,10 +237,10 @@ export async function POST(req: NextRequest) {
         output: response.usage.output_tokens,
       }
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Landing chat API error:', error)
     return NextResponse.json(
-      { error: error.message || 'AI assistant error' },
+      { error: error instanceof Error ? error.message : 'AI assistant error' },
       { status: 500 }
     )
   }

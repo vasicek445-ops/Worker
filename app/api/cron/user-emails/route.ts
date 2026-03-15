@@ -155,7 +155,7 @@ function getUserSequenceEmail(step: number, name: string) {
         </div>
         <p style="color:#8888aa;font-size:13px;">To je hrubý plat. Po odečtení daní a pojištění ti zůstane cca 70–80 %.</p>
         <div style="margin:20px 0;padding:14px;background:rgba(57,255,110,0.08);border-radius:10px;border-left:3px solid #39ff6e;">
-          <p style="margin:0;font-size:14px;"><strong style="color:#39ff6e;">Tip:</strong> Zeptej se AI asistenta Wokee na plat ve svém oboru. Klikni na zelené kolečko na dashboardu.</p>
+          <p style="margin:0;font-size:14px;"><strong style="color:#39ff6e;">Tip:</strong> Zeptej se AI asistenta Wooky na plat ve svém oboru. Klikni na zelené kolečko na dashboardu.</p>
         </div>`)
     },
 

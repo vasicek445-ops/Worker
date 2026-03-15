@@ -193,9 +193,9 @@ export default function Sidebar() {
           <span>Komunita</span>
         </Link>
 
-        <Link href="/asistent" className={linkClass("/asistent")}>
+        <Link href="/dashboard#wooky" className={linkClass("/asistent")}>
           <span className="text-lg">🤖</span>
-          <span>AI Asistent</span>
+          <span>Wooky AI</span>
           <span className="ml-auto w-2 h-2 rounded-full bg-[#39ff6e] shadow-[0_0_8px_rgba(57,255,110,0.4)]"></span>
         </Link>
       </nav>

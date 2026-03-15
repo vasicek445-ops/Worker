@@ -25,13 +25,13 @@ export interface Translation {
     premium_desc: string;
     premium_cta: string;
     premium_trial: string;
-    wokee_name: string;
-    wokee_online: string;
-    wokee_message: string;
-    wokee_open: string;
-    wokee_q1: string;
-    wokee_q2: string;
-    wokee_q3: string;
+    wooky_name: string;
+    wooky_online: string;
+    wooky_message: string;
+    wooky_open: string;
+    wooky_q1: string;
+    wooky_q2: string;
+    wooky_q3: string;
   };
   guides: {
     permits_title: string;

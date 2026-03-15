@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import { useLanguage } from "../../lib/i18n/LanguageContext";
 import LanguageSwitcher from "./LanguageSwitcher";
-import WokeeWidget from "./WokeeWidget";
+import WookyChat from "./WokeeWidget";
 import { useSubscription } from "../../hooks/useSubscription";
 
 interface JobPreview {
@@ -419,9 +419,15 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
             </div>
           </div>
 
-          {/* ═══ WOKEE WIDGET ═══ */}
+          {/* ═══ WOOKY AI CHAT ═══ */}
           <div className="mt-5">
-            <WokeeWidget />
+            <WookyChat
+              profilePercent={profilePercent}
+              profileData={profile}
+              appCount={appCount}
+              matchCount={matchCount}
+              hasCv={false}
+            />
           </div>
 
         </div>
