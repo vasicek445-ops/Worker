@@ -7,6 +7,8 @@
 <!-- TrustBox script -->
 <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 <!-- End TrustBox script -->
+<!-- Spline 3D viewer -->
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
 <title>Woker – AI průvodce prací ve Švýcarsku</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -298,7 +300,8 @@ gtag('config', 'AW-XXXXXXXXX');
     border-radius: 24px;
     overflow: hidden;
   }
-  .hero-3d iframe {
+  .hero-3d iframe,
+  .hero-3d spline-viewer {
     width: 100%;
     height: 100%;
     border: none;
@@ -1087,7 +1090,7 @@ gtag('config', 'AW-XXXXXXXXX');
     <!-- 3D Wooky mascot -->
     <div class="anim-3">
       <div class="hero-3d">
-        <iframe src="https://my.spline.design/untitled-YFlZ0enMdMP9lamLshlk3lW9/" loading="lazy" allow="autoplay"></iframe>
+        <spline-viewer url="https://prod.spline.design/YFlZ0enMdMP9lamLshlk3lW9/scene.splinecode" style="width:100%;height:100%;"></spline-viewer>
       </div>
       <div class="hero-3d-fallback">
         <img src="/images/3d/wooky-wave.png" alt="Wooky — AI Team Leader" />
