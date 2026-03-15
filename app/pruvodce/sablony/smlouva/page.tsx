@@ -101,13 +101,45 @@ export default function SmlouvaPage() {
     e.target.value = ''
   }
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const img = document.createElement('img')
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          const MAX_DIM = 2000
+          let { width, height } = img
+          if (width > MAX_DIM || height > MAX_DIM) {
+            const ratio = Math.min(MAX_DIM / width, MAX_DIM / height)
+            width = Math.round(width * ratio)
+            height = Math.round(height * ratio)
+          }
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (!ctx) { reject(new Error('Canvas not supported')); return }
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(canvas.toDataURL('image/jpeg', 0.85))
+        }
+        img.onerror = () => reject(new Error('Failed to load image'))
+        img.src = reader.result as string
+      }
+      reader.onerror = () => reject(new Error('Failed to read file'))
+      reader.readAsDataURL(file)
+    })
+  }
+
   const processFiles = (files: File[]) => {
-    files.forEach(file => {
+    files.forEach(async (file) => {
       if (file.size > 10 * 1024 * 1024) { setError('Max. velikost obrázku je 10 MB'); return }
       if (!file.type.startsWith('image/')) { setError('Nahrávej pouze obrázky (JPG, PNG)'); return }
-      const reader = new FileReader()
-      reader.onloadend = () => setImages(prev => [...prev, reader.result as string])
-      reader.readAsDataURL(file)
+      try {
+        const compressed = await compressImage(file)
+        setImages(prev => [...prev, compressed])
+      } catch {
+        setError('Nepodařilo se zpracovat obrázek')
+      }
     })
   }
 
