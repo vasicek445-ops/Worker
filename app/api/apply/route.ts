@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { Resend } from 'resend'
-import chromium from '@sparticuz/chromium'
+import chromium from '@sparticuz/chromium-min'
 import puppeteer from 'puppeteer-core'
+
+const CHROMIUM_URL = 'https://github.com/nichochar/chromium-brotli-lambda-arm64/releases/download/v143.0.0/chromium-v143.0.0-pack.tar'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
@@ -239,7 +241,7 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
       const browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: { width: 794, height: 1123 },
-        executablePath: await chromium.executablePath(),
+        executablePath: await chromium.executablePath(CHROMIUM_URL),
         headless: true,
       })
       const page = await browser.newPage()
