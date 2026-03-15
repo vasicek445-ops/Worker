@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <!-- Body gradient -->
+    <linearGradient id="bodyGrad" x1="30" y1="20" x2="90" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4affb0"/>
+      <stop offset="50%" stop-color="#39ff6e"/>
+      <stop offset="100%" stop-color="#1db954"/>
+    </linearGradient>
+    <!-- Dark face gradient -->
+    <linearGradient id="faceGrad" x1="40" y1="30" x2="80" y2="75" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1a2332"/>
+      <stop offset="100%" stop-color="#0d1520"/>
+    </linearGradient>
+    <!-- Visor shine -->
+    <linearGradient id="visorShine" x1="45" y1="35" x2="75" y2="65" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.15)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- Shadow -->
+    <radialGradient id="shadow" cx="60" cy="115" r="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.3)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+    <!-- Glow -->
+    <radialGradient id="glow" cx="60" cy="55" r="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(57,255,110,0.2)"/>
+      <stop offset="100%" stop-color="rgba(57,255,110,0)"/>
+    </radialGradient>
+    <!-- Eye glow -->
+    <radialGradient id="eyeGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#39ff6e"/>
+      <stop offset="60%" stop-color="#39ff6e"/>
+      <stop offset="100%" stop-color="#1db954"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ambient glow -->
+  <circle cx="60" cy="55" r="50" fill="url(#glow)"/>
+
+  <!-- Drop shadow -->
+  <ellipse cx="60" cy="112" rx="25" ry="5" fill="url(#shadow)"/>
+
+  <!-- Body / torso -->
+  <rect x="38" y="72" width="44" height="32" rx="10" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <!-- Body highlight -->
+  <rect x="42" y="74" width="18" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+
+  <!-- Neck -->
+  <rect x="52" y="66" width="16" height="10" rx="4" fill="#2bcc58"/>
+
+  <!-- Head -->
+  <rect x="30" y="18" width="60" height="50" rx="18" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <!-- Head top highlight -->
+  <rect x="38" y="22" width="30" height="6" rx="3" fill="rgba(255,255,255,0.25)"/>
+
+  <!-- Face visor / screen -->
+  <rect x="38" y="32" width="44" height="28" rx="12" fill="url(#faceGrad)" stroke="#0a1a14" stroke-width="1.5"/>
+  <!-- Visor shine -->
+  <rect x="38" y="32" width="44" height="28" rx="12" fill="url(#visorShine)"/>
+
+  <!-- Left eye -->
+  <circle cx="50" cy="44" r="6" fill="url(#eyeGlow)"/>
+  <circle cx="50" cy="44" r="3.5" fill="#0d1520"/>
+  <circle cx="50" cy="44" r="2" fill="#39ff6e"/>
+  <circle cx="48.5" cy="42.5" r="1" fill="rgba(255,255,255,0.7)"/>
+
+  <!-- Right eye -->
+  <circle cx="70" cy="44" r="6" fill="url(#eyeGlow)"/>
+  <circle cx="70" cy="44" r="3.5" fill="#0d1520"/>
+  <circle cx="70" cy="44" r="2" fill="#39ff6e"/>
+  <circle cx="68.5" cy="42.5" r="1" fill="rgba(255,255,255,0.7)"/>
+
+  <!-- Smile -->
+  <path d="M50 52 Q60 58 70 52" stroke="#39ff6e" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <!-- Antenna -->
+  <line x1="60" y1="18" x2="60" y2="8" stroke="#2bcc58" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="60" cy="6" r="4" fill="#39ff6e"/>
+  <circle cx="60" cy="6" r="2" fill="rgba(255,255,255,0.5)"/>
+
+  <!-- Left ear/sensor -->
+  <rect x="24" y="38" width="8" height="14" rx="4" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <rect x="26" y="40" width="4" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+
+  <!-- Right ear/sensor -->
+  <rect x="88" y="38" width="8" height="14" rx="4" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <rect x="90" y="40" width="4" height="4" rx="2" fill="rgba(255,255,255,0.3)"/>
+
+  <!-- Left arm -->
+  <rect x="26" y="76" width="14" height="8" rx="4" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <!-- Left hand -->
+  <circle cx="24" cy="80" r="5" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <circle cx="24" cy="80" r="2.5" fill="rgba(255,255,255,0.2)"/>
+
+  <!-- Right arm (waving!) -->
+  <rect x="80" y="68" width="14" height="8" rx="4" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1" transform="rotate(-30, 87, 72)"/>
+  <!-- Right hand -->
+  <circle cx="96" cy="64" r="5" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <circle cx="96" cy="64" r="2.5" fill="rgba(255,255,255,0.2)"/>
+
+  <!-- Chest badge / logo -->
+  <circle cx="60" cy="86" r="7" fill="#0d1520" stroke="#39ff6e" stroke-width="1.5"/>
+  <text x="60" y="89.5" text-anchor="middle" font-size="9" font-weight="bold" fill="#39ff6e" font-family="sans-serif">W</text>
+
+  <!-- Legs -->
+  <rect x="44" y="102" width="12" height="10" rx="4" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+  <rect x="64" y="102" width="12" height="10" rx="4" fill="url(#bodyGrad)" stroke="#2bcc58" stroke-width="1"/>
+
+  <!-- Feet -->
+  <rect x="40" y="109" width="18" height="6" rx="3" fill="#2bcc58"/>
+  <rect x="62" y="109" width="18" height="6" rx="3" fill="#2bcc58"/>
+</svg>
