@@ -110,6 +110,39 @@ export const LETTER_TEMPLATES: Array<{ id: string; name: string; desc: string; i
   { id: 'letter-single-accent', name: 'Single Accent', desc: 'Barevný jednosloupec', icon: '🎨', category: 'Jednosloupec' },
   { id: 'letter-single-dots', name: 'Single Dots', desc: 'Tečkový jednosloupec', icon: '🔘', category: 'Jednosloupec' },
   { id: 'letter-single-slim', name: 'Single Slim', desc: 'Štíhlý jednosloupec', icon: '➖', category: 'Jednosloupec' },
+  // Tmavý motiv
+  { id: 'letter-dark-sidebar-pro', name: 'Dark Sidebar Pro', desc: 'Tmavý sidebar profesionální', icon: '🌑', category: 'Tmavý motiv' },
+  { id: 'letter-dark-right-pro', name: 'Dark Right Pro', desc: 'Tmavý pravý panel', icon: '🌒', category: 'Tmavý motiv' },
+  { id: 'letter-dark-top-pro', name: 'Dark Top Pro', desc: 'Tmavá horní hlavička', icon: '🌓', category: 'Tmavý motiv' },
+  { id: 'letter-dark-twin-pro', name: 'Dark Twin Pro', desc: 'Tmavé dva sloupce', icon: '🌔', category: 'Tmavý motiv' },
+  { id: 'letter-dark-single-pro', name: 'Dark Single Pro', desc: 'Tmavý jednosloupec', icon: '🌕', category: 'Tmavý motiv' },
+  { id: 'letter-dark-serif-pro', name: 'Dark Serif Pro', desc: 'Tmavý patkový', icon: '🌖', category: 'Tmavý motiv' },
+  { id: 'letter-dark-modern-pro', name: 'Dark Modern Pro', desc: 'Tmavý moderní', icon: '🌗', category: 'Tmavý motiv' },
+  { id: 'letter-dark-compact-pro', name: 'Dark Compact Pro', desc: 'Tmavý kompaktní', icon: '🌘', category: 'Tmavý motiv' },
+  { id: 'letter-dark-cards-pro', name: 'Dark Cards Pro', desc: 'Tmavé kartičky', icon: '🃏', category: 'Tmavý motiv' },
+  { id: 'letter-dark-gradient-pro', name: 'Dark Gradient Pro', desc: 'Tmavý gradient', icon: '🌊', category: 'Tmavý motiv' },
+  // Patkové
+  { id: 'letter-serif-classic', name: 'Serif Classic', desc: 'Klasický patkový', icon: '📜', category: 'Patkové' },
+  { id: 'letter-serif-top', name: 'Serif Top', desc: 'Patkový horní', icon: '📖', category: 'Patkové' },
+  { id: 'letter-serif-single', name: 'Serif Single', desc: 'Patkový jednosloupec', icon: '📕', category: 'Patkové' },
+  { id: 'letter-serif-dark', name: 'Serif Dark', desc: 'Patkový tmavý', icon: '📗', category: 'Patkové' },
+  { id: 'letter-serif-twin', name: 'Serif Twin', desc: 'Patkové dva sloupce', icon: '📘', category: 'Patkové' },
+  { id: 'letter-serif-sidebar', name: 'Serif Sidebar', desc: 'Patkový sidebar', icon: '📙', category: 'Patkové' },
+  { id: 'letter-serif-right', name: 'Serif Right', desc: 'Patkový pravý', icon: '📓', category: 'Patkové' },
+  { id: 'letter-serif-accent', name: 'Serif Accent', desc: 'Patkový barevný', icon: '📔', category: 'Patkové' },
+  { id: 'letter-serif-compact', name: 'Serif Compact', desc: 'Patkový kompaktní', icon: '📒', category: 'Patkové' },
+  { id: 'letter-serif-modern', name: 'Serif Modern', desc: 'Patkový moderní', icon: '📚', category: 'Patkové' },
+  // Moderní
+  { id: 'letter-modern-square', name: 'Modern Square', desc: 'Moderní čtvercový', icon: '⬛', category: 'Moderní' },
+  { id: 'letter-modern-rounded', name: 'Modern Rounded', desc: 'Moderní zaoblený', icon: '🔵', category: 'Moderní' },
+  { id: 'letter-modern-cards', name: 'Modern Cards', desc: 'Moderní kartičky', icon: '🎴', category: 'Moderní' },
+  { id: 'letter-modern-dots', name: 'Modern Dots', desc: 'Moderní tečky', icon: '🔘', category: 'Moderní' },
+  { id: 'letter-modern-accent', name: 'Modern Accent', desc: 'Moderní barevný', icon: '🎯', category: 'Moderní' },
+  { id: 'letter-modern-gradient', name: 'Modern Gradient', desc: 'Moderní gradient', icon: '🌈', category: 'Moderní' },
+  { id: 'letter-modern-compact', name: 'Modern Compact', desc: 'Moderní kompaktní', icon: '📦', category: 'Moderní' },
+  { id: 'letter-modern-slim', name: 'Modern Slim', desc: 'Moderní štíhlý', icon: '📏', category: 'Moderní' },
+  { id: 'letter-modern-twin', name: 'Modern Twin', desc: 'Moderní dva sloupce', icon: '🔷', category: 'Moderní' },
+  { id: 'letter-modern-dark', name: 'Modern Dark', desc: 'Moderní tmavý', icon: '🖤', category: 'Moderní' },
 ]
 
 /* ═══ HELPERS ═══ */
@@ -2160,6 +2193,706 @@ function LetterSingleSlim({ data, c, photo }: { data: LetterData; c: string; pho
   )
 }
 
+/* ═══ DARK MODE SERIES (Tmavý motiv) ═══ */
+
+function LetterDarkSidebarPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, display: 'flex', fontFamily: SANS, fontSize: '10pt' }}>
+      <div style={{ width: '220px', background: '#1a1a2e', color: '#e0e0e0', padding: '48px 24px', boxSizing: 'border-box' as const }}>
+        {photo && <img src={photo} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}`, marginBottom: '20px', display: 'block' }} />}
+        <div style={{ fontSize: '14pt', fontWeight: 700, color: '#fff', marginBottom: '6px' }}>{data.senderName}</div>
+        <div style={{ width: '40px', height: '3px', background: c, marginBottom: '18px' }} />
+        <div style={{ fontSize: '8pt', lineHeight: '1.8', color: '#aaa' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone}</div>
+          <div>{data.senderEmail}</div>
+        </div>
+        <div style={{ marginTop: '28px', fontSize: '8pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <div style={{ flex: 1, background: '#16213e', color: '#d0d0d0', padding: '48px 44px', boxSizing: 'border-box' as const }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6', marginBottom: '32px' }}>
+          <div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div>
+          <div>{data.recipientAddress}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#d0d0d0" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterDarkRightPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, display: 'flex', fontFamily: SANS, fontSize: '10pt' }}>
+      <div style={{ flex: 1, background: '#0d1117', color: '#c9d1d9', padding: '48px 44px', boxSizing: 'border-box' as const }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6', marginBottom: '32px' }}>
+          <div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div>
+          <div>{data.recipientAddress}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#c9d1d9" lineHeight="1.65" />
+      </div>
+      <div style={{ width: '210px', background: '#161b22', color: '#8b949e', padding: '48px 22px', boxSizing: 'border-box' as const, borderLeft: `3px solid ${c}` }}>
+        {photo && <img src={photo} style={{ width: '76px', height: '76px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}`, marginBottom: '18px', display: 'block' }} />}
+        <div style={{ fontSize: '13pt', fontWeight: 700, color: '#fff', marginBottom: '4px' }}>{data.senderName}</div>
+        <div style={{ width: '30px', height: '2px', background: c, marginBottom: '16px' }} />
+        <div style={{ fontSize: '8pt', lineHeight: '1.8' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone}</div>
+          <div>{data.senderEmail}</div>
+        </div>
+        <div style={{ marginTop: '24px', fontSize: '8pt', color: '#484f58' }}>{data.date}</div>
+      </div>
+    </div>
+  )
+}
+
+function LetterDarkTopPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', background: '#121212', color: '#e0e0e0', boxSizing: 'border-box' as const }}>
+      <div style={{ background: '#1e1e2f', padding: '36px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `4px solid ${c}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {photo && <img src={photo} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' as const, border: `2px solid ${c}` }} />}
+          <div>
+            <div style={{ fontSize: '18pt', fontWeight: 700, color: '#fff' }}>{data.senderName}</div>
+            <div style={{ fontSize: '8pt', color: '#888', textTransform: 'uppercase' as const, letterSpacing: '2px' }}>Bewerbungsschreiben</div>
+          </div>
+        </div>
+        <div style={{ fontSize: '8pt', color: '#888', textAlign: 'right' as const, lineHeight: '1.8' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ padding: '40px 56px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
+          <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '9.5pt', color: '#666' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#d0d0d0" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterDarkTwinPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, display: 'flex', fontFamily: SANS, fontSize: '10pt' }}>
+      <div style={{ width: '50%', background: '#1a1a2e', color: '#ccc', padding: '48px 32px', boxSizing: 'border-box' as const }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+          {photo && <img src={photo} style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}` }} />}
+          <div>
+            <div style={{ fontSize: '15pt', fontWeight: 700, color: '#fff' }}>{data.senderName}</div>
+            <div style={{ fontSize: '7.5pt', color: c, textTransform: 'uppercase' as const, letterSpacing: '1px' }}>Bewerber/in</div>
+          </div>
+        </div>
+        <div style={{ fontSize: '8.5pt', lineHeight: '1.8', color: '#999', borderTop: `1px solid ${hexToRgba(c, 0.3)}`, paddingTop: '16px' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone}</div>
+          <div>{data.senderEmail}</div>
+          <div style={{ marginTop: '12px', color: '#666' }}>{data.date}</div>
+        </div>
+      </div>
+      <div style={{ width: '50%', background: '#0f3460', color: '#d0d8e8', padding: '48px 32px', boxSizing: 'border-box' as const }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6', marginBottom: '28px' }}>
+          <div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div>
+          <div>{data.recipientAddress}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#d0d8e8" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterDarkSinglePro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', background: '#0d1117', color: '#c9d1d9', boxSizing: 'border-box' as const, padding: '48px 56px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+        {photo && <img src={photo} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover' as const, border: `2px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '18pt', fontWeight: 700, color: '#fff' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: '#484f58', marginTop: '2px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ height: '2px', background: `linear-gradient(to right, ${c}, transparent)`, marginBottom: '32px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#484f58' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SANS} color="#c9d1d9" lineHeight="1.65" />
+    </div>
+  )
+}
+
+function LetterDarkSerifPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10.5pt', background: '#1a1a2e', color: '#d4c5a9', boxSizing: 'border-box' as const, padding: '52px 60px' }}>
+      <div style={{ textAlign: 'center' as const, marginBottom: '28px' }}>
+        {photo && <img src={photo} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}`, marginBottom: '12px' }} />}
+        <div style={{ fontSize: '20pt', fontWeight: 700, color: '#fff', fontStyle: 'italic' as const }}>{data.senderName}</div>
+        <div style={{ fontSize: '8pt', color: '#8a7e6b', letterSpacing: '3px', textTransform: 'uppercase' as const, marginTop: '4px' }}>Bewerbungsschreiben</div>
+      </div>
+      <div style={{ height: '1px', background: hexToRgba(c, 0.4), marginBottom: '8px' }} />
+      <div style={{ fontSize: '8pt', color: '#7a6f5e', textAlign: 'center' as const, marginBottom: '28px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#e8d8b8' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#7a6f5e' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SERIF} color="#d4c5a9" lineHeight="1.7" />
+    </div>
+  )
+}
+
+function LetterDarkModernPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', background: '#121212', color: '#e0e0e0', boxSizing: 'border-box' as const }}>
+      <div style={{ padding: '32px 56px', background: `linear-gradient(135deg, ${c}, ${darkenHex(c, 60)})`, display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {photo && <img src={photo} style={{ width: '58px', height: '58px', borderRadius: '12px', objectFit: 'cover' as const, border: '2px solid rgba(255,255,255,0.3)' }} />}
+        <div>
+          <div style={{ fontSize: '18pt', fontWeight: 800, color: '#fff' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: 'rgba(255,255,255,0.7)' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ padding: '40px 56px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
+          <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '9.5pt', color: '#666' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#e0e0e0" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterDarkCompactPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '9.5pt', background: '#1e1e2f', color: '#bbb', boxSizing: 'border-box' as const, padding: '36px 48px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {photo && <img src={photo} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' as const }} />}
+          <div style={{ fontSize: '14pt', fontWeight: 700, color: '#fff' }}>{data.senderName}</div>
+        </div>
+        <div style={{ fontSize: '7.5pt', color: '#666' }}>{data.senderPhone} · {data.senderEmail}</div>
+      </div>
+      <div style={{ fontSize: '7.5pt', color: '#555', marginBottom: '4px' }}>{data.senderAddress}</div>
+      <div style={{ height: '2px', background: c, marginBottom: '24px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '22px' }}>
+        <div style={{ fontSize: '9pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#ddd' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9pt', color: '#555' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SANS} color="#bbb" lineHeight="1.6" />
+    </div>
+  )
+}
+
+function LetterDarkCardsPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', background: '#0d1117', color: '#c9d1d9', boxSizing: 'border-box' as const, padding: '44px 52px' }}>
+      <div style={{ background: '#161b22', borderRadius: '12px', padding: '24px 28px', marginBottom: '20px', border: `1px solid ${hexToRgba(c, 0.3)}`, display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {photo && <img src={photo} style={{ width: '64px', height: '64px', borderRadius: '12px', objectFit: 'cover' as const, border: `2px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '16pt', fontWeight: 700, color: '#fff' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: '#484f58', marginTop: '4px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ background: '#161b22', borderRadius: '12px', padding: '20px 28px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#484f58' }}>{data.date}</div>
+      </div>
+      <div style={{ background: '#161b22', borderRadius: '12px', padding: '28px 28px' }}>
+        <LetterBody data={data} font={SANS} color="#c9d1d9" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterDarkGradientPro({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', background: `linear-gradient(180deg, #0d1117 0%, #1a1a2e 50%, ${darkenHex(c, 180)} 100%)`, color: '#d0d0d0', boxSizing: 'border-box' as const, padding: '48px 56px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+        {photo && <img src={photo} style={{ width: '62px', height: '62px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '19pt', fontWeight: 700, color: '#fff' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: c, textTransform: 'uppercase' as const, letterSpacing: '2px' }}>Bewerbungsschreiben</div>
+        </div>
+      </div>
+      <div style={{ fontSize: '8pt', color: '#666', marginBottom: '10px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ height: '2px', background: `linear-gradient(to right, ${c}, transparent)`, marginBottom: '32px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#555' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SANS} color="#d0d0d0" lineHeight="1.65" />
+    </div>
+  )
+}
+
+/* ═══ SERIF SERIES (Patkové) ═══ */
+
+function LetterSerifClassic({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10.5pt', color: '#2c2c2c', background: '#fffef8', boxSizing: 'border-box' as const, padding: '52px 64px' }}>
+      <div style={{ textAlign: 'center' as const, marginBottom: '28px' }}>
+        {photo && <img src={photo} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}`, marginBottom: '12px' }} />}
+        <div style={{ fontSize: '22pt', fontWeight: 700, color: '#1a1a1a' }}>{data.senderName}</div>
+        <div style={{ fontSize: '8.5pt', color: '#888', letterSpacing: '3px', textTransform: 'uppercase' as const, marginTop: '4px' }}>Bewerbungsschreiben</div>
+      </div>
+      <div style={{ height: '2px', background: c, width: '60px', margin: '0 auto 10px' }} />
+      <div style={{ fontSize: '8.5pt', color: '#999', textAlign: 'center' as const, marginBottom: '32px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '10pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '10pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SERIF} color="#2c2c2c" lineHeight="1.75" />
+    </div>
+  )
+}
+
+function LetterSerifTop({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10.5pt', color: '#2c2c2c', background: '#fff', boxSizing: 'border-box' as const }}>
+      <div style={{ background: c, padding: '32px 60px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {photo && <img src={photo} style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover' as const, border: '2px solid rgba(255,255,255,0.5)' }} />}
+          <div style={{ fontSize: '18pt', fontWeight: 700, color: '#fff', fontStyle: 'italic' as const }}>{data.senderName}</div>
+        </div>
+        <div style={{ fontSize: '8pt', color: 'rgba(255,255,255,0.8)', textAlign: 'right' as const, lineHeight: '1.7' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ padding: '40px 60px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
+          <div style={{ fontSize: '10pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '10pt', color: '#888' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SERIF} color="#2c2c2c" lineHeight="1.75" />
+      </div>
+    </div>
+  )
+}
+
+function LetterSerifSingle({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10.5pt', color: '#333', background: '#faf8f2', boxSizing: 'border-box' as const, padding: '48px 60px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
+        {photo && <img src={photo} style={{ width: '58px', height: '58px', borderRadius: '50%', objectFit: 'cover' as const, border: `2px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '18pt', fontWeight: 700, color: '#1a1a1a', fontStyle: 'italic' as const }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase' as const }}>Bewerbung</div>
+        </div>
+      </div>
+      <div style={{ fontSize: '8.5pt', color: '#888', marginBottom: '8px', borderBottom: `2px solid ${c}`, paddingBottom: '10px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '10pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '10pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SERIF} color="#333" lineHeight="1.75" />
+    </div>
+  )
+}
+
+function LetterSerifDark({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10.5pt', color: '#d4c5a9', background: '#2b2520', boxSizing: 'border-box' as const, padding: '52px 60px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+        {photo && <img src={photo} style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '20pt', fontWeight: 700, color: '#f0e6d2', fontStyle: 'italic' as const }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: '#8a7e6b', letterSpacing: '2px', textTransform: 'uppercase' as const }}>Bewerbungsschreiben</div>
+        </div>
+      </div>
+      <div style={{ fontSize: '8.5pt', color: '#7a6f5e', marginBottom: '12px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ height: '1px', background: hexToRgba(c, 0.4), marginBottom: '28px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '10pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#f0e6d2' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '10pt', color: '#7a6f5e' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SERIF} color="#d4c5a9" lineHeight="1.75" />
+    </div>
+  )
+}
+
+function LetterSerifTwin({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, display: 'flex', fontFamily: SERIF, fontSize: '10.5pt' }}>
+      <div style={{ width: '50%', background: '#f5f0e8', color: '#4a3f35', padding: '48px 32px', boxSizing: 'border-box' as const }}>
+        <div style={{ textAlign: 'center' as const, marginBottom: '24px' }}>
+          {photo && <img src={photo} style={{ width: '68px', height: '68px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}`, marginBottom: '10px' }} />}
+          <div style={{ fontSize: '16pt', fontWeight: 700, fontStyle: 'italic' as const }}>{data.senderName}</div>
+        </div>
+        <div style={{ height: '1px', background: c, marginBottom: '16px' }} />
+        <div style={{ fontSize: '8.5pt', lineHeight: '1.8', color: '#8a7e6b' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone}</div>
+          <div>{data.senderEmail}</div>
+          <div style={{ marginTop: '14px' }}>{data.date}</div>
+        </div>
+      </div>
+      <div style={{ width: '50%', background: '#fffef8', color: '#333', padding: '48px 32px', boxSizing: 'border-box' as const, borderLeft: `3px solid ${c}` }}>
+        <div style={{ fontSize: '10pt', lineHeight: '1.6', marginBottom: '28px' }}>
+          <div style={{ fontWeight: 600 }}>{data.recipientName}</div>
+          <div>{data.recipientAddress}</div>
+        </div>
+        <LetterBody data={data} font={SERIF} color="#333" lineHeight="1.75" />
+      </div>
+    </div>
+  )
+}
+
+function LetterSerifSidebar({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, display: 'flex', fontFamily: SERIF, fontSize: '10.5pt' }}>
+      <div style={{ width: '210px', background: c, color: '#fff', padding: '48px 24px', boxSizing: 'border-box' as const }}>
+        {photo && <img src={photo} style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover' as const, border: '3px solid rgba(255,255,255,0.5)', marginBottom: '20px', display: 'block' }} />}
+        <div style={{ fontSize: '15pt', fontWeight: 700, fontStyle: 'italic' as const, marginBottom: '6px' }}>{data.senderName}</div>
+        <div style={{ width: '40px', height: '2px', background: 'rgba(255,255,255,0.5)', marginBottom: '18px' }} />
+        <div style={{ fontSize: '8.5pt', lineHeight: '1.8', color: 'rgba(255,255,255,0.85)' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone}</div>
+          <div>{data.senderEmail}</div>
+        </div>
+        <div style={{ marginTop: '28px', fontSize: '8.5pt', color: 'rgba(255,255,255,0.6)' }}>{data.date}</div>
+      </div>
+      <div style={{ flex: 1, background: '#fffef8', color: '#333', padding: '48px 44px', boxSizing: 'border-box' as const }}>
+        <div style={{ fontSize: '10pt', lineHeight: '1.6', marginBottom: '32px' }}>
+          <div style={{ fontWeight: 600 }}>{data.recipientName}</div>
+          <div>{data.recipientAddress}</div>
+        </div>
+        <LetterBody data={data} font={SERIF} color="#333" lineHeight="1.75" />
+      </div>
+    </div>
+  )
+}
+
+function LetterSerifRight({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, display: 'flex', fontFamily: SERIF, fontSize: '10.5pt' }}>
+      <div style={{ flex: 1, background: '#fffef8', color: '#333', padding: '48px 44px', boxSizing: 'border-box' as const }}>
+        <div style={{ fontSize: '10pt', lineHeight: '1.6', marginBottom: '32px' }}>
+          <div style={{ fontWeight: 600 }}>{data.recipientName}</div>
+          <div>{data.recipientAddress}</div>
+        </div>
+        <LetterBody data={data} font={SERIF} color="#333" lineHeight="1.75" />
+      </div>
+      <div style={{ width: '200px', background: '#f5f0e8', color: '#4a3f35', padding: '48px 22px', boxSizing: 'border-box' as const, borderLeft: `3px solid ${c}` }}>
+        {photo && <img src={photo} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}`, marginBottom: '16px', display: 'block' }} />}
+        <div style={{ fontSize: '13pt', fontWeight: 700, fontStyle: 'italic' as const, marginBottom: '6px' }}>{data.senderName}</div>
+        <div style={{ width: '30px', height: '2px', background: c, marginBottom: '16px' }} />
+        <div style={{ fontSize: '8.5pt', lineHeight: '1.8', color: '#8a7e6b' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone}</div>
+          <div>{data.senderEmail}</div>
+        </div>
+        <div style={{ marginTop: '24px', fontSize: '8.5pt', color: '#b0a898' }}>{data.date}</div>
+      </div>
+    </div>
+  )
+}
+
+function LetterSerifAccent({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10.5pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const, padding: '48px 60px', borderTop: `6px solid ${c}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '14px' }}>
+        {photo && <img src={photo} style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '19pt', fontWeight: 700, color: c, fontStyle: 'italic' as const }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: '#aaa', letterSpacing: '2px', textTransform: 'uppercase' as const }}>Bewerbung</div>
+        </div>
+      </div>
+      <div style={{ fontSize: '8.5pt', color: '#999', marginBottom: '10px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ height: '2px', background: hexToRgba(c, 0.3), marginBottom: '28px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '10pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '10pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SERIF} color="#333" lineHeight="1.75" />
+    </div>
+  )
+}
+
+function LetterSerifCompact({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const, padding: '36px 52px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {photo && <img src={photo} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' as const }} />}
+          <div style={{ fontSize: '14pt', fontWeight: 700, fontStyle: 'italic' as const }}>{data.senderName}</div>
+        </div>
+        <div style={{ fontSize: '7.5pt', color: '#aaa' }}>{data.senderPhone} · {data.senderEmail}</div>
+      </div>
+      <div style={{ fontSize: '7.5pt', color: '#bbb', marginBottom: '4px' }}>{data.senderAddress}</div>
+      <div style={{ height: '2px', background: c, marginBottom: '22px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '22px' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SERIF} color="#333" lineHeight="1.7" />
+    </div>
+  )
+}
+
+function LetterSerifModern({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SERIF, fontSize: '10.5pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const }}>
+      <div style={{ background: hexToRgba(c, 0.08), padding: '36px 60px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `3px solid ${c}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {photo && <img src={photo} style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover' as const, border: `2px solid ${c}` }} />}
+          <div>
+            <div style={{ fontSize: '17pt', fontWeight: 700, color: '#1a1a1a' }}>{data.senderName}</div>
+            <div style={{ fontSize: '7.5pt', color: c, textTransform: 'uppercase' as const, letterSpacing: '2px' }}>Bewerbungsschreiben</div>
+          </div>
+        </div>
+        <div style={{ fontSize: '8pt', color: '#888', textAlign: 'right' as const, lineHeight: '1.7' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ padding: '40px 60px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '32px' }}>
+          <div style={{ fontSize: '10pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '10pt', color: '#888' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SERIF} color="#333" lineHeight="1.75" />
+      </div>
+    </div>
+  )
+}
+
+/* ═══ MODERN SERIES (Moderní) ═══ */
+
+function LetterModernSquare({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const }}>
+      <div style={{ background: c, padding: '36px 56px', display: 'flex', alignItems: 'center', gap: '18px' }}>
+        {photo && <img src={photo} style={{ width: '64px', height: '64px', borderRadius: '4px', objectFit: 'cover' as const, border: '3px solid rgba(255,255,255,0.4)' }} />}
+        <div>
+          <div style={{ fontSize: '20pt', fontWeight: 800, color: '#fff', textTransform: 'uppercase' as const, letterSpacing: '1px' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: 'rgba(255,255,255,0.7)', letterSpacing: '3px', textTransform: 'uppercase' as const }}>Bewerbungsschreiben</div>
+        </div>
+      </div>
+      <div style={{ padding: '40px 56px' }}>
+        <div style={{ fontSize: '8.5pt', color: '#888', marginBottom: '6px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+        <div style={{ height: '3px', background: c, width: '50px', marginBottom: '28px' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+          <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterModernRounded({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', color: '#333', background: '#f8f9fa', boxSizing: 'border-box' as const, padding: '44px 52px' }}>
+      <div style={{ background: '#fff', borderRadius: '20px', padding: '28px 32px', marginBottom: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {photo && <img src={photo} style={{ width: '62px', height: '62px', borderRadius: '16px', objectFit: 'cover' as const, border: `3px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '17pt', fontWeight: 700, color: '#1a1a1a' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: '#aaa', marginTop: '2px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ background: '#fff', borderRadius: '20px', padding: '24px 32px', marginBottom: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <div style={{ background: '#fff', borderRadius: '20px', padding: '32px 32px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+        <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterModernCards({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', color: '#333', background: '#f0f2f5', boxSizing: 'border-box' as const, padding: '44px 48px' }}>
+      <div style={{ background: '#fff', borderRadius: '12px', padding: '24px 28px', marginBottom: '16px', borderLeft: `4px solid ${c}`, display: 'flex', alignItems: 'center', gap: '14px' }}>
+        {photo && <img src={photo} style={{ width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover' as const }} />}
+        <div>
+          <div style={{ fontSize: '16pt', fontWeight: 700, color: '#1a1a1a' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: '#999', marginTop: '2px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ background: '#fff', borderRadius: '12px', padding: '20px 28px', marginBottom: '16px', borderLeft: `4px solid ${hexToRgba(c, 0.4)}`, display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <div style={{ background: '#fff', borderRadius: '12px', padding: '28px 28px' }}>
+        <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterModernDots({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const, padding: '48px 56px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '12px' }}>
+        {photo && <img src={photo} style={{ width: '58px', height: '58px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px dotted ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '18pt', fontWeight: 800, color: '#1a1a1a' }}>{data.senderName}</div>
+          <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: c, display: 'inline-block' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: hexToRgba(c, 0.5), display: 'inline-block' }} />
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: hexToRgba(c, 0.2), display: 'inline-block' }} />
+          </div>
+        </div>
+      </div>
+      <div style={{ fontSize: '8.5pt', color: '#888', marginBottom: '8px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ borderBottom: `3px dotted ${c}`, marginBottom: '28px', paddingBottom: '4px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+    </div>
+  )
+}
+
+function LetterModernAccent({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const, borderLeft: `6px solid ${c}` }}>
+      <div style={{ padding: '48px 52px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
+          {photo && <img src={photo} style={{ width: '58px', height: '58px', borderRadius: '50%', objectFit: 'cover' as const, border: `3px solid ${c}` }} />}
+          <div>
+            <div style={{ fontSize: '19pt', fontWeight: 800, color: c }}>{data.senderName}</div>
+            <div style={{ fontSize: '8pt', color: '#aaa', textTransform: 'uppercase' as const, letterSpacing: '2px' }}>Bewerbungsschreiben</div>
+          </div>
+        </div>
+        <div style={{ background: hexToRgba(c, 0.08), borderRadius: '8px', padding: '12px 16px', fontSize: '8.5pt', color: '#666', marginBottom: '28px' }}>
+          {data.senderAddress} · {data.senderPhone} · {data.senderEmail}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+          <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterModernGradient({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const }}>
+      <div style={{ background: `linear-gradient(135deg, ${c}, ${darkenHex(c, 40)})`, padding: '36px 56px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {photo && <img src={photo} style={{ width: '58px', height: '58px', borderRadius: '50%', objectFit: 'cover' as const, border: '3px solid rgba(255,255,255,0.4)' }} />}
+          <div>
+            <div style={{ fontSize: '19pt', fontWeight: 800, color: '#fff' }}>{data.senderName}</div>
+            <div style={{ fontSize: '8pt', color: 'rgba(255,255,255,0.7)', letterSpacing: '2px', textTransform: 'uppercase' as const }}>Bewerbung</div>
+          </div>
+        </div>
+        <div style={{ fontSize: '8pt', color: 'rgba(255,255,255,0.8)', textAlign: 'right' as const, lineHeight: '1.7' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone} · {data.senderEmail}</div>
+        </div>
+      </div>
+      <div style={{ padding: '40px 56px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+          <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterModernCompact({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '9.5pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const, padding: '36px 48px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {photo && <img src={photo} style={{ width: '36px', height: '36px', borderRadius: '6px', objectFit: 'cover' as const }} />}
+          <div style={{ fontSize: '14pt', fontWeight: 800, color: '#1a1a1a' }}>{data.senderName}</div>
+          <div style={{ width: '3px', height: '20px', background: c, borderRadius: '2px' }} />
+        </div>
+        <div style={{ fontSize: '7.5pt', color: '#aaa' }}>{data.senderPhone} · {data.senderEmail}</div>
+      </div>
+      <div style={{ fontSize: '7.5pt', color: '#bbb', marginBottom: '4px' }}>{data.senderAddress}</div>
+      <div style={{ height: '3px', background: `linear-gradient(to right, ${c}, transparent)`, marginBottom: '22px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '22px' }}>
+        <div style={{ fontSize: '9pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SANS} color="#333" lineHeight="1.6" />
+    </div>
+  )
+}
+
+function LetterModernSlim({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', color: '#333', background: '#fff', boxSizing: 'border-box' as const, padding: '40px 52px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {photo && <img src={photo} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' as const }} />}
+          <div style={{ fontSize: '15pt', fontWeight: 700, color: '#1a1a1a' }}>{data.senderName}</div>
+        </div>
+        <div style={{ background: c, color: '#fff', padding: '4px 14px', borderRadius: '20px', fontSize: '7.5pt', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '1px' }}>Bewerbung</div>
+      </div>
+      <div style={{ fontSize: '8pt', color: '#bbb', marginBottom: '4px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+      <div style={{ height: '1px', background: '#e8e8e8', marginBottom: '28px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600 }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+        <div style={{ fontSize: '9.5pt', color: '#888' }}>{data.date}</div>
+      </div>
+      <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+    </div>
+  )
+}
+
+function LetterModernTwin({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, display: 'flex', fontFamily: SANS, fontSize: '10pt' }}>
+      <div style={{ width: '50%', background: '#fff', color: '#333', padding: '48px 32px', boxSizing: 'border-box' as const }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+          {photo && <img src={photo} style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover' as const, border: `3px solid ${c}` }} />}
+          <div>
+            <div style={{ fontSize: '15pt', fontWeight: 800, color: '#1a1a1a' }}>{data.senderName}</div>
+            <div style={{ fontSize: '7.5pt', color: c, textTransform: 'uppercase' as const, letterSpacing: '1.5px', fontWeight: 600 }}>Bewerber/in</div>
+          </div>
+        </div>
+        <div style={{ fontSize: '8.5pt', lineHeight: '1.8', color: '#888', borderTop: `2px solid ${c}`, paddingTop: '14px' }}>
+          <div>{data.senderAddress}</div>
+          <div>{data.senderPhone}</div>
+          <div>{data.senderEmail}</div>
+          <div style={{ marginTop: '12px', color: '#bbb' }}>{data.date}</div>
+        </div>
+      </div>
+      <div style={{ width: '50%', background: '#f8f9fa', color: '#333', padding: '48px 32px', boxSizing: 'border-box' as const, borderLeft: `4px solid ${c}` }}>
+        <div style={{ fontSize: '9.5pt', lineHeight: '1.6', marginBottom: '28px' }}>
+          <div style={{ fontWeight: 600 }}>{data.recipientName}</div>
+          <div>{data.recipientAddress}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#333" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
+function LetterModernDark({ data, c, photo }: { data: LetterData; c: string; photo?: string | null }) {
+  return (
+    <div style={{ width: W, minHeight: MIN_H, fontFamily: SANS, fontSize: '10pt', background: '#1a1a1a', color: '#e0e0e0', boxSizing: 'border-box' as const }}>
+      <div style={{ padding: '36px 56px', borderBottom: `4px solid ${c}`, display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {photo && <img src={photo} style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover' as const, border: `2px solid ${c}` }} />}
+        <div>
+          <div style={{ fontSize: '20pt', fontWeight: 800, color: '#fff', textTransform: 'uppercase' as const, letterSpacing: '1px' }}>{data.senderName}</div>
+          <div style={{ fontSize: '8pt', color: c, textTransform: 'uppercase' as const, letterSpacing: '3px', fontWeight: 600 }}>Bewerbungsschreiben</div>
+        </div>
+      </div>
+      <div style={{ padding: '40px 56px' }}>
+        <div style={{ fontSize: '8.5pt', color: '#666', marginBottom: '24px' }}>{data.senderAddress} · {data.senderPhone} · {data.senderEmail}</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '28px' }}>
+          <div style={{ fontSize: '9.5pt', lineHeight: '1.6' }}><div style={{ fontWeight: 600, color: '#fff' }}>{data.recipientName}</div><div>{data.recipientAddress}</div></div>
+          <div style={{ fontSize: '9.5pt', color: '#555' }}>{data.date}</div>
+        </div>
+        <LetterBody data={data} font={SANS} color="#e0e0e0" lineHeight="1.65" />
+      </div>
+    </div>
+  )
+}
+
 /* ═══════════════════════════════════════════════════════════
    TEMPLATE MAP & MAIN COMPONENT
    ═══════════════════════════════════════════════════════════ */
@@ -2245,6 +2978,39 @@ const TEMPLATE_MAP: Record<string, React.FC<{ data: LetterData; c: string; photo
   'letter-single-accent': LetterSingleAccent,
   'letter-single-dots': LetterSingleDots,
   'letter-single-slim': LetterSingleSlim,
+  // Tmavý motiv
+  'letter-dark-sidebar-pro': LetterDarkSidebarPro,
+  'letter-dark-right-pro': LetterDarkRightPro,
+  'letter-dark-top-pro': LetterDarkTopPro,
+  'letter-dark-twin-pro': LetterDarkTwinPro,
+  'letter-dark-single-pro': LetterDarkSinglePro,
+  'letter-dark-serif-pro': LetterDarkSerifPro,
+  'letter-dark-modern-pro': LetterDarkModernPro,
+  'letter-dark-compact-pro': LetterDarkCompactPro,
+  'letter-dark-cards-pro': LetterDarkCardsPro,
+  'letter-dark-gradient-pro': LetterDarkGradientPro,
+  // Patkové
+  'letter-serif-classic': LetterSerifClassic,
+  'letter-serif-top': LetterSerifTop,
+  'letter-serif-single': LetterSerifSingle,
+  'letter-serif-dark': LetterSerifDark,
+  'letter-serif-twin': LetterSerifTwin,
+  'letter-serif-sidebar': LetterSerifSidebar,
+  'letter-serif-right': LetterSerifRight,
+  'letter-serif-accent': LetterSerifAccent,
+  'letter-serif-compact': LetterSerifCompact,
+  'letter-serif-modern': LetterSerifModern,
+  // Moderní
+  'letter-modern-square': LetterModernSquare,
+  'letter-modern-rounded': LetterModernRounded,
+  'letter-modern-cards': LetterModernCards,
+  'letter-modern-dots': LetterModernDots,
+  'letter-modern-accent': LetterModernAccent,
+  'letter-modern-gradient': LetterModernGradient,
+  'letter-modern-compact': LetterModernCompact,
+  'letter-modern-slim': LetterModernSlim,
+  'letter-modern-twin': LetterModernTwin,
+  'letter-modern-dark': LetterModernDark,
 }
 
 export default function LetterPreview({ data, template, accentColor, photo, onSave, saving, saved }: LetterPreviewProps) {
