@@ -238,7 +238,6 @@ export default function CVSablona() {
             ...(analysisData!.skills && { skills: prev.skills ? `${prev.skills}, ${analysisData!.skills}` : analysisData!.skills }),
             ...(analysisData!.keywords && { skills: prev.skills ? `${prev.skills}, ${analysisData!.keywords}` : analysisData!.keywords }),
             ...(analysisData!.field && { field: analysisData!.field }),
-            ...(analysisData!.location && { address: analysisData!.location }),
           }))
         }
       } catch {}
