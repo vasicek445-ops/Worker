@@ -275,10 +275,56 @@ gtag('config', 'AW-XXXXXXXXX');
       radial-gradient(ellipse 80% 70% at 50% 20%, rgba(57,255,110,0.06) 0%, transparent 60%),
       radial-gradient(ellipse 60% 50% at 80% 80%, rgba(100,60,255,0.04) 0%, transparent 50%);
   }
+  .hero-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
   .hero-content {
     position: relative;
     z-index: 2;
     max-width: 780px;
+    text-align: left;
+  }
+  .hero-3d {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    border-radius: 24px;
+    overflow: hidden;
+  }
+  .hero-3d iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 24px;
+  }
+  .hero-3d-fallback {
+    display: none;
+    text-align: center;
+  }
+  .hero-3d-fallback img {
+    max-width: 320px;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 20px 60px rgba(57,255,110,0.2));
+  }
+  /* Spline logo overlay — hide it */
+  .hero-3d::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 120px;
+    height: 50px;
+    background: var(--bg);
+    z-index: 10;
+    border-radius: 0 0 24px 0;
   }
   .hero-flag {
     font-size: 44px;
@@ -310,12 +356,12 @@ gtag('config', 'AW-XXXXXXXXX');
     color: var(--text-dim);
     line-height: 1.7;
     max-width: 560px;
-    margin: 20px auto 0;
+    margin: 20px 0 0;
   }
 
   .hero-chips {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 10px;
     margin-top: 32px;
     flex-wrap: wrap;
@@ -336,7 +382,7 @@ gtag('config', 'AW-XXXXXXXXX');
   .cta-wrap {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     margin-top: 36px;
   }
@@ -377,7 +423,14 @@ gtag('config', 'AW-XXXXXXXXX');
 
   @media (max-width: 768px) {
     .hero { padding: 100px 20px 60px; min-height: auto; }
+    .hero-inner { grid-template-columns: 1fr; gap: 24px; }
+    .hero-content { text-align: center; }
+    .hero-sub { margin: 20px auto 0; }
+    .hero-chips { justify-content: center; }
+    .cta-wrap { align-items: center; }
     .cta-primary { width: 100%; justify-content: center; padding: 18px 32px; }
+    .hero-3d { display: none; }
+    .hero-3d-fallback { display: block !important; }
   }
 
   /* ════════════ SECTIONS ════════════ */
@@ -995,37 +1048,49 @@ gtag('config', 'AW-XXXXXXXXX');
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-content">
-    <div class="anim-1">
-      <span class="hero-flag">🇨🇭</span>
-    </div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="anim-1">
+        <span class="hero-flag">🇨🇭</span>
+      </div>
 
-    <h1 class="anim-2">
-      Práce ve Švýcarsku.<br>
-      <span class="green">Jasný plán od A do Z.</span>
-    </h1>
+      <h1 class="anim-2">
+        Práce ve Švýcarsku.<br>
+        <span class="green">Jasný plán od A do Z.</span>
+      </h1>
 
-    <p class="hero-sub anim-3">
-      1 007 kontaktů na firmy, AI asistent 24/7, průvodce povolením, daněmi i bydlením. Vše v jedné appce.
-    </p>
+      <p class="hero-sub anim-3">
+        1 007 kontaktů na firmy, AI asistent 24/7, průvodce povolením, daněmi i bydlením. Vše v jedné appce.
+      </p>
 
-    <div class="hero-chips anim-4">
-      <div class="hero-chip">📋 1 007 firem a agentur</div>
-      <div class="hero-chip">🤖 10 AI nástrojů</div>
-      <div class="hero-chip">🌍 10 jazyků</div>
-      <div class="hero-chip">📖 Průvodce krok za krokem</div>
-    </div>
+      <div class="hero-chips anim-4">
+        <div class="hero-chip">📋 1 007 firem a agentur</div>
+        <div class="hero-chip">🤖 10 AI nástrojů</div>
+        <div class="hero-chip">🌍 10 jazyků</div>
+        <div class="hero-chip">📖 Průvodce krok za krokem</div>
+      </div>
 
-    <div class="cta-wrap anim-5">
-      <a href="#pricing" class="cta-primary">
-        Chci práci ve Švýcarsku <span class="arrow">→</span>
-      </a>
-      <span class="cta-note">Registrace zdarma · Premium od €9.99/měs · Zrušíš kdykoliv</span>
-      <!-- Trustpilot in hero -->
-      <div style="margin-top:20px;">
-        <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="69b554da9b7a4e60b379cddc" data-style-height="52px" data-style-width="100%" data-token="4ce1dab2-7d96-4fbb-9f1c-59fb1a1050a6">
-          <a href="https://www.trustpilot.com/review/gowoker.com" target="_blank" rel="noopener">Trustpilot</a>
+      <div class="cta-wrap anim-5">
+        <a href="#pricing" class="cta-primary">
+          Chci práci ve Švýcarsku <span class="arrow">→</span>
+        </a>
+        <span class="cta-note">Registrace zdarma · Premium od €9.99/měs · Zrušíš kdykoliv</span>
+        <!-- Trustpilot in hero -->
+        <div style="margin-top:20px;">
+          <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="69b554da9b7a4e60b379cddc" data-style-height="52px" data-style-width="100%" data-token="4ce1dab2-7d96-4fbb-9f1c-59fb1a1050a6">
+            <a href="https://www.trustpilot.com/review/gowoker.com" target="_blank" rel="noopener">Trustpilot</a>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 3D Wooky mascot -->
+    <div class="anim-3">
+      <div class="hero-3d">
+        <iframe src="https://my.spline.design/untitled-YFlZ0enMdMP9lamLshlk3lW9/" loading="lazy" allow="autoplay"></iframe>
+      </div>
+      <div class="hero-3d-fallback">
+        <img src="/images/3d/wooky-wave.png" alt="Wooky — AI Team Leader" />
       </div>
     </div>
   </div>
