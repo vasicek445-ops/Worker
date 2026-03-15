@@ -228,18 +228,6 @@ export default function EmailSablona() {
             <pre className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap font-sans m-0">{body || german}</pre>
           </div>
 
-          {/* Action buttons */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <a href={mailtoHref}
-              className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3.5 rounded-xl no-underline transition hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] active:scale-[0.98] text-sm">
-              <span>📧</span> Otevřít v emailu
-            </a>
-            <button onClick={() => handleCopy(german, 'full')}
-              className={`flex items-center justify-center gap-2 font-bold py-3.5 rounded-xl transition text-sm border ${copied === 'full' ? 'bg-[#39ff6e]/10 border-[#39ff6e]/30 text-[#39ff6e]' : 'bg-white/[0.04] border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08]'}`}>
-              {copied === 'full' ? '✓ Zkopírováno' : '📋 Kopírovat email'}
-            </button>
-          </div>
-
           {/* Recipient email input */}
           <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-4 mb-4">
             <div className="flex items-center gap-3">
@@ -248,9 +236,47 @@ export default function EmailSablona() {
                 type="email"
                 value={formData.recipientEmail || ''}
                 onChange={(e) => handleChange('recipientEmail', e.target.value)}
-                placeholder="email@firma.ch — vyplň pro tlačítko 'Otevřít v emailu'"
+                placeholder="email@firma.ch — vyplň pro přímé odeslání"
                 className="flex-1 bg-transparent border-none text-white text-sm placeholder-white/20 focus:outline-none"
               />
+            </div>
+          </div>
+
+          {/* Email client buttons */}
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Image src="/images/3d/rocket.png" alt="" width={18} height={18} />
+              <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Odeslat přes</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <a href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(formData.recipientEmail || '')}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 bg-white/[0.04] border border-white/[0.06] text-white font-semibold py-3 rounded-xl no-underline transition hover:bg-white/[0.08] hover:border-white/[0.12] text-sm">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="#EA4335"/></svg>
+                Gmail
+              </a>
+              <a href={`https://email.seznam.cz/newMessageScreen?to=${encodeURIComponent(formData.recipientEmail || '')}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 bg-white/[0.04] border border-white/[0.06] text-white font-semibold py-3 rounded-xl no-underline transition hover:bg-white/[0.08] hover:border-white/[0.12] text-sm">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#CC0000"/><text x="12" y="17" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">S</text></svg>
+                Seznam
+              </a>
+              <a href={`https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(formData.recipientEmail || '')}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailtoBody)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 bg-white/[0.04] border border-white/[0.06] text-white font-semibold py-3 rounded-xl no-underline transition hover:bg-white/[0.08] hover:border-white/[0.12] text-sm">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z" fill="#0078D4"/></svg>
+                Outlook
+              </a>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <a href={mailtoHref}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 rounded-xl no-underline transition hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] active:scale-[0.98] text-sm">
+                📧 Výchozí email
+              </a>
+              <button onClick={() => handleCopy(german, 'full')}
+                className={`flex items-center justify-center gap-2 font-bold py-3 rounded-xl transition text-sm border ${copied === 'full' ? 'bg-[#39ff6e]/10 border-[#39ff6e]/30 text-[#39ff6e]' : 'bg-white/[0.04] border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08]'}`}>
+                {copied === 'full' ? '✓ Zkopírováno' : '📋 Kopírovat email'}
+              </button>
             </div>
           </div>
 
