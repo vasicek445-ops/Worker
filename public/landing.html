@@ -7,8 +7,8 @@
 <!-- TrustBox script -->
 <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
 <!-- End TrustBox script -->
-<!-- Spline 3D viewer -->
-<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+<!-- Google model-viewer for 3D -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <title>Woker – AI průvodce prací ve Švýcarsku</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -298,10 +298,11 @@ gtag('config', 'AW-XXXXXXXXX');
     border-radius: 24px;
     overflow: hidden;
   }
-  .hero-3d-section spline-viewer {
+  .hero-3d-section model-viewer {
     width: 100%;
     height: 100%;
     border: none;
+    --poster-color: transparent;
   }
   .hero-3d-fallback {
     display: none;
@@ -312,17 +313,6 @@ gtag('config', 'AW-XXXXXXXXX');
     width: 100%;
     height: auto;
     filter: drop-shadow(0 20px 60px rgba(57,255,110,0.2));
-  }
-  /* Spline logo overlay — hide it */
-  .hero-3d-section::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 140px;
-    height: 55px;
-    background: var(--bg);
-    z-index: 10;
   }
   .hero-flag {
     font-size: 44px;
@@ -422,10 +412,9 @@ gtag('config', 'AW-XXXXXXXXX');
   @media (max-width: 768px) {
     .hero { padding: 100px 20px 60px; min-height: auto; }
     .cta-primary { width: 100%; justify-content: center; padding: 18px 32px; }
-    .hero-3d-section { height: 350px; margin-top: 24px; }
-    .hero-3d-section spline-viewer { display: none; }
+    .hero-3d-section { height: 300px; margin-top: 24px; }
+    .hero-3d-section model-viewer { display: none; }
     .hero-3d-fallback { display: block !important; }
-    .hero-3d-section::after { display: none; }
   }
 
   /* ════════════ SECTIONS ════════════ */
@@ -1081,7 +1070,19 @@ gtag('config', 'AW-XXXXXXXXX');
       <!-- 3D Wooky mascot — under Trustpilot -->
       <div class="anim-5">
         <div class="hero-3d-section">
-          <spline-viewer url="https://prod.spline.design/IbapVmEbOuJzv3mY/scene.splinecode" style="width:100%;height:100%;"></spline-viewer>
+          <model-viewer
+            src="/images/3d/robot_playground.glb"
+            alt="Wooky — AI Team Leader"
+            auto-rotate
+            autoplay
+            camera-controls
+            interaction-prompt="none"
+            environment-image="neutral"
+            shadow-intensity="0"
+            exposure="1.2"
+            style="background:transparent;"
+            poster="/images/3d/wooky-wave.png"
+          ></model-viewer>
           <div class="hero-3d-fallback">
             <img src="/images/3d/wooky-wave.png" alt="Wooky — AI Team Leader" />
           </div>
