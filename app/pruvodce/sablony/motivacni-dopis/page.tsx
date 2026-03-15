@@ -54,6 +54,24 @@ export default function MotivacniDopis() {
   const [prefilled, setPrefilled] = useState(false)
   const [photo, setPhoto] = useState<string | null>(null)
 
+  // Restore last letter from sessionStorage
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('woker-last-letter')
+      if (saved) {
+        const { letterData: savedLetter, template: savedTemplate, accentColor: savedColor, photo: savedPhoto } = JSON.parse(saved)
+        if (savedLetter) { setLetterData(savedLetter); if (savedTemplate) setTemplate(savedTemplate); if (savedColor) setAccentColor(savedColor); if (savedPhoto) setPhoto(savedPhoto) }
+      }
+    } catch {}
+  }, [])
+
+  // Save letter to sessionStorage when generated
+  useEffect(() => {
+    if (letterData) {
+      sessionStorage.setItem('woker-last-letter', JSON.stringify({ letterData, template, accentColor, photo }))
+    }
+  }, [letterData, template, accentColor, photo])
+
   // Auto-prefill from user profile
   useEffect(() => {
     if (prefilled) return
@@ -198,7 +216,7 @@ export default function MotivacniDopis() {
             </div>
           )}
 
-          <button onClick={() => { setLetterData(null); setFormData({}); setPhoto(null); setStep(1) }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
+          <button onClick={() => { setLetterData(null); setFormData({}); setPhoto(null); setStep(1); sessionStorage.removeItem('woker-last-letter') }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
             Vytvořit nový motivační dopis
           </button>
         </div>

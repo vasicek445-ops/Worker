@@ -157,6 +157,24 @@ export default function CVSablona() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
+  // Restore last CV from sessionStorage
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('woker-last-cv')
+      if (saved) {
+        const { cvData: savedCv, template: savedTemplate, accentColor: savedColor, photo: savedPhoto } = JSON.parse(saved)
+        if (savedCv) { setCvData(savedCv); if (savedTemplate) setTemplate(savedTemplate); if (savedColor) setAccentColor(savedColor); if (savedPhoto) setPhoto(savedPhoto) }
+      }
+    } catch {}
+  }, [])
+
+  // Save CV to sessionStorage when generated
+  useEffect(() => {
+    if (cvData) {
+      sessionStorage.setItem('woker-last-cv', JSON.stringify({ cvData, template, accentColor, photo }))
+    }
+  }, [cvData, template, accentColor, photo])
+
   // Auto-prefill from user profile
   useEffect(() => {
     if (prefilled) return
@@ -312,7 +330,7 @@ export default function CVSablona() {
             </div>
           )}
 
-          <button onClick={() => { setCvData(null); setFormData({}); setPhoto(null) }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
+          <button onClick={() => { setCvData(null); setFormData({}); setPhoto(null); sessionStorage.removeItem('woker-last-cv') }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
             Vytvořit nový životopis
           </button>
         </div>
