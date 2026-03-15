@@ -34,6 +34,8 @@ export default function SmartMatching() {
   const [matchInfo, setMatchInfo] = useState<{ excluded: number; pool: number } | null>(null)
   const [showCvPreview, setShowCvPreview] = useState(false)
   const [attachCv, setAttachCv] = useState(true)
+  const [showLetterPreview, setShowLetterPreview] = useState(false)
+  const [attachLetter, setAttachLetter] = useState(true)
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 4000) }
 
@@ -114,6 +116,7 @@ export default function SmartMatching() {
           matchScore: match.match_score,
           matchReasoning: match.reasoning,
           attachCv,
+          attachLetter,
         }),
       })
 
@@ -260,6 +263,59 @@ export default function SmartMatching() {
               </div>
             </div>
           )}
+
+          {/* Letter Card */}
+          {profile.saved_letter_html ? (
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-[#39ff6e]/10 p-5 mb-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Image src="/images/3d/envelope.png" alt="" width={18} height={18} />
+                  <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Motivační dopis k přiložení</span>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <span className="text-white/30 text-xs">Přiložit k přihlášce</span>
+                  <button
+                    onClick={() => setAttachLetter(!attachLetter)}
+                    className={`w-9 h-5 rounded-full transition-all relative ${attachLetter ? 'bg-[#39ff6e]/30' : 'bg-white/10'}`}
+                  >
+                    <span className={`absolute top-0.5 w-4 h-4 rounded-full transition-all ${attachLetter ? 'left-[18px] bg-[#39ff6e]' : 'left-0.5 bg-white/40'}`} />
+                  </button>
+                </label>
+              </div>
+              <div
+                className="bg-white rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#39ff6e]/30 transition-all relative group"
+                onClick={() => setShowLetterPreview(true)}
+              >
+                <div className="h-32 overflow-hidden pointer-events-none" style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '286%' }}>
+                  <div dangerouslySetInnerHTML={{ __html: profile.saved_letter_html }} />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-center pb-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-white text-xs font-bold bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-lg">Zobrazit náhled</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-3">
+                <button onClick={() => setShowLetterPreview(true)} className="text-[#39ff6e]/60 hover:text-[#39ff6e] text-xs transition">
+                  Náhled dopisu →
+                </button>
+                <Link href="/pruvodce/sablony/motivacni-dopis" className="text-white/30 hover:text-white/50 text-xs no-underline transition">
+                  Upravit dopis →
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-amber-500/15 p-5 mb-5">
+              <div className="flex items-center gap-3">
+                <Image src="/images/3d/envelope.png" alt="" width={32} height={32} className="opacity-40" />
+                <div className="flex-1">
+                  <p className="text-white/60 text-sm font-semibold m-0">Nemáš uložený motivační dopis</p>
+                  <p className="text-white/30 text-xs m-0 mt-0.5">Vytvoř si profesionální dopis, který se přiloží k přihláškám jako PDF</p>
+                </div>
+                <Link href="/pruvodce/sablony/motivacni-dopis" className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold no-underline hover:opacity-90 transition flex-shrink-0">
+                  Vytvořit dopis
+                </Link>
+              </div>
+            </div>
+          )}
           </>
         ) : (
           <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-amber-500/15 p-6 mb-5 text-center relative overflow-hidden">
@@ -387,9 +443,14 @@ export default function SmartMatching() {
                               <Image src="/images/3d/envelope.png" alt="" width={16} height={16} />
                               Přihlásit se jedním klikem
                             </span>
-                            {profile?.saved_cv_html && attachCv && (
-                              <span className="text-[10px] text-[#0a0a12]/60 font-medium">+ CV v příloze</span>
-                            )}
+                            {(profile?.saved_cv_html && attachCv) || (profile?.saved_letter_html && attachLetter) ? (
+                              <span className="text-[10px] text-[#0a0a12]/60 font-medium">
+                                {[
+                                  profile?.saved_cv_html && attachCv ? 'CV' : '',
+                                  profile?.saved_letter_html && attachLetter ? 'dopis' : '',
+                                ].filter(Boolean).join(' + ')} v příloze
+                              </span>
+                            ) : null}
                           </span>
                         )}
                       </button>
@@ -462,6 +523,27 @@ export default function SmartMatching() {
             </div>
             <div className="p-4">
               <div dangerouslySetInnerHTML={{ __html: profile.saved_cv_html }} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Letter Preview Modal */}
+      {showLetterPreview && profile?.saved_letter_html && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowLetterPreview(false)}>
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-5 py-3 flex items-center justify-between z-10 rounded-t-2xl">
+              <span className="text-gray-800 font-bold text-sm">Náhled motivačního dopisu</span>
+              <div className="flex items-center gap-3">
+                <Link href="/pruvodce/sablony/motivacni-dopis" className="text-[#39ff6e] text-xs font-medium no-underline hover:underline">
+                  Upravit →
+                </Link>
+                <button onClick={() => setShowLetterPreview(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none transition">×</button>
+              </div>
+            </div>
+            <div className="p-4">
+              <div dangerouslySetInnerHTML={{ __html: profile.saved_letter_html }} />
             </div>
           </div>
         </div>

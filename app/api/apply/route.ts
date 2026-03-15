@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
 
     if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
-    const { agency, matchScore, matchReasoning, attachCv = true } = await req.json()
+    const { agency, matchScore, matchReasoning, attachCv = true, attachLetter = true } = await req.json()
 
     if (!agency?.id || !agency?.email) {
       return NextResponse.json({ error: 'Missing agency data' }, { status: 400 })
@@ -192,14 +192,23 @@ export async function POST(req: NextRequest) {
 
     const candidateName = profile.full_name || user.email?.split('@')[0] || 'Kandidát'
 
-    // Generate motivation letter
-    const letterResponse = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1500,
-      system: MOTIVATION_PROMPT,
-      messages: [{
-        role: 'user',
-        content: `Napiš motivační dopis pro:
+    // Use saved letter or generate on-the-fly
+    let letterText = ''
+    let letterHtml: string | null = null
+    if (attachLetter && profile.saved_letter_html) {
+      // Use saved professionally designed letter
+      letterHtml = profile.saved_letter_html as string
+      letterHtml = letterHtml.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/on\w+="[^"]*"/gi, '')
+      letterText = '[Saved letter attached as PDF]'
+    } else {
+      // Generate motivation letter on-the-fly
+      const letterResponse = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1500,
+        system: MOTIVATION_PROMPT,
+        messages: [{
+          role: 'user',
+          content: `Napiš motivační dopis pro:
 Jméno: ${candidateName}
 Cílová pozice: ${profile.pozice}
 Firma / agentura: ${agency.company}
@@ -208,58 +217,89 @@ Zkušenosti: ${profile.zkusenosti}
 Dovednosti: ${profile.dovednosti || 'neuvedeno'}
 Úroveň němčiny: ${profile.nemcina_uroven}
 Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
-      }],
-    })
+        }],
+      })
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const letterBlock = letterResponse.content.find((b: any) => b.type === 'text')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const letterText = letterBlock ? (letterBlock as any).text : ''
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const letterBlock = letterResponse.content.find((b: any) => b.type === 'text')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      letterText = letterBlock ? (letterBlock as any).text : ''
 
-    if (!letterText) return NextResponse.json({ error: 'Letter generation failed' }, { status: 500 })
+      if (!letterText) return NextResponse.json({ error: 'Letter generation failed' }, { status: 500 })
+    }
 
-    // Use saved CV from CV generator if available, otherwise generate basic Lebenslauf
+    // Prepare CV HTML
     let cvHtml: string | null = null
-    let cvPdfBase64: string | null = null
     if (attachCv) {
       cvHtml = (profile.saved_cv_html || generateLebenslaufHtml(profile, user.email || '')) as string
-      // Strip any script tags for security
       cvHtml = cvHtml.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/on\w+="[^"]*"/gi, '')
+    }
 
-      // Wrap innerHTML in full HTML document if needed
-      const fullHtml = cvHtml.trim().startsWith('<!DOCTYPE') || cvHtml.trim().startsWith('<html')
-        ? cvHtml
-        : `<!DOCTYPE html>
-<html lang="de">
-<head><meta charset="utf-8"><title>Lebenslauf – ${candidateName}</title>
-<style>body{margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;}</style>
-</head>
-<body>${cvHtml}</body>
-</html>`
+    // Convert HTML documents to PDF using single browser session
+    let cvPdfBase64: string | null = null
+    let letterPdfBase64: string | null = null
+    const needsBrowser = cvHtml || letterHtml
 
-      // Convert HTML to PDF using Chromium
+    if (needsBrowser) {
       const browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: { width: 794, height: 1123 },
         executablePath: await chromium.executablePath(CHROMIUM_URL),
         headless: true,
       })
-      const page = await browser.newPage()
-      await page.setContent(fullHtml, { waitUntil: 'networkidle0' })
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' },
-      })
+
+      if (cvHtml) {
+        const fullCvHtml = cvHtml.trim().startsWith('<!DOCTYPE') || cvHtml.trim().startsWith('<html')
+          ? cvHtml
+          : `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8"><title>Lebenslauf – ${candidateName}</title>
+<style>body{margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;}</style>
+</head>
+<body>${cvHtml}</body>
+</html>`
+        const cvPage = await browser.newPage()
+        await cvPage.setContent(fullCvHtml, { waitUntil: 'networkidle0' })
+        const cvPdf = await cvPage.pdf({ format: 'A4', printBackground: true, margin: { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' } })
+        await cvPage.close()
+        cvPdfBase64 = Buffer.from(cvPdf).toString('base64')
+      }
+
+      if (letterHtml) {
+        const fullLetterHtml = letterHtml.trim().startsWith('<!DOCTYPE') || letterHtml.trim().startsWith('<html')
+          ? letterHtml
+          : `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8"><title>Bewerbungsschreiben – ${candidateName}</title>
+<style>body{margin:0;padding:0;font-family:'Helvetica Neue',Arial,sans-serif;}</style>
+</head>
+<body>${letterHtml}</body>
+</html>`
+        const letterPage = await browser.newPage()
+        await letterPage.setContent(fullLetterHtml, { waitUntil: 'networkidle0' })
+        const letterPdf = await letterPage.pdf({ format: 'A4', printBackground: true, margin: { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' } })
+        await letterPage.close()
+        letterPdfBase64 = Buffer.from(letterPdf).toString('base64')
+      }
+
       await browser.close()
-      cvPdfBase64 = Buffer.from(pdfBuffer).toString('base64')
     }
 
-    // Build email HTML (motivation letter)
+    // Build attachments array
+    const attachments: Array<{ filename: string; content: string }> = []
+    if (letterPdfBase64) {
+      attachments.push({ filename: `Bewerbungsschreiben_${candidateName.replace(/\s+/g, '_')}.pdf`, content: letterPdfBase64 })
+    }
+    if (cvPdfBase64) {
+      attachments.push({ filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.pdf`, content: cvPdfBase64 })
+    }
+
+    // Build email HTML body
+    const emailBodyText = letterHtml ? 'Sehr geehrte Damen und Herren,\n\nanbei erhalten Sie meine Bewerbungsunterlagen.\n\nMit freundlichen Grüssen,\n' + candidateName : letterText
     const emailHtml = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:20px;font-family:Arial,sans-serif;color:#333;line-height:1.6;">
-${letterText.split('\n').map((line: string) => line.trim() ? `<p style="margin:0 0 10px;">${line}</p>` : '<br>').join('\n')}
+${emailBodyText.split('\n').map((line: string) => line.trim() ? `<p style="margin:0 0 10px;">${line}</p>` : '<br>').join('\n')}
 <hr style="border:none;border-top:1px solid #ddd;margin:20px 0;">
 <p style="font-size:12px;color:#888;">
 Kontakt: ${candidateName}<br>
@@ -267,12 +307,12 @@ Email: ${user.email}<br>
 ${profile.telefon ? `Tel: ${profile.telefon}<br>` : ''}
 ${profile.adresa ? `Adresse: ${profile.adresa}` : ''}
 </p>
-${cvPdfBase64 ? `<p style="font-size:11px;color:#aaa;margin-top:15px;">
-Im Anhang finden Sie meinen Lebenslauf.
+${attachments.length > 0 ? `<p style="font-size:11px;color:#aaa;margin-top:15px;">
+Im Anhang finden Sie meine Bewerbungsunterlagen.
 </p>` : ''}
 </body></html>`
 
-    // Send email with optional PDF CV attachment
+    // Send email
     await resend.emails.send({
       from: `${candidateName} – Bewerbung <bewerbung@gowoker.com>`,
       to: agency.email,
@@ -280,14 +320,7 @@ Im Anhang finden Sie meinen Lebenslauf.
       bcc: user.email!,
       subject: `Bewerbung als ${profile.pozice} - ${candidateName}`,
       html: emailHtml,
-      ...(cvPdfBase64 ? {
-        attachments: [
-          {
-            filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.pdf`,
-            content: cvPdfBase64,
-          },
-        ],
-      } : {}),
+      ...(attachments.length > 0 ? { attachments } : {}),
     })
 
     // Record application in database
