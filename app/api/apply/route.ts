@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
 
     if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
-    const { agency, matchScore, matchReasoning } = await req.json()
+    const { agency, matchScore, matchReasoning, attachCv = true } = await req.json()
 
     if (!agency?.id || !agency?.email) {
       return NextResponse.json({ error: 'Missing agency data' }, { status: 400 })
@@ -213,9 +213,12 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
     if (!letterText) return NextResponse.json({ error: 'Letter generation failed' }, { status: 500 })
 
     // Use saved CV from CV generator if available, otherwise generate basic Lebenslauf
-    let cvHtml = profile.saved_cv_html || generateLebenslaufHtml(profile, user.email || '')
-    // Strip any script tags for security
-    cvHtml = cvHtml.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/on\w+="[^"]*"/gi, '')
+    let cvHtml: string | null = null
+    if (attachCv) {
+      cvHtml = (profile.saved_cv_html || generateLebenslaufHtml(profile, user.email || '')) as string
+      // Strip any script tags for security
+      cvHtml = cvHtml.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/on\w+="[^"]*"/gi, '')
+    }
 
     // Build email HTML (motivation letter)
     const emailHtml = `<!DOCTYPE html>
@@ -229,12 +232,12 @@ Email: ${user.email}<br>
 ${profile.telefon ? `Tel: ${profile.telefon}<br>` : ''}
 ${profile.adresa ? `Adresse: ${profile.adresa}` : ''}
 </p>
-<p style="font-size:11px;color:#aaa;margin-top:15px;">
+${cvHtml ? `<p style="font-size:11px;color:#aaa;margin-top:15px;">
 Im Anhang finden Sie meinen Lebenslauf.
-</p>
+</p>` : ''}
 </body></html>`
 
-    // Send email with CV attachment
+    // Send email with optional CV attachment
     await resend.emails.send({
       from: `${candidateName} – Bewerbung <bewerbung@gowoker.com>`,
       to: agency.email,
@@ -242,12 +245,14 @@ Im Anhang finden Sie meinen Lebenslauf.
       bcc: user.email!,
       subject: `Bewerbung als ${profile.pozice} - ${candidateName}`,
       html: emailHtml,
-      attachments: [
-        {
-          filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.html`,
-          content: Buffer.from(cvHtml).toString('base64'),
-        },
-      ],
+      ...(cvHtml ? {
+        attachments: [
+          {
+            filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.html`,
+            content: Buffer.from(cvHtml).toString('base64'),
+          },
+        ],
+      } : {}),
     })
 
     // Record application in database
