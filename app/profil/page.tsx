@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from 'react'
+import Image from 'next/image'
 import { supabase } from '../supabase'
 import { useSubscription } from '../../hooks/useSubscription'
 import { useLanguage } from '../../lib/i18n/LanguageContext'
@@ -267,23 +268,40 @@ export default function Profil() {
   return (
     <>
       <style jsx global>{'@import url(https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap)'}</style>
-      <main className="min-h-screen bg-[#0a0a12] py-8 px-6 relative" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
-        {/* Background */}
-        <div className="fixed w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none z-0 opacity-15 -top-[200px] -right-[200px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.2), transparent 70%)" }} />
+      <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+        {/* Ambient effects */}
+        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+        <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-10 bottom-[200px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
 
         {/* Toast */}
         {toast && (
-          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#1a1a2e] border border-[#39ff6e]/20 text-[#39ff6e] px-6 py-3 rounded-xl shadow-lg text-sm font-medium">
+          <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#111120]/95 backdrop-blur-sm border border-[#39ff6e]/20 text-[#39ff6e] px-6 py-3 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.4)] text-sm font-medium">
             {toast}
           </div>
         )}
 
         <div className="max-w-xl mx-auto relative z-10">
-          {/* Header */}
-          <h1 className="text-2xl font-extrabold text-white mb-6 tracking-tight">Můj profil</h1>
+          {/* Hero header */}
+          <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
+            <Image src="/images/3d/star.png" alt="" width={120} height={120} className="absolute -right-4 -bottom-4 opacity-[0.08]" />
+            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(100,60,255,0.1), transparent 60%)" }} />
+            <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+              <pattern id="profileGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="0.8" fill="white"/>
+              </pattern>
+              <rect width="100%" height="100%" fill="url(#profileGrid)"/>
+            </svg>
+            <div className="relative flex items-center gap-4">
+              <Image src="/images/3d/star.png" alt="" width={56} height={56} className="drop-shadow-[0_4px_20px_rgba(57,255,110,0.3)]" />
+              <div>
+                <h1 className="text-white text-2xl font-extrabold m-0 tracking-tight">Můj profil</h1>
+                <p className="text-white/35 text-sm m-0 mt-1">Správa účtu · pracovní profil · nastavení</p>
+              </div>
+            </div>
+          </div>
 
           {/* Profile Completion */}
-          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-white/70 text-sm font-semibold">
                 Tvůj profil je vyplněný na <span className={completionPct >= 80 ? 'text-[#39ff6e]' : completionPct >= 50 ? 'text-blue-400' : 'text-orange-400'}>{completionPct}%</span>
@@ -321,7 +339,7 @@ export default function Profil() {
           </div>
 
           {/* Avatar Card */}
-          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-6 mb-4">
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6 mb-4">
             <div className="flex items-center gap-5">
               <div className="relative">
                 <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="relative group">
@@ -333,7 +351,7 @@ export default function Profil() {
                       onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden') }}
                     />
                   ) : null}
-                  <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-[#E8302A] to-orange-400 flex items-center justify-center text-white font-black text-3xl border-2 border-white/[0.08] group-hover:border-[#39ff6e]/40 transition ${profile?.avatar_url ? 'hidden' : ''}`}>
+                  <div className={`w-20 h-20 rounded-full bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center text-[#0a0a12] font-black text-3xl border-2 border-white/[0.08] group-hover:border-[#39ff6e]/40 transition shadow-[0_0_20px_rgba(57,255,110,0.15)] ${profile?.avatar_url ? 'hidden' : ''}`}>
                     {userInitial}
                   </div>
                   <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
@@ -357,7 +375,7 @@ export default function Profil() {
 
           {/* Premium */}
           {isActive ? (
-            <div className="bg-gradient-to-br from-[#111120] to-[#0f1a14] rounded-[20px] p-5 border border-[#39ff6e]/15 mb-4">
+            <div className="bg-gradient-to-br from-[#111120]/80 to-[#0f1a14]/80 backdrop-blur-sm rounded-2xl p-5 border border-[#39ff6e]/15 mb-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
                   <span className="text-lg">⭐</span>
@@ -372,7 +390,7 @@ export default function Profil() {
             </div>
           ) : (
             <a href="/pricing" className="block mb-4 no-underline">
-              <div className="bg-gradient-to-br from-[#111120] to-[#0f1a14] rounded-[20px] p-5 border border-[#39ff6e]/15">
+              <div className="bg-gradient-to-br from-[#111120]/80 to-[#0f1a14]/80 backdrop-blur-sm rounded-2xl p-5 border border-[#39ff6e]/15">
                 <div className="flex items-center gap-2.5 mb-2">
                   <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center">⚡</div>
                   <span className="text-white font-extrabold text-sm">Aktivovat Premium</span>
@@ -384,8 +402,11 @@ export default function Profil() {
           )}
 
           {/* Personal Info */}
-          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
-            <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider mb-4">Osobní údaje</h3>
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Image src="/images/3d/key.png" alt="" width={18} height={18} />
+              <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider m-0">Osobní údaje</h3>
+            </div>
 
             <div className="space-y-0">
               {/* Name */}
@@ -422,9 +443,12 @@ export default function Profil() {
           </div>
 
           {/* Work Profile */}
-          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider">Pracovní profil</h3>
+              <div className="flex items-center gap-2">
+                <Image src="/images/3d/briefcase.png" alt="" width={18} height={18} />
+                <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider m-0">Pracovní profil</h3>
+              </div>
               {profile?.profile_complete && <span className="text-[10px] bg-[#39ff6e]/10 text-[#39ff6e] font-bold px-2.5 py-1 rounded-full">Kompletní</span>}
             </div>
 
@@ -522,20 +546,23 @@ export default function Profil() {
           {/* Smart Matching CTA */}
           {profile?.profile_complete && (
             <a href="/pruvodce/matching" className="block mb-4 no-underline">
-              <div className="bg-gradient-to-br from-[#111120] to-[#0f1420] rounded-[20px] p-5 border border-blue-500/15">
+              <div className="bg-gradient-to-br from-[#111120]/80 to-[#0f1420]/80 backdrop-blur-sm rounded-2xl p-5 border border-[#39ff6e]/15">
                 <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-lg">🎯</div>
+                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center text-lg shadow-[0_0_15px_rgba(57,255,110,0.15)]">🎯</div>
                   <span className="text-white font-extrabold text-sm">Smart Matching</span>
                 </div>
                 <p className="text-white/35 text-xs mb-3 m-0">AI najde nejlepší agentury pro tvůj profil a odešle přihlášku jedním klikem.</p>
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2.5 rounded-xl text-sm font-extrabold text-center">Spustit matching →</div>
+                <div className="bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] py-2.5 rounded-xl text-sm font-extrabold text-center">Spustit matching →</div>
               </div>
             </a>
           )}
 
           {/* Preferences */}
-          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
-            <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider mb-4">Preference</h3>
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Image src="/images/3d/target.png" alt="" width={18} height={18} />
+              <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider m-0">Preference</h3>
+            </div>
 
             <div className="space-y-0">
               {/* Language */}
@@ -571,8 +598,11 @@ export default function Profil() {
           </div>
 
           {/* Security */}
-          <div className="bg-[#111120] rounded-[20px] border border-white/[0.06] p-5 mb-4">
-            <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider mb-4">Zabezpečení</h3>
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Image src="/images/3d/shield.png" alt="" width={18} height={18} />
+              <h3 className="text-white/25 text-[10px] font-bold uppercase tracking-wider m-0">Zabezpečení</h3>
+            </div>
 
             {/* Change email */}
             <div className="pb-3 mb-3 border-b border-white/[0.04]">
@@ -629,7 +659,7 @@ export default function Profil() {
           </div>
 
           {/* Danger Zone */}
-          <div className="bg-[#111120] rounded-[20px] border border-red-500/10 p-5 mb-4">
+          <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-red-500/10 p-5 mb-4">
             <h3 className="text-red-400/40 text-[10px] font-bold uppercase tracking-wider mb-3">Nebezpečná zóna</h3>
             {!showDeleteConfirm ? (
               <button onClick={() => setShowDeleteConfirm(true)} className="text-red-400/60 text-sm hover:text-red-400 transition">
@@ -658,7 +688,7 @@ export default function Profil() {
           </div>
 
           {/* Logout */}
-          <button onClick={handleLogout} className="w-full bg-white/[0.03] border border-red-500/15 text-red-400/80 font-medium py-3 rounded-[16px] hover:bg-red-500/[0.06] transition text-sm mb-4">
+          <button onClick={handleLogout} className="w-full bg-white/[0.03] border border-red-500/15 text-red-400/80 font-medium py-3 rounded-xl hover:bg-red-500/[0.06] transition text-sm mb-4">
             Odhlásit se
           </button>
 

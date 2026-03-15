@@ -74,7 +74,13 @@ export default function MotivacniDopis() {
     } catch {}
   }
 
-  useEffect(() => { loadSavedDocs() }, [])
+  useEffect(() => {
+    loadSavedDocs()
+    const params = new URLSearchParams(window.location.search)
+    const loadId = params.get('load')
+    if (loadId) loadDocument(loadId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const loadDocument = async (docId: string) => {
     setLoadingDocs(true)

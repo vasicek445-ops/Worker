@@ -177,7 +177,14 @@ export default function CVSablona() {
     } catch {}
   }
 
-  useEffect(() => { loadSavedDocs() }, [])
+  useEffect(() => {
+    loadSavedDocs()
+    // Load document from ?load= URL param (coming from /dokumenty page)
+    const params = new URLSearchParams(window.location.search)
+    const loadId = params.get('load')
+    if (loadId) loadDocument(loadId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const loadDocument = async (docId: string) => {
     setLoadingDocs(true)

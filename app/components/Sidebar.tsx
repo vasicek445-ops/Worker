@@ -103,6 +103,11 @@ export default function Sidebar() {
           <span>Moje přihlášky</span>
         </Link>
 
+        <Link href="/dokumenty" className={linkClass("/dokumenty")}>
+          <span className="text-lg">📄</span>
+          <span>Moje dokumenty</span>
+        </Link>
+
         {/* Tools - expandable */}
         <div>
           <button
