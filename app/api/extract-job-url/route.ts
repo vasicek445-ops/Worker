@@ -209,7 +209,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Nepodařilo se extrahovat text inzerátu z této stránky. Zkopíruj text ručně.' }, { status: 400 })
     }
 
-    return NextResponse.json({ text, source: parsedUrl.hostname })
+    // Check if extracted text actually contains job content
+    let hasJobContent = false
+    for (const marker of JOB_CONTENT_MARKERS) {
+      if (marker.test(text)) { hasJobContent = true; break }
+    }
+
+    const warning = !hasJobContent
+      ? 'Tato stránka pravděpodobně načítá obsah přes JavaScript a nepodařilo se získat celý inzerát. Zkontroluj text a případně doplň ručně, nebo zkopíruj celý text inzerátu přímo ze stránky.'
+      : undefined
+
+    return NextResponse.json({ text, source: parsedUrl.hostname, warning })
   } catch (error: unknown) {
     console.error('Extract URL error:', error)
     const message = error instanceof Error ? error.message : 'Extraction error'

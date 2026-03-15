@@ -71,6 +71,7 @@ export default function AnalyzaInzeratu() {
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [showHistory, setShowHistory] = useState(false)
   const [inputMode, setInputMode] = useState<'text' | 'url'>('text')
+  const [urlWarning, setUrlWarning] = useState<string | null>(null)
 
   // Restore last analysis from sessionStorage
   useEffect(() => {
@@ -114,7 +115,7 @@ export default function AnalyzaInzeratu() {
 
   const handleExtractUrl = async () => {
     if (!jobUrl.trim()) return
-    setExtractingUrl(true); setError(null)
+    setExtractingUrl(true); setError(null); setUrlWarning(null)
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session?.access_token) { setError('Musíš být přihlášen'); return }
@@ -127,6 +128,7 @@ export default function AnalyzaInzeratu() {
       if (!res.ok) throw new Error(data.error || 'Nepodařilo se načíst')
       setJobText(data.text)
       setUrlSource(data.source)
+      if (data.warning) setUrlWarning(data.warning)
       setInputMode('text')
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Něco se pokazilo'
@@ -544,6 +546,12 @@ export default function AnalyzaInzeratu() {
                 <textarea value={jobText} onChange={(e) => setJobText(e.target.value)} placeholder={'Zkopíruj celý text inzerátu z jobs.ch, Indeed, LinkedIn...\n\nNapříklad:\nMonteur (m/w) – Stahlbau\nWir suchen einen erfahrenen Monteur für...'} rows={10}
                   className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition resize-none" />
                 <p className="text-white/20 text-xs mt-1.5">{jobText.length} znaků · {jobText.length < 30 ? 'vlož celý text inzerátu' : <span className="text-[#39ff6e]/60">✓ dostatečný text</span>}</p>
+                {urlWarning && (
+                  <div className="bg-yellow-500/[0.06] border border-yellow-500/20 rounded-xl p-3 mt-3">
+                    <p className="text-yellow-400 text-sm font-medium mb-1">⚠️ Neúplný text</p>
+                    <p className="text-yellow-400/60 text-xs">{urlWarning}</p>
+                  </div>
+                )}
               </div>
             )}
 
