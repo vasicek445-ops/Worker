@@ -38,6 +38,8 @@ const QUICK_COLORS = [
   '#1c1c1c', '#2c3e50', '#b9770e',
 ]
 
+type SavedDoc = { id: string; title: string; template: string; accent_color: string; created_at: string; updated_at: string }
+
 export default function MotivacniDopis() {
   const { isActive, loading } = useSubscription()
   const [step, setStep] = useState(1)
@@ -53,6 +55,87 @@ export default function MotivacniDopis() {
   const [error, setError] = useState<string | null>(null)
   const [prefilled, setPrefilled] = useState(false)
   const [photo, setPhoto] = useState<string | null>(null)
+  const [savedDocs, setSavedDocs] = useState<SavedDoc[]>([])
+  const [loadingDocs, setLoadingDocs] = useState(false)
+  const [activeDocId, setActiveDocId] = useState<string | null>(null)
+  const [savingDoc, setSavingDoc] = useState(false)
+  const [savedDoc, setSavedDoc] = useState(false)
+
+  // Load saved documents list
+  const loadSavedDocs = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+      const res = await fetch('/api/documents?type=letter', { headers: { Authorization: `Bearer ${session.access_token}` } })
+      if (res.ok) {
+        const { documents } = await res.json()
+        setSavedDocs(documents || [])
+      }
+    } catch {}
+  }
+
+  useEffect(() => { loadSavedDocs() }, [])
+
+  const loadDocument = async (docId: string) => {
+    setLoadingDocs(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+      const res = await fetch(`/api/documents/${docId}`, { headers: { Authorization: `Bearer ${session.access_token}` } })
+      if (res.ok) {
+        const { document } = await res.json()
+        setLetterData(document.document_data)
+        if (document.template) setTemplate(document.template)
+        if (document.accent_color) setAccentColor(document.accent_color)
+        if (document.photo) setPhoto(document.photo)
+        setActiveDocId(document.id)
+      }
+    } catch {}
+    finally { setLoadingDocs(false) }
+  }
+
+  const saveDocument = async () => {
+    if (!letterData) return
+    setSavingDoc(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+      const title = formData.position
+        ? `${formData.position}${formData.company ? ` — ${formData.company}` : ''}`
+        : 'Motivační dopis'
+      const res = await fetch('/api/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({
+          id: activeDocId || undefined,
+          type: 'letter',
+          title,
+          document_data: letterData,
+          template,
+          accent_color: accentColor,
+          photo: photo || undefined,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.id) setActiveDocId(data.id)
+        setSavedDoc(true)
+        setTimeout(() => setSavedDoc(false), 3000)
+        loadSavedDocs()
+      }
+    } catch {}
+    finally { setSavingDoc(false) }
+  }
+
+  const deleteDocument = async (docId: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+      await fetch(`/api/documents?id=${docId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${session.access_token}` } })
+      setSavedDocs(prev => prev.filter(d => d.id !== docId))
+      if (activeDocId === docId) setActiveDocId(null)
+    } catch {}
+  }
 
   // Restore last letter from sessionStorage
   useEffect(() => {
@@ -193,7 +276,13 @@ export default function MotivacniDopis() {
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="flex items-center justify-between mb-5">
             <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white text-sm no-underline transition">← Zpět</Link>
-            <button onClick={() => setLetterData(null)} className="text-white/40 hover:text-white text-xs px-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Upravit údaje</button>
+            <div className="flex items-center gap-2">
+              <button onClick={saveDocument} disabled={savingDoc}
+                className={`text-xs px-4 py-2 rounded-xl transition border ${savedDoc ? 'bg-[#39ff6e]/10 border-[#39ff6e]/30 text-[#39ff6e]' : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white hover:bg-white/[0.08]'}`}>
+                {savingDoc ? '...' : savedDoc ? '✓ Uloženo' : activeDocId ? '💾 Aktualizovat' : '💾 Uložit'}
+              </button>
+              <button onClick={() => setLetterData(null)} className="text-white/40 hover:text-white text-xs px-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Upravit údaje</button>
+            </div>
           </div>
 
           {/* Template + color switcher */}
@@ -242,7 +331,7 @@ export default function MotivacniDopis() {
             </div>
           )}
 
-          <button onClick={() => { setLetterData(null); setFormData({}); setPhoto(null); setStep(1); sessionStorage.removeItem('woker-last-letter') }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
+          <button onClick={() => { setLetterData(null); setFormData({}); setPhoto(null); setStep(1); setActiveDocId(null); sessionStorage.removeItem('woker-last-letter') }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
             Vytvořit nový motivační dopis
           </button>
         </div>
@@ -298,6 +387,30 @@ export default function MotivacniDopis() {
 
         <PaywallOverlay isLocked={!isActive && !loading} title="AI šablony jsou součástí Premium" description="Získej profesionální motivační dopis v němčině za 30 sekund">
           <div className="space-y-5">
+
+            {/* Saved documents */}
+            {savedDocs.length > 0 && (
+              <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Image src="/images/3d/briefcase.png" alt="" width={18} height={18} />
+                  <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Uložené dopisy</span>
+                  <span className="text-white/20 text-xs ml-1">Načti bez AI</span>
+                </div>
+                <div className="space-y-1.5">
+                  {savedDocs.map((doc) => (
+                    <div key={doc.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition group">
+                      <button onClick={() => loadDocument(doc.id)} disabled={loadingDocs}
+                        className="flex-1 text-left min-w-0">
+                        <p className="text-white text-sm font-medium m-0 truncate">{doc.title}</p>
+                        <p className="text-white/25 text-[10px] m-0">{new Date(doc.updated_at).toLocaleDateString('cs-CZ')} · {LETTER_TEMPLATES.find(t => t.id === doc.template)?.name || doc.template}</p>
+                      </button>
+                      <button onClick={() => deleteDocument(doc.id)}
+                        className="text-white/15 hover:text-red-400 text-xs transition opacity-0 group-hover:opacity-100 flex-shrink-0">✕</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Profile prefill banner */}
             {prefilled && Object.keys(formData).length > 2 && (
