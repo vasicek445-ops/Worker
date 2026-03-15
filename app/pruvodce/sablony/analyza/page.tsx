@@ -401,6 +401,10 @@ export default function AnalyzaInzeratu() {
               className="block w-full bg-white/[0.04] text-white font-bold py-3.5 px-6 rounded-2xl text-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
               ✉️ Napsat motivační dopis
             </Link>
+            <Link href={`/pruvodce/sablony/email?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, skills: result.skills_needed || [] }))}`}
+              className="block w-full bg-white/[0.04] text-white/60 font-bold py-3.5 px-6 rounded-2xl text-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
+              📧 Napsat email pro HR
+            </Link>
             <Link href={`/pruvodce/sablony/pohovor?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, topics: result.interview_topics || [] }))}`}
               className="block w-full bg-white/[0.04] text-white/60 font-bold py-3.5 px-6 rounded-2xl text-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
               🎤 Připravit se na pohovor
