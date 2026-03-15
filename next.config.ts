@@ -3,6 +3,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'flatfox.ch' },
+      { protocol: 'https', hostname: 'recyoezvcfiarmeizgqc.supabase.co' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
   async rewrites() {
