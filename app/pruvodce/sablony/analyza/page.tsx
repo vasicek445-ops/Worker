@@ -367,10 +367,10 @@ export default function AnalyzaInzeratu() {
           {/* CTA buttons */}
           <div className="space-y-2 mt-6">
             <p className="text-gray-500 text-xs text-center mb-1">🔗 Data z analýzy se automaticky předvyplní</p>
-            <Link href={`/pruvodce/sablony/cv?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, skills: result.skills_needed?.join(', ') || '', keywords: result.cover_letter_keywords?.join(', ') || '' }))}`} className="block w-full bg-[#E8302A] text-white font-bold py-3 px-6 rounded-xl text-center hover:opacity-90 transition">
+            <Link href={`/pruvodce/sablony/cv?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, skills: result.skills_needed?.join(', ') || '', keywords: result.cover_letter_keywords?.join(', ') || '', location: result.location || '' }))}`} className="block w-full bg-[#E8302A] text-white font-bold py-3 px-6 rounded-xl text-center hover:opacity-90 transition">
               📄 Vytvořit CV na míru
             </Link>
-            <Link href={`/pruvodce/sablony/motivacni-dopis?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, keywords: result.cover_letter_keywords || [], tips: result.match_tips || [] }))}`} className="block w-full bg-[#1A1A1A] text-white font-bold py-3 px-6 rounded-xl text-center border border-gray-700 hover:border-gray-500 transition">
+            <Link href={`/pruvodce/sablony/motivacni-dopis?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, keywords: result.cover_letter_keywords || [], tips: result.match_tips || [], location: result.location || '' }))}`} className="block w-full bg-[#1A1A1A] text-white font-bold py-3 px-6 rounded-xl text-center border border-gray-700 hover:border-gray-500 transition">
               ✉️ Napsat motivační dopis
             </Link>
             <Link href={`/pruvodce/sablony/pohovor?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, topics: result.interview_topics || [] }))}`} className="block w-full bg-[#1A1A1A] text-gray-300 font-bold py-3 px-6 rounded-xl text-center border border-gray-700 hover:border-gray-500 transition">

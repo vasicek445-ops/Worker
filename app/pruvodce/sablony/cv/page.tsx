@@ -184,7 +184,7 @@ export default function CVSablona() {
           // Use profile avatar as default photo
           if (profile.avatar_url && !photo) setPhoto(profile.avatar_url)
         }
-        // Also check URL prefill params
+        // Also check URL prefill params (from job analysis)
         const params = new URLSearchParams(window.location.search)
         const p = params.get('prefill')
         if (p) {
@@ -192,7 +192,11 @@ export default function CVSablona() {
           setFormData(prev => ({
             ...prev,
             ...(data.position && { position: data.position }),
-            ...(data.skills && { skills: data.skills }),
+            ...(data.company && { company: data.company }),
+            ...(data.skills && { skills: prev.skills ? `${prev.skills}, ${data.skills}` : data.skills }),
+            ...(data.keywords && { skills: prev.skills ? `${prev.skills}, ${data.keywords}` : data.keywords }),
+            ...(data.field && { field: data.field }),
+            ...(data.location && { address: data.location }),
           }))
         }
       } catch {}

@@ -76,7 +76,7 @@ export default function MotivacniDopis() {
           setFormData(prev => ({ ...prev, ...prefillData }))
           if (profile.avatar_url && !photo) setPhoto(profile.avatar_url)
         }
-        // URL prefill params
+        // URL prefill params (from job analysis)
         const params = new URLSearchParams(window.location.search)
         const p = params.get('prefill')
         if (p) {
@@ -85,7 +85,11 @@ export default function MotivacniDopis() {
             ...prev,
             ...(data.position && { position: data.position }),
             ...(data.company && { company: data.company }),
-            ...(data.keywords?.length && { skills: data.keywords.join(', ') }),
+            ...(data.companyAddress && { companyAddress: data.companyAddress }),
+            ...(data.field && { field: data.field }),
+            ...(data.keywords?.length && { skills: prev.skills ? `${prev.skills}, ${data.keywords.join(', ')}` : data.keywords.join(', ') }),
+            ...(data.tips?.length && { motivation: data.tips.join('. ') }),
+            ...(data.location && { companyAddress: data.location }),
           }))
         }
       } catch {}
