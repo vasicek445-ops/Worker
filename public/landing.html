@@ -280,32 +280,28 @@ gtag('config', 'AW-XXXXXXXXX');
   .hero-inner {
     position: relative;
     z-index: 2;
-    max-width: 1200px;
+    max-width: 780px;
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: center;
   }
   .hero-content {
     position: relative;
     z-index: 2;
     max-width: 780px;
-    text-align: left;
+    text-align: center;
   }
-  .hero-3d {
+  .hero-3d-section {
     position: relative;
     width: 100%;
-    height: 500px;
+    max-width: 600px;
+    height: 520px;
+    margin: 40px auto 0;
     border-radius: 24px;
     overflow: hidden;
   }
-  .hero-3d iframe,
-  .hero-3d spline-viewer {
+  .hero-3d-section spline-viewer {
     width: 100%;
     height: 100%;
     border: none;
-    border-radius: 24px;
   }
   .hero-3d-fallback {
     display: none;
@@ -318,16 +314,15 @@ gtag('config', 'AW-XXXXXXXXX');
     filter: drop-shadow(0 20px 60px rgba(57,255,110,0.2));
   }
   /* Spline logo overlay — hide it */
-  .hero-3d::after {
+  .hero-3d-section::after {
     content: '';
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 120px;
-    height: 50px;
+    width: 140px;
+    height: 55px;
     background: var(--bg);
     z-index: 10;
-    border-radius: 0 0 24px 0;
   }
   .hero-flag {
     font-size: 44px;
@@ -359,12 +354,12 @@ gtag('config', 'AW-XXXXXXXXX');
     color: var(--text-dim);
     line-height: 1.7;
     max-width: 560px;
-    margin: 20px 0 0;
+    margin: 20px auto 0;
   }
 
   .hero-chips {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 10px;
     margin-top: 32px;
     flex-wrap: wrap;
@@ -385,7 +380,7 @@ gtag('config', 'AW-XXXXXXXXX');
   .cta-wrap {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 12px;
     margin-top: 36px;
   }
@@ -426,14 +421,11 @@ gtag('config', 'AW-XXXXXXXXX');
 
   @media (max-width: 768px) {
     .hero { padding: 100px 20px 60px; min-height: auto; }
-    .hero-inner { grid-template-columns: 1fr; gap: 24px; }
-    .hero-content { text-align: center; }
-    .hero-sub { margin: 20px auto 0; }
-    .hero-chips { justify-content: center; }
-    .cta-wrap { align-items: center; }
     .cta-primary { width: 100%; justify-content: center; padding: 18px 32px; }
-    .hero-3d { display: none; }
+    .hero-3d-section { height: 350px; margin-top: 24px; }
+    .hero-3d-section spline-viewer { display: none; }
     .hero-3d-fallback { display: block !important; }
+    .hero-3d-section::after { display: none; }
   }
 
   /* ════════════ SECTIONS ════════════ */
@@ -1085,15 +1077,15 @@ gtag('config', 'AW-XXXXXXXXX');
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 3D Wooky mascot -->
-    <div class="anim-3">
-      <div class="hero-3d">
-        <spline-viewer url="https://prod.spline.design/IbapVmEbOuJzv3mY/scene.splinecode" style="width:100%;height:100%;"></spline-viewer>
-      </div>
-      <div class="hero-3d-fallback">
-        <img src="/images/3d/wooky-wave.png" alt="Wooky — AI Team Leader" />
+      <!-- 3D Wooky mascot — under Trustpilot -->
+      <div class="anim-5">
+        <div class="hero-3d-section">
+          <spline-viewer url="https://prod.spline.design/IbapVmEbOuJzv3mY/scene.splinecode" style="width:100%;height:100%;"></spline-viewer>
+          <div class="hero-3d-fallback">
+            <img src="/images/3d/wooky-wave.png" alt="Wooky — AI Team Leader" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
