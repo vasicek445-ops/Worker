@@ -43,8 +43,17 @@ ODPOVĚZ POUZE VALIDNÍM JSON (žádný jiný text!):
   ],
   "cover_letter_keywords": ["klíčová slova co použít v motivačním dopise"],
   "interview_topics": ["téma na které se pravděpodobně budou ptát"],
-  "salary_estimate": "Odhad platu pro tuto pozici ve Švýcarsku (rozmezí CHF/měsíc) pokud není uveden"
-}`
+  "salary_estimate": "Odhad platu pro tuto pozici ve Švýcarsku (rozmezí CHF/měsíc) pokud není uveden",
+  "match_score": 75
+}
+
+MATCH SCORE (0-100):
+Pokud je k dispozici profil uchazeče, vypočítej match_score (0-100) na základě:
+- Shoda požadavků s dovednostmi uchazeče (40%)
+- Jazyková úroveň vs. požadavek (30%)
+- Relevance zkušeností (20%)
+- Obor/pozice shoda (10%)
+Pokud profil není k dispozici, nastav match_score na null.`
 
 export async function POST(req: NextRequest) {
   try {
@@ -68,13 +77,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Vlož text inzerátu (min. 30 znaků)' }, { status: 400 })
     }
 
-    const userContext = userProfile ? `
+    // Load profile from DB if not provided
+    let profileData = userProfile
+    if (!profileData) {
+      const { data: dbProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('pozice, obor, nemcina_uroven, zkusenosti, dovednosti')
+        .eq('id', user.id)
+        .single()
 
-PROFIL UCHAZEČE (porovnej s požadavky):
-Pozice: ${userProfile.position || 'Neuvedeno'}
-Zkušenosti: ${userProfile.experience || 'Neuvedeno'}
-Němčina: ${userProfile.german || 'Neuvedeno'}
-Dovednosti: ${userProfile.skills || 'Neuvedeno'}` : ''
+      if (dbProfile && (dbProfile.pozice || dbProfile.dovednosti || dbProfile.zkusenosti)) {
+        profileData = {
+          position: dbProfile.pozice || '',
+          experience: dbProfile.zkusenosti || '',
+          german: dbProfile.nemcina_uroven || '',
+          skills: dbProfile.dovednosti || '',
+          field: dbProfile.obor || '',
+        }
+      }
+    }
+
+    const userContext = profileData ? `
+
+PROFIL UCHAZEČE (porovnej s požadavky a vypočítej match_score):
+Pozice: ${profileData.position || 'Neuvedeno'}
+Obor: ${profileData.field || 'Neuvedeno'}
+Zkušenosti: ${profileData.experience || 'Neuvedeno'}
+Němčina: ${profileData.german || 'Neuvedeno'}
+Dovednosti: ${profileData.skills || 'Neuvedeno'}` : ''
 
     const userMessage = `Analyzuj tento pracovní inzerát a vytvoř kompletní analýzu v JSON:
 
@@ -90,6 +120,7 @@ DŮLEŽITÉ:
 - Dej konkrétní tipy jak se prezentovat
 - Odhadni plat pokud není uveden
 - Navrhni klíčová slova pro motivační dopis
+${profileData ? '- VYPOČÍTEJ match_score (0-100) na základě profilu uchazeče' : '- match_score nastav na null (profil není k dispozici)'}
 - Odpověz POUZE validním JSON`
 
     const response = await anthropic.messages.create({
@@ -99,8 +130,8 @@ DŮLEŽITÉ:
       messages: [{ role: 'user', content: userMessage }],
     })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    let text = textBlock ? (textBlock as any).text : ''
+    const textBlock = response.content.find((block: { type: string }) => block.type === 'text')
+    let text = textBlock && 'text' in textBlock ? (textBlock as { type: string; text: string }).text : ''
     if (!text) return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
 
     text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
@@ -121,7 +152,21 @@ DŮLEŽITÉ:
       }
     }
 
+    // Save to history (non-blocking)
+    void supabaseAdmin
+      .from('job_analyses')
+      .insert({
+        user_id: user.id,
+        job_text: jobText.substring(0, 5000),
+        position: analysisData.position || null,
+        company: analysisData.company || null,
+        location: analysisData.location || null,
+        match_score: typeof analysisData.match_score === 'number' ? analysisData.match_score : null,
+        analysis_data: analysisData,
+      })
+
     return NextResponse.json({ analysisData, usage: { input: response.usage.input_tokens, output: response.usage.output_tokens } })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('Analyze job error:', error)
     return NextResponse.json({ error: error.message || 'Analysis error' }, { status: 500 })
