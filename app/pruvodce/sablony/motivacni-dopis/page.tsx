@@ -105,7 +105,7 @@ export default function MotivacniDopis() {
       const res = await fetch('/api/generate-letter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ formData }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Generování selhalo')

@@ -65,11 +65,15 @@ interface LetterFormData {
   company: string
   companyAddress: string
   field: string
-  experienceYears: string
+  experienceYears?: string
+  experience?: string
   skills: string
-  germanLevel: string
-  whySwitzerland: string
-  additionalInfo: string
+  germanLevel?: string
+  german?: string
+  whySwitzerland?: string
+  motivation?: string
+  additionalInfo?: string
+  extra?: string
 }
 
 interface GeneratedLetterFields {
@@ -148,13 +152,13 @@ Firmenadresse: ${formData.companyAddress || 'nicht angegeben'}
 Branche: ${formData.field || 'nicht angegeben'}
 
 QUALIFIKATIONEN:
-Berufserfahrung: ${formData.experienceYears || 'nicht angegeben'} Jahre
+Berufserfahrung: ${formData.experienceYears || formData.experience || 'nicht angegeben'} Jahre
 Kompetenzen/Fähigkeiten: ${formData.skills || 'nicht angegeben'}
-Deutschniveau: ${formData.germanLevel || 'nicht angegeben'}
+Deutschniveau: ${formData.germanLevel || formData.german || 'nicht angegeben'}
 
 MOTIVATION:
-Warum Schweiz: ${formData.whySwitzerland || 'nicht angegeben'}
-Zusätzliche Informationen: ${formData.additionalInfo || 'keine'}
+Warum Schweiz: ${formData.whySwitzerland || formData.motivation || 'nicht angegeben'}
+Zusätzliche Informationen: ${formData.additionalInfo || formData.extra || 'keine'}
 
 Antworte NUR mit validem JSON. Kein anderer Text.`
 
