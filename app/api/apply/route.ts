@@ -5,7 +5,7 @@ import { Resend } from 'resend'
 import chromium from '@sparticuz/chromium-min'
 import puppeteer from 'puppeteer-core'
 
-const CHROMIUM_URL = 'https://github.com/nichochar/chromium-brotli-lambda-arm64/releases/download/v143.0.0/chromium-v143.0.0-pack.tar'
+const CHROMIUM_URL = 'https://github.com/Sparticuz/chromium/releases/download/v143.0.4/chromium-v143.0.4-pack.x64.tar'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
