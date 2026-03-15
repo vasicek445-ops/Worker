@@ -72,6 +72,24 @@ export default function AnalyzaInzeratu() {
   const [showHistory, setShowHistory] = useState(false)
   const [inputMode, setInputMode] = useState<'text' | 'url'>('text')
 
+  // Restore last analysis from sessionStorage
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('woker-last-analysis')
+      if (saved) {
+        const { result: savedResult, jobText: savedJobText } = JSON.parse(saved)
+        if (savedResult) { setResult(savedResult); setJobText(savedJobText || '') }
+      }
+    } catch {}
+  }, [])
+
+  // Save analysis to sessionStorage when result changes
+  useEffect(() => {
+    if (result) {
+      sessionStorage.setItem('woker-last-analysis', JSON.stringify({ result, jobText }))
+    }
+  }, [result, jobText])
+
   useEffect(() => {
     const loadData = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -182,7 +200,7 @@ export default function AnalyzaInzeratu() {
         <div className="max-w-2xl mx-auto relative z-10">
           <div className="flex items-center justify-between mb-5">
             <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white text-sm transition">← Zpět</Link>
-            <button onClick={() => setResult(null)} className="text-white/40 hover:text-white text-xs px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Nový inzerát</button>
+            <button onClick={() => { setResult(null); sessionStorage.removeItem('woker-last-analysis') }} className="text-white/40 hover:text-white text-xs px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Nový inzerát</button>
           </div>
 
           {/* Header card with match score */}
@@ -391,7 +409,7 @@ export default function AnalyzaInzeratu() {
             </Link>
           </div>
 
-          <button onClick={() => { setResult(null); setJobText('') }} className="w-full text-white/30 hover:text-white text-sm py-3 mt-3 transition">
+          <button onClick={() => { setResult(null); setJobText(''); sessionStorage.removeItem('woker-last-analysis') }} className="w-full text-white/30 hover:text-white text-sm py-3 mt-3 transition">
             Analyzovat jiný inzerát
           </button>
         </div>
