@@ -254,7 +254,7 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center shadow-[0_0_20px_rgba(57,255,110,0.2)]">
-                  <Image src="/images/3d/wooky.svg" alt="Wooky" width={26} height={26} />
+                  <Image src="/images/3d/wooky-wave-sm.png" alt="Wooky" width={26} height={26} className="rounded-md" />
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#39ff6e] rounded-full border-2 border-[#0a0a12] shadow-[0_0_8px_rgba(57,255,110,0.5)]" />
               </div>
@@ -296,7 +296,7 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
       <div className="px-5 py-3.5 border-b border-white/[0.04] flex items-center gap-3 bg-white/[0.02]">
         <div className="relative">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center shadow-[0_0_20px_rgba(57,255,110,0.2)]">
-            <Image src="/images/3d/wooky.svg" alt="Wooky" width={26} height={26} />
+            <Image src="/images/3d/wooky-wave-sm.png" alt="Wooky" width={26} height={26} className="rounded-md" />
           </div>
           <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#39ff6e] rounded-full border-2 border-[#0a0a12]" />
         </div>
@@ -322,7 +322,7 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
           <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             {msg.role === "assistant" && (
               <div className="w-7 h-7 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Image src="/images/3d/wooky.svg" alt="" width={18} height={18} />
+                <Image src="/images/3d/wooky-default-sm.png" alt="" width={18} height={18} className="rounded-sm" />
               </div>
             )}
             <div className={`rounded-xl px-3.5 py-2.5 max-w-[80%] ${
@@ -339,7 +339,7 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
         {isStreaming && streamingText && (
           <div className="flex gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Image src="/images/3d/wooky.svg" alt="" width={18} height={18} />
+              <Image src="/images/3d/wooky-default-sm.png" alt="" width={18} height={18} className="rounded-sm" />
             </div>
             <div className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3.5 py-2.5 max-w-[80%]">
               <p className="text-[13px] whitespace-pre-wrap leading-relaxed text-white/60 m-0">
@@ -354,7 +354,7 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
         {isStreaming && !streamingText && (
           <div className="flex gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Image src="/images/3d/wooky.svg" alt="" width={18} height={18} />
+              <Image src="/images/3d/wooky-default-sm.png" alt="" width={18} height={18} className="rounded-sm" />
             </div>
             <div className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3.5 py-2.5">
               <div className="flex gap-1.5">
