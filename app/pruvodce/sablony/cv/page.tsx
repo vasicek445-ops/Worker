@@ -202,32 +202,32 @@ export default function CVSablona() {
           // Use profile avatar as default photo
           if (profile.avatar_url && !photo) setPhoto(profile.avatar_url)
         }
-        // Prefill from job analysis: URL params or sessionStorage
+        // Prefill from job analysis (only when coming from analysis via URL param)
         const params = new URLSearchParams(window.location.search)
         const p = params.get('prefill')
         let analysisData: Record<string, string> | null = null
 
         if (p) {
           try { analysisData = JSON.parse(decodeURIComponent(p)) } catch {}
-        }
 
-        // Fallback: read last analysis from sessionStorage
-        if (!analysisData) {
-          try {
-            const saved = sessionStorage.getItem('woker-last-analysis')
-            if (saved) {
-              const { result } = JSON.parse(saved)
-              if (result) {
-                analysisData = {
-                  position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '',
-                  company: result.company || '',
-                  skills: result.skills_needed?.join(', ') || '',
-                  keywords: result.cover_letter_keywords?.join(', ') || '',
-                  location: result.location || '',
+          // Also try sessionStorage if URL param parse failed
+          if (!analysisData) {
+            try {
+              const saved = sessionStorage.getItem('woker-last-analysis')
+              if (saved) {
+                const { result } = JSON.parse(saved)
+                if (result) {
+                  analysisData = {
+                    position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '',
+                    company: result.company || '',
+                    skills: result.skills_needed?.join(', ') || '',
+                    keywords: result.cover_letter_keywords?.join(', ') || '',
+                    location: result.location || '',
+                  }
                 }
               }
-            }
-          } catch {}
+            } catch {}
+          }
         }
 
         if (analysisData) {
