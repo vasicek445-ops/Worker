@@ -52,6 +52,7 @@ export default function MotivacniDopis() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [prefilled, setPrefilled] = useState(false)
+  const [photo, setPhoto] = useState<string | null>(null)
 
   // Auto-prefill from user profile
   useEffect(() => {
@@ -185,14 +186,14 @@ export default function MotivacniDopis() {
             </div>
           </div>
 
-          <LetterPreview data={letterData} template={template} accentColor={accentColor} onSave={handleSaveLetter} saving={saving} saved={saved} />
+          <LetterPreview data={letterData} photo={photo} template={template} accentColor={accentColor} onSave={handleSaveLetter} saving={saving} saved={saved} />
           {saved && (
             <div className="bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20 rounded-xl p-3 mt-3 text-center">
               <span className="text-[#39ff6e]/80 text-sm">Dopis uložen — bude se automaticky přikládat k přihláškám přes Smart Matching</span>
             </div>
           )}
 
-          <button onClick={() => { setLetterData(null); setFormData({}); setStep(1) }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
+          <button onClick={() => { setLetterData(null); setFormData({}); setPhoto(null); setStep(1) }} className="w-full text-white/30 hover:text-white text-sm py-4 mt-5 transition bg-white/[0.02] hover:bg-white/[0.05] rounded-xl border border-white/[0.06]">
             Vytvořit nový motivační dopis
           </button>
         </div>
@@ -340,7 +341,29 @@ export default function MotivacniDopis() {
                     <Image src="/images/3d/key.png" alt="" width={18} height={18} />
                     <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Osobní údaje</span>
                   </div>
-                  <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Celé jméno *" className={inputClass} />
+                  <div className="flex items-center gap-4 mb-2">
+                    <label className="relative cursor-pointer group">
+                      <div className={`w-16 h-16 rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition ${photo ? 'border-[#39ff6e]/40' : 'border-white/15 hover:border-white/30'}`}>
+                        {photo ? (
+                          <img src={photo} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-white/20 text-xl">+</span>
+                        )}
+                      </div>
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const reader = new FileReader()
+                        reader.onload = (ev) => setPhoto(ev.target?.result as string)
+                        reader.readAsDataURL(file)
+                      }} />
+                      {photo && <button onClick={(e) => { e.preventDefault(); setPhoto(null) }} className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center hover:bg-red-600">×</button>}
+                    </label>
+                    <div className="flex-1 space-y-2">
+                      <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Celé jméno *" className={inputClass} />
+                      <span className="text-white/20 text-[10px]">Fotka je volitelná</span>
+                    </div>
+                  </div>
                   <input type="text" value={formData.address || ''} onChange={(e) => handleChange('address', e.target.value)} placeholder="Adresa (ulice, město, PSČ)" className={inputClass} />
                   <div className="grid grid-cols-2 gap-3">
                     <input type="text" value={formData.phone || ''} onChange={(e) => handleChange('phone', e.target.value)} placeholder="Telefon" className={inputClass} />
