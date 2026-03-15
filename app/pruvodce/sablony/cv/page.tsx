@@ -202,19 +202,43 @@ export default function CVSablona() {
           // Use profile avatar as default photo
           if (profile.avatar_url && !photo) setPhoto(profile.avatar_url)
         }
-        // Also check URL prefill params (from job analysis)
+        // Prefill from job analysis: URL params or sessionStorage
         const params = new URLSearchParams(window.location.search)
         const p = params.get('prefill')
+        let analysisData: Record<string, string> | null = null
+
         if (p) {
-          const data = JSON.parse(decodeURIComponent(p))
+          try { analysisData = JSON.parse(decodeURIComponent(p)) } catch {}
+        }
+
+        // Fallback: read last analysis from sessionStorage
+        if (!analysisData) {
+          try {
+            const saved = sessionStorage.getItem('woker-last-analysis')
+            if (saved) {
+              const { result } = JSON.parse(saved)
+              if (result) {
+                analysisData = {
+                  position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '',
+                  company: result.company || '',
+                  skills: result.skills_needed?.join(', ') || '',
+                  keywords: result.cover_letter_keywords?.join(', ') || '',
+                  location: result.location || '',
+                }
+              }
+            }
+          } catch {}
+        }
+
+        if (analysisData) {
           setFormData(prev => ({
             ...prev,
-            ...(data.position && { position: data.position }),
-            ...(data.company && { company: data.company }),
-            ...(data.skills && { skills: prev.skills ? `${prev.skills}, ${data.skills}` : data.skills }),
-            ...(data.keywords && { skills: prev.skills ? `${prev.skills}, ${data.keywords}` : data.keywords }),
-            ...(data.field && { field: data.field }),
-            ...(data.location && { address: data.location }),
+            ...(analysisData!.position && { position: analysisData!.position }),
+            ...(analysisData!.company && { company: analysisData!.company }),
+            ...(analysisData!.skills && { skills: prev.skills ? `${prev.skills}, ${analysisData!.skills}` : analysisData!.skills }),
+            ...(analysisData!.keywords && { skills: prev.skills ? `${prev.skills}, ${analysisData!.keywords}` : analysisData!.keywords }),
+            ...(analysisData!.field && { field: analysisData!.field }),
+            ...(analysisData!.location && { address: analysisData!.location }),
           }))
         }
       } catch {}

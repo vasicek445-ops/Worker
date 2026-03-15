@@ -94,20 +94,46 @@ export default function MotivacniDopis() {
           setFormData(prev => ({ ...prev, ...prefillData }))
           if (profile.avatar_url && !photo) setPhoto(profile.avatar_url)
         }
-        // URL prefill params (from job analysis)
+        // Prefill from job analysis: URL params or sessionStorage
         const params = new URLSearchParams(window.location.search)
         const p = params.get('prefill')
+        let analysisResult: { position?: string; company?: string; companyAddress?: string; field?: string; keywords?: string[]; tips?: string[]; location?: string; cover_letter_keywords?: string[]; match_tips?: string[]; skills_needed?: string[] } | null = null
+
         if (p) {
-          const data = JSON.parse(decodeURIComponent(p))
+          try { analysisResult = JSON.parse(decodeURIComponent(p)) } catch {}
+        }
+
+        // Fallback: read last analysis from sessionStorage
+        if (!analysisResult) {
+          try {
+            const saved = sessionStorage.getItem('woker-last-analysis')
+            if (saved) {
+              const { result } = JSON.parse(saved)
+              if (result) {
+                analysisResult = {
+                  position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '',
+                  company: result.company || '',
+                  keywords: result.cover_letter_keywords || [],
+                  tips: result.match_tips || [],
+                  location: result.location || '',
+                }
+              }
+            }
+          } catch {}
+        }
+
+        if (analysisResult) {
+          const keywords = analysisResult.keywords || analysisResult.cover_letter_keywords || []
+          const tips = analysisResult.tips || analysisResult.match_tips || []
           setFormData(prev => ({
             ...prev,
-            ...(data.position && { position: data.position }),
-            ...(data.company && { company: data.company }),
-            ...(data.companyAddress && { companyAddress: data.companyAddress }),
-            ...(data.field && { field: data.field }),
-            ...(data.keywords?.length && { skills: prev.skills ? `${prev.skills}, ${data.keywords.join(', ')}` : data.keywords.join(', ') }),
-            ...(data.tips?.length && { motivation: data.tips.join('. ') }),
-            ...(data.location && { companyAddress: data.location }),
+            ...(analysisResult!.position && { position: analysisResult!.position }),
+            ...(analysisResult!.company && { company: analysisResult!.company }),
+            ...(analysisResult!.companyAddress && { companyAddress: analysisResult!.companyAddress }),
+            ...(analysisResult!.field && { field: analysisResult!.field }),
+            ...(keywords.length && { skills: prev.skills ? `${prev.skills}, ${keywords.join(', ')}` : keywords.join(', ') }),
+            ...(tips.length && { motivation: tips.join('. ') }),
+            ...(analysisResult!.location && { companyAddress: analysisResult!.location }),
           }))
         }
       } catch {}
