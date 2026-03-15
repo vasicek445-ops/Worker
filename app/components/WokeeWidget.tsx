@@ -68,21 +68,21 @@ function getContextQuestions(profilePercent: number, appCount: number, hasCv: bo
 
 function getGreeting(profilePercent: number, name: string, appCount: number, hasCv: boolean): string {
   const firstName = name?.split(" ")[0] || "";
-  const hi = firstName ? `Ahoj ${firstName}!` : "Ahoj!";
+  const hi = firstName ? `${firstName}, ahoj!` : "Ahoj!";
 
   if (profilePercent < 50) {
-    return `${hi} Jsem Wooky, tvuj AI pruvodce praci ve Svycarsku. Vidim ze mas profil na ${profilePercent}% — chces ti pomuzem ho doplnit? Kompletni profil odemkne Smart Matching a lepsi nabidky.`;
+    return `${hi} Jsem Wooky, tvuj Team Leader tady na Wokeru. Vidim ze mas profil na ${profilePercent}% — to musime dohodit. Kompletni profil mi umozni spustit Smart Matching a najit ti presne ty spravne agentury. Pojdme na to!`;
   }
   if (profilePercent < 100) {
-    return `${hi} Tvuj profil je na ${profilePercent}%. Jeste par udaju a budes mit plny pristup ke Smart Matching. Muzu poradit s cimkoliv — od hledani prace po pripravy na pohovor.`;
+    return `${hi} Tady Wooky, tvuj Team Leader. Profil mas na ${profilePercent}% — jeste par udaju a poustim na to cely tym. Smart Matching, CV generator, vse bude ready. Co potrebujes?`;
   }
   if (!hasCv) {
-    return `${hi} Profil mas kompletni — super! Dalsi krok je vytvorit CV ve svycarskem formatu. Muzu ti s tim pomoct, nebo se zeptej na cokoliv o praci ve Svycarsku.`;
+    return `${hi} Wooky tady. Profil je kompletni, super prace! Ted doporucuju nechat nas CV tym vytvorit zivotopis ve svycarskem formatu — zabere to minutu a bude profi. Nebo mi rekni co resis.`;
   }
   if (appCount === 0) {
-    return `${hi} Mas profil i CV — ted je cas se prihlasit! Spust Smart Matching a nech AI najit idealni agentury pro tebe. Nebo se zeptej na cokoliv.`;
+    return `${hi} Wooky hlasi pripravenost. Mas profil i CV — je cas akcne nasadit Smart Matching. Sparuju te s nejlepsimi agenturami pro tvuj obor. Nebo chces jeste neco doladit?`;
   }
-  return `${hi} Jsi na spravne ceste — ${appCount} prihlasek odeslan${appCount === 1 ? "a" : appCount < 5 ? "y" : "o"}! Muzu ti pomoct s pripravou na pohovor, nemcinou nebo cimkoliv dalsim.`;
+  return `${hi} Tady Wooky. Uz mas ${appCount} odeslan${appCount === 1 ? "ou prihlasku" : appCount < 5 ? "e prihlasky" : "ych prihlasek"} — skvela prace! Chces se pripravit na pohovor? Nebo ti muzu pomoct s necim dalsim.`;
 }
 
 function parseChips(text: string): { cleanText: string; chips: string[] } {
@@ -263,16 +263,16 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
                 <p className="text-[#39ff6e] text-[11px] font-medium m-0">Online 24/7</p>
               </div>
             </div>
-            <span className="text-[11px] text-white/25 font-medium bg-white/[0.04] px-3 py-1.5 rounded-full border border-white/[0.06]">AI pruvodce</span>
+            <span className="text-[11px] text-white/25 font-medium bg-white/[0.04] px-3 py-1.5 rounded-full border border-white/[0.06]">AI Team Leader</span>
           </div>
           <div className="p-4 flex flex-col gap-3">
             <div className="bg-[#39ff6e]/[0.04] rounded-xl rounded-bl-sm px-3.5 py-2.5 max-w-[85%] border border-[#39ff6e]/10">
               <p className="text-[13px] text-white/60 leading-relaxed m-0">
                 {profilePercent < 50
-                  ? `Profil na ${profilePercent}% — pomuzem ti ho doplnit a najit praci ve Svycarsku.`
+                  ? `Profil na ${profilePercent}% — dohodime to a pustim na to cely tym.`
                   : profilePercent < 100
-                    ? `Jeste par kroku do kompletniho profilu. Poradim s cimkoliv!`
-                    : `Profil kompletni! Ptej se na cokoliv o praci ve Svycarsku.`}
+                    ? `Jeste par kroku a mam vsechno ready. Poradim s cimkoliv.`
+                    : `Vse ready! Rekni co resis a nasmeruju te na spravny nastroj.`}
               </p>
             </div>
             <div className="flex flex-wrap gap-1.5">

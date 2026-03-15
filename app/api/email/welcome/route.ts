@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
       <div style="display:flex;gap:12px;margin-bottom:14px;">
         <div style="min-width:32px;height:32px;background:rgba(57,255,110,0.1);border-radius:50%;text-align:center;line-height:32px;font-size:14px;">3</div>
         <div>
-          <p style="margin:0;color:#f0f0f5;font-weight:bold;">Zeptej se Wooky</p>
-          <p style="margin:4px 0 0;font-size:13px;color:#8888aa;">AI asistent ti poradí s čímkoliv — povolení, daně, bydlení, platy.</p>
+          <p style="margin:0;color:#f0f0f5;font-weight:bold;">Zeptej se Wookyho</p>
+          <p style="margin:4px 0 0;font-size:13px;color:#8888aa;">Tvůj AI Team Leader — naviguje tě celým procesem od CV po nástup.</p>
         </div>
       </div>
     </div>
