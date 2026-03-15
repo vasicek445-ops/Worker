@@ -68,27 +68,47 @@ function isNoiseLine(line: string): boolean {
 }
 
 function deduplicateContent(text: string): string {
-  const paragraphs = text.split('\n\n')
-  if (paragraphs.length < 4) return text
+  // First: deduplicate individual lines
+  const lines = text.split('\n')
+  const seenLines = new Map<string, number>()
+  const dedupedLines: string[] = []
 
-  // Find duplicate paragraphs (content that appears more than once)
-  const seen = new Map<string, number>()
+  for (const line of lines) {
+    const normalized = line.trim().toLowerCase().replace(/\s+/g, ' ')
+    if (!normalized) {
+      dedupedLines.push(line)
+      continue
+    }
+    const count = seenLines.get(normalized) || 0
+    if (count === 0) {
+      dedupedLines.push(line)
+    }
+    seenLines.set(normalized, count + 1)
+  }
+
+  text = dedupedLines.join('\n')
+
+  // Then: deduplicate paragraphs (blocks separated by double newlines)
+  const paragraphs = text.split('\n\n')
+  if (paragraphs.length < 4) return text.replace(/\n{3,}/g, '\n\n').trim()
+
+  const seenParas = new Map<string, number>()
   const result: string[] = []
 
   for (const para of paragraphs) {
     const normalized = para.trim().toLowerCase().replace(/\s+/g, ' ')
-    if (normalized.length < 20) {
+    if (normalized.length < 10) {
       result.push(para)
       continue
     }
-    const count = seen.get(normalized) || 0
+    const count = seenParas.get(normalized) || 0
     if (count === 0) {
       result.push(para)
     }
-    seen.set(normalized, count + 1)
+    seenParas.set(normalized, count + 1)
   }
 
-  return result.join('\n\n')
+  return result.join('\n\n').replace(/\n{3,}/g, '\n\n').trim()
 }
 
 function extractJobContent(html: string): string {
