@@ -347,20 +347,29 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
 
   function parseScript(text: string): GeneratedScript {
     const sections: Record<string, string> = {};
-    const labels = ["HOOK", "BODY", "CTA", "B-ROLL", "DÉLKA"];
+    // Match labels with optional emojis, brackets, timing info
+    const labelPatterns: [string, RegExp][] = [
+      ["HOOK", /HOOK/i],
+      ["BODY", /(?:TĚLO|BODY)/i],
+      ["CTA", /CTA/i],
+      ["B-ROLL", /B-?ROLL/i],
+      ["DÉLKA", /(?:DÉLKA|CELKOVÁ|Celkov|⏱|Hashtag|📊)/i],
+    ];
 
     let current = "";
     for (const line of text.split("\n")) {
       const trimmed = line.trim();
-      if (trimmed === "---") continue;
+      if (!trimmed || trimmed === "---") continue;
 
-      const matchedLabel = labels.find(
-        (l) => trimmed.startsWith(l + ":") || trimmed.startsWith(l + " :")
-      );
-      if (matchedLabel) {
-        current = matchedLabel;
-        const afterLabel = trimmed.slice(trimmed.indexOf(":") + 1).trim();
-        sections[current] = afterLabel;
+      const matched = labelPatterns.find(([, regex]) => regex.test(trimmed));
+      if (matched) {
+        current = matched[0];
+        // Extract text after the colon if present
+        const colonIdx = trimmed.indexOf(":");
+        const afterLabel = colonIdx !== -1 ? trimmed.slice(colonIdx + 1).trim() : "";
+        if (afterLabel) {
+          sections[current] = (sections[current] || "") + afterLabel;
+        }
       } else if (current) {
         sections[current] = (sections[current] || "") + "\n" + trimmed;
       }
