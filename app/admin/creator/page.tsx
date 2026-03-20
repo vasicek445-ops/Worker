@@ -808,7 +808,7 @@ export default function ContentCreatorPage() {
                 )}
 
                 {/* Hook */}
-                {script.hook && (
+                {script?.hook && (
                   <div className="bg-red-500/5 border border-red-500/20 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 text-xs font-bold uppercase tracking-wide">
@@ -819,13 +819,13 @@ export default function ContentCreatorPage() {
                       </span>
                     </div>
                     <p className="text-white/90 leading-relaxed font-medium">
-                      {script.hook}
+                      {script?.hook}
                     </p>
                   </div>
                 )}
 
                 {/* Body */}
-                {script.body && (
+                {script?.body && (
                   <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wide">
@@ -836,13 +836,13 @@ export default function ContentCreatorPage() {
                       </span>
                     </div>
                     <p className="text-white/80 leading-relaxed whitespace-pre-line">
-                      {script.body}
+                      {script?.body}
                     </p>
                   </div>
                 )}
 
                 {/* CTA */}
-                {script.cta && (
+                {script?.cta && (
                   <div className="bg-[#39ff6e]/5 border border-[#39ff6e]/20 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2 py-0.5 rounded-full bg-[#39ff6e]/20 text-[#39ff6e] text-xs font-bold uppercase tracking-wide">
@@ -853,13 +853,13 @@ export default function ContentCreatorPage() {
                       </span>
                     </div>
                     <p className="text-white/90 leading-relaxed font-medium">
-                      {script.cta}
+                      {script?.cta}
                     </p>
                   </div>
                 )}
 
                 {/* B-Roll */}
-                {script.broll && (
+                {script?.broll && (
                   <div className="bg-purple-500/5 border border-purple-500/20 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wide">
@@ -870,15 +870,15 @@ export default function ContentCreatorPage() {
                       </span>
                     </div>
                     <p className="text-white/70 leading-relaxed whitespace-pre-line">
-                      {script.broll}
+                      {script?.broll}
                     </p>
                   </div>
                 )}
 
                 {/* Duration */}
-                {script.duration && (
+                {script?.duration && (
                   <div className="flex items-center gap-2 text-sm text-white/40">
-                    <span>⏱️</span> Odhadovaná délka: {script.duration}
+                    <span>⏱️</span> Odhadovaná délka: {script?.duration}
                   </div>
                 )}
 
