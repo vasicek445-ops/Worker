@@ -6,7 +6,7 @@ import { supabase } from '../supabase'
 
 export default function Pricing() {
   const [loading, setLoading] = useState<string | null>(null)
-  const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
+  const [billing, setBilling] = useState<'monthly' | 'quarterly'>('monthly')
 
   const handleCheckout = async (planKey: string) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -160,24 +160,24 @@ export default function Pricing() {
               Měsíčně
             </button>
             <button
-              onClick={() => setBilling('yearly')}
+              onClick={() => setBilling('quarterly')}
               style={{
                 padding: '10px 24px', borderRadius: '10px', border: 'none',
                 fontSize: '14px', fontWeight: 600, cursor: 'pointer',
                 fontFamily: 'inherit',
-                background: billing === 'yearly' ? '#39ff6e' : 'transparent',
-                color: billing === 'yearly' ? '#0a0a12' : 'rgba(255,255,255,0.5)',
+                background: billing === 'quarterly' ? '#39ff6e' : 'transparent',
+                color: billing === 'quarterly' ? '#0a0a12' : 'rgba(255,255,255,0.5)',
                 transition: 'all 0.3s',
                 display: 'flex', alignItems: 'center', gap: '6px',
               }}
             >
-              Ročně
+              3 měsíce
               <span style={{
-                background: billing === 'yearly' ? 'rgba(0,0,0,0.2)' : 'rgba(57,255,110,0.15)',
-                color: billing === 'yearly' ? '#0a0a12' : '#39ff6e',
+                background: billing === 'quarterly' ? 'rgba(0,0,0,0.2)' : 'rgba(57,255,110,0.15)',
+                color: billing === 'quarterly' ? '#0a0a12' : '#39ff6e',
                 padding: '2px 8px', borderRadius: '6px',
                 fontSize: '11px', fontWeight: 700,
-              }}>-17%</span>
+              }}>-23%</span>
             </button>
           </div>
 
@@ -227,19 +227,19 @@ export default function Pricing() {
                 <div style={{ marginBottom: '8px' }}>
                   {billing === 'monthly' ? (
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                      <span style={{ color: 'white', fontSize: '48px', fontWeight: 800 }}>€9</span>
+                      <span style={{ color: 'white', fontSize: '48px', fontWeight: 800 }}>€19</span>
                       <span style={{ color: 'white', fontSize: '24px', fontWeight: 800 }}>.99</span>
                       <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '16px', marginLeft: '4px' }}>/měsíc</span>
                     </div>
                   ) : (
                     <div>
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                        <span style={{ color: 'white', fontSize: '48px', fontWeight: 800 }}>€99</span>
+                        <span style={{ color: 'white', fontSize: '48px', fontWeight: 800 }}>€45</span>
                         <span style={{ color: 'white', fontSize: '24px', fontWeight: 800 }}>.99</span>
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '16px', marginLeft: '4px' }}>/rok</span>
+                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '16px', marginLeft: '4px' }}>/3 měsíce</span>
                       </div>
                       <span style={{ color: '#39ff6e', fontSize: '13px', fontWeight: 600 }}>
-                        Ušetříš 19,89 € ročně
+                        Ušetříš 13,98 € oproti měsíčnímu
                       </span>
                     </div>
                   )}
@@ -305,7 +305,7 @@ export default function Pricing() {
                     boxShadow: '0 4px 24px rgba(57,255,110,0.25)',
                   }}
                 >
-                  {loading ? 'Načítání...' : billing === 'monthly' ? 'ZÍSKAT PŘÍSTUP TEĎ →' : 'ZAČÍT ZA 99,99 €/ROK →'}
+                  {loading ? 'Načítání...' : billing === 'monthly' ? 'ZÍSKAT PŘÍSTUP TEĎ →' : 'ZAČÍT ZA 45,99 € / 3 MĚSÍCE →'}
                 </button>
 
                 <p style={{
@@ -317,7 +317,7 @@ export default function Pricing() {
               </div>
             </div>
 
-            {/* Yearly bonus card - only show if monthly selected */}
+            {/* Quarterly bonus card - only show if monthly selected */}
             {billing === 'monthly' && (
               <div style={{
                 background: '#111120',
@@ -339,12 +339,12 @@ export default function Pricing() {
                   marginBottom: '20px',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                }}>Roční</div>
+                }}>3 měsíce</div>
 
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '8px' }}>
-                  <span style={{ color: 'white', fontSize: '42px', fontWeight: 800 }}>€99</span>
+                  <span style={{ color: 'white', fontSize: '42px', fontWeight: 800 }}>€45</span>
                   <span style={{ color: 'white', fontSize: '20px', fontWeight: 800 }}>.99</span>
-                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '15px', marginLeft: '4px' }}>/rok</span>
+                  <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '15px', marginLeft: '4px' }}>/3 měsíce</span>
                 </div>
 
                 <span style={{
@@ -352,7 +352,7 @@ export default function Pricing() {
                   padding: '4px 12px', borderRadius: '8px', fontSize: '12px',
                   fontWeight: 700, display: 'inline-block', width: 'fit-content',
                   marginBottom: '24px',
-                }}>Ušetříte 20 €</span>
+                }}>Ušetříš 23 %</span>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '28px' }}>
                   {[
@@ -361,7 +361,6 @@ export default function Pricing() {
                     { text: 'Prémiové nabídky jako první', icon: '✅' },
                     { text: 'Šablony životopisů pro CH', icon: '✅' },
                     { text: '3denní zkušební doba', icon: '✅' },
-                    { text: '2 měsíce zdarma', icon: '✅' },
                   ].map((f) => (
                     <div key={f.text} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{
@@ -384,7 +383,7 @@ export default function Pricing() {
                 </div>
 
                 <button
-                  onClick={() => { setBilling('yearly'); handleCheckout('yearly'); }}
+                  onClick={() => { setBilling('quarterly'); handleCheckout('quarterly'); }}
                   disabled={loading !== null}
                   style={{
                     width: '100%',
@@ -428,7 +427,7 @@ export default function Pricing() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
               {[
-                { label: 'Cena', agency: '400–600 €', woker: '9,99 €/měs' },
+                { label: 'Cena', agency: '400–600 €', woker: '19,99 €/měs' },
                 { label: 'Kontakty na firmy', agency: '❌ Žádné', woker: '✅ 1 007+' },
                 { label: 'Transparentnost', agency: '❌ Skryté poplatky', woker: '✅ Plná' },
                 { label: 'AI asistent', agency: '❌', woker: '✅ 24/7' },

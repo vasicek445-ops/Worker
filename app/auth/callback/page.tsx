@@ -38,7 +38,7 @@ async function handlePostAuth(user: any, plan: string | null, isRecovery: boolea
   }
 
   if (isRecovery) { window.location.replace("/reset-heslo"); return; }
-  if (plan && (plan === "monthly" || plan === "yearly")) {
+  if (plan && (plan === "monthly" || plan === "quarterly")) {
     const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

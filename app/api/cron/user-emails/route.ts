@@ -215,7 +215,7 @@ function getUserSequenceEmail(step: number, name: string) {
         <p>Věřím, že Woker ti může pomoct najít práci ve Švýcarsku. Ale rozhodnutí je na tobě.</p>
         <div style="margin:20px 0;padding:18px;background:#1a1a2e;border-radius:10px;border-left:3px solid #39ff6e;">
           <p style="color:#f0f0f5;margin:0;font-size:16px;">
-            <strong>Roční plán: 3 dny zdarma.</strong>
+            <strong>3-měsíční plán: 3 dny zdarma.</strong>
           </p>
           <p style="color:#8888aa;font-size:13px;margin:8px 0 0;">Vyzkoušej vše na 3 dny — pokud se ti to nelíbí, zrušíš to a neplatíš nic.</p>
         </div>

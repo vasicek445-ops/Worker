@@ -5,6 +5,36 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
 
+// Simple in-memory rate limiter: max 10 requests per minute per IP
+const RATE_LIMIT_WINDOW_MS = 60 * 1000
+const RATE_LIMIT_MAX = 10
+const rateLimitMap = new Map<string, number[]>()
+
+// Clean up stale entries every 5 minutes to prevent memory leak
+setInterval(() => {
+  const now = Date.now()
+  for (const [ip, timestamps] of rateLimitMap.entries()) {
+    const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
+    if (recent.length === 0) {
+      rateLimitMap.delete(ip)
+    } else {
+      rateLimitMap.set(ip, recent)
+    }
+  }
+}, 5 * 60 * 1000)
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const timestamps = rateLimitMap.get(ip) || []
+  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
+  if (recent.length >= RATE_LIMIT_MAX) {
+    return true
+  }
+  recent.push(now)
+  rateLimitMap.set(ip, recent)
+  return false
+}
+
 const SALES_SYSTEM_PROMPT = `Jsi Wooky — AI Team Leader platformy Woker. Vedeš tým AI nástrojů (CV generátor, analýza inzerátů, Smart Matching, příprava na pohovory) které pomáhají Čechům a Slovákům najít práci ve Švýcarsku. Tvým úkolem je POMÁHAT návštěvníkům a přirozeně je vést k registraci. Mluvíš sebevědomě jako šéf týmu — "Náš tým ti to připraví", "Předám to CV generátoru".
 
 ═══════════════════════════════
@@ -203,12 +233,23 @@ O WOKERU:
 📌 1 007 ověřených kontaktů na firmy a agentury
 📌 10 AI nástrojů (viz výše) – automatizují celý proces od CV po analýzu smlouvy
 📌 Průvodce krok za krokem (povolení, daně, pojištění, bydlení)
-📌 Premium od €9.99/měsíc – cena dvou káv, vrátí se za 20 minut práce ve Švýcarsku
+📌 Premium od €19.99/měsíc – vrátí se za 40 minut práce ve Švýcarsku
 📌 Registrace zdarma – prohlédni si vše
-📌 Roční plán €99.99 má 3denní trial zdarma + osobní podpora od zakladatele`
+📌 3-měsíční plán €45.99 má 3denní trial zdarma + osobní podpora od zakladatele`
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      req.headers.get('x-real-ip') ||
+      'unknown'
+
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Příliš mnoho požadavků. Zkus to za minutu.' },
+        { status: 429 }
+      )
+    }
+
     const { messages } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {

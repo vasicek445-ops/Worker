@@ -2,13 +2,15 @@ export const PLANS = {
   monthly: {
     name: 'Měsíční',
     priceId: process.env.STRIPE_MONTHLY_PRICE_ID!,
-    price: 9.99,
+    price: 19.99,
+    interval: 1,
     currency: 'EUR',
   },
-  yearly: {
-    name: 'Roční',
-    priceId: process.env.STRIPE_YEARLY_PRICE_ID!,
-    price: 99.99,
+  quarterly: {
+    name: '3-měsíční',
+    priceId: process.env.STRIPE_QUARTERLY_PRICE_ID!,
+    price: 45.99,
+    interval: 3,
     currency: 'EUR',
   },
 } as const
