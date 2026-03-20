@@ -19,7 +19,6 @@ interface Transcription {
   text: string;
   segments: Segment[];
   duration: number;
-  date: string;
   created_at: string;
 }
 
@@ -280,43 +279,6 @@ export default function ContentCreatorPage() {
     setGenerating(true);
     setScript(null);
 
-    const platformLimits: Record<string, string> = {
-      TikTok: "15-60 sekund",
-      Instagram: "15-90 sekund (Reels)",
-      YouTube: "15-60 sekund (Shorts)",
-    };
-
-    // Build examples from library
-    const examples = library
-      .map(
-        (t, i) =>
-          `--- Příklad ${i + 1}: "${t.title}" (${t.platform}, ${t.views || "?"} views, tón: ${t.tags || "obecný"}) ---\n${t.text}\n`
-      )
-      .join("\n");
-
-    const systemPrompt = `Jsi expert na virální krátká videa. Generuješ scripty pro sociální sítě.
-
-FORMÁT ODPOVĚDI (vždy dodržuj přesně):
-HOOK: [první 2-3 sekundy — musí zastavit scrollování]
----
-BODY: [hlavní obsah — konkrétní, bez vatování]
----
-CTA: [výzva k akci — komentář, follow, sdílení]
----
-B-ROLL: [návrhy vizuálů, záběrů, textových overlayů]
----
-DÉLKA: [odhadovaná stopáž]
-
-PRAVIDLA:
-- Piš česky
-- Hook musí být provokativní nebo překvapivý
-- Platformu: ${targetPlatform} (${platformLimits[targetPlatform]})
-- Tón: ${tone}
-- Žádný markdown (hvězdičky, nadpisy) — čistý text
-- Krátké věty, mluvený styl
-
-${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žádné příklady v knihovně."}`;
-
     try {
       const res = await fetch("/api/generate-script", {
         method: "POST",
@@ -334,11 +296,14 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
         }),
       });
 
-      if (!res.ok) throw new Error("Chyba při generování");
-
       const data = await res.json();
-      setRawScript(data.script || "");
-      const parsed = parseScript(data.script || "");
+      if (!res.ok) throw new Error(data.error || "Chyba při generování");
+
+      const scriptText = data.script || "";
+      if (!scriptText) throw new Error("API vrátilo prázdný script");
+
+      setRawScript(scriptText);
+      const parsed = parseScript(scriptText);
       setScript(parsed);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Chyba při generování");
@@ -658,7 +623,7 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
                           <span>{item.platform}</span>
                           {item.views && <span>{item.views} views</span>}
                           <span>
-                            {new Date(item.date).toLocaleDateString("cs-CZ")}
+                            {new Date(item.created_at).toLocaleDateString("cs-CZ")}
                           </span>
                         </p>
                       </div>
@@ -828,14 +793,14 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
             </button>
 
             {/* Generated script output */}
-            {script && (
+            {(script || rawScript) && (
               <div className="mt-6 space-y-4 animate-fade-in">
                 <div className="flex items-center gap-2 text-[#39ff6e] font-medium text-lg">
                   <span>🎬</span> Vygenerovaný script
                 </div>
 
                 {/* Raw output fallback if parser found nothing */}
-                {!script.hook && !script.body && rawScript && (
+                {(!script?.hook && !script?.body) && rawScript && (
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <div className="text-white/40 text-xs mb-2 uppercase tracking-wide">Raw output</div>
                     <pre className="text-white/90 whitespace-pre-wrap text-sm leading-relaxed">{rawScript}</pre>
@@ -920,7 +885,9 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
                 {/* Copy button */}
                 <button
                   onClick={() => {
-                    const full = `HOOK:\n${script.hook}\n\nBODY:\n${script.body}\n\nCTA:\n${script.cta}\n\nB-ROLL:\n${script.broll}\n\nDÉLKA: ${script.duration}`;
+                    const full = script?.hook
+                      ? `HOOK:\n${script.hook}\n\nBODY:\n${script.body}\n\nCTA:\n${script.cta}\n\nB-ROLL:\n${script.broll}\n\nDÉLKA: ${script.duration}`
+                      : rawScript;
                     navigator.clipboard.writeText(full);
                     alert("Zkopírováno do schránky!");
                   }}
