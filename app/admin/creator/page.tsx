@@ -87,6 +87,7 @@ export default function ContentCreatorPage() {
   const [file, setFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const [transcribeStatus, setTranscribeStatus] = useState("");
   const [transcriptionResult, setTranscriptionResult] = useState<{
     text: string;
     segments: Segment[];
@@ -149,17 +150,94 @@ export default function ContentCreatorPage() {
   }, []);
 
   // ─── Transcribe ─────────────────────────────────────────
+  // Extract audio from video using Web Audio API to reduce file size
+  const extractAudio = async (videoFile: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      video.muted = true;
+      video.src = URL.createObjectURL(videoFile);
+
+      video.onloadedmetadata = async () => {
+        try {
+          const audioContext = new AudioContext({ sampleRate: 16000 });
+          const duration = video.duration;
+
+          // Use MediaRecorder to extract audio
+          const stream = (video as HTMLVideoElement & { captureStream(): MediaStream }).captureStream();
+          const audioTracks = stream.getAudioTracks();
+
+          if (audioTracks.length === 0) {
+            // No audio track — send original file
+            resolve(videoFile);
+            return;
+          }
+
+          const audioStream = new MediaStream(audioTracks);
+          const mediaRecorder = new MediaRecorder(audioStream, {
+            mimeType: "audio/webm;codecs=opus",
+          });
+
+          const chunks: Blob[] = [];
+          mediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) chunks.push(e.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(chunks, { type: "audio/webm" });
+            const audioFile = new File([audioBlob], "audio.webm", {
+              type: "audio/webm",
+            });
+            URL.revokeObjectURL(video.src);
+            audioContext.close();
+            resolve(audioFile);
+          };
+
+          mediaRecorder.onerror = () => {
+            // Fallback: send original file
+            URL.revokeObjectURL(video.src);
+            audioContext.close();
+            resolve(videoFile);
+          };
+
+          mediaRecorder.start();
+          video.play();
+
+          // Stop recording when video ends
+          setTimeout(() => {
+            mediaRecorder.stop();
+            video.pause();
+          }, duration * 1000 + 500);
+        } catch {
+          resolve(videoFile);
+        }
+      };
+
+      video.onerror = () => reject(new Error("Nelze načíst video"));
+    });
+  };
+
   const handleTranscribe = async () => {
     if (!file) return;
     setTranscribing(true);
     setTranscriptionResult(null);
 
     try {
+      let fileToSend: File;
+
+      // If file > 4MB and is video, extract audio to reduce size
+      const isVideo = file.type.startsWith("video/");
+      if (file.size > 4 * 1024 * 1024 && isVideo) {
+        setTranscribeStatus("Extrahuji audio z videa...");
+        fileToSend = await extractAudio(file);
+      } else {
+        const ext = file.name.split(".").pop() || "mp4";
+        fileToSend = new File([file], `audio.${ext}`, { type: file.type });
+      }
+
+      setTranscribeStatus("Whisper přepisuje...");
+
       const formData = new FormData();
-      // Rename file to clean name — Whisper API rejects some filename patterns
-      const ext = file.name.split(".").pop() || "mp4";
-      const cleanFile = new File([file], `audio.${ext}`, { type: file.type });
-      formData.append("file", cleanFile);
+      formData.append("file", fileToSend);
 
       const res = await fetch("/api/transcribe", {
         method: "POST",
@@ -167,8 +245,14 @@ export default function ContentCreatorPage() {
       });
 
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Chyba při přepisu");
+        let errorMsg = "Chyba při přepisu";
+        try {
+          const err = await res.json();
+          errorMsg = err.error || errorMsg;
+        } catch {
+          errorMsg = `Server error: ${res.status}`;
+        }
+        throw new Error(errorMsg);
       }
 
       const data = await res.json();
@@ -189,6 +273,7 @@ export default function ContentCreatorPage() {
       alert(err instanceof Error ? err.message : "Chyba při přepisu");
     } finally {
       setTranscribing(false);
+      setTranscribeStatus("");
     }
   };
 
@@ -437,7 +522,7 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
             {transcribing ? (
               <span className="flex items-center justify-center gap-3">
                 <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Whisper přepisuje...
+                {transcribeStatus || "Whisper přepisuje..."}
               </span>
             ) : (
               "🎤 Přepsat video"
