@@ -150,115 +150,51 @@ export default function ContentCreatorPage() {
   }, []);
 
   // ─── Transcribe ─────────────────────────────────────────
-  // Extract audio from video using Web Audio API to reduce file size
-  const extractAudio = async (videoFile: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      const video = document.createElement("video");
-      video.muted = true;
-      video.src = URL.createObjectURL(videoFile);
-
-      video.onloadedmetadata = async () => {
-        try {
-          const audioContext = new AudioContext({ sampleRate: 16000 });
-          const duration = video.duration;
-
-          // Use MediaRecorder to extract audio
-          const stream = (video as HTMLVideoElement & { captureStream(): MediaStream }).captureStream();
-          const audioTracks = stream.getAudioTracks();
-
-          if (audioTracks.length === 0) {
-            // No audio track — send original file
-            resolve(videoFile);
-            return;
-          }
-
-          const audioStream = new MediaStream(audioTracks);
-          const mediaRecorder = new MediaRecorder(audioStream, {
-            mimeType: "audio/webm;codecs=opus",
-          });
-
-          const chunks: Blob[] = [];
-          mediaRecorder.ondataavailable = (e) => {
-            if (e.data.size > 0) chunks.push(e.data);
-          };
-
-          mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(chunks, { type: "audio/webm" });
-            const audioFile = new File([audioBlob], "audio.webm", {
-              type: "audio/webm",
-            });
-            URL.revokeObjectURL(video.src);
-            audioContext.close();
-            resolve(audioFile);
-          };
-
-          mediaRecorder.onerror = () => {
-            // Fallback: send original file
-            URL.revokeObjectURL(video.src);
-            audioContext.close();
-            resolve(videoFile);
-          };
-
-          mediaRecorder.start();
-          video.play();
-
-          // Stop recording when video ends
-          setTimeout(() => {
-            mediaRecorder.stop();
-            video.pause();
-          }, duration * 1000 + 500);
-        } catch {
-          resolve(videoFile);
-        }
-      };
-
-      video.onerror = () => reject(new Error("Nelze načíst video"));
-    });
-  };
-
   const handleTranscribe = async () => {
     if (!file) return;
     setTranscribing(true);
     setTranscriptionResult(null);
+    setTranscribeStatus("Získávám přístup...");
 
     try {
-      let fileToSend: File;
-
-      // If file > 4MB and is video, extract audio to reduce size
-      const isVideo = file.type.startsWith("video/");
-      if (file.size > 4 * 1024 * 1024 && isVideo) {
-        setTranscribeStatus("Extrahuji audio z videa...");
-        fileToSend = await extractAudio(file);
-      } else {
-        const ext = file.name.split(".").pop() || "mp4";
-        fileToSend = new File([file], `audio.${ext}`, { type: file.type });
-      }
+      // Step 1: Get API key from server
+      const keyRes = await fetch("/api/transcribe");
+      const keyData = await keyRes.json();
+      if (!keyData.success) throw new Error(keyData.error || "Chyba přístupu");
 
       setTranscribeStatus("Whisper přepisuje...");
 
+      // Step 2: Send file directly to OpenAI (bypasses Vercel 4.5MB limit)
+      const ext = file.name.split(".").pop() || "mp4";
+      const cleanFile = new File([file], `audio.${ext}`, { type: file.type });
+
       const formData = new FormData();
-      formData.append("file", fileToSend);
+      formData.append("file", cleanFile);
+      formData.append("model", "whisper-1");
+      formData.append("response_format", "verbose_json");
 
-      const res = await fetch("/api/transcribe", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        let errorMsg = "Chyba při přepisu";
-        try {
-          const err = await res.json();
-          errorMsg = err.error || errorMsg;
-        } catch {
-          errorMsg = `Server error: ${res.status}`;
+      const whisperRes = await fetch(
+        "https://api.openai.com/v1/audio/transcriptions",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${keyData.key}` },
+          body: formData,
         }
-        throw new Error(errorMsg);
+      );
+
+      if (!whisperRes.ok) {
+        const errText = await whisperRes.text();
+        throw new Error(`Whisper error ${whisperRes.status}: ${errText.slice(0, 200)}`);
       }
 
-      const data = await res.json();
+      const data = await whisperRes.json();
       setTranscriptionResult({
         text: data.text,
-        segments: data.segments || [],
+        segments: (data.segments || []).map((s: { start: number; end: number; text: string }) => ({
+          start: s.start,
+          end: s.end,
+          text: s.text,
+        })),
         duration: data.duration || 0,
       });
 
