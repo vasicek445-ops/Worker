@@ -1,1206 +1,1512 @@
 // =============================================================================
-// Woker Mario-Style Game — Pixel Art Sprite Definitions
+// Woker Comic Book Style Game — Canvas 2D Drawing Functions
 // Brand colors: #39ff6e (green), #2bcc58 (dark green), #ff6b2c (orange), #1a1a2e (dark)
-// All sprites use sparse coordinate arrays: [x, y, '#color']
+// Style: Thick outlines, flat bold colors, Ben-Day dots, hand-drawn feel
 // =============================================================================
 
-// ---------------------------------------------------------------------------
-// 1. czechWorker — 16x24, 3 walk frames (hard hat, red shirt, blue overalls)
-// ---------------------------------------------------------------------------
-const czechWorker = {
-  width: 16, height: 24,
-  frames: [
-    // Frame 0 — standing / walk mid
-    [
-      // Hard hat (yellow)
-      [5,0,'#f5c542'],[6,0,'#f5c542'],[7,0,'#f5c542'],[8,0,'#f5c542'],[9,0,'#f5c542'],[10,0,'#f5c542'],
-      [4,1,'#f5c542'],[5,1,'#f5c542'],[6,1,'#f5c542'],[7,1,'#f5c542'],[8,1,'#f5c542'],[9,1,'#f5c542'],[10,1,'#f5c542'],[11,1,'#f5c542'],
-      [4,2,'#f5c542'],[5,2,'#f5c542'],[6,2,'#f5c542'],[7,2,'#f5c542'],[8,2,'#f5c542'],[9,2,'#f5c542'],[10,2,'#f5c542'],[11,2,'#f5c542'],
-      [3,3,'#f5c542'],[4,3,'#f5c542'],[5,3,'#f5c542'],[6,3,'#f5c542'],[7,3,'#f5c542'],[8,3,'#f5c542'],[9,3,'#f5c542'],[10,3,'#f5c542'],[11,3,'#f5c542'],[12,3,'#f5c542'],
-      // Face (skin)
-      [5,4,'#f5b68a'],[6,4,'#f5b68a'],[7,4,'#f5b68a'],[8,4,'#f5b68a'],[9,4,'#f5b68a'],[10,4,'#f5b68a'],
-      [5,5,'#f5b68a'],[6,5,'#1a1a2e'],[7,5,'#f5b68a'],[8,5,'#f5b68a'],[9,5,'#1a1a2e'],[10,5,'#f5b68a'],
-      [5,6,'#f5b68a'],[6,6,'#f5b68a'],[7,6,'#f5b68a'],[8,6,'#f5b68a'],[9,6,'#f5b68a'],[10,6,'#f5b68a'],
-      [6,7,'#f5b68a'],[7,7,'#d9886a'],[8,7,'#d9886a'],[9,7,'#f5b68a'],
-      // Red shirt
-      [4,8,'#cc2222'],[5,8,'#cc2222'],[6,8,'#cc2222'],[7,8,'#cc2222'],[8,8,'#cc2222'],[9,8,'#cc2222'],[10,8,'#cc2222'],[11,8,'#cc2222'],
-      [3,9,'#cc2222'],[4,9,'#cc2222'],[5,9,'#cc2222'],[6,9,'#cc2222'],[7,9,'#cc2222'],[8,9,'#cc2222'],[9,9,'#cc2222'],[10,9,'#cc2222'],[11,9,'#cc2222'],[12,9,'#cc2222'],
-      [3,10,'#cc2222'],[4,10,'#cc2222'],[5,10,'#cc2222'],[6,10,'#cc2222'],[7,10,'#cc2222'],[8,10,'#cc2222'],[9,10,'#cc2222'],[10,10,'#cc2222'],[11,10,'#cc2222'],[12,10,'#cc2222'],
-      // Arms (skin)
-      [2,9,'#f5b68a'],[13,9,'#f5b68a'],
-      [2,10,'#f5b68a'],[13,10,'#f5b68a'],
-      [2,11,'#f5b68a'],[13,11,'#f5b68a'],
-      // Blue overalls
-      [4,11,'#2255aa'],[5,11,'#2255aa'],[6,11,'#2255aa'],[7,11,'#2255aa'],[8,11,'#2255aa'],[9,11,'#2255aa'],[10,11,'#2255aa'],[11,11,'#2255aa'],
-      [4,12,'#2255aa'],[5,12,'#2255aa'],[6,12,'#f5c542'],[7,12,'#2255aa'],[8,12,'#2255aa'],[9,12,'#f5c542'],[10,12,'#2255aa'],[11,12,'#2255aa'],
-      [4,13,'#2255aa'],[5,13,'#2255aa'],[6,13,'#2255aa'],[7,13,'#2255aa'],[8,13,'#2255aa'],[9,13,'#2255aa'],[10,13,'#2255aa'],[11,13,'#2255aa'],
-      [4,14,'#2255aa'],[5,14,'#2255aa'],[6,14,'#2255aa'],[7,14,'#2255aa'],[8,14,'#2255aa'],[9,14,'#2255aa'],[10,14,'#2255aa'],[11,14,'#2255aa'],
-      [4,15,'#2255aa'],[5,15,'#2255aa'],[6,15,'#2255aa'],[7,15,'#2255aa'],[8,15,'#2255aa'],[9,15,'#2255aa'],[10,15,'#2255aa'],[11,15,'#2255aa'],
-      // Legs
-      [4,16,'#2255aa'],[5,16,'#2255aa'],[6,16,'#2255aa'],[9,16,'#2255aa'],[10,16,'#2255aa'],[11,16,'#2255aa'],
-      [4,17,'#2255aa'],[5,17,'#2255aa'],[6,17,'#2255aa'],[9,17,'#2255aa'],[10,17,'#2255aa'],[11,17,'#2255aa'],
-      [4,18,'#2255aa'],[5,18,'#2255aa'],[6,18,'#2255aa'],[9,18,'#2255aa'],[10,18,'#2255aa'],[11,18,'#2255aa'],
-      // Boots (brown)
-      [3,19,'#5c3a1e'],[4,19,'#5c3a1e'],[5,19,'#5c3a1e'],[6,19,'#5c3a1e'],[9,19,'#5c3a1e'],[10,19,'#5c3a1e'],[11,19,'#5c3a1e'],[12,19,'#5c3a1e'],
-      [3,20,'#5c3a1e'],[4,20,'#5c3a1e'],[5,20,'#5c3a1e'],[6,20,'#5c3a1e'],[7,20,'#5c3a1e'],[9,20,'#5c3a1e'],[10,20,'#5c3a1e'],[11,20,'#5c3a1e'],[12,20,'#5c3a1e'],
-      [3,21,'#4a2e17'],[4,21,'#4a2e17'],[5,21,'#4a2e17'],[6,21,'#4a2e17'],[7,21,'#4a2e17'],[9,21,'#4a2e17'],[10,21,'#4a2e17'],[11,21,'#4a2e17'],[12,21,'#4a2e17'],
-    ],
-    // Frame 1 — walk left leg forward
-    [
-      // Hard hat
-      [5,0,'#f5c542'],[6,0,'#f5c542'],[7,0,'#f5c542'],[8,0,'#f5c542'],[9,0,'#f5c542'],[10,0,'#f5c542'],
-      [4,1,'#f5c542'],[5,1,'#f5c542'],[6,1,'#f5c542'],[7,1,'#f5c542'],[8,1,'#f5c542'],[9,1,'#f5c542'],[10,1,'#f5c542'],[11,1,'#f5c542'],
-      [4,2,'#f5c542'],[5,2,'#f5c542'],[6,2,'#f5c542'],[7,2,'#f5c542'],[8,2,'#f5c542'],[9,2,'#f5c542'],[10,2,'#f5c542'],[11,2,'#f5c542'],
-      [3,3,'#f5c542'],[4,3,'#f5c542'],[5,3,'#f5c542'],[6,3,'#f5c542'],[7,3,'#f5c542'],[8,3,'#f5c542'],[9,3,'#f5c542'],[10,3,'#f5c542'],[11,3,'#f5c542'],[12,3,'#f5c542'],
-      // Face
-      [5,4,'#f5b68a'],[6,4,'#f5b68a'],[7,4,'#f5b68a'],[8,4,'#f5b68a'],[9,4,'#f5b68a'],[10,4,'#f5b68a'],
-      [5,5,'#f5b68a'],[6,5,'#1a1a2e'],[7,5,'#f5b68a'],[8,5,'#f5b68a'],[9,5,'#1a1a2e'],[10,5,'#f5b68a'],
-      [5,6,'#f5b68a'],[6,6,'#f5b68a'],[7,6,'#f5b68a'],[8,6,'#f5b68a'],[9,6,'#f5b68a'],[10,6,'#f5b68a'],
-      [6,7,'#f5b68a'],[7,7,'#d9886a'],[8,7,'#d9886a'],[9,7,'#f5b68a'],
-      // Red shirt
-      [4,8,'#cc2222'],[5,8,'#cc2222'],[6,8,'#cc2222'],[7,8,'#cc2222'],[8,8,'#cc2222'],[9,8,'#cc2222'],[10,8,'#cc2222'],[11,8,'#cc2222'],
-      [3,9,'#cc2222'],[4,9,'#cc2222'],[5,9,'#cc2222'],[6,9,'#cc2222'],[7,9,'#cc2222'],[8,9,'#cc2222'],[9,9,'#cc2222'],[10,9,'#cc2222'],[11,9,'#cc2222'],[12,9,'#cc2222'],
-      [3,10,'#cc2222'],[4,10,'#cc2222'],[5,10,'#cc2222'],[6,10,'#cc2222'],[7,10,'#cc2222'],[8,10,'#cc2222'],[9,10,'#cc2222'],[10,10,'#cc2222'],[11,10,'#cc2222'],[12,10,'#cc2222'],
-      // Arms swinging
-      [1,9,'#f5b68a'],[14,10,'#f5b68a'],
-      [1,10,'#f5b68a'],[14,11,'#f5b68a'],
-      [2,11,'#f5b68a'],[13,11,'#f5b68a'],
-      // Blue overalls
-      [4,11,'#2255aa'],[5,11,'#2255aa'],[6,11,'#2255aa'],[7,11,'#2255aa'],[8,11,'#2255aa'],[9,11,'#2255aa'],[10,11,'#2255aa'],[11,11,'#2255aa'],
-      [4,12,'#2255aa'],[5,12,'#2255aa'],[6,12,'#f5c542'],[7,12,'#2255aa'],[8,12,'#2255aa'],[9,12,'#f5c542'],[10,12,'#2255aa'],[11,12,'#2255aa'],
-      [4,13,'#2255aa'],[5,13,'#2255aa'],[6,13,'#2255aa'],[7,13,'#2255aa'],[8,13,'#2255aa'],[9,13,'#2255aa'],[10,13,'#2255aa'],[11,13,'#2255aa'],
-      [4,14,'#2255aa'],[5,14,'#2255aa'],[6,14,'#2255aa'],[7,14,'#2255aa'],[8,14,'#2255aa'],[9,14,'#2255aa'],[10,14,'#2255aa'],[11,14,'#2255aa'],
-      [4,15,'#2255aa'],[5,15,'#2255aa'],[6,15,'#2255aa'],[7,15,'#2255aa'],[8,15,'#2255aa'],[9,15,'#2255aa'],[10,15,'#2255aa'],[11,15,'#2255aa'],
-      // Left leg forward, right leg back
-      [3,16,'#2255aa'],[4,16,'#2255aa'],[5,16,'#2255aa'],[10,16,'#2255aa'],[11,16,'#2255aa'],[12,16,'#2255aa'],
-      [2,17,'#2255aa'],[3,17,'#2255aa'],[4,17,'#2255aa'],[11,17,'#2255aa'],[12,17,'#2255aa'],[13,17,'#2255aa'],
-      [2,18,'#2255aa'],[3,18,'#2255aa'],[4,18,'#2255aa'],[11,18,'#2255aa'],[12,18,'#2255aa'],[13,18,'#2255aa'],
-      // Boots
-      [1,19,'#5c3a1e'],[2,19,'#5c3a1e'],[3,19,'#5c3a1e'],[4,19,'#5c3a1e'],[11,19,'#5c3a1e'],[12,19,'#5c3a1e'],[13,19,'#5c3a1e'],[14,19,'#5c3a1e'],
-      [1,20,'#5c3a1e'],[2,20,'#5c3a1e'],[3,20,'#5c3a1e'],[4,20,'#5c3a1e'],[5,20,'#5c3a1e'],[11,20,'#5c3a1e'],[12,20,'#5c3a1e'],[13,20,'#5c3a1e'],[14,20,'#5c3a1e'],
-      [1,21,'#4a2e17'],[2,21,'#4a2e17'],[3,21,'#4a2e17'],[4,21,'#4a2e17'],[5,21,'#4a2e17'],[11,21,'#4a2e17'],[12,21,'#4a2e17'],[13,21,'#4a2e17'],[14,21,'#4a2e17'],
-    ],
-    // Frame 2 — walk right leg forward
-    [
-      // Hard hat
-      [5,0,'#f5c542'],[6,0,'#f5c542'],[7,0,'#f5c542'],[8,0,'#f5c542'],[9,0,'#f5c542'],[10,0,'#f5c542'],
-      [4,1,'#f5c542'],[5,1,'#f5c542'],[6,1,'#f5c542'],[7,1,'#f5c542'],[8,1,'#f5c542'],[9,1,'#f5c542'],[10,1,'#f5c542'],[11,1,'#f5c542'],
-      [4,2,'#f5c542'],[5,2,'#f5c542'],[6,2,'#f5c542'],[7,2,'#f5c542'],[8,2,'#f5c542'],[9,2,'#f5c542'],[10,2,'#f5c542'],[11,2,'#f5c542'],
-      [3,3,'#f5c542'],[4,3,'#f5c542'],[5,3,'#f5c542'],[6,3,'#f5c542'],[7,3,'#f5c542'],[8,3,'#f5c542'],[9,3,'#f5c542'],[10,3,'#f5c542'],[11,3,'#f5c542'],[12,3,'#f5c542'],
-      // Face
-      [5,4,'#f5b68a'],[6,4,'#f5b68a'],[7,4,'#f5b68a'],[8,4,'#f5b68a'],[9,4,'#f5b68a'],[10,4,'#f5b68a'],
-      [5,5,'#f5b68a'],[6,5,'#1a1a2e'],[7,5,'#f5b68a'],[8,5,'#f5b68a'],[9,5,'#1a1a2e'],[10,5,'#f5b68a'],
-      [5,6,'#f5b68a'],[6,6,'#f5b68a'],[7,6,'#f5b68a'],[8,6,'#f5b68a'],[9,6,'#f5b68a'],[10,6,'#f5b68a'],
-      [6,7,'#f5b68a'],[7,7,'#d9886a'],[8,7,'#d9886a'],[9,7,'#f5b68a'],
-      // Red shirt
-      [4,8,'#cc2222'],[5,8,'#cc2222'],[6,8,'#cc2222'],[7,8,'#cc2222'],[8,8,'#cc2222'],[9,8,'#cc2222'],[10,8,'#cc2222'],[11,8,'#cc2222'],
-      [3,9,'#cc2222'],[4,9,'#cc2222'],[5,9,'#cc2222'],[6,9,'#cc2222'],[7,9,'#cc2222'],[8,9,'#cc2222'],[9,9,'#cc2222'],[10,9,'#cc2222'],[11,9,'#cc2222'],[12,9,'#cc2222'],
-      [3,10,'#cc2222'],[4,10,'#cc2222'],[5,10,'#cc2222'],[6,10,'#cc2222'],[7,10,'#cc2222'],[8,10,'#cc2222'],[9,10,'#cc2222'],[10,10,'#cc2222'],[11,10,'#cc2222'],[12,10,'#cc2222'],
-      // Arms swinging (opposite)
-      [14,9,'#f5b68a'],[1,10,'#f5b68a'],
-      [14,10,'#f5b68a'],[1,11,'#f5b68a'],
-      [13,11,'#f5b68a'],[2,11,'#f5b68a'],
-      // Blue overalls
-      [4,11,'#2255aa'],[5,11,'#2255aa'],[6,11,'#2255aa'],[7,11,'#2255aa'],[8,11,'#2255aa'],[9,11,'#2255aa'],[10,11,'#2255aa'],[11,11,'#2255aa'],
-      [4,12,'#2255aa'],[5,12,'#2255aa'],[6,12,'#f5c542'],[7,12,'#2255aa'],[8,12,'#2255aa'],[9,12,'#f5c542'],[10,12,'#2255aa'],[11,12,'#2255aa'],
-      [4,13,'#2255aa'],[5,13,'#2255aa'],[6,13,'#2255aa'],[7,13,'#2255aa'],[8,13,'#2255aa'],[9,13,'#2255aa'],[10,13,'#2255aa'],[11,13,'#2255aa'],
-      [4,14,'#2255aa'],[5,14,'#2255aa'],[6,14,'#2255aa'],[7,14,'#2255aa'],[8,14,'#2255aa'],[9,14,'#2255aa'],[10,14,'#2255aa'],[11,14,'#2255aa'],
-      [4,15,'#2255aa'],[5,15,'#2255aa'],[6,15,'#2255aa'],[7,15,'#2255aa'],[8,15,'#2255aa'],[9,15,'#2255aa'],[10,15,'#2255aa'],[11,15,'#2255aa'],
-      // Right leg forward, left leg back
-      [10,16,'#2255aa'],[11,16,'#2255aa'],[12,16,'#2255aa'],[3,16,'#2255aa'],[4,16,'#2255aa'],[5,16,'#2255aa'],
-      [11,17,'#2255aa'],[12,17,'#2255aa'],[13,17,'#2255aa'],[2,17,'#2255aa'],[3,17,'#2255aa'],[4,17,'#2255aa'],
-      [11,18,'#2255aa'],[12,18,'#2255aa'],[13,18,'#2255aa'],[2,18,'#2255aa'],[3,18,'#2255aa'],[4,18,'#2255aa'],
-      // Boots
-      [11,19,'#5c3a1e'],[12,19,'#5c3a1e'],[13,19,'#5c3a1e'],[14,19,'#5c3a1e'],[1,19,'#5c3a1e'],[2,19,'#5c3a1e'],[3,19,'#5c3a1e'],[4,19,'#5c3a1e'],
-      [10,20,'#5c3a1e'],[11,20,'#5c3a1e'],[12,20,'#5c3a1e'],[13,20,'#5c3a1e'],[14,20,'#5c3a1e'],[1,20,'#5c3a1e'],[2,20,'#5c3a1e'],[3,20,'#5c3a1e'],[4,20,'#5c3a1e'],[5,20,'#5c3a1e'],
-      [10,21,'#4a2e17'],[11,21,'#4a2e17'],[12,21,'#4a2e17'],[13,21,'#4a2e17'],[14,21,'#4a2e17'],[1,21,'#4a2e17'],[2,21,'#4a2e17'],[3,21,'#4a2e17'],[4,21,'#4a2e17'],[5,21,'#4a2e17'],
-    ],
-  ]
-};
+const Comic = {
 
-// ---------------------------------------------------------------------------
-// 2. wookyRobot — 16x24, 3 frames (green robot mascot, orange chest emblem)
-// ---------------------------------------------------------------------------
-const wookyRobot = {
-  width: 16, height: 24,
-  frames: [
-    // Frame 0 — idle
-    [
-      // Antenna
-      [7,0,'#39ff6e'],[8,0,'#39ff6e'],
-      [7,1,'#2bcc58'],[8,1,'#2bcc58'],
-      // Head
-      [4,2,'#39ff6e'],[5,2,'#39ff6e'],[6,2,'#39ff6e'],[7,2,'#39ff6e'],[8,2,'#39ff6e'],[9,2,'#39ff6e'],[10,2,'#39ff6e'],[11,2,'#39ff6e'],
-      [3,3,'#39ff6e'],[4,3,'#2bcc58'],[5,3,'#2bcc58'],[6,3,'#2bcc58'],[7,3,'#2bcc58'],[8,3,'#2bcc58'],[9,3,'#2bcc58'],[10,3,'#2bcc58'],[11,3,'#2bcc58'],[12,3,'#39ff6e'],
-      [3,4,'#39ff6e'],[4,4,'#2bcc58'],[5,4,'#ffffff'],[6,4,'#1a1a2e'],[7,4,'#2bcc58'],[8,4,'#2bcc58'],[9,4,'#ffffff'],[10,4,'#1a1a2e'],[11,4,'#2bcc58'],[12,4,'#39ff6e'],
-      [3,5,'#39ff6e'],[4,5,'#2bcc58'],[5,5,'#ffffff'],[6,5,'#1a1a2e'],[7,5,'#2bcc58'],[8,5,'#2bcc58'],[9,5,'#ffffff'],[10,5,'#1a1a2e'],[11,5,'#2bcc58'],[12,5,'#39ff6e'],
-      [3,6,'#39ff6e'],[4,6,'#2bcc58'],[5,6,'#2bcc58'],[6,6,'#2bcc58'],[7,6,'#2bcc58'],[8,6,'#2bcc58'],[9,6,'#2bcc58'],[10,6,'#2bcc58'],[11,6,'#2bcc58'],[12,6,'#39ff6e'],
-      [4,7,'#39ff6e'],[5,7,'#ff6b2c'],[6,7,'#ff6b2c'],[7,7,'#ff6b2c'],[8,7,'#ff6b2c'],[9,7,'#ff6b2c'],[10,7,'#ff6b2c'],[11,7,'#39ff6e'],
-      [4,8,'#39ff6e'],[5,8,'#39ff6e'],[6,8,'#39ff6e'],[7,8,'#39ff6e'],[8,8,'#39ff6e'],[9,8,'#39ff6e'],[10,8,'#39ff6e'],[11,8,'#39ff6e'],
-      // Body
-      [3,9,'#555555'],[4,9,'#39ff6e'],[5,9,'#39ff6e'],[6,9,'#39ff6e'],[7,9,'#39ff6e'],[8,9,'#39ff6e'],[9,9,'#39ff6e'],[10,9,'#39ff6e'],[11,9,'#39ff6e'],[12,9,'#555555'],
-      [3,10,'#555555'],[4,10,'#2bcc58'],[5,10,'#2bcc58'],[6,10,'#2bcc58'],[7,10,'#2bcc58'],[8,10,'#2bcc58'],[9,10,'#2bcc58'],[10,10,'#2bcc58'],[11,10,'#2bcc58'],[12,10,'#555555'],
-      [3,11,'#555555'],[4,11,'#2bcc58'],[5,11,'#ff6b2c'],[6,11,'#ff6b2c'],[7,11,'#ff6b2c'],[8,11,'#ff6b2c'],[9,11,'#ff6b2c'],[10,11,'#ff6b2c'],[11,11,'#2bcc58'],[12,11,'#555555'],
-      [3,12,'#555555'],[4,12,'#2bcc58'],[5,12,'#ff6b2c'],[6,12,'#ffffff'],[7,12,'#ff6b2c'],[8,12,'#ff6b2c'],[9,12,'#ffffff'],[10,12,'#ff6b2c'],[11,12,'#2bcc58'],[12,12,'#555555'],
-      [3,13,'#555555'],[4,13,'#2bcc58'],[5,13,'#ff6b2c'],[6,13,'#ff6b2c'],[7,13,'#ff6b2c'],[8,13,'#ff6b2c'],[9,13,'#ff6b2c'],[10,13,'#ff6b2c'],[11,13,'#2bcc58'],[12,13,'#555555'],
-      [3,14,'#555555'],[4,14,'#2bcc58'],[5,14,'#2bcc58'],[6,14,'#2bcc58'],[7,14,'#2bcc58'],[8,14,'#2bcc58'],[9,14,'#2bcc58'],[10,14,'#2bcc58'],[11,14,'#2bcc58'],[12,14,'#555555'],
-      // Arms
-      [1,10,'#39ff6e'],[2,10,'#39ff6e'],[13,10,'#39ff6e'],[14,10,'#39ff6e'],
-      [1,11,'#2bcc58'],[2,11,'#2bcc58'],[13,11,'#2bcc58'],[14,11,'#2bcc58'],
-      [1,12,'#39ff6e'],[2,12,'#39ff6e'],[13,12,'#39ff6e'],[14,12,'#39ff6e'],
-      [1,13,'#555555'],[2,13,'#555555'],[13,13,'#555555'],[14,13,'#555555'],
-      // Legs
-      [4,15,'#555555'],[5,15,'#555555'],[6,15,'#555555'],[9,15,'#555555'],[10,15,'#555555'],[11,15,'#555555'],
-      [4,16,'#39ff6e'],[5,16,'#39ff6e'],[6,16,'#39ff6e'],[9,16,'#39ff6e'],[10,16,'#39ff6e'],[11,16,'#39ff6e'],
-      [4,17,'#39ff6e'],[5,17,'#39ff6e'],[6,17,'#39ff6e'],[9,17,'#39ff6e'],[10,17,'#39ff6e'],[11,17,'#39ff6e'],
-      [4,18,'#2bcc58'],[5,18,'#2bcc58'],[6,18,'#2bcc58'],[9,18,'#2bcc58'],[10,18,'#2bcc58'],[11,18,'#2bcc58'],
-      // Feet
-      [3,19,'#555555'],[4,19,'#555555'],[5,19,'#555555'],[6,19,'#555555'],[7,19,'#555555'],[9,19,'#555555'],[10,19,'#555555'],[11,19,'#555555'],[12,19,'#555555'],
-      [3,20,'#444444'],[4,20,'#444444'],[5,20,'#444444'],[6,20,'#444444'],[7,20,'#444444'],[9,20,'#444444'],[10,20,'#444444'],[11,20,'#444444'],[12,20,'#444444'],
-    ],
-    // Frame 1 — walk left
-    [
-      [7,0,'#39ff6e'],[8,0,'#39ff6e'],
-      [7,1,'#2bcc58'],[8,1,'#2bcc58'],
-      [4,2,'#39ff6e'],[5,2,'#39ff6e'],[6,2,'#39ff6e'],[7,2,'#39ff6e'],[8,2,'#39ff6e'],[9,2,'#39ff6e'],[10,2,'#39ff6e'],[11,2,'#39ff6e'],
-      [3,3,'#39ff6e'],[4,3,'#2bcc58'],[5,3,'#2bcc58'],[6,3,'#2bcc58'],[7,3,'#2bcc58'],[8,3,'#2bcc58'],[9,3,'#2bcc58'],[10,3,'#2bcc58'],[11,3,'#2bcc58'],[12,3,'#39ff6e'],
-      [3,4,'#39ff6e'],[4,4,'#2bcc58'],[5,4,'#ffffff'],[6,4,'#1a1a2e'],[7,4,'#2bcc58'],[8,4,'#2bcc58'],[9,4,'#ffffff'],[10,4,'#1a1a2e'],[11,4,'#2bcc58'],[12,4,'#39ff6e'],
-      [3,5,'#39ff6e'],[4,5,'#2bcc58'],[5,5,'#ffffff'],[6,5,'#1a1a2e'],[7,5,'#2bcc58'],[8,5,'#2bcc58'],[9,5,'#ffffff'],[10,5,'#1a1a2e'],[11,5,'#2bcc58'],[12,5,'#39ff6e'],
-      [3,6,'#39ff6e'],[4,6,'#2bcc58'],[5,6,'#2bcc58'],[6,6,'#2bcc58'],[7,6,'#2bcc58'],[8,6,'#2bcc58'],[9,6,'#2bcc58'],[10,6,'#2bcc58'],[11,6,'#2bcc58'],[12,6,'#39ff6e'],
-      [4,7,'#39ff6e'],[5,7,'#ff6b2c'],[6,7,'#ff6b2c'],[7,7,'#ff6b2c'],[8,7,'#ff6b2c'],[9,7,'#ff6b2c'],[10,7,'#ff6b2c'],[11,7,'#39ff6e'],
-      [4,8,'#39ff6e'],[5,8,'#39ff6e'],[6,8,'#39ff6e'],[7,8,'#39ff6e'],[8,8,'#39ff6e'],[9,8,'#39ff6e'],[10,8,'#39ff6e'],[11,8,'#39ff6e'],
-      // Body
-      [3,9,'#555555'],[4,9,'#39ff6e'],[5,9,'#39ff6e'],[6,9,'#39ff6e'],[7,9,'#39ff6e'],[8,9,'#39ff6e'],[9,9,'#39ff6e'],[10,9,'#39ff6e'],[11,9,'#39ff6e'],[12,9,'#555555'],
-      [3,10,'#555555'],[4,10,'#2bcc58'],[5,10,'#2bcc58'],[6,10,'#2bcc58'],[7,10,'#2bcc58'],[8,10,'#2bcc58'],[9,10,'#2bcc58'],[10,10,'#2bcc58'],[11,10,'#2bcc58'],[12,10,'#555555'],
-      [3,11,'#555555'],[4,11,'#2bcc58'],[5,11,'#ff6b2c'],[6,11,'#ff6b2c'],[7,11,'#ff6b2c'],[8,11,'#ff6b2c'],[9,11,'#ff6b2c'],[10,11,'#ff6b2c'],[11,11,'#2bcc58'],[12,11,'#555555'],
-      [3,12,'#555555'],[4,12,'#2bcc58'],[5,12,'#ff6b2c'],[6,12,'#ffffff'],[7,12,'#ff6b2c'],[8,12,'#ff6b2c'],[9,12,'#ffffff'],[10,12,'#ff6b2c'],[11,12,'#2bcc58'],[12,12,'#555555'],
-      [3,13,'#555555'],[4,13,'#2bcc58'],[5,13,'#ff6b2c'],[6,13,'#ff6b2c'],[7,13,'#ff6b2c'],[8,13,'#ff6b2c'],[9,13,'#ff6b2c'],[10,13,'#ff6b2c'],[11,13,'#2bcc58'],[12,13,'#555555'],
-      [3,14,'#555555'],[4,14,'#2bcc58'],[5,14,'#2bcc58'],[6,14,'#2bcc58'],[7,14,'#2bcc58'],[8,14,'#2bcc58'],[9,14,'#2bcc58'],[10,14,'#2bcc58'],[11,14,'#2bcc58'],[12,14,'#555555'],
-      // Arms raised left
-      [0,9,'#39ff6e'],[1,9,'#39ff6e'],[2,10,'#2bcc58'],[13,10,'#39ff6e'],[14,10,'#39ff6e'],
-      [0,10,'#555555'],[1,10,'#2bcc58'],[2,11,'#39ff6e'],[13,11,'#2bcc58'],[14,11,'#2bcc58'],
-      [13,12,'#39ff6e'],[14,12,'#39ff6e'],
-      [13,13,'#555555'],[14,13,'#555555'],
-      // Legs — left forward
-      [3,15,'#555555'],[4,15,'#555555'],[5,15,'#555555'],[10,15,'#555555'],[11,15,'#555555'],[12,15,'#555555'],
-      [2,16,'#39ff6e'],[3,16,'#39ff6e'],[4,16,'#39ff6e'],[10,16,'#39ff6e'],[11,16,'#39ff6e'],[12,16,'#39ff6e'],
-      [2,17,'#39ff6e'],[3,17,'#39ff6e'],[4,17,'#39ff6e'],[11,17,'#39ff6e'],[12,17,'#39ff6e'],[13,17,'#39ff6e'],
-      [2,18,'#2bcc58'],[3,18,'#2bcc58'],[4,18,'#2bcc58'],[11,18,'#2bcc58'],[12,18,'#2bcc58'],[13,18,'#2bcc58'],
-      [1,19,'#555555'],[2,19,'#555555'],[3,19,'#555555'],[4,19,'#555555'],[5,19,'#555555'],[10,19,'#555555'],[11,19,'#555555'],[12,19,'#555555'],[13,19,'#555555'],[14,19,'#555555'],
-      [1,20,'#444444'],[2,20,'#444444'],[3,20,'#444444'],[4,20,'#444444'],[5,20,'#444444'],[10,20,'#444444'],[11,20,'#444444'],[12,20,'#444444'],[13,20,'#444444'],[14,20,'#444444'],
-    ],
-    // Frame 2 — walk right
-    [
-      [7,0,'#39ff6e'],[8,0,'#39ff6e'],
-      [7,1,'#2bcc58'],[8,1,'#2bcc58'],
-      [4,2,'#39ff6e'],[5,2,'#39ff6e'],[6,2,'#39ff6e'],[7,2,'#39ff6e'],[8,2,'#39ff6e'],[9,2,'#39ff6e'],[10,2,'#39ff6e'],[11,2,'#39ff6e'],
-      [3,3,'#39ff6e'],[4,3,'#2bcc58'],[5,3,'#2bcc58'],[6,3,'#2bcc58'],[7,3,'#2bcc58'],[8,3,'#2bcc58'],[9,3,'#2bcc58'],[10,3,'#2bcc58'],[11,3,'#2bcc58'],[12,3,'#39ff6e'],
-      [3,4,'#39ff6e'],[4,4,'#2bcc58'],[5,4,'#ffffff'],[6,4,'#1a1a2e'],[7,4,'#2bcc58'],[8,4,'#2bcc58'],[9,4,'#ffffff'],[10,4,'#1a1a2e'],[11,4,'#2bcc58'],[12,4,'#39ff6e'],
-      [3,5,'#39ff6e'],[4,5,'#2bcc58'],[5,5,'#ffffff'],[6,5,'#1a1a2e'],[7,5,'#2bcc58'],[8,5,'#2bcc58'],[9,5,'#ffffff'],[10,5,'#1a1a2e'],[11,5,'#2bcc58'],[12,5,'#39ff6e'],
-      [3,6,'#39ff6e'],[4,6,'#2bcc58'],[5,6,'#2bcc58'],[6,6,'#2bcc58'],[7,6,'#2bcc58'],[8,6,'#2bcc58'],[9,6,'#2bcc58'],[10,6,'#2bcc58'],[11,6,'#2bcc58'],[12,6,'#39ff6e'],
-      [4,7,'#39ff6e'],[5,7,'#ff6b2c'],[6,7,'#ff6b2c'],[7,7,'#ff6b2c'],[8,7,'#ff6b2c'],[9,7,'#ff6b2c'],[10,7,'#ff6b2c'],[11,7,'#39ff6e'],
-      [4,8,'#39ff6e'],[5,8,'#39ff6e'],[6,8,'#39ff6e'],[7,8,'#39ff6e'],[8,8,'#39ff6e'],[9,8,'#39ff6e'],[10,8,'#39ff6e'],[11,8,'#39ff6e'],
-      // Body (same as frame 0)
-      [3,9,'#555555'],[4,9,'#39ff6e'],[5,9,'#39ff6e'],[6,9,'#39ff6e'],[7,9,'#39ff6e'],[8,9,'#39ff6e'],[9,9,'#39ff6e'],[10,9,'#39ff6e'],[11,9,'#39ff6e'],[12,9,'#555555'],
-      [3,10,'#555555'],[4,10,'#2bcc58'],[5,10,'#2bcc58'],[6,10,'#2bcc58'],[7,10,'#2bcc58'],[8,10,'#2bcc58'],[9,10,'#2bcc58'],[10,10,'#2bcc58'],[11,10,'#2bcc58'],[12,10,'#555555'],
-      [3,11,'#555555'],[4,11,'#2bcc58'],[5,11,'#ff6b2c'],[6,11,'#ff6b2c'],[7,11,'#ff6b2c'],[8,11,'#ff6b2c'],[9,11,'#ff6b2c'],[10,11,'#ff6b2c'],[11,11,'#2bcc58'],[12,11,'#555555'],
-      [3,12,'#555555'],[4,12,'#2bcc58'],[5,12,'#ff6b2c'],[6,12,'#ffffff'],[7,12,'#ff6b2c'],[8,12,'#ff6b2c'],[9,12,'#ffffff'],[10,12,'#ff6b2c'],[11,12,'#2bcc58'],[12,12,'#555555'],
-      [3,13,'#555555'],[4,13,'#2bcc58'],[5,13,'#ff6b2c'],[6,13,'#ff6b2c'],[7,13,'#ff6b2c'],[8,13,'#ff6b2c'],[9,13,'#ff6b2c'],[10,13,'#ff6b2c'],[11,13,'#2bcc58'],[12,13,'#555555'],
-      [3,14,'#555555'],[4,14,'#2bcc58'],[5,14,'#2bcc58'],[6,14,'#2bcc58'],[7,14,'#2bcc58'],[8,14,'#2bcc58'],[9,14,'#2bcc58'],[10,14,'#2bcc58'],[11,14,'#2bcc58'],[12,14,'#555555'],
-      // Arms raised right
-      [1,10,'#39ff6e'],[2,10,'#39ff6e'],[13,9,'#39ff6e'],[14,9,'#39ff6e'],
-      [1,11,'#2bcc58'],[2,11,'#2bcc58'],[13,10,'#2bcc58'],[14,10,'#555555'],
-      [1,12,'#39ff6e'],[2,12,'#39ff6e'],
-      [1,13,'#555555'],[2,13,'#555555'],
-      // Legs — right forward
-      [4,15,'#555555'],[5,15,'#555555'],[6,15,'#555555'],[10,15,'#555555'],[11,15,'#555555'],[12,15,'#555555'],
-      [4,16,'#39ff6e'],[5,16,'#39ff6e'],[6,16,'#39ff6e'],[11,16,'#39ff6e'],[12,16,'#39ff6e'],[13,16,'#39ff6e'],
-      [3,17,'#39ff6e'],[4,17,'#39ff6e'],[5,17,'#39ff6e'],[12,17,'#39ff6e'],[13,17,'#39ff6e'],[14,17,'#39ff6e'],
-      [3,18,'#2bcc58'],[4,18,'#2bcc58'],[5,18,'#2bcc58'],[12,18,'#2bcc58'],[13,18,'#2bcc58'],[14,18,'#2bcc58'],
-      [2,19,'#555555'],[3,19,'#555555'],[4,19,'#555555'],[5,19,'#555555'],[6,19,'#555555'],[11,19,'#555555'],[12,19,'#555555'],[13,19,'#555555'],[14,19,'#555555'],[15,19,'#555555'],
-      [2,20,'#444444'],[3,20,'#444444'],[4,20,'#444444'],[5,20,'#444444'],[6,20,'#444444'],[11,20,'#444444'],[12,20,'#444444'],[13,20,'#444444'],[14,20,'#444444'],[15,20,'#444444'],
-    ],
-  ]
-};
+  // -------------------------------------------------------------------------
+  // Helper: set comic outline style
+  // -------------------------------------------------------------------------
+  setOutlineStyle(ctx, width) {
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = width || 2.5;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+  },
 
-// ---------------------------------------------------------------------------
-// 3. panelak — 48x64, procedurally generated Czech apartment building
-// ---------------------------------------------------------------------------
-function generatePanelak() {
-  const pixels = [];
-  const wallColor = '#999999';
-  const wallDark = '#888888';
-  const windowColor = '#5588bb';
-  const windowDark = '#336699';
-  const windowLit = '#ffdd66';
-  const roofColor = '#777777';
-  const frameColor = '#aaaaaa';
-
-  // Roof
-  for (let x = 0; x < 48; x++) {
-    for (let y = 0; y < 4; y++) {
-      pixels.push([x, y, roofColor]);
+  // -------------------------------------------------------------------------
+  // Helper: draw rounded rect with thick outline
+  // -------------------------------------------------------------------------
+  roundedRect(ctx, x, y, w, h, r, fill, stroke) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+    if (fill) {
+      ctx.fillStyle = fill;
+      ctx.fill();
     }
-  }
-
-  // Main wall
-  for (let x = 0; x < 48; x++) {
-    for (let y = 4; y < 62; y++) {
-      pixels.push([x, y, (x + y) % 8 === 0 ? wallDark : wallColor]);
+    if (stroke !== false) {
+      if (typeof stroke === 'string') ctx.strokeStyle = stroke;
+      else Comic.setOutlineStyle(ctx, 2.5);
+      ctx.stroke();
     }
-  }
+  },
 
-  // Foundation
-  for (let x = 0; x < 48; x++) {
-    for (let y = 62; y < 64; y++) {
-      pixels.push([x, y, '#666666']);
-    }
-  }
-
-  // Windows (4 columns, 6 rows)
-  for (let col = 0; col < 4; col++) {
-    for (let row = 0; row < 6; row++) {
-      const wx = 3 + col * 12;
-      const wy = 7 + row * 9;
-      // Window frame
-      for (let fx = -1; fx <= 6; fx++) {
-        pixels.push([wx + fx, wy - 1, frameColor]);
-        pixels.push([wx + fx, wy + 5, frameColor]);
-      }
-      for (let fy = 0; fy < 5; fy++) {
-        pixels.push([wx - 1, wy + fy, frameColor]);
-        pixels.push([wx + 6, wy + fy, frameColor]);
-      }
-      // Window glass
-      const lit = Math.random() > 0.5;
-      for (let fx = 0; fx < 6; fx++) {
-        for (let fy = 0; fy < 5; fy++) {
-          const c = lit ? windowLit : (fx < 3 ? windowColor : windowDark);
-          pixels.push([wx + fx, wy + fy, c]);
-        }
-      }
-      // Window cross
-      pixels.push([wx + 2, wy + 0, frameColor]);
-      pixels.push([wx + 2, wy + 1, frameColor]);
-      pixels.push([wx + 2, wy + 2, frameColor]);
-      pixels.push([wx + 2, wy + 3, frameColor]);
-      pixels.push([wx + 2, wy + 4, frameColor]);
-      pixels.push([wx + 3, wy + 0, frameColor]);
-      pixels.push([wx + 3, wy + 1, frameColor]);
-      pixels.push([wx + 3, wy + 2, frameColor]);
-      pixels.push([wx + 3, wy + 3, frameColor]);
-      pixels.push([wx + 3, wy + 4, frameColor]);
-      for (let fx = 0; fx < 6; fx++) {
-        pixels.push([wx + fx, wy + 2, frameColor]);
+  // -------------------------------------------------------------------------
+  // Draw Ben-Day dots pattern (for comic shading)
+  // -------------------------------------------------------------------------
+  drawBenDayDots(ctx, x, y, w, h, color, spacing) {
+    spacing = spacing || 6;
+    const dotR = spacing * 0.25;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.clip();
+    ctx.fillStyle = color || 'rgba(0,0,0,0.15)';
+    for (let dx = 0; dx < w + spacing; dx += spacing) {
+      for (let dy = 0; dy < h + spacing; dy += spacing) {
+        const offsetX = (Math.floor(dy / spacing) % 2) * (spacing / 2);
+        ctx.beginPath();
+        ctx.arc(x + dx + offsetX, y + dy, dotR, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
-  }
+    ctx.restore();
+  },
 
-  // Door
-  for (let dx = 20; dx < 28; dx++) {
-    for (let dy = 52; dy < 62; dy++) {
-      pixels.push([dx, dy, '#5c3a1e']);
+  // -------------------------------------------------------------------------
+  // Draw speed lines (horizontal motion lines behind character)
+  // -------------------------------------------------------------------------
+  drawSpeedLines(ctx, x, y, w, h) {
+    ctx.save();
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = 0.5;
+    const lineCount = 6;
+    for (let i = 0; i < lineCount; i++) {
+      const ly = y + (h / (lineCount + 1)) * (i + 1) + (Math.random() - 0.5) * 3;
+      const lx = x + Math.random() * w * 0.2;
+      const lw = w * (0.4 + Math.random() * 0.6);
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.lineTo(lx + lw, ly);
+      ctx.stroke();
     }
-  }
-  pixels.push([26, 57, '#f5c542']); // door handle
+    ctx.restore();
+  },
 
-  return pixels;
-}
-
-const panelak = {
-  width: 48, height: 64,
-  frames: [generatePanelak()]
-};
-
-// ---------------------------------------------------------------------------
-// 4. swissChalet — 48x64, procedurally generated wooden alpine house
-// ---------------------------------------------------------------------------
-function generateSwissChalet() {
-  const pixels = [];
-  const woodLight = '#b5834a';
-  const woodDark = '#8b6333';
-  const roofRed = '#cc3333';
-  const roofDark = '#aa2222';
-  const whiteWall = '#f0ead6';
-  const flowerRed = '#ff4444';
-  const flowerPink = '#ff88aa';
-  const flowerGreen = '#2bcc58';
-
-  // Triangular roof
-  for (let row = 0; row < 20; row++) {
-    const left = 24 - row - 4;
-    const right = 24 + row + 4;
-    for (let x = Math.max(0, left); x <= Math.min(47, right); x++) {
-      const c = (x + row) % 3 === 0 ? roofDark : roofRed;
-      pixels.push([x, row, c]);
+  // -------------------------------------------------------------------------
+  // Draw star burst (behind action words)
+  // -------------------------------------------------------------------------
+  drawStarBurst(ctx, x, y, radius, color) {
+    const points = 12;
+    ctx.save();
+    ctx.beginPath();
+    for (let i = 0; i < points * 2; i++) {
+      const angle = (i * Math.PI) / points - Math.PI / 2;
+      const r = i % 2 === 0 ? radius : radius * 0.55;
+      const px = x + Math.cos(angle) * r;
+      const py = y + Math.sin(angle) * r;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
     }
-  }
+    ctx.closePath();
+    ctx.fillStyle = color || '#ffdd00';
+    ctx.fill();
+    Comic.setOutlineStyle(ctx, 2);
+    ctx.stroke();
+    ctx.restore();
+  },
 
-  // Roof overhang
-  for (let x = 0; x < 48; x++) {
-    pixels.push([x, 20, roofDark]);
-    pixels.push([x, 21, roofDark]);
-  }
+  // -------------------------------------------------------------------------
+  // Draw comic panel border (thick black frame)
+  // -------------------------------------------------------------------------
+  drawPanelBorder(ctx, x, y, w, h) {
+    ctx.save();
+    Comic.setOutlineStyle(ctx, 4);
+    ctx.strokeRect(x, y, w, h);
+    // Inner shadow lines
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.15;
+    ctx.strokeRect(x + 3, y + 3, w - 6, h - 6);
+    ctx.restore();
+  },
 
-  // Attic window
-  for (let fx = 21; fx <= 26; fx++) {
-    for (let fy = 12; fy <= 17; fy++) {
-      pixels.push([fx, fy, '#5588bb']);
+  // -------------------------------------------------------------------------
+  // Draw main character (Czech worker) — side view, walking
+  // ~60px tall at scale 1. Brown hair, friendly face, blue jeans, grey t-shirt, sneakers.
+  // frame: 0 = stand, 1 = walk left leg forward, 2 = walk right leg forward
+  // -------------------------------------------------------------------------
+  drawCharacter(ctx, x, y, scale, frame, options) {
+    scale = scale || 1;
+    frame = frame || 0;
+    options = options || {};
+    const s = scale;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s, s);
+    Comic.setOutlineStyle(ctx, 2.5 / s);
+
+    // --- Hair ---
+    ctx.beginPath();
+    ctx.arc(15, 8, 11, Math.PI, 0, false);
+    ctx.closePath();
+    ctx.fillStyle = '#5c3317';
+    ctx.fill();
+    ctx.stroke();
+
+    // --- Head ---
+    ctx.beginPath();
+    ctx.arc(15, 14, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#fcd9b6';
+    ctx.fill();
+    ctx.stroke();
+
+    // Hair on top (over head circle)
+    ctx.beginPath();
+    ctx.moveTo(5, 12);
+    ctx.quadraticCurveTo(8, 2, 18, 2);
+    ctx.quadraticCurveTo(26, 2, 26, 10);
+    ctx.lineTo(26, 12);
+    ctx.quadraticCurveTo(24, 8, 18, 6);
+    ctx.quadraticCurveTo(12, 6, 5, 12);
+    ctx.closePath();
+    ctx.fillStyle = '#5c3317';
+    ctx.fill();
+    ctx.stroke();
+
+    // --- Eye ---
+    ctx.beginPath();
+    ctx.ellipse(20, 13, 2, 2.5, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.stroke();
+    // Pupil
+    ctx.beginPath();
+    ctx.arc(21, 13, 1.2, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fill();
+    // Eye shine
+    ctx.beginPath();
+    ctx.arc(21.5, 12, 0.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    // Eyebrow
+    ctx.beginPath();
+    ctx.moveTo(18, 9.5);
+    ctx.lineTo(23, 9);
+    ctx.strokeStyle = '#5c3317';
+    ctx.lineWidth = 1.5 / s;
+    ctx.stroke();
+    Comic.setOutlineStyle(ctx, 2.5 / s);
+
+    // --- Nose ---
+    ctx.beginPath();
+    ctx.moveTo(23, 14);
+    ctx.quadraticCurveTo(25, 16, 23, 17);
+    ctx.strokeStyle = '#d4a574';
+    ctx.lineWidth = 1.5 / s;
+    ctx.stroke();
+    Comic.setOutlineStyle(ctx, 2.5 / s);
+
+    // --- Mouth (friendly smile) ---
+    ctx.beginPath();
+    ctx.arc(20, 19, 3, 0.1, Math.PI - 0.1);
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 1.5 / s;
+    ctx.stroke();
+    Comic.setOutlineStyle(ctx, 2.5 / s);
+
+    // --- Ear ---
+    ctx.beginPath();
+    ctx.ellipse(5, 14, 3, 4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#fcd9b6';
+    ctx.fill();
+    ctx.stroke();
+
+    // --- Neck ---
+    ctx.beginPath();
+    ctx.rect(12, 23, 8, 4);
+    ctx.fillStyle = '#fcd9b6';
+    ctx.fill();
+
+    // --- T-shirt (grey) ---
+    ctx.beginPath();
+    ctx.moveTo(4, 27);
+    ctx.lineTo(8, 27);
+    ctx.lineTo(10, 30);
+    ctx.lineTo(4, 42);
+    ctx.lineTo(4, 27);
+    ctx.closePath();
+    ctx.fillStyle = '#d0d0d0';
+    ctx.fill();
+    ctx.stroke();
+
+    // Main torso
+    ctx.beginPath();
+    ctx.moveTo(8, 27);
+    ctx.lineTo(24, 27);
+    ctx.lineTo(26, 42);
+    ctx.lineTo(4, 42);
+    ctx.closePath();
+    ctx.fillStyle = '#d0d0d0';
+    ctx.fill();
+    ctx.stroke();
+
+    // Right sleeve area
+    ctx.beginPath();
+    ctx.moveTo(24, 27);
+    ctx.lineTo(28, 27);
+    ctx.lineTo(28, 34);
+    ctx.lineTo(24, 34);
+    ctx.closePath();
+    ctx.fillStyle = '#d0d0d0';
+    ctx.fill();
+    ctx.stroke();
+
+    // Arm (skin) — right visible arm
+    ctx.beginPath();
+    ctx.moveTo(26, 34);
+    ctx.lineTo(30, 34);
+    ctx.lineTo(30, 44);
+    ctx.quadraticCurveTo(30, 46, 28, 46);
+    ctx.lineTo(26, 46);
+    ctx.quadraticCurveTo(24, 46, 24, 44);
+    ctx.lineTo(24, 34);
+    ctx.closePath();
+    ctx.fillStyle = '#fcd9b6';
+    ctx.fill();
+    ctx.stroke();
+
+    // Hand
+    ctx.beginPath();
+    ctx.arc(28, 46, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#fcd9b6';
+    ctx.fill();
+    ctx.stroke();
+
+    // --- Belt ---
+    ctx.beginPath();
+    ctx.rect(4, 41, 22, 3);
+    ctx.fillStyle = '#4a3728';
+    ctx.fill();
+    ctx.stroke();
+    // Belt buckle
+    ctx.beginPath();
+    ctx.rect(13, 41, 4, 3);
+    ctx.fillStyle = '#daa520';
+    ctx.fill();
+    ctx.stroke();
+
+    // --- Jeans ---
+    const legSpread = frame === 0 ? 0 : 4;
+    const leftLegX = frame === 1 ? 4 : (frame === 2 ? 10 : 6);
+    const rightLegX = frame === 1 ? 18 : (frame === 2 ? 14 : 16);
+    const leftLegOffY = frame === 1 ? -2 : (frame === 2 ? 2 : 0);
+    const rightLegOffY = frame === 1 ? 2 : (frame === 2 ? -2 : 0);
+
+    // Left leg
+    ctx.beginPath();
+    ctx.moveTo(leftLegX, 44);
+    ctx.lineTo(leftLegX + 8, 44);
+    ctx.lineTo(leftLegX + 8, 54 + leftLegOffY);
+    ctx.lineTo(leftLegX, 54 + leftLegOffY);
+    ctx.closePath();
+    ctx.fillStyle = '#3b6cb5';
+    ctx.fill();
+    ctx.stroke();
+
+    // Right leg
+    ctx.beginPath();
+    ctx.moveTo(rightLegX - 4, 44);
+    ctx.lineTo(rightLegX + 4, 44);
+    ctx.lineTo(rightLegX + 4, 54 + rightLegOffY);
+    ctx.lineTo(rightLegX - 4, 54 + rightLegOffY);
+    ctx.closePath();
+    ctx.fillStyle = '#3b6cb5';
+    ctx.fill();
+    ctx.stroke();
+
+    // --- Sneakers ---
+    // Left shoe
+    ctx.beginPath();
+    Comic.setOutlineStyle(ctx, 2 / s);
+    ctx.moveTo(leftLegX - 1, 54 + leftLegOffY);
+    ctx.lineTo(leftLegX + 11, 54 + leftLegOffY);
+    ctx.quadraticCurveTo(leftLegX + 13, 54 + leftLegOffY, leftLegX + 13, 56 + leftLegOffY);
+    ctx.lineTo(leftLegX + 13, 58 + leftLegOffY);
+    ctx.lineTo(leftLegX - 1, 58 + leftLegOffY);
+    ctx.closePath();
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.stroke();
+    // Sole
+    ctx.beginPath();
+    ctx.rect(leftLegX - 1, 57 + leftLegOffY, 14, 2);
+    ctx.fillStyle = '#555555';
+    ctx.fill();
+
+    // Right shoe
+    ctx.beginPath();
+    ctx.moveTo(rightLegX - 5, 54 + rightLegOffY);
+    ctx.lineTo(rightLegX + 7, 54 + rightLegOffY);
+    ctx.quadraticCurveTo(rightLegX + 9, 54 + rightLegOffY, rightLegX + 9, 56 + rightLegOffY);
+    ctx.lineTo(rightLegX + 9, 58 + rightLegOffY);
+    ctx.lineTo(rightLegX - 5, 58 + rightLegOffY);
+    ctx.closePath();
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.rect(rightLegX - 5, 57 + rightLegOffY, 14, 2);
+    ctx.fillStyle = '#555555';
+    ctx.fill();
+
+    Comic.setOutlineStyle(ctx, 2.5 / s);
+
+    // --- Backpack (if traveling) ---
+    if (options.backpack !== false) {
+      ctx.beginPath();
+      ctx.moveTo(0, 28);
+      ctx.lineTo(-4, 30);
+      ctx.quadraticCurveTo(-8, 30, -8, 34);
+      ctx.lineTo(-8, 44);
+      ctx.quadraticCurveTo(-8, 47, -5, 47);
+      ctx.lineTo(4, 47);
+      ctx.lineTo(4, 28);
+      ctx.closePath();
+      ctx.fillStyle = '#ff6b2c';
+      ctx.fill();
+      ctx.stroke();
+      // Backpack pocket
+      Comic.roundedRect(ctx, -6, 35, 8, 7, 2, '#e55a1f', true);
+      // Strap
+      ctx.beginPath();
+      ctx.moveTo(4, 28);
+      ctx.quadraticCurveTo(8, 28, 10, 30);
+      ctx.strokeStyle = '#cc4400';
+      ctx.lineWidth = 2 / s;
+      ctx.stroke();
+      Comic.setOutlineStyle(ctx, 2.5 / s);
     }
-  }
-  for (let fx = 21; fx <= 26; fx++) {
-    pixels.push([fx, 12, woodDark]);
-    pixels.push([fx, 17, woodDark]);
-  }
-  for (let fy = 12; fy <= 17; fy++) {
-    pixels.push([21, fy, woodDark]);
-    pixels.push([26, fy, woodDark]);
-  }
 
-  // Main body — white stucco with wood trim
-  for (let x = 2; x < 46; x++) {
-    for (let y = 22; y < 60; y++) {
-      pixels.push([x, y, whiteWall]);
-    }
-  }
+    ctx.restore();
+  },
 
-  // Wood beams (horizontal)
-  for (let x = 2; x < 46; x++) {
-    pixels.push([x, 22, woodDark]);
-    pixels.push([x, 35, woodLight]);
-    pixels.push([x, 59, woodDark]);
-  }
+  // -------------------------------------------------------------------------
+  // Draw Wooky robot companion — cute, green, comic style
+  // ~45px tall at scale 1. Green body (#39ff6e), round head, big LED eyes,
+  // small antenna, orange chest light (#ff6b2c). Bounces when moving.
+  // -------------------------------------------------------------------------
+  drawWooky(ctx, x, y, scale, frame) {
+    scale = scale || 1;
+    frame = frame || 0;
+    const s = scale;
+    const bounce = Math.sin((frame || 0) * 0.5) * 2;
+    ctx.save();
+    ctx.translate(x, y + bounce);
+    ctx.scale(s, s);
+    Comic.setOutlineStyle(ctx, 2.5 / s);
 
-  // Wood beams (vertical — half-timber)
-  for (let y = 22; y < 60; y++) {
-    pixels.push([2, y, woodDark]);
-    pixels.push([15, y, woodLight]);
-    pixels.push([24, y, woodLight]);
-    pixels.push([33, y, woodLight]);
-    pixels.push([45, y, woodDark]);
-  }
+    // --- Antenna ---
+    ctx.beginPath();
+    ctx.moveTo(16, 0);
+    ctx.lineTo(16, -8);
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2 / s;
+    ctx.stroke();
+    // Antenna ball
+    ctx.beginPath();
+    ctx.arc(16, -10, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff6b2c';
+    ctx.fill();
+    Comic.setOutlineStyle(ctx, 2 / s);
+    ctx.stroke();
 
-  // Windows (2 columns, 2 rows) with shutters
-  const winPositions = [[5, 24], [18, 24], [5, 40], [36, 40]];
-  for (const [wx, wy] of winPositions) {
-    // Shutters (wood)
-    for (let fy = 0; fy < 8; fy++) {
-      pixels.push([wx - 1, wy + fy, woodLight]);
-      pixels.push([wx + 8, wy + fy, woodLight]);
-    }
-    // Glass
-    for (let fx = 0; fx < 8; fx++) {
-      for (let fy = 0; fy < 8; fy++) {
-        pixels.push([wx + fx, wy + fy, '#88bbdd']);
-      }
-    }
-    // Cross
-    for (let fx = 0; fx < 8; fx++) {
-      pixels.push([wx + fx, wy + 3, woodDark]);
-      pixels.push([wx + fx, wy + 4, woodDark]);
-    }
-    for (let fy = 0; fy < 8; fy++) {
-      pixels.push([wx + 3, wy + fy, woodDark]);
-      pixels.push([wx + 4, wy + fy, woodDark]);
-    }
-    // Flower box
-    for (let fx = -1; fx <= 8; fx++) {
-      pixels.push([wx + fx, wy + 8, woodDark]);
-      pixels.push([wx + fx, wy + 9, woodDark]);
-    }
-    // Flowers
-    const fc = Math.random() > 0.5 ? flowerRed : flowerPink;
-    for (let fx = 0; fx < 8; fx += 2) {
-      pixels.push([wx + fx, wy + 7, fc]);
-      pixels.push([wx + fx + 1, wy + 7, flowerGreen]);
-    }
-  }
+    // --- Head (round) ---
+    Comic.setOutlineStyle(ctx, 2.5 / s);
+    ctx.beginPath();
+    ctx.arc(16, 10, 12, 0, Math.PI * 2);
+    ctx.fillStyle = '#39ff6e';
+    ctx.fill();
+    ctx.stroke();
 
-  // Big door
-  for (let dx = 18; dx < 30; dx++) {
-    for (let dy = 42; dy < 59; dy++) {
-      pixels.push([dx, dy, woodLight]);
-    }
-  }
-  for (let dx = 18; dx < 30; dx++) {
-    pixels.push([dx, 42, woodDark]);
-  }
-  for (let dy = 42; dy < 59; dy++) {
-    pixels.push([18, dy, woodDark]);
-    pixels.push([29, dy, woodDark]);
-    pixels.push([23, dy, woodDark]);
-  }
-  pixels.push([27, 50, '#f5c542']); // handle
+    // --- Face plate (lighter area) ---
+    ctx.beginPath();
+    ctx.ellipse(16, 11, 9, 8, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#5aff8a';
+    ctx.fill();
+    ctx.stroke();
 
-  // Foundation
-  for (let x = 0; x < 48; x++) {
-    for (let y = 60; y < 64; y++) {
-      pixels.push([x, y, '#777777']);
-    }
-  }
+    // --- Eyes (big, friendly, LED-style) ---
+    // Left eye
+    ctx.beginPath();
+    ctx.ellipse(11, 9, 3.5, 4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.stroke();
+    // Left pupil
+    ctx.beginPath();
+    ctx.arc(12, 9, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fill();
+    // Left eye shine
+    ctx.beginPath();
+    ctx.arc(12.5, 7.5, 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = '#39ff6e';
+    ctx.fill();
 
-  return pixels;
-}
+    // Right eye
+    ctx.beginPath();
+    ctx.ellipse(21, 9, 3.5, 4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.stroke();
+    // Right pupil
+    ctx.beginPath();
+    ctx.arc(22, 9, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fill();
+    // Right eye shine
+    ctx.beginPath();
+    ctx.arc(22.5, 7.5, 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = '#39ff6e';
+    ctx.fill();
 
-const swissChalet = {
-  width: 48, height: 64,
-  frames: [generateSwissChalet()]
-};
+    // --- Mouth (happy arc) ---
+    ctx.beginPath();
+    ctx.arc(16, 14, 4, 0.2, Math.PI - 0.2);
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 1.5 / s;
+    ctx.stroke();
+    Comic.setOutlineStyle(ctx, 2.5 / s);
 
-// ---------------------------------------------------------------------------
-// 5. alpsMountains — 320x80, mountain silhouette with snow caps
-// ---------------------------------------------------------------------------
-function generateAlpsMountains() {
-  const pixels = [];
-  const mountainColor = '#4a5568';
-  const mountainLight = '#5a6578';
-  const snowColor = '#ffffff';
-  const snowShadow = '#dde4ee';
+    // --- Body ---
+    ctx.beginPath();
+    ctx.moveTo(8, 22);
+    ctx.lineTo(24, 22);
+    ctx.lineTo(26, 38);
+    ctx.lineTo(6, 38);
+    ctx.closePath();
+    ctx.fillStyle = '#39ff6e';
+    ctx.fill();
+    ctx.stroke();
 
-  // Define peak positions [x, peakY]
-  const peaks = [
-    [30, 10], [70, 5], [110, 15], [140, 3], [180, 12],
-    [220, 8], [260, 6], [295, 14]
-  ];
+    // Chest light (orange circle)
+    ctx.beginPath();
+    ctx.arc(16, 28, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff6b2c';
+    ctx.fill();
+    ctx.stroke();
+    // Chest light inner glow
+    ctx.beginPath();
+    ctx.arc(16, 27, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffaa66';
+    ctx.fill();
 
-  // For each column, determine mountain height from nearest peaks
-  for (let x = 0; x < 320; x++) {
-    let minY = 80;
-    for (const [px, py] of peaks) {
-      const dist = Math.abs(x - px);
-      const slope = 0.6 + Math.random() * 0.1;
-      const y = py + dist * slope;
-      if (y < minY) minY = y;
-    }
-    minY = Math.max(0, Math.min(79, Math.floor(minY)));
+    // --- Arms ---
+    // Left arm
+    ctx.beginPath();
+    ctx.moveTo(8, 24);
+    ctx.lineTo(2, 24);
+    ctx.quadraticCurveTo(-1, 24, -1, 27);
+    ctx.lineTo(-1, 34);
+    ctx.quadraticCurveTo(-1, 37, 2, 37);
+    ctx.lineTo(6, 37);
+    ctx.lineTo(6, 24);
+    ctx.closePath();
+    ctx.fillStyle = '#2bcc58';
+    ctx.fill();
+    ctx.stroke();
+    // Left hand (claw)
+    ctx.beginPath();
+    ctx.arc(1, 37, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#39ff6e';
+    ctx.fill();
+    ctx.stroke();
 
-    for (let y = minY; y < 80; y++) {
-      const depth = y - minY;
-      let color;
-      if (depth < 4) {
-        color = snowColor;
-      } else if (depth < 7) {
-        color = snowShadow;
-      } else if ((x + y) % 5 === 0) {
-        color = mountainLight;
+    // Right arm
+    ctx.beginPath();
+    ctx.moveTo(24, 24);
+    ctx.lineTo(30, 24);
+    ctx.quadraticCurveTo(33, 24, 33, 27);
+    ctx.lineTo(33, 34);
+    ctx.quadraticCurveTo(33, 37, 30, 37);
+    ctx.lineTo(26, 37);
+    ctx.lineTo(26, 24);
+    ctx.closePath();
+    ctx.fillStyle = '#2bcc58';
+    ctx.fill();
+    ctx.stroke();
+    // Right hand
+    ctx.beginPath();
+    ctx.arc(31, 37, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#39ff6e';
+    ctx.fill();
+    ctx.stroke();
+
+    // --- Legs ---
+    const legPhase = frame % 3;
+    const leftOff = legPhase === 1 ? -2 : (legPhase === 2 ? 2 : 0);
+    const rightOff = legPhase === 1 ? 2 : (legPhase === 2 ? -2 : 0);
+
+    // Left leg
+    Comic.roundedRect(ctx, 8 + leftOff, 38, 6, 8, 2, '#2bcc58', true);
+    // Left foot
+    Comic.roundedRect(ctx, 6 + leftOff, 45, 10, 4, 2, '#1a8a3e', true);
+
+    // Right leg
+    Comic.roundedRect(ctx, 18 + rightOff, 38, 6, 8, 2, '#2bcc58', true);
+    // Right foot
+    Comic.roundedRect(ctx, 16 + rightOff, 45, 10, 4, 2, '#1a8a3e', true);
+
+    // --- Panel lines (decorative) ---
+    ctx.beginPath();
+    ctx.moveTo(10, 32);
+    ctx.lineTo(22, 32);
+    ctx.strokeStyle = '#2bcc58';
+    ctx.lineWidth = 1 / s;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(10, 35);
+    ctx.lineTo(22, 35);
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw speech bubble with text
+  // tailDir: 'left', 'right', 'down'
+  // -------------------------------------------------------------------------
+  drawSpeechBubble(ctx, x, y, text, tailDir, options) {
+    options = options || {};
+    ctx.save();
+    const fontSize = options.fontSize || 13;
+    ctx.font = `bold ${fontSize}px "Comic Sans MS", "Chalkboard SE", cursive`;
+    const padding = 10;
+    const maxWidth = options.maxWidth || 180;
+
+    // Word wrap
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = words[0] || '';
+    for (let i = 1; i < words.length; i++) {
+      const test = currentLine + ' ' + words[i];
+      if (ctx.measureText(test).width > maxWidth) {
+        lines.push(currentLine);
+        currentLine = words[i];
       } else {
-        color = mountainColor;
+        currentLine = test;
       }
-      pixels.push([x, y, color]);
     }
-  }
+    lines.push(currentLine);
 
-  return pixels;
-}
+    const lineHeight = fontSize * 1.3;
+    const textW = Math.min(maxWidth, Math.max(...lines.map(l => ctx.measureText(l).width)));
+    const bubbleW = textW + padding * 2;
+    const bubbleH = lines.length * lineHeight + padding * 2;
+    const bx = x - bubbleW / 2;
+    const by = y - bubbleH;
 
-const alpsMountains = {
-  width: 320, height: 80,
-  frames: [generateAlpsMountains()]
-};
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    Comic.roundedRect(ctx, bx + 3, by + 3, bubbleW, bubbleH, 12, 'rgba(0,0,0,0.1)', false);
 
-// ---------------------------------------------------------------------------
-// 6. grassTile — 16x16, green grass on dirt
-// ---------------------------------------------------------------------------
-const grassTile = {
-  width: 16, height: 16,
-  frames: [
-    (() => {
-      const p = [];
-      const grassGreen = '#39ff6e';
-      const grassDark = '#2bcc58';
-      const dirtLight = '#b5834a';
-      const dirtDark = '#8b6333';
+    // Bubble
+    Comic.roundedRect(ctx, bx, by, bubbleW, bubbleH, 12, options.fill || '#ffffff', true);
 
-      // Grass blades (top 6 rows)
-      for (let x = 0; x < 16; x++) {
-        for (let y = 0; y < 6; y++) {
-          if (y === 0) {
-            // Grass tips — sparse
-            if (x % 3 === 0 || x % 5 === 0) {
-              p.push([x, y, grassGreen]);
-            }
-          } else if (y < 3) {
-            p.push([x, y, (x + y) % 3 === 0 ? grassGreen : grassDark]);
-          } else {
-            p.push([x, y, (x + y) % 4 === 0 ? grassDark : '#1f9e3a']);
-          }
-        }
-      }
-      // Dirt (bottom 10 rows)
-      for (let x = 0; x < 16; x++) {
-        for (let y = 6; y < 16; y++) {
-          p.push([x, y, (x * y) % 7 === 0 ? dirtDark : dirtLight]);
-        }
-      }
-      return p;
-    })()
-  ]
-};
+    // Tail
+    ctx.beginPath();
+    Comic.setOutlineStyle(ctx, 2);
+    if (tailDir === 'left') {
+      ctx.moveTo(bx + 15, by + bubbleH - 2);
+      ctx.lineTo(bx - 8, by + bubbleH + 14);
+      ctx.lineTo(bx + 28, by + bubbleH - 2);
+    } else if (tailDir === 'right') {
+      ctx.moveTo(bx + bubbleW - 28, by + bubbleH - 2);
+      ctx.lineTo(bx + bubbleW + 8, by + bubbleH + 14);
+      ctx.lineTo(bx + bubbleW - 15, by + bubbleH - 2);
+    } else {
+      ctx.moveTo(x - 8, by + bubbleH - 2);
+      ctx.lineTo(x, by + bubbleH + 14);
+      ctx.lineTo(x + 8, by + bubbleH - 2);
+    }
+    ctx.fillStyle = options.fill || '#ffffff';
+    ctx.fill();
+    ctx.stroke();
 
-// ---------------------------------------------------------------------------
-// 7. pathTile — 16x16, sandy path with pebbles
-// ---------------------------------------------------------------------------
-const pathTile = {
-  width: 16, height: 16,
-  frames: [
-    (() => {
-      const p = [];
-      const sand = '#d4b896';
-      const sandDark = '#c4a880';
-      const pebble = '#999999';
-
-      for (let x = 0; x < 16; x++) {
-        for (let y = 0; y < 16; y++) {
-          let color = (x + y) % 5 === 0 ? sandDark : sand;
-          // Pebbles at fixed positions
-          if ((x === 3 && y === 4) || (x === 9 && y === 2) ||
-              (x === 6 && y === 10) || (x === 12 && y === 7) ||
-              (x === 1 && y === 13) || (x === 14 && y === 12) ||
-              (x === 7 && y === 6)) {
-            color = pebble;
-          }
-          if ((x === 4 && y === 4) || (x === 10 && y === 2) ||
-              (x === 7 && y === 10) || (x === 13 && y === 7)) {
-            color = '#aaaaaa';
-          }
-          p.push([x, y, color]);
-        }
-      }
-      return p;
-    })()
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 8. greyGrassTile — 16x16, desaturated grey grass for Czech levels
-// ---------------------------------------------------------------------------
-const greyGrassTile = {
-  width: 16, height: 16,
-  frames: [
-    (() => {
-      const p = [];
-      const grassGrey = '#8a9a7a';
-      const grassDark = '#6a7a5a';
-      const dirtGrey = '#887766';
-      const dirtDark = '#776655';
-
-      for (let x = 0; x < 16; x++) {
-        for (let y = 0; y < 6; y++) {
-          if (y === 0) {
-            if (x % 3 === 0 || x % 5 === 0) {
-              p.push([x, y, grassGrey]);
-            }
-          } else if (y < 3) {
-            p.push([x, y, (x + y) % 3 === 0 ? grassGrey : grassDark]);
-          } else {
-            p.push([x, y, (x + y) % 4 === 0 ? grassDark : '#5a6a4a']);
-          }
-        }
-      }
-      for (let x = 0; x < 16; x++) {
-        for (let y = 6; y < 16; y++) {
-          p.push([x, y, (x * y) % 7 === 0 ? dirtDark : dirtGrey]);
-        }
-      }
-      return p;
-    })()
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 9. coin — 16x16, 4 spin frames, gold with "W" emblem
-// ---------------------------------------------------------------------------
-const coin = {
-  width: 16, height: 16,
-  frames: [
-    // Frame 0 — full face
-    [
-      // Outer ring
-      ...[5,6,7,8,9,10].map(x => [x, 1, '#daa520']),
-      ...[3,4].map(x => [x, 2, '#daa520']), ...[11,12].map(x => [x, 2, '#daa520']),
-      [2,3,'#daa520'],[13,3,'#daa520'],
-      [1,4,'#daa520'],[14,4,'#daa520'],
-      [1,5,'#daa520'],[14,5,'#daa520'],
-      ...[1].map(x => [x, 6, '#daa520']), [14,6,'#daa520'],
-      [1,7,'#daa520'],[14,7,'#daa520'],
-      [1,8,'#daa520'],[14,8,'#daa520'],
-      [1,9,'#daa520'],[14,9,'#daa520'],
-      [1,10,'#daa520'],[14,10,'#daa520'],
-      [1,11,'#daa520'],[14,11,'#daa520'],
-      [2,12,'#daa520'],[13,12,'#daa520'],
-      ...[3,4].map(x => [x, 13, '#daa520']), ...[11,12].map(x => [x, 13, '#daa520']),
-      ...[5,6,7,8,9,10].map(x => [x, 14, '#daa520']),
-      // Fill gold
-      ...(() => {
-        const fill = [];
-        for (let y = 2; y <= 13; y++) {
-          for (let x = 2; x <= 13; x++) {
-            if (y === 2 && (x < 3 || x > 12)) continue;
-            if (y === 3 && (x < 2 || x > 13)) continue;
-            if (y === 13 && (x < 3 || x > 12)) continue;
-            if (y >= 4 && y <= 11 && x >= 2 && x <= 13) {
-              fill.push([x, y, '#ffd700']);
-            } else if ((y === 2 || y === 13) && x >= 3 && x <= 12) {
-              fill.push([x, y, '#ffd700']);
-            } else if (y === 3 && x >= 2 && x <= 13) {
-              fill.push([x, y, '#ffd700']);
-            } else if (y === 12 && x >= 2 && x <= 13) {
-              fill.push([x, y, '#ffd700']);
-            }
-          }
-        }
-        return fill;
-      })(),
-      // "W" letter
-      [4,5,'#8b6914'],[5,5,'#8b6914'],[10,5,'#8b6914'],[11,5,'#8b6914'],
-      [4,6,'#8b6914'],[5,6,'#8b6914'],[10,6,'#8b6914'],[11,6,'#8b6914'],
-      [4,7,'#8b6914'],[5,7,'#8b6914'],[10,7,'#8b6914'],[11,7,'#8b6914'],
-      [4,8,'#8b6914'],[5,8,'#8b6914'],[7,8,'#8b6914'],[8,8,'#8b6914'],[10,8,'#8b6914'],[11,8,'#8b6914'],
-      [4,9,'#8b6914'],[5,9,'#8b6914'],[6,9,'#8b6914'],[7,9,'#8b6914'],[8,9,'#8b6914'],[9,9,'#8b6914'],[10,9,'#8b6914'],[11,9,'#8b6914'],
-      [5,10,'#8b6914'],[6,10,'#8b6914'],[7,10,'#8b6914'],[8,10,'#8b6914'],[9,10,'#8b6914'],[10,10,'#8b6914'],
-      [6,11,'#8b6914'],[7,11,'#8b6914'],[8,11,'#8b6914'],[9,11,'#8b6914'],
-    ],
-    // Frame 1 — slightly narrower (3/4 turn)
-    [
-      ...[6,7,8,9].map(x => [x, 1, '#daa520']),
-      [5,2,'#daa520'],[10,2,'#daa520'],
-      [4,3,'#daa520'],[11,3,'#daa520'],
-      ...[3,4,5,6,7,8,9,10,11,12].flatMap(x => {
-        const ps = [];
-        for (let y = 3; y <= 12; y++) {
-          if (x >= 4 && x <= 11) ps.push([x, y, '#ffd700']);
-        }
-        return ps;
-      }),
-      [4,12,'#daa520'],[11,12,'#daa520'],
-      [5,13,'#daa520'],[10,13,'#daa520'],
-      ...[6,7,8,9].map(x => [x, 14, '#daa520']),
-      // W narrower
-      [5,6,'#8b6914'],[6,6,'#8b6914'],[9,6,'#8b6914'],[10,6,'#8b6914'],
-      [5,7,'#8b6914'],[6,7,'#8b6914'],[9,7,'#8b6914'],[10,7,'#8b6914'],
-      [5,8,'#8b6914'],[7,8,'#8b6914'],[8,8,'#8b6914'],[10,8,'#8b6914'],
-      [6,9,'#8b6914'],[7,9,'#8b6914'],[8,9,'#8b6914'],[9,9,'#8b6914'],
-      [6,10,'#8b6914'],[7,10,'#8b6914'],[8,10,'#8b6914'],[9,10,'#8b6914'],
-    ],
-    // Frame 2 — edge-on (thin line)
-    [
-      ...[7,8].map(x => [x, 1, '#daa520']),
-      ...[7,8].map(x => [x, 2, '#daa520']),
-      ...Array.from({length: 11}, (_, i) => [[7, 3 + i, '#ffd700'], [8, 3 + i, '#ffd700']]).flat(),
-      ...[7,8].map(x => [x, 13, '#daa520']),
-      ...[7,8].map(x => [x, 14, '#daa520']),
-    ],
-    // Frame 3 — other 3/4 turn
-    [
-      ...[6,7,8,9].map(x => [x, 1, '#daa520']),
-      [5,2,'#daa520'],[10,2,'#daa520'],
-      [4,3,'#daa520'],[11,3,'#daa520'],
-      ...[4,5,6,7,8,9,10,11].flatMap(x => {
-        const ps = [];
-        for (let y = 3; y <= 12; y++) {
-          ps.push([x, y, '#ffd700']);
-        }
-        return ps;
-      }),
-      [4,12,'#daa520'],[11,12,'#daa520'],
-      [5,13,'#daa520'],[10,13,'#daa520'],
-      ...[6,7,8,9].map(x => [x, 14, '#daa520']),
-      // W narrower (mirrored)
-      [5,6,'#8b6914'],[6,6,'#8b6914'],[9,6,'#8b6914'],[10,6,'#8b6914'],
-      [5,7,'#8b6914'],[6,7,'#8b6914'],[9,7,'#8b6914'],[10,7,'#8b6914'],
-      [5,8,'#8b6914'],[7,8,'#8b6914'],[8,8,'#8b6914'],[10,8,'#8b6914'],
-      [6,9,'#8b6914'],[7,9,'#8b6914'],[8,9,'#8b6914'],[9,9,'#8b6914'],
-      [6,10,'#8b6914'],[7,10,'#8b6914'],[8,10,'#8b6914'],[9,10,'#8b6914'],
-    ],
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 10. mysteryBox — 16x16, 2 frames (idle, hit)
-// ---------------------------------------------------------------------------
-const mysteryBox = {
-  width: 16, height: 16,
-  frames: [
-    // Frame 0 — idle
-    [
-      // Border
-      ...Array.from({length: 16}, (_, x) => [x, 0, '#cc5500']),
-      ...Array.from({length: 16}, (_, x) => [x, 15, '#cc5500']),
-      ...Array.from({length: 16}, (_, y) => [0, y, '#cc5500']),
-      ...Array.from({length: 16}, (_, y) => [15, y, '#cc5500']),
-      // Inner border
-      ...Array.from({length: 14}, (_, x) => [x + 1, 1, '#ff8833']),
-      ...Array.from({length: 14}, (_, x) => [x + 1, 14, '#ff8833']),
-      ...Array.from({length: 14}, (_, y) => [1, y + 1, '#ff8833']),
-      ...Array.from({length: 14}, (_, y) => [14, y + 1, '#ff8833']),
-      // Fill orange
-      ...(() => {
-        const f = [];
-        for (let x = 2; x < 14; x++) for (let y = 2; y < 14; y++) f.push([x, y, '#ff6b2c']);
-        return f;
-      })(),
-      // Corner rivets
-      [2,2,'#ffcc00'],[13,2,'#ffcc00'],[2,13,'#ffcc00'],[13,13,'#ffcc00'],
-      // "?" mark
-      [6,4,'#ffffff'],[7,4,'#ffffff'],[8,4,'#ffffff'],[9,4,'#ffffff'],
-      [5,5,'#ffffff'],[10,5,'#ffffff'],
-      [9,6,'#ffffff'],[10,6,'#ffffff'],
-      [8,7,'#ffffff'],[9,7,'#ffffff'],
-      [7,8,'#ffffff'],[8,8,'#ffffff'],
-      [7,9,'#ffffff'],[8,9,'#ffffff'],
-      [7,11,'#ffffff'],[8,11,'#ffffff'],
-      [7,12,'#ffffff'],[8,12,'#ffffff'],
-    ],
-    // Frame 1 — hit (darker, slightly shifted)
-    [
-      ...Array.from({length: 16}, (_, x) => [x, 0, '#993300']),
-      ...Array.from({length: 16}, (_, x) => [x, 15, '#993300']),
-      ...Array.from({length: 16}, (_, y) => [0, y, '#993300']),
-      ...Array.from({length: 16}, (_, y) => [15, y, '#993300']),
-      ...Array.from({length: 14}, (_, x) => [x + 1, 1, '#aa5522']),
-      ...Array.from({length: 14}, (_, x) => [x + 1, 14, '#aa5522']),
-      ...Array.from({length: 14}, (_, y) => [1, y + 1, '#aa5522']),
-      ...Array.from({length: 14}, (_, y) => [14, y + 1, '#aa5522']),
-      ...(() => {
-        const f = [];
-        for (let x = 2; x < 14; x++) for (let y = 2; y < 14; y++) f.push([x, y, '#cc5500']);
-        return f;
-      })(),
-      [2,2,'#cc9900'],[13,2,'#cc9900'],[2,13,'#cc9900'],[13,13,'#cc9900'],
-      // Dimmed "?"
-      [6,4,'#cccccc'],[7,4,'#cccccc'],[8,4,'#cccccc'],[9,4,'#cccccc'],
-      [5,5,'#cccccc'],[10,5,'#cccccc'],
-      [9,6,'#cccccc'],[10,6,'#cccccc'],
-      [8,7,'#cccccc'],[9,7,'#cccccc'],
-      [7,8,'#cccccc'],[8,8,'#cccccc'],
-      [7,9,'#cccccc'],[8,9,'#cccccc'],
-      [7,11,'#cccccc'],[8,11,'#cccccc'],
-      [7,12,'#cccccc'],[8,12,'#cccccc'],
-    ],
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 11. cvDocument — 16x16, white paper CV icon
-// ---------------------------------------------------------------------------
-const cvDocument = {
-  width: 16, height: 16,
-  frames: [
-    [
-      // Paper body (white with fold corner)
-      ...(() => {
-        const p = [];
-        for (let x = 2; x < 14; x++) {
-          for (let y = 1; y < 15; y++) {
-            if (x >= 10 && y <= 4 && (x - 10 + 1) > (4 - y)) continue; // folded corner cutoff
-            p.push([x, y, '#f5f5f0']);
-          }
-        }
-        return p;
-      })(),
-      // Folded corner
-      [10,1,'#ddddcc'],[11,1,'#ddddcc'],[12,1,'#ddddcc'],[13,1,'#ddddcc'],
-      [10,2,'#ddddcc'],[11,2,'#ddddcc'],[12,2,'#ddddcc'],
-      [10,3,'#ddddcc'],[11,3,'#ddddcc'],
-      [10,4,'#ddddcc'],
-      // Border
-      ...Array.from({length: 8}, (_, i) => [2 + i, 1, '#ccccbb']),
-      ...Array.from({length: 12}, (_, i) => [2, 1 + i, '#ccccbb']),
-      ...Array.from({length: 12}, (_, i) => [13, 3 + i, '#ccccbb']),
-      ...Array.from({length: 12}, (_, i) => [2 + i, 14, '#ccccbb']),
-      // Text lines
-      ...[4,5,6,7,8].map(x => [x, 4, '#333333']),
-      ...[4,5,6,7,8,9,10,11].map(x => [x, 6, '#666666']),
-      ...[4,5,6,7,8,9,10].map(x => [x, 7, '#666666']),
-      ...[4,5,6,7,8,9,10,11].map(x => [x, 9, '#666666']),
-      ...[4,5,6,7,8,9].map(x => [x, 10, '#666666']),
-      ...[4,5,6,7,8,9,10,11].map(x => [x, 12, '#666666']),
-      // "CV" header
-      [4,3,'#1a1a2e'],[5,3,'#1a1a2e'],[7,3,'#1a1a2e'],[8,3,'#1a1a2e'],
-    ],
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 12. book — 16x16, green guidebook
-// ---------------------------------------------------------------------------
-const book = {
-  width: 16, height: 16,
-  frames: [
-    [
-      // Book spine
-      [3,2,'#1a6b30'],[3,3,'#1a6b30'],[3,4,'#1a6b30'],[3,5,'#1a6b30'],[3,6,'#1a6b30'],[3,7,'#1a6b30'],[3,8,'#1a6b30'],[3,9,'#1a6b30'],[3,10,'#1a6b30'],[3,11,'#1a6b30'],[3,12,'#1a6b30'],[3,13,'#1a6b30'],
-      [4,2,'#1a6b30'],[4,13,'#1a6b30'],
-      // Cover
-      ...(() => {
-        const p = [];
-        for (let x = 5; x < 13; x++) for (let y = 2; y < 14; y++) p.push([x, y, '#2bcc58']);
-        return p;
-      })(),
-      // Cover border
-      ...Array.from({length: 8}, (_, i) => [5 + i, 2, '#1a6b30']),
-      ...Array.from({length: 8}, (_, i) => [5 + i, 13, '#1a6b30']),
-      [12,2,'#1a6b30'],[12,3,'#1a6b30'],[12,4,'#1a6b30'],[12,5,'#1a6b30'],[12,6,'#1a6b30'],[12,7,'#1a6b30'],[12,8,'#1a6b30'],[12,9,'#1a6b30'],[12,10,'#1a6b30'],[12,11,'#1a6b30'],[12,12,'#1a6b30'],[12,13,'#1a6b30'],
-      // Title area (white rectangle)
-      ...(() => {
-        const p = [];
-        for (let x = 6; x < 11; x++) for (let y = 4; y < 8; y++) p.push([x, y, '#ffffff']);
-        return p;
-      })(),
-      // "CH" text on cover
-      [7,5,'#1a1a2e'],[7,6,'#1a1a2e'],
-      [9,5,'#1a1a2e'],[9,6,'#1a1a2e'],[8,5,'#1a1a2e'],
-      // Page edges
-      [4,3,'#f5f5f0'],[4,4,'#f5f5f0'],[4,5,'#f5f5f0'],[4,6,'#f5f5f0'],[4,7,'#f5f5f0'],[4,8,'#f5f5f0'],[4,9,'#f5f5f0'],[4,10,'#f5f5f0'],[4,11,'#f5f5f0'],[4,12,'#f5f5f0'],
-    ],
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 13. permitScroll — 16x16, parchment scroll with red seal
-// ---------------------------------------------------------------------------
-const permitScroll = {
-  width: 16, height: 16,
-  frames: [
-    [
-      // Top roll
-      ...[4,5,6,7,8,9,10,11].map(x => [x, 1, '#d4b896']),
-      ...[3,4,5,6,7,8,9,10,11,12].map(x => [x, 2, '#c4a880']),
-      ...[4,5,6,7,8,9,10,11].map(x => [x, 3, '#d4b896']),
-      // Parchment body
-      ...(() => {
-        const p = [];
-        for (let x = 4; x < 12; x++) for (let y = 4; y < 12; y++) p.push([x, y, '#f5e6c8']);
-        return p;
-      })(),
-      // Text lines
-      ...[5,6,7,8,9,10].map(x => [x, 5, '#666666']),
-      ...[5,6,7,8,9].map(x => [x, 7, '#666666']),
-      ...[5,6,7,8,9,10].map(x => [x, 9, '#666666']),
-      // Bottom roll
-      ...[4,5,6,7,8,9,10,11].map(x => [x, 12, '#d4b896']),
-      ...[3,4,5,6,7,8,9,10,11,12].map(x => [x, 13, '#c4a880']),
-      ...[4,5,6,7,8,9,10,11].map(x => [x, 14, '#d4b896']),
-      // Red seal
-      [9,10,'#cc2222'],[10,10,'#cc2222'],[11,10,'#cc2222'],
-      [9,11,'#cc2222'],[10,11,'#ee3333'],[11,11,'#cc2222'],
-      [10,12,'#cc2222'],
-      // Ribbon
-      [10,13,'#cc2222'],[9,14,'#cc2222'],[11,14,'#cc2222'],
-    ],
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 14. bureaucracyWall — 16x32, grey brick wall with red tape
-// ---------------------------------------------------------------------------
-const bureaucracyWall = {
-  width: 16, height: 32,
-  frames: [
-    (() => {
-      const p = [];
-      const brick = '#888888';
-      const brickDark = '#777777';
-      const mortar = '#aaaaaa';
-      const tape = '#cc2222';
-
-      // Brick pattern
-      for (let y = 0; y < 32; y++) {
-        const row = Math.floor(y / 4);
-        const offset = (row % 2) * 4;
-        for (let x = 0; x < 16; x++) {
-          if (y % 4 === 3) {
-            p.push([x, y, mortar]); // horizontal mortar
-          } else if ((x + offset) % 8 === 0) {
-            p.push([x, y, mortar]); // vertical mortar
-          } else {
-            p.push([x, y, (x + y) % 7 === 0 ? brickDark : brick]);
-          }
-        }
-      }
-
-      // Red tape (diagonal)
-      for (let i = 0; i < 28; i++) {
-        const x = Math.floor(i * 16 / 28);
-        const y = i + 2;
-        if (x >= 0 && x < 16 && y >= 0 && y < 32) {
-          p.push([x, y, tape]);
-          if (x + 1 < 16) p.push([x + 1, y, tape]);
-        }
-      }
-
-      // Horizontal red tape
-      for (let x = 0; x < 16; x++) {
-        p.push([x, 15, tape]);
-        p.push([x, 16, tape]);
-      }
-
-      // "STOP" text area (dark patch)
-      for (let x = 3; x < 13; x++) {
-        for (let y = 13; y < 19; y++) {
-          p.push([x, y, '#cc2222']);
-        }
-      }
-      // "!" marks
-      [5, 7, 10].forEach(x => {
-        p.push([x, 14, '#ffffff']);
-        p.push([x, 15, '#ffffff']);
-        p.push([x, 16, '#ffffff']);
-        p.push([x, 17, '#ffffff']);
-      });
-
-      return p;
-    })()
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 15. languageBarrierSign — 16x32, wooden sign with "DE" and "??"
-// ---------------------------------------------------------------------------
-const languageBarrierSign = {
-  width: 16, height: 32,
-  frames: [
-    [
-      // Post
-      ...(() => {
-        const p = [];
-        for (let y = 0; y < 32; y++) {
-          p.push([7, y, '#8b6333']);
-          p.push([8, y, '#8b6333']);
-        }
-        return p;
-      })(),
-      // Sign board
-      ...(() => {
-        const p = [];
-        for (let x = 1; x < 15; x++) {
-          for (let y = 2; y < 18; y++) {
-            p.push([x, y, '#b5834a']);
-          }
-        }
-        return p;
-      })(),
-      // Board border
-      ...Array.from({length: 14}, (_, i) => [i + 1, 2, '#8b6333']),
-      ...Array.from({length: 14}, (_, i) => [i + 1, 17, '#8b6333']),
-      ...Array.from({length: 16}, (_, i) => [1, 2 + i > 17 ? 17 : 2 + i, '#8b6333']),
-      ...Array.from({length: 16}, (_, i) => [14, Math.min(2 + i, 17), '#8b6333']),
-      // Top half: "DE" in white
-      [3,5,'#ffffff'],[4,5,'#ffffff'],[5,5,'#ffffff'],
-      [3,6,'#ffffff'],[6,6,'#ffffff'],
-      [3,7,'#ffffff'],[6,7,'#ffffff'],
-      [3,8,'#ffffff'],[6,8,'#ffffff'],
-      [3,9,'#ffffff'],[4,9,'#ffffff'],[5,9,'#ffffff'],
-      [8,5,'#ffffff'],[9,5,'#ffffff'],[10,5,'#ffffff'],[11,5,'#ffffff'],
-      [8,6,'#ffffff'],
-      [8,7,'#ffffff'],[9,7,'#ffffff'],[10,7,'#ffffff'],
-      [8,8,'#ffffff'],
-      [8,9,'#ffffff'],[9,9,'#ffffff'],[10,9,'#ffffff'],[11,9,'#ffffff'],
-      // Divider line
-      ...Array.from({length: 12}, (_, i) => [2 + i, 10, '#8b6333']),
-      // Bottom half: "??" in red
-      [3,12,'#cc2222'],[4,12,'#cc2222'],[5,12,'#cc2222'],
-      [6,12,'#cc2222'],
-      [5,13,'#cc2222'],[6,13,'#cc2222'],
-      [4,14,'#cc2222'],[5,14,'#cc2222'],
-      [4,15,'#cc2222'],[5,15,'#cc2222'],
-      [9,12,'#cc2222'],[10,12,'#cc2222'],[11,12,'#cc2222'],
-      [12,12,'#cc2222'],
-      [11,13,'#cc2222'],[12,13,'#cc2222'],
-      [10,14,'#cc2222'],[11,14,'#cc2222'],
-      [10,15,'#cc2222'],[11,15,'#cc2222'],
-      // Ground detail
-      ...Array.from({length: 6}, (_, i) => [5 + i, 30, '#5c3a1e']),
-      ...Array.from({length: 8}, (_, i) => [4 + i, 31, '#5c3a1e']),
-    ],
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 16. swissFlag — 16x16, red background with white cross
-// ---------------------------------------------------------------------------
-const swissFlag = {
-  width: 16, height: 16,
-  frames: [
-    [
-      // Red background
-      ...(() => {
-        const p = [];
-        for (let x = 1; x < 15; x++) for (let y = 1; y < 15; y++) p.push([x, y, '#ff0000']);
-        return p;
-      })(),
-      // Border
-      ...Array.from({length: 16}, (_, i) => [i, 0, '#cc0000']),
-      ...Array.from({length: 16}, (_, i) => [i, 15, '#cc0000']),
-      ...Array.from({length: 16}, (_, i) => [0, i, '#cc0000']),
-      ...Array.from({length: 16}, (_, i) => [15, i, '#cc0000']),
-      // White cross — vertical bar
-      [6,3,'#ffffff'],[7,3,'#ffffff'],[8,3,'#ffffff'],[9,3,'#ffffff'],
-      [6,4,'#ffffff'],[7,4,'#ffffff'],[8,4,'#ffffff'],[9,4,'#ffffff'],
-      [6,5,'#ffffff'],[7,5,'#ffffff'],[8,5,'#ffffff'],[9,5,'#ffffff'],
-      [6,6,'#ffffff'],[7,6,'#ffffff'],[8,6,'#ffffff'],[9,6,'#ffffff'],
-      [6,7,'#ffffff'],[7,7,'#ffffff'],[8,7,'#ffffff'],[9,7,'#ffffff'],
-      [6,8,'#ffffff'],[7,8,'#ffffff'],[8,8,'#ffffff'],[9,8,'#ffffff'],
-      [6,9,'#ffffff'],[7,9,'#ffffff'],[8,9,'#ffffff'],[9,9,'#ffffff'],
-      [6,10,'#ffffff'],[7,10,'#ffffff'],[8,10,'#ffffff'],[9,10,'#ffffff'],
-      [6,11,'#ffffff'],[7,11,'#ffffff'],[8,11,'#ffffff'],[9,11,'#ffffff'],
-      [6,12,'#ffffff'],[7,12,'#ffffff'],[8,12,'#ffffff'],[9,12,'#ffffff'],
-      // White cross — horizontal bar
-      [3,6,'#ffffff'],[4,6,'#ffffff'],[5,6,'#ffffff'],
-      [10,6,'#ffffff'],[11,6,'#ffffff'],[12,6,'#ffffff'],
-      [3,7,'#ffffff'],[4,7,'#ffffff'],[5,7,'#ffffff'],
-      [10,7,'#ffffff'],[11,7,'#ffffff'],[12,7,'#ffffff'],
-      [3,8,'#ffffff'],[4,8,'#ffffff'],[5,8,'#ffffff'],
-      [10,8,'#ffffff'],[11,8,'#ffffff'],[12,8,'#ffffff'],
-      [3,9,'#ffffff'],[4,9,'#ffffff'],[5,9,'#ffffff'],
-      [10,9,'#ffffff'],[11,9,'#ffffff'],[12,9,'#ffffff'],
-    ],
-  ]
-};
-
-// ---------------------------------------------------------------------------
-// 17. confettiParticle — helper for end screen
-// ---------------------------------------------------------------------------
-const confettiColors = ['#39ff6e', '#ff6b2c', '#ffd700', '#ff4444', '#4488ff', '#ff88cc', '#ffffff'];
-
-function createConfettiParticle(x, y) {
-  const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-  const size = 1 + Math.floor(Math.random() * 3);
-  const vx = (Math.random() - 0.5) * 4;
-  const vy = -2 - Math.random() * 4;
-  const gravity = 0.15;
-  const rotation = Math.random() * Math.PI * 2;
-  const rotSpeed = (Math.random() - 0.5) * 0.3;
-  return { x, y, vx, vy, gravity, color, size, rotation, rotSpeed, life: 1.0 };
-}
-
-function updateConfettiParticle(particle) {
-  particle.x += particle.vx;
-  particle.vy += particle.gravity;
-  particle.y += particle.vy;
-  particle.rotation += particle.rotSpeed;
-  particle.life -= 0.008;
-  return particle.life > 0;
-}
-
-function drawConfettiParticle(ctx, particle, scale) {
-  if (particle.life <= 0) return;
-  ctx.save();
-  ctx.globalAlpha = particle.life;
-  ctx.translate(particle.x, particle.y);
-  ctx.rotate(particle.rotation);
-  ctx.fillStyle = particle.color;
-  ctx.fillRect(-particle.size * scale / 2, -particle.size * scale / 2, particle.size * scale, particle.size * scale * 0.6);
-  ctx.restore();
-}
-
-// =============================================================================
-// Rendering Helpers
-// =============================================================================
-
-/**
- * Draw a sprite frame onto a canvas context using fillRect per pixel.
- * @param {CanvasRenderingContext2D} ctx
- * @param {object} sprite - Sprite definition with width, height, frames
- * @param {number} frameIndex - Which animation frame to draw
- * @param {number} posX - X position on canvas
- * @param {number} posY - Y position on canvas
- * @param {number} scale - Pixel scale (e.g., 3 = each pixel is 3x3)
- */
-function drawSprite(ctx, sprite, frameIndex, posX, posY, scale) {
-  scale = scale || 1;
-  const fi = frameIndex % sprite.frames.length;
-
-  // Use cached canvas if available
-  if (sprite._cache && sprite._cache[fi]) {
-    ctx.drawImage(sprite._cache[fi], posX, posY);
-    return;
-  }
-
-  const frame = sprite.frames[fi];
-  for (let i = 0; i < frame.length; i++) {
-    const px = frame[i];
-    ctx.fillStyle = px[2];
-    ctx.fillRect(posX + px[0] * scale, posY + px[1] * scale, scale, scale);
-  }
-}
-
-/**
- * Pre-render each frame of a sprite to an offscreen canvas for performance.
- * After caching, drawSprite will use drawImage instead of per-pixel fillRect.
- * @param {object} sprite - Sprite definition
- * @param {number} scale - Pixel scale
- * @returns {object} The same sprite object, with _cache populated
- */
-function cacheSprite(sprite, scale) {
-  scale = scale || 3;
-  sprite._cache = [];
-
-  for (let fi = 0; fi < sprite.frames.length; fi++) {
-    const offscreen = document.createElement('canvas');
-    offscreen.width = sprite.width * scale;
-    offscreen.height = sprite.height * scale;
-    const offCtx = offscreen.getContext('2d');
-    const frame = sprite.frames[fi];
-
-    for (let i = 0; i < frame.length; i++) {
-      const px = frame[i];
-      offCtx.fillStyle = px[2];
-      offCtx.fillRect(px[0] * scale, px[1] * scale, scale, scale);
+    // Cover tail join with fill
+    ctx.fillStyle = options.fill || '#ffffff';
+    if (tailDir === 'left') {
+      ctx.fillRect(bx + 14, by + bubbleH - 3, 16, 4);
+    } else if (tailDir === 'right') {
+      ctx.fillRect(bx + bubbleW - 30, by + bubbleH - 3, 16, 4);
+    } else {
+      ctx.fillRect(x - 9, by + bubbleH - 3, 18, 4);
     }
 
-    sprite._cache[fi] = offscreen;
-  }
+    // Text
+    ctx.fillStyle = options.textColor || '#1a1a2e';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], x, by + padding + i * lineHeight);
+    }
 
-  return sprite;
-}
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw thought bubble (smaller circles leading to cloud)
+  // -------------------------------------------------------------------------
+  drawThoughtBubble(ctx, x, y, text) {
+    ctx.save();
+    const fontSize = 12;
+    ctx.font = `bold ${fontSize}px "Comic Sans MS", cursive`;
+    const padding = 10;
+    const maxW = 150;
+
+    const words = text.split(' ');
+    const lines = [];
+    let cur = words[0] || '';
+    for (let i = 1; i < words.length; i++) {
+      const test = cur + ' ' + words[i];
+      if (ctx.measureText(test).width > maxW) { lines.push(cur); cur = words[i]; }
+      else cur = test;
+    }
+    lines.push(cur);
+
+    const lineH = fontSize * 1.3;
+    const textW = Math.min(maxW, Math.max(...lines.map(l => ctx.measureText(l).width)));
+    const bw = textW + padding * 2;
+    const bh = lines.length * lineH + padding * 2;
+    const bx = x - bw / 2;
+    const by = y - bh - 20;
+
+    // Leading dots
+    Comic.setOutlineStyle(ctx, 2);
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x - 5, y - 8, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x - 8, y - 16, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Cloud shape (bumpy rounded rect)
+    ctx.beginPath();
+    const cx = bx + bw / 2;
+    const cy = by + bh / 2;
+    const rx = bw / 2 + 5;
+    const ry = bh / 2 + 5;
+    const bumps = 10;
+    for (let i = 0; i <= bumps; i++) {
+      const angle = (i / bumps) * Math.PI * 2;
+      const bumpR = 6 + Math.sin(i * 3) * 3;
+      const px = cx + Math.cos(angle) * rx + Math.cos(angle) * bumpR;
+      const py = cy + Math.sin(angle) * ry + Math.sin(angle) * bumpR;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    Comic.setOutlineStyle(ctx, 2);
+    ctx.stroke();
+
+    // Text
+    ctx.fillStyle = '#1a1a2e';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], x, by + padding + i * lineH);
+    }
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw action word ("WOW!", "BOOM!", etc) with comic styling
+  // -------------------------------------------------------------------------
+  drawActionWord(ctx, x, y, text, color, rotation) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((rotation || 0) * Math.PI / 180);
+    const fontSize = 22;
+    ctx.font = `900 ${fontSize}px "Impact", "Arial Black", sans-serif`;
+    const tw = ctx.measureText(text).width;
+
+    // Starburst behind
+    Comic.drawStarBurst(ctx, 0, 0, tw * 0.8, color || '#ffdd00');
+
+    // Text with outline
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 3;
+    ctx.strokeText(text, 0, 0);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, 0, 0);
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw Czech apartment building (panelak) — comic style
+  // -------------------------------------------------------------------------
+  drawPanelak(ctx, x, y, scale) {
+    scale = scale || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Main building body
+    Comic.roundedRect(ctx, 0, 0, 80, 100, 3, '#b0b0b0', true);
+
+    // Ben-Day dots for concrete texture
+    Comic.drawBenDayDots(ctx, 2, 2, 76, 96, 'rgba(0,0,0,0.08)', 5);
+
+    // Windows (4 columns x 5 rows)
+    for (let col = 0; col < 4; col++) {
+      for (let row = 0; row < 5; row++) {
+        const wx = 8 + col * 18;
+        const wy = 8 + row * 18;
+        Comic.roundedRect(ctx, wx, wy, 12, 12, 1, '#7eb8da', true);
+        // Window cross
+        ctx.beginPath();
+        ctx.moveTo(wx + 6, wy);
+        ctx.lineTo(wx + 6, wy + 12);
+        ctx.moveTo(wx, wy + 6);
+        ctx.lineTo(wx + 12, wy + 6);
+        ctx.strokeStyle = '#5a8aa5';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        Comic.setOutlineStyle(ctx, 2.5);
+      }
+    }
+
+    // Door
+    Comic.roundedRect(ctx, 30, 80, 20, 20, 3, '#8b6333', true);
+    // Door handle
+    ctx.beginPath();
+    ctx.arc(44, 92, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#daa520';
+    ctx.fill();
+    ctx.stroke();
+
+    // Roof line
+    ctx.beginPath();
+    ctx.moveTo(-2, 0);
+    ctx.lineTo(82, 0);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#888888';
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw Swiss chalet — comic style with charm
+  // -------------------------------------------------------------------------
+  drawChalet(ctx, x, y, scale) {
+    scale = scale || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Roof (triangle)
+    ctx.beginPath();
+    ctx.moveTo(40, -20);
+    ctx.lineTo(-10, 30);
+    ctx.lineTo(90, 30);
+    ctx.closePath();
+    ctx.fillStyle = '#8b2500';
+    ctx.fill();
+    ctx.stroke();
+
+    // Roof overhang lines
+    ctx.beginPath();
+    ctx.moveTo(-12, 30);
+    ctx.lineTo(92, 30);
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Main body (wood)
+    Comic.roundedRect(ctx, 5, 30, 70, 55, 3, '#d4a06a', true);
+
+    // Wood plank lines
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.moveTo(7, 40 + i * 10);
+      ctx.lineTo(73, 40 + i * 10);
+      ctx.strokeStyle = '#b8844a';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Balcony
+    ctx.beginPath();
+    ctx.rect(20, 35, 40, 3);
+    ctx.fillStyle = '#8b6333';
+    ctx.fill();
+    ctx.stroke();
+    // Balcony rails
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.moveTo(24 + i * 8, 38);
+      ctx.lineTo(24 + i * 8, 50);
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = '#8b6333';
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.rect(20, 49, 40, 2);
+    ctx.fillStyle = '#8b6333';
+    ctx.fill();
+
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Windows
+    Comic.roundedRect(ctx, 12, 55, 18, 16, 2, '#7eb8da', true);
+    Comic.roundedRect(ctx, 50, 55, 18, 16, 2, '#7eb8da', true);
+
+    // Window shutters (red)
+    Comic.roundedRect(ctx, 8, 54, 5, 18, 1, '#cc2222', true);
+    Comic.roundedRect(ctx, 31, 54, 5, 18, 1, '#cc2222', true);
+    Comic.roundedRect(ctx, 46, 54, 5, 18, 1, '#cc2222', true);
+    Comic.roundedRect(ctx, 69, 54, 5, 18, 1, '#cc2222', true);
+
+    // Door
+    Comic.roundedRect(ctx, 30, 68, 20, 17, 3, '#5c3317', true);
+    ctx.beginPath();
+    ctx.arc(44, 78, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#daa520';
+    ctx.fill();
+    ctx.stroke();
+
+    // Chimney
+    Comic.roundedRect(ctx, 58, -10, 10, 25, 2, '#aa4422', true);
+
+    // Flower box under window
+    Comic.roundedRect(ctx, 11, 71, 20, 4, 1, '#5c3317', true);
+    // Flowers
+    const flowerColors = ['#ff4466', '#ffaa22', '#ff66aa'];
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.arc(16 + i * 6, 69, 3, 0, Math.PI * 2);
+      ctx.fillStyle = flowerColors[i];
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw car (for the road trip level)
+  // -------------------------------------------------------------------------
+  drawCar(ctx, x, y, scale, color) {
+    scale = scale || 1;
+    color = color || '#3b6cb5';
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Body
+    ctx.beginPath();
+    ctx.moveTo(10, 20);
+    ctx.lineTo(10, 10);
+    ctx.quadraticCurveTo(10, 5, 15, 5);
+    ctx.lineTo(25, 5);
+    ctx.lineTo(30, -8);
+    ctx.lineTo(55, -8);
+    ctx.lineTo(60, 5);
+    ctx.lineTo(75, 5);
+    ctx.quadraticCurveTo(80, 5, 80, 10);
+    ctx.lineTo(80, 20);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.stroke();
+
+    // Windows
+    ctx.beginPath();
+    ctx.moveTo(32, -5);
+    ctx.lineTo(35, 5);
+    ctx.lineTo(42, 5);
+    ctx.lineTo(42, -5);
+    ctx.closePath();
+    ctx.fillStyle = '#c8e0f0';
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(45, -5);
+    ctx.lineTo(45, 5);
+    ctx.lineTo(56, 5);
+    ctx.lineTo(53, -5);
+    ctx.closePath();
+    ctx.fillStyle = '#c8e0f0';
+    ctx.fill();
+    ctx.stroke();
+
+    // Headlight
+    ctx.beginPath();
+    ctx.ellipse(78, 12, 4, 3, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffdd44';
+    ctx.fill();
+    ctx.stroke();
+
+    // Taillight
+    ctx.beginPath();
+    ctx.ellipse(12, 12, 3, 3, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff3333';
+    ctx.fill();
+    ctx.stroke();
+
+    // Wheels
+    ctx.beginPath();
+    ctx.arc(25, 22, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#333333';
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(25, 22, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#888888';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(65, 22, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#333333';
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(65, 22, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#888888';
+    ctx.fill();
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw mountain with snow cap
+  // -------------------------------------------------------------------------
+  drawMountain(ctx, x, y, scale, snow) {
+    scale = scale || 1;
+    snow = snow !== false;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Mountain body
+    ctx.beginPath();
+    ctx.moveTo(0, 80);
+    ctx.lineTo(50, 0);
+    ctx.lineTo(100, 80);
+    ctx.closePath();
+    ctx.fillStyle = '#6b7b3a';
+    ctx.fill();
+    ctx.stroke();
+
+    // Snow cap
+    if (snow) {
+      ctx.beginPath();
+      ctx.moveTo(35, 20);
+      ctx.lineTo(50, 0);
+      ctx.lineTo(65, 20);
+      ctx.quadraticCurveTo(60, 25, 55, 22);
+      ctx.quadraticCurveTo(50, 28, 45, 22);
+      ctx.quadraticCurveTo(40, 25, 35, 20);
+      ctx.closePath();
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // Rock details
+    ctx.beginPath();
+    ctx.moveTo(30, 60);
+    ctx.lineTo(40, 50);
+    ctx.lineTo(50, 60);
+    ctx.strokeStyle = '#5a6a2a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(55, 65);
+    ctx.lineTo(65, 55);
+    ctx.lineTo(72, 65);
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw tree (comic style — round canopy, trunk)
+  // -------------------------------------------------------------------------
+  drawTree(ctx, x, y, scale, color) {
+    scale = scale || 1;
+    color = color || '#2bcc58';
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Trunk
+    ctx.beginPath();
+    ctx.moveTo(13, 30);
+    ctx.lineTo(13, 55);
+    ctx.quadraticCurveTo(13, 58, 10, 58);
+    ctx.lineTo(22, 58);
+    ctx.quadraticCurveTo(19, 58, 19, 55);
+    ctx.lineTo(19, 30);
+    ctx.closePath();
+    ctx.fillStyle = '#8b6333';
+    ctx.fill();
+    ctx.stroke();
+
+    // Canopy (overlapping circles for organic shape)
+    const circles = [
+      { cx: 16, cy: 18, r: 16 },
+      { cx: 6, cy: 24, r: 12 },
+      { cx: 26, cy: 24, r: 12 },
+      { cx: 10, cy: 12, r: 11 },
+      { cx: 22, cy: 12, r: 11 },
+      { cx: 16, cy: 6, r: 10 },
+    ];
+    // Fill all circles first
+    circles.forEach(c => {
+      ctx.beginPath();
+      ctx.arc(c.cx, c.cy, c.r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    });
+    // Then stroke outer ones
+    circles.forEach(c => {
+      ctx.beginPath();
+      ctx.arc(c.cx, c.cy, c.r, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw coin (golden circle with CHF/Kc text)
+  // -------------------------------------------------------------------------
+  drawCoin(ctx, x, y, scale, label) {
+    scale = scale || 1;
+    label = label || 'W';
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Outer ring
+    ctx.beginPath();
+    ctx.arc(10, 10, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#daa520';
+    ctx.fill();
+    ctx.stroke();
+
+    // Inner circle
+    ctx.beginPath();
+    ctx.arc(10, 10, 7, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd700';
+    ctx.fill();
+    ctx.stroke();
+
+    // Text
+    ctx.font = 'bold 10px "Arial Black", sans-serif';
+    ctx.fillStyle = '#8b6914';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, 10, 10);
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw Swiss flag
+  // -------------------------------------------------------------------------
+  drawSwissFlag(ctx, x, y, scale) {
+    scale = scale || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Red square
+    Comic.roundedRect(ctx, 0, 0, 24, 24, 2, '#ff0000', true);
+
+    // White cross
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(9, 4, 6, 16);
+    ctx.fillRect(4, 9, 16, 6);
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw couch/sofa (for living room scene)
+  // -------------------------------------------------------------------------
+  drawCouch(ctx, x, y, scale) {
+    scale = scale || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Back
+    Comic.roundedRect(ctx, 0, 0, 80, 25, 6, '#cc5544', true);
+
+    // Seat
+    Comic.roundedRect(ctx, 5, 20, 70, 18, 4, '#e06655', true);
+
+    // Arms
+    Comic.roundedRect(ctx, -5, 10, 12, 30, 5, '#cc5544', true);
+    Comic.roundedRect(ctx, 73, 10, 12, 30, 5, '#cc5544', true);
+
+    // Cushion line
+    ctx.beginPath();
+    ctx.moveTo(40, 22);
+    ctx.lineTo(40, 36);
+    ctx.strokeStyle = '#aa3322';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Legs
+    ctx.fillStyle = '#5c3317';
+    ctx.fillRect(8, 38, 4, 6);
+    ctx.fillRect(68, 38, 4, 6);
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw phone/tablet showing TikTok
+  // -------------------------------------------------------------------------
+  drawPhone(ctx, x, y, scale) {
+    scale = scale || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2);
+
+    // Phone body
+    Comic.roundedRect(ctx, 0, 0, 20, 36, 3, '#1a1a2e', true);
+
+    // Screen
+    Comic.roundedRect(ctx, 2, 4, 16, 26, 1, '#222244', false);
+
+    // TikTok-ish icon (musical note)
+    ctx.beginPath();
+    ctx.arc(10, 18, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff3366';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(13, 18);
+    ctx.lineTo(13, 10);
+    ctx.lineTo(15, 8);
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Home button
+    ctx.beginPath();
+    ctx.arc(10, 33, 2, 0, Math.PI * 2);
+    ctx.strokeStyle = '#444466';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw family group (simple comic people)
+  // -------------------------------------------------------------------------
+  drawFamily(ctx, x, y, scale) {
+    scale = scale || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    function drawPerson(px, py, h, hairColor, shirtColor) {
+      Comic.setOutlineStyle(ctx, 2);
+      // Head
+      ctx.beginPath();
+      ctx.arc(px, py, h * 0.18, 0, Math.PI * 2);
+      ctx.fillStyle = '#fcd9b6';
+      ctx.fill();
+      ctx.stroke();
+      // Hair
+      ctx.beginPath();
+      ctx.arc(px, py - h * 0.06, h * 0.18, Math.PI, 0, true);
+      ctx.fillStyle = hairColor;
+      ctx.fill();
+      ctx.stroke();
+      // Eyes
+      ctx.fillStyle = '#1a1a2e';
+      ctx.beginPath();
+      ctx.arc(px - h * 0.06, py - h * 0.02, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(px + h * 0.06, py - h * 0.02, 1.2, 0, Math.PI * 2);
+      ctx.fill();
+      // Smile
+      ctx.beginPath();
+      ctx.arc(px, py + h * 0.05, h * 0.06, 0, Math.PI);
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      // Body
+      Comic.roundedRect(ctx, px - h * 0.15, py + h * 0.16, h * 0.3, h * 0.35, 3, shirtColor, true);
+      // Legs
+      ctx.fillStyle = '#3b6cb5';
+      ctx.fillRect(px - h * 0.12, py + h * 0.5, h * 0.1, h * 0.3);
+      ctx.fillRect(px + h * 0.02, py + h * 0.5, h * 0.1, h * 0.3);
+      Comic.setOutlineStyle(ctx, 2);
+      ctx.strokeRect(px - h * 0.12, py + h * 0.5, h * 0.1, h * 0.3);
+      ctx.strokeRect(px + h * 0.02, py + h * 0.5, h * 0.1, h * 0.3);
+    }
+
+    // Dad
+    drawPerson(0, 0, 50, '#5c3317', '#3b6cb5');
+    // Mom
+    drawPerson(25, 3, 45, '#8b4513', '#cc5544');
+    // Kid
+    drawPerson(12, 16, 30, '#5c3317', '#39ff6e');
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw road sign
+  // -------------------------------------------------------------------------
+  drawRoadSign(ctx, x, y, text) {
+    ctx.save();
+    ctx.translate(x, y);
+    Comic.setOutlineStyle(ctx, 2.5);
+
+    // Post
+    ctx.beginPath();
+    ctx.rect(13, 25, 4, 35);
+    ctx.fillStyle = '#888888';
+    ctx.fill();
+    ctx.stroke();
+
+    // Sign board
+    Comic.roundedRect(ctx, -5, 0, 40, 25, 4, '#2266aa', true);
+
+    // Border on sign
+    Comic.roundedRect(ctx, -2, 3, 34, 19, 2, false, '#ffffff');
+
+    // Text
+    ctx.font = 'bold 10px "Arial Black", sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text || 'CH', 15, 13);
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw lamp post
+  // -------------------------------------------------------------------------
+  drawLampPost(ctx, x, y, scale) {
+    scale = scale || 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2);
+
+    // Pole
+    ctx.beginPath();
+    ctx.rect(8, 15, 4, 55);
+    ctx.fillStyle = '#555555';
+    ctx.fill();
+    ctx.stroke();
+
+    // Arm
+    ctx.beginPath();
+    ctx.moveTo(10, 15);
+    ctx.quadraticCurveTo(10, 5, 20, 5);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#555555';
+    ctx.stroke();
+    Comic.setOutlineStyle(ctx, 2);
+
+    // Lamp housing
+    ctx.beginPath();
+    ctx.moveTo(16, 0);
+    ctx.lineTo(26, 0);
+    ctx.lineTo(28, 8);
+    ctx.lineTo(14, 8);
+    ctx.closePath();
+    ctx.fillStyle = '#333333';
+    ctx.fill();
+    ctx.stroke();
+
+    // Light glow
+    ctx.beginPath();
+    ctx.ellipse(21, 8, 5, 3, 0, 0, Math.PI);
+    ctx.fillStyle = '#ffee88';
+    ctx.fill();
+
+    // Base
+    ctx.beginPath();
+    ctx.moveTo(4, 68);
+    ctx.lineTo(16, 68);
+    ctx.lineTo(14, 70);
+    ctx.lineTo(6, 70);
+    ctx.closePath();
+    ctx.fillStyle = '#555555';
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw flower
+  // -------------------------------------------------------------------------
+  drawFlower(ctx, x, y, color) {
+    color = color || '#ff6688';
+    ctx.save();
+    ctx.translate(x, y);
+    Comic.setOutlineStyle(ctx, 1.5);
+
+    // Stem
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(-2, 6, 0, 12);
+    ctx.strokeStyle = '#2bcc58';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Leaf
+    ctx.beginPath();
+    ctx.ellipse(4, 7, 4, 2, 0.3, 0, Math.PI * 2);
+    ctx.fillStyle = '#2bcc58';
+    ctx.fill();
+    Comic.setOutlineStyle(ctx, 1.5);
+    ctx.stroke();
+
+    // Petals
+    const petals = 5;
+    for (let i = 0; i < petals; i++) {
+      const angle = (i / petals) * Math.PI * 2;
+      const px = Math.cos(angle) * 4;
+      const py = Math.sin(angle) * 4;
+      ctx.beginPath();
+      ctx.arc(px, py, 3, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // Center
+    ctx.beginPath();
+    ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffcc00';
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+  // -------------------------------------------------------------------------
+  // Draw cloud
+  // -------------------------------------------------------------------------
+  drawCloud(ctx, x, y, scale, color) {
+    scale = scale || 1;
+    color = color || '#ffffff';
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    Comic.setOutlineStyle(ctx, 2);
+
+    ctx.beginPath();
+    ctx.arc(20, 20, 14, 0, Math.PI * 2);
+    ctx.arc(38, 18, 16, 0, Math.PI * 2);
+    ctx.arc(55, 20, 13, 0, Math.PI * 2);
+    ctx.arc(30, 12, 12, 0, Math.PI * 2);
+    ctx.arc(45, 10, 11, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  },
+
+};
+
+// Make Comic globally available
+if (typeof window !== 'undefined') window.Comic = Comic;
 
 // =============================================================================
-// SPRITES — master export object
+// LEGACY STUBS — keep so woker-game.js doesn't error
 // =============================================================================
+
 const SPRITES = {
-  // Characters
-  czechWorker,
-  wookyRobot,
+  czechWorker: { width: 16, height: 24, frames: [[]] },
+  wookyRobot: { width: 16, height: 16, frames: [[]] },
+  panelak: { width: 80, height: 100, frames: [[]] },
+  swissChalet: { width: 80, height: 100, frames: [[]] },
+  alpsMountains: { width: 100, height: 80, frames: [[]] },
+  grassTile: { width: 16, height: 16, frames: [[]] },
+  pathTile: { width: 16, height: 16, frames: [[]] },
+  greyGrassTile: { width: 16, height: 16, frames: [[]] },
+  coin: { width: 16, height: 16, frames: [[]] },
+  mysteryBox: { width: 16, height: 16, frames: [[]] },
+  cvDocument: { width: 16, height: 16, frames: [[]] },
+  book: { width: 16, height: 16, frames: [[]] },
+  permitScroll: { width: 16, height: 16, frames: [[]] },
+  bureaucracyWall: { width: 16, height: 32, frames: [[]] },
+  languageBarrierSign: { width: 16, height: 32, frames: [[]] },
+  swissFlag: { width: 16, height: 16, frames: [[]] },
 
-  // Buildings (procedurally generated)
-  panelak,
-  swissChalet,
+  // Confetti helpers (kept functional)
+  confettiColors: ['#39ff6e', '#ff6b2c', '#ffd700', '#ff4444', '#4488ff', '#ff88cc', '#ffffff'],
+  createConfettiParticle(x, y) {
+    const color = this.confettiColors[Math.floor(Math.random() * this.confettiColors.length)];
+    const size = 1 + Math.floor(Math.random() * 3);
+    const vx = (Math.random() - 0.5) * 4;
+    const vy = -2 - Math.random() * 4;
+    return { x, y, vx, vy, gravity: 0.15, color, size, rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.3, life: 1.0 };
+  },
+  updateConfettiParticle(p) {
+    p.x += p.vx;
+    p.vy += p.gravity;
+    p.y += p.vy;
+    p.rotation += p.rotSpeed;
+    p.life -= 0.008;
+    return p.life > 0;
+  },
+  drawConfettiParticle(ctx, p, scale) {
+    if (p.life <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size * scale / 2, -p.size * scale / 2, p.size * scale, p.size * scale * 0.6);
+    ctx.restore();
+  },
 
-  // Background
-  alpsMountains,
-
-  // Tiles
-  grassTile,
-  pathTile,
-  greyGrassTile,
-
-  // Collectibles
-  coin,
-  mysteryBox,
-  cvDocument,
-  book,
-  permitScroll,
-
-  // Obstacles
-  bureaucracyWall,
-  languageBarrierSign,
-
-  // Decorations
-  swissFlag,
-
-  // Confetti helpers
-  confettiColors,
-  createConfettiParticle,
-  updateConfettiParticle,
-  drawConfettiParticle,
-
-  // Rendering
-  drawSprite,
-  cacheSprite,
+  // Legacy rendering stubs
+  drawSprite(ctx, sprite, frameIndex, posX, posY, scale) {
+    // No-op stub — pixel rendering replaced by Comic.draw* functions
+  },
+  cacheSprite(sprite, scale) {
+    return sprite;
+  },
 };
 
 // Support both module and script tag usage
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = SPRITES;
+  module.exports = { Comic, SPRITES };
 }

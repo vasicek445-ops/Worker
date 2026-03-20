@@ -1,11 +1,23 @@
 /**
- * Woker Game Engine — Mario-style scroll-driven pixel art game
+ * Woker Game Engine — Comic Book style scroll-driven story game
  *
  * Dependencies (must be loaded before this script):
- *   - sprites.js  (SPRITES, drawSprite, cacheSprite)
+ *   - sprites.js  (SPRITES — legacy, Comic object used if available)
  *   - levels.js   (LEVELS, getLevel, getTerrainY)
- *   - parallax.js (Parallax)
+ *   - parallax.js (Parallax — optional, used for sky gradients)
  */
+
+// Comic, LEVELS, getLevel, getTerrainY etc. are provided by sprites.js and levels.js
+// They share the global lexical scope via <script> tags — no redeclaration needed.
+// Just verify Comic is available:
+if (typeof Comic === 'undefined') {
+  console.error('[WokerGame] Comic not found! Load sprites.js before woker-game.js.');
+}
+
+
+// =============================================================================
+// WokerGame — Comic Book Engine
+// =============================================================================
 
 const WokerGame = {
   // ── Config ───────────────────────────────────────────────
@@ -15,8 +27,8 @@ const WokerGame = {
   container: null,
   canvasW: 900,
   canvasH: 460,
-  pixelSize: 3,
-  totalWorldWidth: 5000,
+  pixelSize: 3,  // kept for sizing calculations only
+  totalWorldWidth: 8000,
   wrapperHeight: 6000,
 
   // ── State ────────────────────────────────────────────────
@@ -33,102 +45,7 @@ const WokerGame = {
   collectEffects: [],
   skipBtn: null,
   endCTA: null,
-
-  // ── Pixel Font ───────────────────────────────────────────
-  // 5x7 bitmap font — each char is an array of 7 rows, each row a 5-bit number
-  FONT: {
-    'A': [0x04,0x0A,0x11,0x1F,0x11,0x11,0x11],
-    'B': [0x1E,0x11,0x11,0x1E,0x11,0x11,0x1E],
-    'C': [0x0E,0x11,0x10,0x10,0x10,0x11,0x0E],
-    'D': [0x1E,0x11,0x11,0x11,0x11,0x11,0x1E],
-    'E': [0x1F,0x10,0x10,0x1E,0x10,0x10,0x1F],
-    'F': [0x1F,0x10,0x10,0x1E,0x10,0x10,0x10],
-    'G': [0x0E,0x11,0x10,0x17,0x11,0x11,0x0E],
-    'H': [0x11,0x11,0x11,0x1F,0x11,0x11,0x11],
-    'I': [0x0E,0x04,0x04,0x04,0x04,0x04,0x0E],
-    'J': [0x07,0x02,0x02,0x02,0x02,0x12,0x0C],
-    'K': [0x11,0x12,0x14,0x18,0x14,0x12,0x11],
-    'L': [0x10,0x10,0x10,0x10,0x10,0x10,0x1F],
-    'M': [0x11,0x1B,0x15,0x15,0x11,0x11,0x11],
-    'N': [0x11,0x19,0x15,0x13,0x11,0x11,0x11],
-    'O': [0x0E,0x11,0x11,0x11,0x11,0x11,0x0E],
-    'P': [0x1E,0x11,0x11,0x1E,0x10,0x10,0x10],
-    'Q': [0x0E,0x11,0x11,0x11,0x15,0x12,0x0D],
-    'R': [0x1E,0x11,0x11,0x1E,0x14,0x12,0x11],
-    'S': [0x0E,0x11,0x10,0x0E,0x01,0x11,0x0E],
-    'T': [0x1F,0x04,0x04,0x04,0x04,0x04,0x04],
-    'U': [0x11,0x11,0x11,0x11,0x11,0x11,0x0E],
-    'V': [0x11,0x11,0x11,0x11,0x0A,0x0A,0x04],
-    'W': [0x11,0x11,0x11,0x15,0x15,0x1B,0x11],
-    'X': [0x11,0x11,0x0A,0x04,0x0A,0x11,0x11],
-    'Y': [0x11,0x11,0x0A,0x04,0x04,0x04,0x04],
-    'Z': [0x1F,0x01,0x02,0x04,0x08,0x10,0x1F],
-    '0': [0x0E,0x11,0x13,0x15,0x19,0x11,0x0E],
-    '1': [0x04,0x0C,0x04,0x04,0x04,0x04,0x0E],
-    '2': [0x0E,0x11,0x01,0x06,0x08,0x10,0x1F],
-    '3': [0x0E,0x11,0x01,0x06,0x01,0x11,0x0E],
-    '4': [0x02,0x06,0x0A,0x12,0x1F,0x02,0x02],
-    '5': [0x1F,0x10,0x1E,0x01,0x01,0x11,0x0E],
-    '6': [0x06,0x08,0x10,0x1E,0x11,0x11,0x0E],
-    '7': [0x1F,0x01,0x02,0x04,0x08,0x08,0x08],
-    '8': [0x0E,0x11,0x11,0x0E,0x11,0x11,0x0E],
-    '9': [0x0E,0x11,0x11,0x0F,0x01,0x02,0x0C],
-    ' ': [0x00,0x00,0x00,0x00,0x00,0x00,0x00],
-    '.': [0x00,0x00,0x00,0x00,0x00,0x00,0x04],
-    ',': [0x00,0x00,0x00,0x00,0x00,0x04,0x08],
-    '!': [0x04,0x04,0x04,0x04,0x04,0x00,0x04],
-    '?': [0x0E,0x11,0x01,0x06,0x04,0x00,0x04],
-    ':': [0x00,0x00,0x04,0x00,0x00,0x04,0x00],
-    '-': [0x00,0x00,0x00,0x0E,0x00,0x00,0x00],
-    '+': [0x00,0x04,0x04,0x1F,0x04,0x04,0x00],
-    '/': [0x01,0x01,0x02,0x04,0x08,0x10,0x10],
-    '(': [0x02,0x04,0x08,0x08,0x08,0x04,0x02],
-    ')': [0x08,0x04,0x02,0x02,0x02,0x04,0x08],
-    // Czech diacritics — mapped to base letter glyphs (caron/accent drawn above)
-    '\u010C': null, // C with caron
-    '\u010D': null, // c with caron
-    '\u0160': null, // S with caron
-    '\u0161': null, // s with caron
-    '\u017D': null, // Z with caron
-    '\u017E': null, // z with caron
-    '\u0158': null, // R with caron
-    '\u0159': null, // r with caron
-    '\u0147': null, // N with caron
-    '\u0148': null, // n with caron
-    '\u0164': null, // T with caron
-    '\u0165': null, // t with caron
-    '\u010E': null, // D with caron
-    '\u010F': null, // d with caron
-    '\u00C1': null, // A acute
-    '\u00E1': null, // a acute
-    '\u00C9': null, // E acute
-    '\u00E9': null, // e acute
-    '\u00CD': null, // I acute
-    '\u00ED': null, // i acute
-    '\u00DA': null, // U acute
-    '\u00FA': null, // u acute
-    '\u016E': null, // U ring
-    '\u016F': null, // u ring
-    '\u00DD': null, // Y acute
-    '\u00FD': null, // y acute
-  },
-
-  // Map Czech chars to base letter + diacritic type
-  DIACRITICS: {
-    '\u010C':'C','\u010D':'C','\u0160':'S','\u0161':'S','\u017D':'Z','\u017E':'Z',
-    '\u0158':'R','\u0159':'R','\u0147':'N','\u0148':'N','\u0164':'T','\u0165':'T',
-    '\u010E':'D','\u010F':'D',
-    '\u00C1':'A','\u00E1':'A','\u00C9':'E','\u00E9':'E','\u00CD':'I','\u00ED':'I',
-    '\u00DA':'U','\u00FA':'U','\u016E':'U','\u016F':'U','\u00DD':'Y','\u00FD':'Y',
-  },
-
-  CARONS: new Set([
-    '\u010C','\u010D','\u0160','\u0161','\u017D','\u017E',
-    '\u0158','\u0159','\u0147','\u0148','\u0164','\u0165',
-    '\u010E','\u010F',
-  ]),
-
-  RINGS: new Set(['\u016E','\u016F']),
+  lastWorldX: 0,  // for speed calculation
 
   // ── Init ─────────────────────────────────────────────────
   init(canvasId) {
@@ -139,85 +56,69 @@ const WokerGame = {
     }
     this.ctx = this.canvas.getContext('2d');
     this.wrapper = document.getElementById('game-wrapper');
-    this.container = document.getElementById('game-sticky');
 
-    if (!this.wrapper || !this.container) {
-      console.warn('[WokerGame] Missing #game-wrapper or #game-sticky');
-      return;
-    }
-
-    // Crisp pixel art
-    this.ctx.imageSmoothingEnabled = false;
+    // Smooth rendering for comic style
+    this.ctx.imageSmoothingEnabled = true;
 
     // Responsive sizing
     this.handleResize();
     window.addEventListener('resize', () => this.handleResize());
 
-    // Scroll listener — passive, RAF debounced
-    let rafId = null;
-    window.addEventListener('scroll', () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        const p = this.getScrollProgress();
-        this.render(p);
-        rafId = null;
-      });
+    // ── Wheel scroll on canvas → horizontal game movement ──
+    this.canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const speed = 0.0004;
+      this.progress = Math.max(0, Math.min(1, this.progress + e.deltaY * speed));
+      this.render(this.progress);
+    }, { passive: false });
+
+    // ── Touch drag on mobile → horizontal game movement ──
+    let touchStartX = 0;
+    let touchStartProgress = 0;
+    this.canvas.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartProgress = this.progress;
+      this.canvas.style.cursor = 'grabbing';
     }, { passive: true });
 
-    // Cache sprites if available
-    if (typeof cacheSprite === 'function' && typeof SPRITES !== 'undefined') {
-      Object.keys(SPRITES).forEach(key => {
-        if (SPRITES[key] && SPRITES[key].frames) cacheSprite(SPRITES[key], this.pixelSize);
-      });
-    }
+    this.canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const dx = touchStartX - e.touches[0].clientX;
+      const speed = 0.001;
+      this.progress = Math.max(0, Math.min(1, touchStartProgress + dx * speed));
+      this.render(this.progress);
+    }, { passive: false });
 
-    // Create skip button
-    this._createSkipButton();
+    this.canvas.addEventListener('touchend', () => {
+      this.canvas.style.cursor = 'grab';
+    }, { passive: true });
+
+    // ── Mouse drag on desktop ──
+    let dragging = false;
+    let dragStartX = 0;
+    let dragStartProgress = 0;
+    this.canvas.addEventListener('mousedown', (e) => {
+      dragging = true;
+      dragStartX = e.clientX;
+      dragStartProgress = this.progress;
+      this.canvas.style.cursor = 'grabbing';
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const dx = dragStartX - e.clientX;
+      const speed = 0.0008;
+      this.progress = Math.max(0, Math.min(1, dragStartProgress + dx * speed));
+      this.render(this.progress);
+    });
+    window.addEventListener('mouseup', () => {
+      if (dragging) {
+        dragging = false;
+        this.canvas.style.cursor = 'grab';
+      }
+    });
 
     // Initial render
     this.render(0);
-  },
-
-  // ── Scroll Progress ──────────────────────────────────────
-  getScrollProgress() {
-    if (!this.wrapper) return 0;
-    const wrapperRect = this.wrapper.getBoundingClientRect();
-    const scrollOffset = -wrapperRect.top;
-    const maxScroll = this.wrapperHeight - window.innerHeight;
-    return Math.max(0, Math.min(1, scrollOffset / maxScroll));
-  },
-
-  // ── Skip Button ──────────────────────────────────────────
-  _createSkipButton() {
-    if (this.skipBtn) return;
-    this.skipBtn = document.createElement('button');
-    this.skipBtn.textContent = 'P\u0159esko\u010Dit hru \u2192';
-    this.skipBtn.style.cssText = [
-      'position:absolute',
-      'top:12px',
-      'right:12px',
-      'z-index:20',
-      'background:rgba(0,0,0,0.55)',
-      'color:#fff',
-      'border:1px solid rgba(255,255,255,0.25)',
-      'border-radius:6px',
-      'padding:6px 14px',
-      'font-size:13px',
-      'font-family:monospace',
-      'cursor:pointer',
-      'backdrop-filter:blur(4px)',
-      'transition:opacity 0.3s',
-    ].join(';');
-
-    this.skipBtn.addEventListener('click', () => {
-      if (!this.wrapper) return;
-      const wrapperBottom = this.wrapper.offsetTop + this.wrapper.offsetHeight;
-      window.scrollTo({ top: wrapperBottom, behavior: 'smooth' });
-    });
-
-    // Append to the sticky container so it stays in view
-    this.container.style.position = 'relative';
-    this.container.appendChild(this.skipBtn);
   },
 
   // ── End Screen CTA ───────────────────────────────────────
@@ -238,7 +139,7 @@ const WokerGame = {
       'border-radius:8px',
       'padding:14px 36px',
       'font-size:18px',
-      'font-family:monospace',
+      'font-family:"Comic Sans MS","Chalkboard SE",sans-serif',
       'font-weight:bold',
       'cursor:pointer',
       'text-decoration:none',
@@ -254,7 +155,11 @@ const WokerGame = {
       this.endCTA.style.transform = 'translateX(-50%)';
     });
 
-    this.container.appendChild(this.endCTA);
+    if (this.wrapper) {
+      this.wrapper.appendChild(this.endCTA);
+    } else {
+      this.canvas.parentElement.appendChild(this.endCTA);
+    }
   },
 
   // ── Resize Handler ───────────────────────────────────────
@@ -274,7 +179,7 @@ const WokerGame = {
 
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.scale(dpr, dpr);
-    this.ctx.imageSmoothingEnabled = false;
+    this.ctx.imageSmoothingEnabled = true;
 
     // Re-render at current progress
     this.render(this.progress);
@@ -291,21 +196,27 @@ const WokerGame = {
     this.worldX = progress * this.totalWorldWidth;
     this.cameraX = this.worldX - W / 2;
 
+    // Speed for effects
+    const speed = Math.abs(this.worldX - this.lastWorldX);
+    this.lastWorldX = this.worldX;
+
     // Current level
     const level = (typeof getLevel === 'function')
       ? getLevel(this.worldX)
       : null;
 
     // Character walk frame
-    this.walkFrame = Math.floor(this.worldX / 30) % 3;
+    this.walkFrame = this.worldX / 30;
 
     // Character Y from terrain
     this.characterY = (typeof getTerrainY === 'function')
       ? getTerrainY(this.worldX)
       : H - 100;
 
-    // Wooky spawns after 60% progress
-    this.wookySpawned = progress > 0.6;
+    // Wooky spawns after mystery box (Level 2, x=1300)
+    if (!this.wookySpawned && this.worldX > 1300) {
+      this.wookySpawned = true;
+    }
 
     // End screen after 95%
     this.showEndScreen = progress > 0.95;
@@ -313,242 +224,346 @@ const WokerGame = {
     // ── Clear canvas
     ctx.clearRect(0, 0, W, H);
 
-    // ── 1. Parallax background
-    if (typeof Parallax !== 'undefined' && Parallax.draw) {
-      Parallax.draw(ctx, this.cameraX, W, H, level);
-    } else {
-      this._drawFallbackBackground(ctx, W, H, level);
-    }
+    // ── 1. Background (comic style painted look)
+    this._drawComicBackground(ctx, W, H, level);
 
-    // ── 2. Ground tiles
+    // ── 2. Ground
     this._drawGround(ctx, W, H, level);
 
-    // ── 3. Level elements (buildings, items, obstacles)
-    this.drawElements(ctx, level);
+    // ── 3. Level elements from ALL levels visible in viewport
+    if (typeof LEVELS !== 'undefined') {
+      LEVELS.forEach(lv => this.drawElements(ctx, lv));
+    } else {
+      this.drawElements(ctx, level);
+    }
 
-    // ── 4. Main character
+    // ── 4. Speed lines behind character when moving fast
+    if (speed > 5) {
+      const cx = W / 2;
+      const cy = this.characterY - 20;
+      Comic.drawSpeedLines(ctx, cx - 80, cy - 15, 60, 30);
+    }
+
+    // ── 5. Main character
     this.drawCharacter(ctx);
 
-    // ── 5. Wooky companion
+    // ── 6. Wooky companion
     if (this.wookySpawned) {
       this.drawWooky(ctx);
     }
 
-    // ── 6. Collection effects
+    // ── 7. Collection effects
     this._updateCollectEffects();
     this.collectEffects.forEach(e => this.drawCollectEffect(ctx, e));
 
-    // ── 7. HUD
-    this.drawHUD(ctx, level);
+    // ── 8. HUD — removed (bottom progress bar replaces it)
 
-    // ── 8. Instruction text at start
+    // ── 9. Instruction (speech bubble from Wooky)
     if (progress < 0.05) {
       this.instructionOpacity = 1 - (progress / 0.05);
       this._drawInstruction(ctx, W, H);
     }
 
-    // ── 9. End screen
+    // ── 10. End screen (just confetti)
     if (this.showEndScreen) {
-      this.drawEndScreen(ctx, W, H);
+      this.updateConfetti();
+      this.confettiParticles.forEach(p => {
+        ctx.save();
+        ctx.globalAlpha = p.life || 1;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation || 0);
+        ctx.fillStyle = p.color;
+        Comic.roundedRect(ctx, -p.size / 2, -p.size / 2, p.size, p.size * 0.6, 1, p.color, null);
+        ctx.restore();
+      });
     }
 
-    // Toggle end CTA visibility
-    if (this.endCTA) {
-      this.endCTA.style.display = this.showEndScreen ? 'block' : 'none';
-    }
+    // ── 11. Comic panel border
+    this._drawPanelBorder(ctx, W, H);
 
-    // Hide skip button at end
-    if (this.skipBtn) {
-      this.skipBtn.style.opacity = this.showEndScreen ? '0' : '1';
-      this.skipBtn.style.pointerEvents = this.showEndScreen ? 'none' : 'auto';
-    }
+    // ── 12. Bottom progress bar (loading style)
+    this._drawBottomProgressBar(ctx, W, H, progress);
   },
 
-  // ── Fallback Background ──────────────────────────────────
-  _drawFallbackBackground(ctx, W, H, level) {
-    // Gradient sky
-    const grad = ctx.createLinearGradient(0, 0, 0, H * 0.7);
-    grad.addColorStop(0, '#1a1a2e');
-    grad.addColorStop(1, '#16213e');
+  // ── Comic Panel Border ─────────────────────────────────────
+  _drawPanelBorder(ctx, W, H) {
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(2, 2, W - 4, H - 4);
+    // Inner highlight line
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(5, 5, W - 10, H - 10);
+  },
+
+  // ── Bottom Progress Bar (game loading style) ──────────────
+  _drawBottomProgressBar(ctx, W, H, progress) {
+    const barH = 22;
+    const margin = 8;
+    const barW = W - margin * 2;
+    const barX = margin;
+    const barY = H - barH - margin;
+    const pct = Math.round(progress * 100);
+
+    ctx.save();
+
+    // Dark background panel
+    Comic.roundedRect(ctx, barX - 2, barY - 2, barW + 4, barH + 4, 6, 'rgba(0,0,0,0.7)', null);
+
+    // Bar track (dark inset)
+    Comic.roundedRect(ctx, barX, barY, barW, barH, 4, '#1a1a2e', null);
+
+    // Inner shadow for depth
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.lineWidth = 1;
+    Comic.roundedRect(ctx, barX + 1, barY + 1, barW - 2, barH - 2, 3, null, 'rgba(0,0,0,0.5)');
+
+    // Filled portion
+    const fillW = barW * progress;
+    if (fillW > 4) {
+      // Clip to rounded bar shape
+      ctx.beginPath();
+      const r = 4;
+      ctx.moveTo(barX + r, barY);
+      ctx.lineTo(barX + barW - r, barY);
+      ctx.quadraticCurveTo(barX + barW, barY, barX + barW, barY + r);
+      ctx.lineTo(barX + barW, barY + barH - r);
+      ctx.quadraticCurveTo(barX + barW, barY + barH, barX + barW - r, barY + barH);
+      ctx.lineTo(barX + r, barY + barH);
+      ctx.quadraticCurveTo(barX, barY + barH, barX, barY + barH - r);
+      ctx.lineTo(barX, barY + r);
+      ctx.quadraticCurveTo(barX, barY, barX + r, barY);
+      ctx.closePath();
+      ctx.clip();
+
+      // Green gradient fill
+      const grad = ctx.createLinearGradient(barX, barY, barX, barY + barH);
+      grad.addColorStop(0, '#4dff88');
+      grad.addColorStop(0.4, '#39ff6e');
+      grad.addColorStop(0.6, '#2bcc58');
+      grad.addColorStop(1, '#1fa044');
+      ctx.fillStyle = grad;
+      ctx.fillRect(barX, barY, fillW, barH);
+
+      // Animated shine stripe
+      const shineX = barX + ((Date.now() * 0.08) % (barW + 60)) - 30;
+      if (shineX < barX + fillW) {
+        const shineGrad = ctx.createLinearGradient(shineX - 15, 0, shineX + 15, 0);
+        shineGrad.addColorStop(0, 'rgba(255,255,255,0)');
+        shineGrad.addColorStop(0.5, 'rgba(255,255,255,0.25)');
+        shineGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = shineGrad;
+        ctx.fillRect(shineX - 15, barY, 30, barH);
+      }
+
+      // Segment notches (10% marks)
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i < 10; i++) {
+        const nx = barX + barW * (i / 10);
+        if (nx < barX + fillW) {
+          ctx.beginPath();
+          ctx.moveTo(nx, barY);
+          ctx.lineTo(nx, barY + barH);
+          ctx.stroke();
+        }
+      }
+    }
+
+    ctx.restore();
+
+    // Thick comic border on top
+    ctx.save();
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2.5;
+    Comic.roundedRect(ctx, barX, barY, barW, barH, 4, null, '#1a1a2e');
+
+    // Percentage text
+    const label = pct + '%';
+    ctx.font = 'bold 13px "Comic Sans MS", "Chalkboard SE", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 3;
+    ctx.strokeText(label, W / 2, barY + barH / 2);
+    ctx.fillStyle = pct >= 100 ? '#ffd700' : '#ffffff';
+    ctx.fillText(label, W / 2, barY + barH / 2);
+
+    // "LOADING..." text on the left when not complete
+    if (pct < 100) {
+      ctx.font = 'bold 10px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 2;
+      ctx.strokeText('LOADING...', barX + 8, barY + barH / 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText('LOADING...', barX + 8, barY + barH / 2);
+    } else {
+      // "COMPLETE!" when at 100%
+      ctx.font = 'bold 10px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 2;
+      ctx.strokeText('KOMPLETNI!', barX + 8, barY + barH / 2);
+      ctx.fillStyle = '#ffd700';
+      ctx.fillText('KOMPLETNI!', barX + 8, barY + barH / 2);
+    }
+
+    ctx.restore();
+
+    // Request animation frame for shine effect when scrolling
+    if (this._shineRAF) cancelAnimationFrame(this._shineRAF);
+    this._shineRAF = requestAnimationFrame(() => {
+      // Only re-render for shine animation if not actively scrolling
+    });
+  },
+
+  // ── Comic Background ──────────────────────────────────────
+  _drawComicBackground(ctx, W, H, level) {
+    // Sky gradient
+    const skyTop = (level && level.skyGradient) ? level.skyGradient[0] : '#1a1a2e';
+    const skyBot = (level && level.skyGradient) ? level.skyGradient[1] : '#16213e';
+    const grad = ctx.createLinearGradient(0, 0, 0, H * 0.75);
+    grad.addColorStop(0, skyTop);
+    grad.addColorStop(1, skyBot);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Simple parallax mountains
-    const ps = this.pixelSize;
-    ctx.fillStyle = '#0f3460';
-    for (let x = 0; x < W; x += ps) {
-      const worldXOff = (x + this.cameraX * 0.3) * 0.02;
-      const mtnH = Math.sin(worldXOff) * 40 + Math.cos(worldXOff * 0.7) * 25 + 80;
-      ctx.fillRect(x, H * 0.7 - mtnH, ps, mtnH);
+    // Subtle Ben-Day dots on sky for comic texture
+    const sat = level ? (level.saturation || 0) : 0;
+    if (sat < 0.5) {
+      Comic.drawBenDayDots(ctx, 0, 0, W, H * 0.6, 'rgba(255,255,255,0.03)', 12);
     }
 
-    // Mid mountains
-    ctx.fillStyle = '#1a1a4e';
-    for (let x = 0; x < W; x += ps) {
-      const worldXOff = (x + this.cameraX * 0.5) * 0.025;
-      const mtnH = Math.sin(worldXOff + 1) * 30 + Math.cos(worldXOff * 0.5) * 20 + 50;
-      ctx.fillRect(x, H * 0.7 - mtnH, ps, mtnH);
+    // Stars for dark levels
+    if (sat < 0.3) {
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      for (let i = 0; i < 40; i++) {
+        const sx = ((i * 137 + 42) % W);
+        const sy = ((i * 97 + 42) % (H * 0.45));
+        ctx.beginPath();
+        ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
-    // Stars
-    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    const starSeed = 42;
-    for (let i = 0; i < 50; i++) {
-      const sx = ((i * 137 + starSeed) % W);
-      const sy = ((i * 97 + starSeed) % (H * 0.5));
-      ctx.fillRect(sx, sy, ps, ps);
+    // Sun for bright levels
+    if (sat > 0.5) {
+      const sunX = W * 0.82;
+      const sunY = H * 0.15;
+      // Glow
+      const sunGrad = ctx.createRadialGradient(sunX, sunY, 5, sunX, sunY, 40);
+      sunGrad.addColorStop(0, 'rgba(255,236,153,0.5)');
+      sunGrad.addColorStop(1, 'rgba(255,236,153,0)');
+      ctx.fillStyle = sunGrad;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 40, 0, Math.PI * 2);
+      ctx.fill();
+      // Core
+      ctx.fillStyle = '#fbd38d';
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fefcbf';
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 8, 0, Math.PI * 2);
+      ctx.fill();
     }
+
+    // Background mountains (parallax)
+    this._drawBackgroundMountains(ctx, W, H, level);
+  },
+
+  // ── Background Mountains (smooth parallax) ────────────────
+  _drawBackgroundMountains(ctx, W, H, level) {
+    const sat = level ? (level.saturation || 0) : 0;
+    const groundY = H - 60;
+
+    // Far mountains (0.2x parallax)
+    ctx.fillStyle = sat > 0.5 ? '#7a8aaa' : '#3a3a5a';
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    for (let x = 0; x <= W; x += 3) {
+      const wx = (x + this.cameraX * 0.2) * 0.015;
+      const mtnH = Math.sin(wx) * 50 + Math.cos(wx * 0.6) * 30 + 80;
+      ctx.lineTo(x, groundY - mtnH);
+    }
+    ctx.lineTo(W, groundY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Mid mountains (0.35x parallax)
+    ctx.fillStyle = sat > 0.5 ? '#6a7a9a' : '#2a2a4a';
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    for (let x = 0; x <= W; x += 3) {
+      const wx = (x + this.cameraX * 0.35) * 0.02;
+      const mtnH = Math.sin(wx + 1) * 35 + Math.cos(wx * 0.5) * 25 + 55;
+      ctx.lineTo(x, groundY - mtnH);
+    }
+    ctx.lineTo(W, groundY);
+    ctx.closePath();
+    ctx.fill();
   },
 
   // ── Ground ───────────────────────────────────────────────
   _drawGround(ctx, W, H, level) {
-    const ps = this.pixelSize;
     const groundY = H - 60;
     const groundColor = level && level.groundColor ? level.groundColor : '#2d5016';
-    const dirtColor = level && level.dirtColor ? level.dirtColor : '#4a3728';
+    const sat = level ? (level.saturation || 0) : 0;
+    const dirtColor = sat < 0.5 ? '#4a4a3a' : '#4a3728';
 
-    // Grass top
-    ctx.fillStyle = groundColor;
-    ctx.fillRect(0, groundY, W, ps * 2);
+    // Ground body — smooth painted look
+    const groundGrad = ctx.createLinearGradient(0, groundY, 0, H);
+    groundGrad.addColorStop(0, groundColor);
+    groundGrad.addColorStop(0.15, groundColor);
+    groundGrad.addColorStop(1, dirtColor);
+    ctx.fillStyle = groundGrad;
+    ctx.fillRect(0, groundY, W, H - groundY);
 
-    // Dirt
-    ctx.fillStyle = dirtColor;
-    ctx.fillRect(0, groundY + ps * 2, W, H - groundY - ps * 2);
-
-    // Grass detail
-    ctx.fillStyle = '#3d7a1e';
-    for (let x = 0; x < W; x += ps * 4) {
-      const worldXTile = x + Math.floor(this.cameraX / ps) * ps;
-      if ((worldXTile / ps) % 3 === 0) {
-        ctx.fillRect(x, groundY - ps, ps, ps);
-      }
+    // Grass edge — wavy line on top
+    ctx.strokeStyle = '#3d7a1e';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    for (let x = 0; x <= W; x += 8) {
+      const wx = x + this.cameraX;
+      const wave = Math.sin(wx * 0.08) * 2 + Math.sin(wx * 0.15) * 1;
+      ctx.lineTo(x, groundY + wave);
     }
+    ctx.stroke();
+
+    // Horizon line
+    ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    ctx.lineTo(W, groundY);
+    ctx.stroke();
   },
 
   // ── Character ────────────────────────────────────────────
   drawCharacter(ctx) {
-    const ps = this.pixelSize;
     const cx = this.canvasW / 2;
     const groundY = this.canvasH - 60;
     const baseY = (typeof getTerrainY === 'function')
       ? getTerrainY(this.worldX)
       : groundY;
-    const cy = baseY - 36 * ps / 3;
+    const cy = baseY - 5;
 
-    // Try sprite system first
-    if (typeof drawSprite === 'function' && typeof SPRITES !== 'undefined' && SPRITES.czechWorker) {
-      drawSprite(ctx, SPRITES.czechWorker, this.walkFrame, cx - 12 * ps / 3, cy, ps);
-      return;
-    }
-
-    // Fallback: draw pixel character
-    this._drawPixelCharacter(ctx, cx, cy, ps);
-  },
-
-  _drawPixelCharacter(ctx, cx, cy, ps) {
-    const s = ps;
-    const frame = this.walkFrame;
-
-    // Hard hat (yellow)
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(cx - 4*s, cy - 2*s, 8*s, 2*s);
-    ctx.fillRect(cx - 3*s, cy - 4*s, 6*s, 2*s);
-
-    // Face
-    ctx.fillStyle = '#fcd9b6';
-    ctx.fillRect(cx - 3*s, cy, 6*s, 5*s);
-
-    // Eyes
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(cx - 2*s, cy + 1*s, s, s);
-    ctx.fillRect(cx + 1*s, cy + 1*s, s, s);
-
-    // Mouth
-    ctx.fillRect(cx - 1*s, cy + 3*s, 2*s, s);
-
-    // Body (blue work shirt)
-    ctx.fillStyle = '#3b82f6';
-    ctx.fillRect(cx - 4*s, cy + 5*s, 8*s, 8*s);
-
-    // Arms
-    const armOffset = frame === 1 ? s : 0;
-    ctx.fillStyle = '#3b82f6';
-    ctx.fillRect(cx - 6*s, cy + 5*s + armOffset, 2*s, 6*s);
-    ctx.fillRect(cx + 4*s, cy + 5*s - armOffset, 2*s, 6*s);
-
-    // Hands
-    ctx.fillStyle = '#fcd9b6';
-    ctx.fillRect(cx - 6*s, cy + 11*s + armOffset, 2*s, 2*s);
-    ctx.fillRect(cx + 4*s, cy + 11*s - armOffset, 2*s, 2*s);
-
-    // Pants (dark)
-    ctx.fillStyle = '#1e3a5f';
-    ctx.fillRect(cx - 4*s, cy + 13*s, 3*s, 6*s);
-    ctx.fillRect(cx + 1*s, cy + 13*s, 3*s, 6*s);
-
-    // Boots
-    const bootOff1 = frame === 0 ? s : 0;
-    const bootOff2 = frame === 2 ? s : 0;
-    ctx.fillStyle = '#6b4423';
-    ctx.fillRect(cx - 5*s, cy + 19*s - bootOff1, 4*s, 3*s);
-    ctx.fillRect(cx + 1*s, cy + 19*s - bootOff2, 4*s, 3*s);
+    Comic.drawCharacter(ctx, cx, cy, this.pixelSize / 3, this.walkFrame);
   },
 
   // ── Wooky Companion ──────────────────────────────────────
   drawWooky(ctx) {
-    const ps = this.pixelSize;
     const cx = this.canvasW / 2 - 60;
     const groundY = this.canvasH - 60;
     const baseY = (typeof getTerrainY === 'function')
       ? getTerrainY(this.worldX - 60)
       : groundY;
-    const cy = baseY - 28 * ps / 3;
+    const cy = baseY - 2;
 
-    // Try sprite system first
-    if (typeof drawSprite === 'function' && typeof SPRITES !== 'undefined' && SPRITES.wookyRobot) {
-      drawSprite(ctx, SPRITES.wookyRobot, this.walkFrame, cx - 10 * ps / 3, cy, ps);
-      return;
-    }
-
-    // Fallback: pixel Wooky robot
-    this._drawPixelWooky(ctx, cx, cy, ps);
-  },
-
-  _drawPixelWooky(ctx, cx, cy, ps) {
-    const s = ps;
-    const bounce = Math.sin(this.worldX * 0.1) * s;
-
-    // Antenna
-    ctx.fillStyle = '#ef4444';
-    ctx.fillRect(cx, cy - 3*s + bounce, s, 3*s);
-    ctx.fillRect(cx - s, cy - 4*s + bounce, 3*s, s);
-
-    // Head (rounded robot)
-    ctx.fillStyle = '#60a5fa';
-    ctx.fillRect(cx - 4*s, cy + bounce, 8*s, 6*s);
-
-    // Eyes (LED)
-    ctx.fillStyle = '#22c55e';
-    ctx.fillRect(cx - 3*s, cy + 2*s + bounce, 2*s, 2*s);
-    ctx.fillRect(cx + 1*s, cy + 2*s + bounce, 2*s, 2*s);
-
-    // Body
-    ctx.fillStyle = '#93c5fd';
-    ctx.fillRect(cx - 3*s, cy + 6*s + bounce, 6*s, 7*s);
-
-    // Chest light
-    ctx.fillStyle = '#fbbf24';
-    ctx.fillRect(cx - s, cy + 8*s + bounce, 2*s, 2*s);
-
-    // Legs
-    ctx.fillStyle = '#60a5fa';
-    ctx.fillRect(cx - 3*s, cy + 13*s + bounce, 2*s, 4*s);
-    ctx.fillRect(cx + 1*s, cy + 13*s + bounce, 2*s, 4*s);
-
-    // Feet
-    ctx.fillStyle = '#3b82f6';
-    ctx.fillRect(cx - 4*s, cy + 17*s + bounce, 3*s, 2*s);
-    ctx.fillRect(cx + 1*s, cy + 17*s + bounce, 3*s, 2*s);
+    Comic.drawWooky(ctx, cx, cy, this.pixelSize / 3.5, this.walkFrame);
   },
 
   // ── Level Elements ───────────────────────────────────────
@@ -557,43 +572,118 @@ const WokerGame = {
 
     const cam = this.cameraX;
     const W = this.canvasW;
-    const ps = this.pixelSize;
     const groundY = this.canvasH - 60;
 
     level.elements.forEach(el => {
-      // Only draw elements in viewport (with margin)
       const screenX = el.x - cam;
-      if (screenX < -200 || screenX > W + 200) return;
+      if (screenX < -300 || screenX > W + 300) return;
 
       switch (el.type) {
-        case 'building':
-          this._drawBuilding(ctx, screenX, groundY, el, ps);
+        case 'panelak':
+          Comic.drawPanelak(ctx, screenX, groundY, el.scale || 2);
           break;
-        case 'item':
-          this._drawItem(ctx, screenX, groundY, el, ps);
+
+        case 'chalet':
+          Comic.drawChalet(ctx, screenX, groundY, el.scale || 1.5);
           break;
+
+        case 'coin':
+          this._drawCoin(ctx, screenX, el);
+          break;
+
+        case 'mysteryBox':
+          this._drawMysteryBox(ctx, screenX, el);
+          break;
+
+        case 'powerUp':
+          this._drawPowerUp(ctx, screenX, el);
+          break;
+
         case 'obstacle':
-          this._drawObstacle(ctx, screenX, groundY, el, ps);
+          this._drawObstacle(ctx, screenX, groundY, el);
           break;
+
         case 'sign':
-          this._drawSign(ctx, screenX, groundY, el, ps);
+          Comic.drawRoadSign(ctx, screenX, groundY, el.text || el.label || '');
           break;
+
         case 'tree':
-          this._drawTree(ctx, screenX, groundY, el, ps);
+          Comic.drawTree(ctx, screenX, groundY, el.scale || 1, el.color);
           break;
+
+        case 'bush':
+          this._drawBush(ctx, screenX, el);
+          break;
+
+        case 'cloud':
+          Comic.drawCloud(ctx, screenX, el.y || 50, el.scale || 1, el.color);
+          break;
+
+        case 'mountain':
+          Comic.drawMountain(ctx, screenX, el.y || 120, el.scale || 2, el.snow);
+          break;
+
+        case 'swissFlag':
+          Comic.drawSwissFlag(ctx, screenX, el.y || 250, 1);
+          break;
+
+        case 'flower':
+          Comic.drawFlower(ctx, screenX, el.y || (this.canvasH - 65));
+          break;
+
+        case 'textPopup':
+          this._drawTextPopup(ctx, screenX, el);
+          break;
+
+        case 'platform':
+          this._drawPlatform(ctx, screenX, el);
+          break;
+
+        case 'lampPost':
+          Comic.drawLampPost(ctx, screenX, groundY, 1);
+          break;
+
+        case 'bench':
+          this._drawBench(ctx, screenX, groundY);
+          break;
+
+        case 'princess':
+          this._drawPrincess(ctx, screenX, groundY, el);
+          break;
+
+        case 'car':
+          Comic.drawCar(ctx, screenX, groundY, el.scale || 1.2, el.color || '#cc0000');
+          break;
+
+        case 'coupleInCar':
+          this._drawCoupleInCar(ctx, screenX, groundY, el);
+          break;
+
+        case 'landmark':
+          this._drawLandmark(ctx, screenX, groundY, el);
+          break;
+
+        case 'heart':
+          this._drawHeart(ctx, screenX, el);
+          break;
+
+        case 'palmTree':
+          this._drawPalmTree(ctx, screenX, groundY, el);
+          break;
+
         default:
           break;
       }
 
-      // Item collection logic
-      if (el.type === 'item' && !el.collected) {
+      // Collectible logic (coins, powerUps)
+      if ((el.type === 'coin' || el.type === 'powerUp') && !el.collected) {
         const dist = Math.abs(this.worldX - el.x);
-        if (dist < 30) {
+        if (dist < 40) {
           el.collected = true;
           this.collectedItems.push(el);
           this.collectEffects.push({
             x: screenX,
-            y: groundY - (el.height || 40),
+            y: (el.y || groundY - 40) - 20,
             label: el.label || '+1',
             alpha: 1,
             vy: -2,
@@ -603,100 +693,699 @@ const WokerGame = {
     });
   },
 
-  _drawBuilding(ctx, x, groundY, el, ps) {
-    const w = (el.width || 80);
-    const h = (el.height || 120);
-    ctx.fillStyle = el.color || '#4a5568';
-    ctx.fillRect(x, groundY - h, w, h);
+  // ── Coin ──
+  _drawCoin(ctx, screenX, el) {
+    if (el.collected) return;
+    const y = el.y || (this.canvasH - 100);
+    const bobble = Math.sin(this.worldX * 0.05 + el.x * 0.1) * 4;
+    Comic.drawCoin(ctx, screenX, y + bobble, 1, el.label);
 
-    // Windows
-    ctx.fillStyle = '#fbbf24';
-    const winSize = ps * 3;
-    for (let wy = groundY - h + 15; wy < groundY - 15; wy += winSize * 3) {
-      for (let wx = x + 10; wx < x + w - 10; wx += winSize * 3) {
-        ctx.fillRect(wx, wy, winSize, winSize);
+    // Label above
+    if (el.label) {
+      ctx.save();
+      ctx.font = 'bold 10px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffd700';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 2;
+      ctx.strokeText(el.label, screenX, y + bobble - 16);
+      ctx.fillText(el.label, screenX, y + bobble - 16);
+      ctx.restore();
+    }
+  },
+
+  // ── Mystery Box ──
+  _drawMysteryBox(ctx, screenX, el) {
+    const y = el.y || (this.canvasH - 100);
+    const bobble = Math.sin(this.worldX * 0.03) * 3;
+    const s = 20;
+
+    // Box
+    Comic.roundedRect(ctx, screenX - s, y + bobble - s, s * 2, s * 2, 5, '#ff6b2c', '#cc5520');
+
+    // Inner border
+    Comic.roundedRect(ctx, screenX - s + 3, y + bobble - s + 3, s * 2 - 6, s * 2 - 6, 3, null, '#ffaa66');
+
+    // "?" text
+    ctx.save();
+    ctx.font = 'bold 22px "Comic Sans MS", "Chalkboard SE", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#cc5520';
+    ctx.lineWidth = 2;
+    ctx.strokeText('?', screenX, y + bobble);
+    ctx.fillText('?', screenX, y + bobble);
+    ctx.restore();
+
+    // Action word above
+    Comic.drawActionWord(ctx, screenX + 25, y + bobble - s - 10, 'WOW!', '#fbbf24', -15);
+  },
+
+  // ── Power-Up ──
+  _drawPowerUp(ctx, screenX, el) {
+    if (el.collected) return;
+    const y = el.y || (this.canvasH - 100);
+    const bobble = Math.sin(this.worldX * 0.04 + el.x * 0.2) * 5;
+
+    // Glow
+    ctx.save();
+    const glow = ctx.createRadialGradient(screenX, y + bobble, 3, screenX, y + bobble, 25);
+    glow.addColorStop(0, 'rgba(57,255,110,0.3)');
+    glow.addColorStop(1, 'rgba(57,255,110,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(screenX, y + bobble, 25, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Icon based on variant
+    const s = 12;
+    if (el.variant === 'cv') {
+      // Document icon
+      Comic.roundedRect(ctx, screenX - s, y + bobble - s * 1.3, s * 2, s * 2.6, 3, '#f5f5f5', '#999');
+      ctx.fillStyle = '#2563eb';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('CV', screenX, y + bobble - 2);
+      // Lines
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(screenX - 6, y + bobble + 4 + i * 4);
+        ctx.lineTo(screenX + 6, y + bobble + 4 + i * 4);
+        ctx.stroke();
+      }
+    } else if (el.variant === 'book') {
+      // Book icon
+      Comic.roundedRect(ctx, screenX - s, y + bobble - s, s * 2, s * 2.2, 3, '#2bcc58', '#1a6b30');
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('CH', screenX, y + bobble + 2);
+    } else if (el.variant === 'permit') {
+      // Permit scroll
+      Comic.roundedRect(ctx, screenX - s, y + bobble - s * 1.2, s * 2, s * 2.4, 3, '#f5e6c8', '#c4a880');
+      // Red seal
+      ctx.fillStyle = '#cc0000';
+      ctx.beginPath();
+      ctx.arc(screenX + 4, y + bobble + 6, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#666';
+      ctx.font = '7px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('PERMIT', screenX, y + bobble - 2);
+    }
+
+    // Label above
+    if (el.label) {
+      ctx.save();
+      ctx.font = 'bold 10px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#39ff6e';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 2;
+      ctx.strokeText(el.label, screenX, y + bobble - s * 1.5 - 8);
+      ctx.fillText(el.label, screenX, y + bobble - s * 1.5 - 8);
+      ctx.restore();
+    }
+  },
+
+  // ── Obstacle ──
+  _drawObstacle(ctx, x, groundY, el) {
+    const h = 35;
+
+    // Barrier
+    Comic.roundedRect(ctx, x - 18, groundY - h, 36, h, 3, '#9e9e9e', '#666');
+
+    // Red tape stripes
+    ctx.save();
+    ctx.fillStyle = '#cc0000';
+    ctx.fillRect(x - 18, groundY - h + 6, 36, 4);
+    ctx.fillRect(x - 18, groundY - h + 18, 36, 4);
+    ctx.restore();
+
+    // "STOP!" action word
+    Comic.drawActionWord(ctx, x, groundY - h - 12, 'STOP!', '#ef4444', -5);
+
+    if (el.label) {
+      ctx.save();
+      ctx.font = 'bold 9px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(el.label, x, groundY - h + 30);
+      ctx.restore();
+    }
+  },
+
+  // ── Bush ──
+  _drawBush(ctx, x, el) {
+    const y = el.y || (this.canvasH - 60);
+    const color = el.color || '#4a7a3a';
+    ctx.save();
+    ctx.fillStyle = color;
+    // Rounded bush shape
+    ctx.beginPath();
+    ctx.arc(x - 6, y - 6, 8, 0, Math.PI * 2);
+    ctx.arc(x + 6, y - 6, 8, 0, Math.PI * 2);
+    ctx.arc(x, y - 10, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#2a5a1a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  },
+
+  // ── Text Popup (speech bubble) ──
+  _drawTextPopup(ctx, screenX, el) {
+    const y = el.y || 220;
+    const dist = Math.abs(this.worldX - el.x);
+    if (dist > 200) return;
+    const alpha = Math.max(0, 1 - dist / 200);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    Comic.drawSpeechBubble(ctx, screenX, y, el.text || '', 'down', {
+      bg: 'rgba(255,255,255,0.95)',
+      border: '#1a1a2e',
+      color: '#1a1a2e',
+    });
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  },
+
+  // ── Platform ──
+  _drawPlatform(ctx, screenX, el) {
+    const y = el.y || 300;
+    const w = el.width || 80;
+    // Wooden platform
+    Comic.roundedRect(ctx, screenX, y, w, 10, 3, '#8B4513', '#6b3410');
+    // Wood grain lines
+    ctx.save();
+    ctx.strokeStyle = '#6b3410';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.moveTo(screenX + 5, y + 2 + i * 3);
+      ctx.lineTo(screenX + w - 5, y + 2 + i * 3);
+      ctx.stroke();
+    }
+    ctx.restore();
+  },
+
+  // ── Bench ──
+  _drawBench(ctx, x, groundY) {
+    ctx.save();
+    // Seat
+    Comic.roundedRect(ctx, x - 14, groundY - 14, 28, 4, 2, '#8b5e34', '#6b4020');
+    // Legs
+    ctx.fillStyle = '#8b5e34';
+    ctx.strokeStyle = '#6b4020';
+    ctx.lineWidth = 1;
+    ctx.fillRect(x - 11, groundY - 14, 3, 14);
+    ctx.strokeRect(x - 11, groundY - 14, 3, 14);
+    ctx.fillRect(x + 8, groundY - 14, 3, 14);
+    ctx.strokeRect(x + 8, groundY - 14, 3, 14);
+    // Back rest
+    Comic.roundedRect(ctx, x - 14, groundY - 22, 28, 4, 2, '#8b5e34', '#6b4020');
+    ctx.restore();
+  },
+
+  // ── Princess ──
+  _drawPrincess(ctx, x, groundY, el) {
+    const s = el.scale || 1;
+    const bobble = Math.sin(Date.now() * 0.003) * 2;
+    ctx.save();
+    ctx.translate(x, groundY + bobble);
+
+    // Dress (red/gold Swiss style)
+    ctx.fillStyle = '#cc2244';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-14 * s, -20 * s);
+    ctx.lineTo(-20 * s, 0);
+    ctx.lineTo(20 * s, 0);
+    ctx.lineTo(14 * s, -20 * s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Dress detail — gold belt
+    ctx.fillStyle = '#ffd700';
+    ctx.fillRect(-13 * s, -22 * s, 26 * s, 4 * s);
+
+    // Body
+    ctx.fillStyle = '#fcd5b8';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, -32 * s, 10 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Hair (blonde)
+    ctx.fillStyle = '#f5d442';
+    ctx.beginPath();
+    ctx.arc(0, -36 * s, 11 * s, Math.PI, Math.PI * 2);
+    ctx.fill();
+    // Side curls
+    ctx.beginPath();
+    ctx.arc(-10 * s, -30 * s, 4 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(10 * s, -30 * s, 4 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Crown
+    ctx.fillStyle = '#ffd700';
+    ctx.strokeStyle = '#b8860b';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-8 * s, -44 * s);
+    ctx.lineTo(-10 * s, -52 * s);
+    ctx.lineTo(-4 * s, -48 * s);
+    ctx.lineTo(0, -54 * s);
+    ctx.lineTo(4 * s, -48 * s);
+    ctx.lineTo(10 * s, -52 * s);
+    ctx.lineTo(8 * s, -44 * s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Crown jewels
+    ctx.fillStyle = '#cc2244';
+    ctx.beginPath();
+    ctx.arc(0, -49 * s, 2 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Eyes
+    ctx.fillStyle = '#1a1a2e';
+    ctx.beginPath();
+    ctx.arc(-4 * s, -33 * s, 1.5 * s, 0, Math.PI * 2);
+    ctx.arc(4 * s, -33 * s, 1.5 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Smile
+    ctx.strokeStyle = '#cc6666';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, -29 * s, 4 * s, 0.1, Math.PI - 0.1);
+    ctx.stroke();
+
+    // Legs
+    ctx.fillStyle = '#fcd5b8';
+    ctx.fillRect(-5 * s, 0, 4 * s, 10 * s);
+    ctx.fillRect(1 * s, 0, 4 * s, 10 * s);
+
+    ctx.restore();
+
+    // Swiss cross on dress
+    ctx.save();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x - 3, groundY + bobble - 15 * s, 6, 2);
+    ctx.fillRect(x - 1, groundY + bobble - 17 * s, 2, 6);
+    ctx.restore();
+  },
+
+  // ── Couple in Car ──
+  _drawCoupleInCar(ctx, x, groundY, el) {
+    const s = el.scale || 1.5;
+    const bounce = Math.sin(this.worldX * 0.02 + x * 0.01) * 1.5;
+    ctx.save();
+    ctx.translate(x, groundY + bounce);
+
+    // Car body
+    ctx.fillStyle = el.color || '#cc0000';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2.5;
+    // Lower body
+    Comic.roundedRect(ctx, -40 * s, -18 * s, 80 * s, 18 * s, 4 * s, el.color || '#cc0000', '#1a1a2e');
+    // Cabin
+    ctx.fillStyle = '#7ac0f0';
+    ctx.beginPath();
+    ctx.moveTo(-20 * s, -18 * s);
+    ctx.lineTo(-14 * s, -34 * s);
+    ctx.lineTo(18 * s, -34 * s);
+    ctx.lineTo(24 * s, -18 * s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Window divider
+    ctx.beginPath();
+    ctx.moveTo(2 * s, -18 * s);
+    ctx.lineTo(2 * s, -33 * s);
+    ctx.stroke();
+
+    // Driver (character) - left window
+    ctx.fillStyle = '#fcd5b8';
+    ctx.beginPath();
+    ctx.arc(-8 * s, -28 * s, 5 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // Driver hair
+    ctx.fillStyle = '#5c3317';
+    ctx.beginPath();
+    ctx.arc(-8 * s, -31 * s, 5 * s, Math.PI, Math.PI * 2);
+    ctx.fill();
+
+    // Princess - right window
+    ctx.fillStyle = '#fcd5b8';
+    ctx.beginPath();
+    ctx.arc(12 * s, -28 * s, 5 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    // Princess blonde hair
+    ctx.fillStyle = '#f5d442';
+    ctx.beginPath();
+    ctx.arc(12 * s, -31 * s, 5.5 * s, Math.PI, Math.PI * 2);
+    ctx.fill();
+    // Mini crown
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.moveTo(8 * s, -35 * s);
+    ctx.lineTo(9 * s, -39 * s);
+    ctx.lineTo(12 * s, -37 * s);
+    ctx.lineTo(15 * s, -39 * s);
+    ctx.lineTo(16 * s, -35 * s);
+    ctx.closePath();
+    ctx.fill();
+
+    // Wheels
+    ctx.fillStyle = '#333';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(-22 * s, 2 * s, 7 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(22 * s, 2 * s, 7 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    // Hubcaps
+    ctx.fillStyle = '#888';
+    ctx.beginPath();
+    ctx.arc(-22 * s, 2 * s, 3 * s, 0, Math.PI * 2);
+    ctx.arc(22 * s, 2 * s, 3 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Headlights
+    ctx.fillStyle = '#ffd700';
+    ctx.beginPath();
+    ctx.arc(40 * s, -8 * s, 3 * s, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+
+    // Heart above car
+    this._drawHeart(ctx, x, { y: groundY + bounce - 44 * s, scale: 0.8, animated: true });
+  },
+
+  // ── Heart ──
+  _drawHeart(ctx, x, el) {
+    const y = el.y || 200;
+    const s = el.scale || 1;
+    const pulse = el.animated ? (1 + Math.sin(Date.now() * 0.005) * 0.15) : 1;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(s * pulse, s * pulse);
+    ctx.fillStyle = '#ef4444';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 4);
+    ctx.bezierCurveTo(-10, -6, -18, 2, -10, 10);
+    ctx.lineTo(0, 18);
+    ctx.lineTo(10, 10);
+    ctx.bezierCurveTo(18, 2, 10, -6, 0, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // Shine
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.beginPath();
+    ctx.arc(-4, 4, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  },
+
+  // ── Landmark (famous world places) ──
+  _drawLandmark(ctx, x, groundY, el) {
+    const variant = el.variant || 'eiffel';
+    const s = el.scale || 1;
+    ctx.save();
+
+    switch (variant) {
+      case 'eiffel': {
+        // Eiffel Tower
+        const h = 100 * s;
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 2.5;
+        ctx.fillStyle = '#7a7a7a';
+        // Main structure
+        ctx.beginPath();
+        ctx.moveTo(x - 20 * s, groundY);
+        ctx.lineTo(x - 8 * s, groundY - h * 0.5);
+        ctx.lineTo(x - 5 * s, groundY - h * 0.8);
+        ctx.lineTo(x - 2 * s, groundY - h);
+        ctx.lineTo(x + 2 * s, groundY - h);
+        ctx.lineTo(x + 5 * s, groundY - h * 0.8);
+        ctx.lineTo(x + 8 * s, groundY - h * 0.5);
+        ctx.lineTo(x + 20 * s, groundY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        // Platform lines
+        ctx.strokeStyle = '#666';
+        ctx.lineWidth = 1.5;
+        [0.35, 0.55, 0.78].forEach(pct => {
+          const py = groundY - h * pct;
+          const pw = 20 * s * (1 - pct) + 4;
+          ctx.beginPath();
+          ctx.moveTo(x - pw, py);
+          ctx.lineTo(x + pw, py);
+          ctx.stroke();
+        });
+        // Antenna
+        ctx.strokeStyle = '#555';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, groundY - h);
+        ctx.lineTo(x, groundY - h - 12 * s);
+        ctx.stroke();
+        break;
+      }
+      case 'pyramid': {
+        // Egyptian Pyramid
+        const h = 70 * s;
+        const w = 80 * s;
+        ctx.fillStyle = '#d4a843';
+        ctx.strokeStyle = '#8b7320';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, groundY - h);
+        ctx.lineTo(x - w / 2, groundY);
+        ctx.lineTo(x + w / 2, groundY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        // Shadow side
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.beginPath();
+        ctx.moveTo(x, groundY - h);
+        ctx.lineTo(x + w / 2, groundY);
+        ctx.lineTo(x, groundY);
+        ctx.closePath();
+        ctx.fill();
+        // Brick lines
+        ctx.strokeStyle = 'rgba(139,115,32,0.3)';
+        ctx.lineWidth = 0.5;
+        for (let i = 1; i < 6; i++) {
+          const py = groundY - h + (h / 6) * i;
+          const pw = (w / 2) * (i / 6);
+          ctx.beginPath();
+          ctx.moveTo(x - pw, py);
+          ctx.lineTo(x + pw, py);
+          ctx.stroke();
+        }
+        break;
+      }
+      case 'statue': {
+        // Statue of Liberty (simplified)
+        const h = 85 * s;
+        ctx.fillStyle = '#6baa87';
+        ctx.strokeStyle = '#3a7a5a';
+        ctx.lineWidth = 2;
+        // Body
+        ctx.beginPath();
+        ctx.moveTo(x - 10 * s, groundY);
+        ctx.lineTo(x - 12 * s, groundY - h * 0.4);
+        ctx.lineTo(x - 8 * s, groundY - h * 0.7);
+        ctx.lineTo(x - 5 * s, groundY - h * 0.85);
+        ctx.lineTo(x + 5 * s, groundY - h * 0.85);
+        ctx.lineTo(x + 8 * s, groundY - h * 0.7);
+        ctx.lineTo(x + 12 * s, groundY - h * 0.4);
+        ctx.lineTo(x + 10 * s, groundY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        // Head
+        ctx.beginPath();
+        ctx.arc(x, groundY - h * 0.9, 6 * s, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Crown
+        ctx.fillStyle = '#6baa87';
+        for (let i = 0; i < 5; i++) {
+          const angle = -Math.PI / 2 + (i - 2) * 0.35;
+          ctx.beginPath();
+          ctx.moveTo(x + Math.cos(angle) * 6 * s, groundY - h * 0.9 + Math.sin(angle) * 6 * s);
+          ctx.lineTo(x + Math.cos(angle) * 12 * s, groundY - h * 0.9 + Math.sin(angle) * 12 * s);
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+        // Torch (raised arm)
+        ctx.beginPath();
+        ctx.moveTo(x + 8 * s, groundY - h * 0.75);
+        ctx.lineTo(x + 14 * s, groundY - h);
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        // Flame
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(x + 14 * s, groundY - h - 4 * s, 4 * s, 0, Math.PI * 2);
+        ctx.fill();
+        break;
+      }
+      case 'torii': {
+        // Japanese Torii gate
+        const h = 70 * s;
+        ctx.fillStyle = '#cc2200';
+        ctx.strokeStyle = '#8b1500';
+        ctx.lineWidth = 2;
+        // Pillars
+        ctx.fillRect(x - 22 * s, groundY - h, 5 * s, h);
+        ctx.strokeRect(x - 22 * s, groundY - h, 5 * s, h);
+        ctx.fillRect(x + 17 * s, groundY - h, 5 * s, h);
+        ctx.strokeRect(x + 17 * s, groundY - h, 5 * s, h);
+        // Top beam
+        ctx.fillRect(x - 28 * s, groundY - h, 56 * s, 6 * s);
+        ctx.strokeRect(x - 28 * s, groundY - h, 56 * s, 6 * s);
+        // Curved top
+        ctx.beginPath();
+        ctx.moveTo(x - 30 * s, groundY - h - 2 * s);
+        ctx.quadraticCurveTo(x, groundY - h - 10 * s, x + 30 * s, groundY - h - 2 * s);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#cc2200';
+        ctx.stroke();
+        // Middle beam
+        ctx.fillRect(x - 20 * s, groundY - h + 15 * s, 40 * s, 4 * s);
+        break;
+      }
+      case 'colosseum': {
+        // Roman Colosseum
+        const h = 60 * s;
+        const w = 90 * s;
+        ctx.fillStyle = '#c4a882';
+        ctx.strokeStyle = '#8a7a60';
+        ctx.lineWidth = 2;
+        // Main structure (elliptical)
+        ctx.beginPath();
+        ctx.ellipse(x, groundY - h / 2, w / 2, h / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Arches
+        ctx.strokeStyle = '#8a7a60';
+        ctx.lineWidth = 1.5;
+        for (let i = 0; i < 7; i++) {
+          const ax = x - w / 2 + 8 + i * (w / 7);
+          ctx.beginPath();
+          ctx.arc(ax, groundY - h * 0.35, 5 * s, Math.PI, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(ax, groundY - h * 0.65, 4 * s, Math.PI, Math.PI * 2);
+          ctx.stroke();
+        }
+        break;
       }
     }
 
-    // Label
+    // Label below
     if (el.label) {
-      this.drawPixelText(ctx, el.label, x + w / 2, groundY - h - 14, '#ffffff', 1);
+      ctx.font = 'bold 10px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 2;
+      ctx.strokeText(el.label, x, groundY + 14);
+      ctx.fillText(el.label, x, groundY + 14);
     }
+
+    ctx.restore();
   },
 
-  _drawItem(ctx, x, groundY, el, ps) {
-    if (el.collected) return;
+  // ── Palm Tree ──
+  _drawPalmTree(ctx, x, groundY, el) {
+    const s = el.scale || 1;
+    ctx.save();
+    // Trunk (curved)
+    ctx.strokeStyle = '#8b6914';
+    ctx.lineWidth = 6 * s;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x, groundY);
+    ctx.quadraticCurveTo(x + 5 * s, groundY - 40 * s, x - 2 * s, groundY - 70 * s);
+    ctx.stroke();
 
-    const y = groundY - (el.height || 40);
-    const bobble = Math.sin(this.worldX * 0.05 + el.x * 0.1) * 4;
-
-    // Glow
-    ctx.fillStyle = 'rgba(251,191,36,0.25)';
-    ctx.fillRect(x - 6*ps, y + bobble - 6*ps, 12*ps, 12*ps);
-
-    // Item (coin/star shape)
-    ctx.fillStyle = el.color || '#fbbf24';
-    ctx.fillRect(x - 3*ps, y + bobble - 3*ps, 6*ps, 6*ps);
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(x - 2*ps, y + bobble - 2*ps, 4*ps, 4*ps);
-    ctx.fillStyle = '#fcd34d';
-    ctx.fillRect(x - ps, y + bobble - ps, 2*ps, 2*ps);
-
-    // Floating label
-    if (el.label) {
-      this.drawPixelText(ctx, el.label, x, y + bobble - 18, '#fbbf24', 1);
+    // Leaves
+    const lx = x - 2 * s;
+    const ly = groundY - 70 * s;
+    const leafColors = ['#2a8a1a', '#3a9a2a', '#1a7a0a'];
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      ctx.strokeStyle = leafColors[i % 3];
+      ctx.lineWidth = 3 * s;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      const endX = lx + Math.cos(angle) * 30 * s;
+      const endY = ly + Math.sin(angle) * 20 * s - 5 * s;
+      const cpX = lx + Math.cos(angle) * 20 * s;
+      const cpY = ly + Math.sin(angle) * 8 * s - 10 * s;
+      ctx.quadraticCurveTo(cpX, cpY, endX, endY);
+      ctx.stroke();
     }
-  },
-
-  _drawObstacle(ctx, x, groundY, el, ps) {
-    const h = el.height || 30;
-    ctx.fillStyle = el.color || '#ef4444';
-    ctx.fillRect(x - 10, groundY - h, 20, h);
-
-    // Warning stripes
-    ctx.fillStyle = '#fbbf24';
-    for (let sy = groundY - h; sy < groundY; sy += ps * 4) {
-      ctx.fillRect(x - 10, sy, 20, ps * 2);
-    }
-  },
-
-  _drawSign(ctx, x, groundY, el, ps) {
-    // Post
-    ctx.fillStyle = '#8b5e34';
-    ctx.fillRect(x - ps, groundY - 50, ps * 2, 50);
-
-    // Sign board
-    const textW = (el.label || '').length * 6 + 16;
-    ctx.fillStyle = '#f5f0e1';
-    ctx.fillRect(x - textW / 2, groundY - 70, textW, 24);
-    ctx.strokeStyle = '#8b5e34';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x - textW / 2, groundY - 70, textW, 24);
-
-    if (el.label) {
-      this.drawPixelText(ctx, el.label, x, groundY - 62, '#4a3728', 1);
-    }
-  },
-
-  _drawTree(ctx, x, groundY, el, ps) {
-    const h = el.height || 60;
-    // Trunk
-    ctx.fillStyle = '#6b4423';
-    ctx.fillRect(x - 2*ps, groundY - h * 0.4, 4*ps, h * 0.4);
-
-    // Canopy layers
-    ctx.fillStyle = el.color || '#22863a';
-    ctx.fillRect(x - 8*ps, groundY - h, 16*ps, h * 0.3);
-    ctx.fillRect(x - 6*ps, groundY - h * 0.85, 12*ps, h * 0.25);
-    ctx.fillRect(x - 10*ps, groundY - h * 0.55, 20*ps, h * 0.2);
+    // Coconuts
+    ctx.fillStyle = '#8b4513';
+    ctx.beginPath();
+    ctx.arc(lx - 3, ly + 3, 3 * s, 0, Math.PI * 2);
+    ctx.arc(lx + 3, ly + 2, 3 * s, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   },
 
   // ── Collection Effect ────────────────────────────────────
   drawCollectEffect(ctx, effect) {
     if (effect.alpha <= 0) return;
+    ctx.save();
     ctx.globalAlpha = effect.alpha;
-    this.drawPixelText(ctx, effect.label, effect.x, effect.y, '#22c55e', 1.5);
+    ctx.font = 'bold 14px "Comic Sans MS", "Chalkboard SE", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.strokeText(effect.label, effect.x, effect.y);
+    ctx.fillStyle = '#22c55e';
+    ctx.fillText(effect.label, effect.x, effect.y);
     ctx.globalAlpha = 1;
+    ctx.restore();
   },
 
   _updateCollectEffects() {
@@ -710,72 +1399,113 @@ const WokerGame = {
     }
   },
 
-  // ── HUD ──────────────────────────────────────────────────
+  // ── HUD (comic styled) ──────────────────────────────────
   drawHUD(ctx, level) {
     const W = this.canvasW;
-    const ps = this.pixelSize;
 
-    // Level name
-    if (level && level.name) {
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(8, 8, level.name.length * 7 + 16, 22);
-      this.drawPixelText(ctx, level.name, 16 + (level.name.length * 7) / 2, 14, '#ffffff', 1);
+    // Level name in comic panel box
+    const levelName = (level && level.nameCS) || (level && level.name) || '';
+    if (levelName) {
+      const nameW = levelName.length * 7.5 + 20;
+      Comic.roundedRect(ctx, 8, 8, nameW, 26, 4, '#ffffff', '#1a1a2e');
+      ctx.save();
+      ctx.font = 'bold 12px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#1a1a2e';
+      ctx.fillText(levelName, 18, 21);
+      ctx.restore();
     }
 
-    // Progress bar
+    // Progress bar with thick border
     const barW = Math.min(200, W * 0.3);
-    const barH = 8;
-    const barX = W - barW - 12;
+    const barH = 12;
+    const barX = W - barW - 16;
     const barY = 12;
 
-    ctx.fillStyle = 'rgba(0,0,0,0.5)';
-    ctx.fillRect(barX - 2, barY - 2, barW + 4, barH + 4);
+    // Bar background
+    Comic.roundedRect(ctx, barX, barY, barW, barH, 4, '#374151', '#1a1a2e');
 
-    ctx.fillStyle = '#374151';
-    ctx.fillRect(barX, barY, barW, barH);
+    // Bar fill
+    const fillW = barW * this.progress;
+    if (fillW > 2) {
+      ctx.save();
+      ctx.beginPath();
+      // Clip to rounded shape
+      const r = 3;
+      ctx.moveTo(barX + r, barY + 1);
+      ctx.lineTo(barX + fillW - 1, barY + 1);
+      ctx.lineTo(barX + fillW - 1, barY + barH - 1);
+      ctx.lineTo(barX + r, barY + barH - 1);
+      ctx.quadraticCurveTo(barX + 1, barY + barH - 1, barX + 1, barY + barH - r);
+      ctx.lineTo(barX + 1, barY + r);
+      ctx.quadraticCurveTo(barX + 1, barY + 1, barX + r, barY + 1);
+      ctx.closePath();
+      ctx.clip();
+      const barGrad = ctx.createLinearGradient(barX, barY, barX, barY + barH);
+      barGrad.addColorStop(0, '#39ff6e');
+      barGrad.addColorStop(1, '#22c55e');
+      ctx.fillStyle = barGrad;
+      ctx.fillRect(barX, barY, fillW, barH);
+      ctx.restore();
+    }
 
-    ctx.fillStyle = '#22c55e';
-    ctx.fillRect(barX, barY, barW * this.progress, barH);
+    // Thick border on top
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2.5;
+    Comic.roundedRect(ctx, barX, barY, barW, barH, 4, null, '#1a1a2e');
 
     // Collected items count
     if (this.collectedItems.length > 0) {
       const countText = this.collectedItems.length + 'x';
-      ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      ctx.fillRect(barX - 50, barY - 2, 44, barH + 4);
-      this.drawPixelText(ctx, countText, barX - 28, barY + 2, '#fbbf24', 1);
+      Comic.roundedRect(ctx, barX - 42, barY, 36, barH, 4, '#ffffff', '#1a1a2e');
+      ctx.save();
+      ctx.font = 'bold 10px "Comic Sans MS", "Chalkboard SE", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText(countText, barX - 24, barY + barH / 2);
+      ctx.restore();
     }
   },
 
-  // ── Instruction Text ─────────────────────────────────────
+  // ── Instruction Text (speech bubble) ─────────────────────
   _drawInstruction(ctx, W, H) {
+    ctx.save();
     ctx.globalAlpha = this.instructionOpacity;
 
-    // Background pill
-    const text = 'SCROLLUJ DOLU A SLEDUJ PRIBEH';
-    const textW = text.length * 7 + 30;
-    const pillX = (W - textW) / 2;
-    const pillY = H / 2 - 16;
+    // Speech bubble from Wooky
+    const bubbleX = W / 2;
+    const bubbleY = H / 2 - 20;
+    Comic.drawSpeechBubble(ctx, bubbleX, bubbleY, 'SCROLLUJ A SLEDUJ PRIBEH', 'down', {
+      bg: '#ffffff',
+      border: '#1a1a2e',
+      color: '#1a1a2e',
+      font: 'bold 14px "Comic Sans MS", "Chalkboard SE", sans-serif',
+    });
 
-    ctx.fillStyle = 'rgba(0,0,0,0.65)';
-    ctx.fillRect(pillX, pillY, textW, 32);
-
-    this.drawPixelText(ctx, text, W / 2, pillY + 11, '#ffffff', 1);
-
-    // Down arrow hint
+    // Down arrow hint (bouncing)
     const arrowX = W / 2;
-    const arrowY = pillY + 40;
-    const bounce = Math.sin(Date.now() * 0.004) * 4;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(arrowX - 1, arrowY + bounce, 2, 10);
-    ctx.fillRect(arrowX - 4, arrowY + bounce + 7, 8, 2);
-    ctx.fillRect(arrowX - 2, arrowY + bounce + 9, 4, 2);
+    const arrowY = bubbleY + 35;
+    const bounce = Math.sin(Date.now() * 0.004) * 5;
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(arrowX, arrowY + bounce);
+    ctx.lineTo(arrowX, arrowY + bounce + 14);
+    ctx.moveTo(arrowX - 6, arrowY + bounce + 8);
+    ctx.lineTo(arrowX, arrowY + bounce + 14);
+    ctx.lineTo(arrowX + 6, arrowY + bounce + 8);
+    ctx.stroke();
 
     ctx.globalAlpha = 1;
+    ctx.restore();
   },
 
   // ── End Screen ───────────────────────────────────────────
   drawEndScreen(ctx, W, H) {
-    // Overlay
     const alpha = Math.min(1, (this.progress - 0.95) / 0.05) * 0.85;
     ctx.fillStyle = 'rgba(0,0,0,' + alpha + ')';
     ctx.fillRect(0, 0, W, H);
@@ -785,47 +1515,75 @@ const WokerGame = {
     // Confetti
     this.updateConfetti();
     this.confettiParticles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.life || 1;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation || 0);
       ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.size, p.size);
+      Comic.roundedRect(ctx, -p.size / 2, -p.size / 2, p.size, p.size * 0.6, 1, p.color, null);
+      ctx.restore();
     });
 
     // Title
-    this.drawPixelText(ctx, 'SCORE: NOVY ZIVOT', W / 2, H * 0.2, '#22c55e', 2);
+    ctx.save();
+    ctx.font = 'bold 24px "Comic Sans MS", "Chalkboard SE", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 3;
+    ctx.strokeText('SCORE: NOVY ZIVOT', W / 2, H * 0.2);
+    ctx.fillStyle = '#22c55e';
+    ctx.fillText('SCORE: NOVY ZIVOT', W / 2, H * 0.2);
+    ctx.restore();
 
-    // Collected items list
+    // Collected items
     const startY = H * 0.35;
+    ctx.save();
+    ctx.font = 'bold 14px "Comic Sans MS", "Chalkboard SE", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     this.collectedItems.forEach((item, i) => {
-      if (i > 6) return; // Max 7 items shown
-      const label = item.label || 'Bonus';
-      this.drawPixelText(ctx, '+ ' + label, W / 2, startY + i * 22, '#fbbf24', 1);
+      if (i > 6) return;
+      ctx.fillStyle = '#fbbf24';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 2;
+      const text = '+ ' + (item.label || 'Bonus');
+      ctx.strokeText(text, W / 2, startY + i * 24);
+      ctx.fillText(text, W / 2, startY + i * 24);
     });
 
     if (this.collectedItems.length === 0) {
-      this.drawPixelText(ctx, 'TVUJ PRIBEH ZACINA!', W / 2, startY, '#60a5fa', 1);
+      ctx.fillStyle = '#60a5fa';
+      ctx.strokeStyle = '#1a1a2e';
+      ctx.lineWidth = 2;
+      ctx.strokeText('TVUJ PRIBEH ZACINA!', W / 2, startY);
+      ctx.fillText('TVUJ PRIBEH ZACINA!', W / 2, startY);
     }
+    ctx.restore();
 
-    // Create CTA if not yet
-    this._createEndCTA();
+    // No CTA — pricing is below on the landing page
   },
 
   // ── Confetti ─────────────────────────────────────────────
   spawnConfetti() {
-    const colors = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#a855f7','#ec4899'];
+    const colors = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'];
     for (let i = 0; i < 60; i++) {
       this.confettiParticles.push({
         x: Math.random() * this.canvasW,
         y: -10 - Math.random() * 100,
         vx: (Math.random() - 0.5) * 3,
         vy: Math.random() * 2 + 1,
-        size: this.pixelSize + Math.random() * this.pixelSize,
+        size: 4 + Math.random() * 6,
         color: colors[Math.floor(Math.random() * colors.length)],
         gravity: 0.05 + Math.random() * 0.05,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.2,
+        life: 1.0,
       });
     }
   },
 
   updateConfetti() {
-    // Spawn once if empty and end screen showing
     if (this.confettiParticles.length === 0 && this.showEndScreen) {
       this.spawnConfetti();
     }
@@ -835,89 +1593,33 @@ const WokerGame = {
       p.x += p.vx;
       p.vy += p.gravity;
       p.y += p.vy;
+      p.rotation += (p.rotSpeed || 0);
+      p.life = (p.life || 1) - 0.005;
 
-      // Remove if off screen
-      if (p.y > this.canvasH + 20) {
+      if (p.y > this.canvasH + 20 || p.life <= 0) {
         this.confettiParticles.splice(i, 1);
       }
     }
 
-    // Respawn if running low during end screen
     if (this.confettiParticles.length < 15 && this.showEndScreen) {
       this.spawnConfetti();
     }
   },
 
-  // ── Pixel Text Renderer ──────────────────────────────────
-  drawPixelText(ctx, text, x, y, color, scale) {
+  // ── Comic Text Renderer (replaces drawPixelText) ─────────
+  drawComicText(ctx, text, x, y, color, size) {
     if (!text) return;
-    scale = scale || 1;
-    const charW = 5;
-    const charH = 7;
-    const spacing = 1;
-    const totalW = text.length * (charW + spacing) - spacing;
-    const ps = scale;
-
-    // Center-align
-    let cursorX = x - (totalW * ps) / 2;
-
-    const upper = text.toUpperCase();
-
-    for (let i = 0; i < upper.length; i++) {
-      let ch = upper[i];
-      let baseChar = ch;
-      let hasCaron = false;
-      let hasAcute = false;
-      let hasRing = false;
-
-      // Check Czech diacritics (also check original case)
-      const origCh = text[i];
-      if (this.DIACRITICS[origCh]) {
-        baseChar = this.DIACRITICS[origCh];
-        if (this.CARONS.has(origCh)) hasCaron = true;
-        else if (this.RINGS.has(origCh)) hasRing = true;
-        else hasAcute = true;
-      } else if (this.DIACRITICS[ch]) {
-        baseChar = this.DIACRITICS[ch];
-        if (this.CARONS.has(ch)) hasCaron = true;
-        else if (this.RINGS.has(ch)) hasRing = true;
-        else hasAcute = true;
-      }
-
-      const glyph = this.FONT[baseChar];
-      if (glyph) {
-        ctx.fillStyle = color;
-        for (let row = 0; row < charH; row++) {
-          const bits = glyph[row];
-          for (let col = 0; col < charW; col++) {
-            if (bits & (1 << (charW - 1 - col))) {
-              ctx.fillRect(
-                cursorX + col * ps,
-                y + row * ps,
-                ps,
-                ps
-              );
-            }
-          }
-        }
-
-        // Diacritic marks above the character
-        if (hasCaron) {
-          ctx.fillRect(cursorX + 1 * ps, y - 2 * ps, ps, ps);
-          ctx.fillRect(cursorX + 2 * ps, y - 1 * ps, ps, ps);
-          ctx.fillRect(cursorX + 3 * ps, y - 2 * ps, ps, ps);
-        } else if (hasAcute) {
-          ctx.fillRect(cursorX + 2 * ps, y - 2 * ps, ps, ps);
-          ctx.fillRect(cursorX + 3 * ps, y - 3 * ps, ps, ps);
-        } else if (hasRing) {
-          ctx.fillRect(cursorX + 1.5 * ps, y - 3 * ps, 2 * ps, ps);
-          ctx.fillRect(cursorX + 1 * ps, y - 2 * ps, ps, ps);
-          ctx.fillRect(cursorX + 3 * ps, y - 2 * ps, ps, ps);
-          ctx.fillRect(cursorX + 1.5 * ps, y - 1 * ps, 2 * ps, ps);
-        }
-      }
-
-      cursorX += (charW + spacing) * ps;
-    }
+    size = size || 12;
+    ctx.save();
+    ctx.font = 'bold ' + size + 'px "Comic Sans MS", "Chalkboard SE", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    // Outline for readability
+    ctx.strokeStyle = '#1a1a2e';
+    ctx.lineWidth = 2;
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = color || '#ffffff';
+    ctx.fillText(text, x, y);
+    ctx.restore();
   },
 };
