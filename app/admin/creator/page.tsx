@@ -156,7 +156,10 @@ export default function ContentCreatorPage() {
 
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      // Rename file to clean name — Whisper API rejects some filename patterns
+      const ext = file.name.split(".").pop() || "mp4";
+      const cleanFile = new File([file], `audio.${ext}`, { type: file.type });
+      formData.append("file", cleanFile);
 
       const res = await fetch("/api/transcribe", {
         method: "POST",
