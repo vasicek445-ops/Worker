@@ -12,10 +12,14 @@ const PLATFORM_CONSTRAINTS: Record<string, string> = {
 }
 
 const TONE_INSTRUCTIONS: Record<string, string> = {
-  informative: 'Informativní tón — jasná fakta, strukturované sdělení, důvěryhodnost. Mluv jako expert který ví o čem mluví.',
-  funny: 'Zábavný tón — humor, nadsázka, relatable momenty. Mluv jako kamarád co má skvělou historku.',
-  provocative: 'Provokativní tón — kontroverzní úhel pohledu, challenge běžných názorů, vyvolej diskusi. Mluv odvážně a přímo.',
-  motivational: 'Motivační tón — energie, inspirace, call to action. Mluv jako mentor co tě nakopne k akci.',
+  'informativní': 'Informativní tón — jasná fakta, strukturované sdělení, důvěryhodnost. Mluv jako expert který ví o čem mluví.',
+  'informative': 'Informativní tón — jasná fakta, strukturované sdělení, důvěryhodnost. Mluv jako expert který ví o čem mluví.',
+  'zábavný': 'Zábavný tón — humor, nadsázka, relatable momenty. Mluv jako kamarád co má skvělou historku.',
+  'funny': 'Zábavný tón — humor, nadsázka, relatable momenty. Mluv jako kamarád co má skvělou historku.',
+  'provokativní': 'Provokativní tón — kontroverzní úhel pohledu, challenge běžných názorů, vyvolej diskusi. Mluv odvážně a přímo.',
+  'provocative': 'Provokativní tón — kontroverzní úhel pohledu, challenge běžných názorů, vyvolej diskusi. Mluv odvážně a přímo.',
+  'motivační': 'Motivační tón — energie, inspirace, call to action. Mluv jako mentor co tě nakopne k akci.',
+  'motivational': 'Motivační tón — energie, inspirace, call to action. Mluv jako mentor co tě nakopne k akci.',
 }
 
 interface Transcription {
@@ -33,12 +37,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing or invalid "idea"' }, { status: 400 })
     }
 
-    if (!platform || !PLATFORM_CONSTRAINTS[platform]) {
+    const platformKey = platform?.toLowerCase() as string
+    if (!platformKey || !PLATFORM_CONSTRAINTS[platformKey]) {
       return NextResponse.json({ error: 'Invalid platform. Use: tiktok, instagram, youtube' }, { status: 400 })
     }
 
-    if (!tone || !TONE_INSTRUCTIONS[tone]) {
-      return NextResponse.json({ error: 'Invalid tone. Use: informative, funny, provocative, motivational' }, { status: 400 })
+    const toneKey = tone?.toLowerCase() as string
+    if (!toneKey || !TONE_INSTRUCTIONS[toneKey]) {
+      return NextResponse.json({ error: `Invalid tone: ${tone}` }, { status: 400 })
     }
 
     // Build transcription reference block
@@ -60,14 +66,14 @@ ${transcriptionBlock}
 
 TVŮJ STYL:
 - Piš v ČEŠTINĚ
-- ${TONE_INSTRUCTIONS[tone]}
+- ${TONE_INSTRUCTIONS[toneKey]}
 - Napodobuj styl a vzorce z referenčních přepisů — NE generický AI styl
 - Používej krátké, úderné věty
 - Každá věta musí mít důvod proč tam je
 - Hook musí být nečekaný, kontroverzní nebo emocionální
 
 PLATFORMA:
-${PLATFORM_CONSTRAINTS[platform]}
+${PLATFORM_CONSTRAINTS[platformKey]}
 
 FORMÁT VÝSTUPU (dodržuj přesně):
 
