@@ -1291,6 +1291,28 @@ gtag('config', 'AW-XXXXXXXXX');
   </div>
 </div>
 
+<!-- PIXEL MARIO GAME: Tvůj příběh -->
+<div id="game-wrapper" style="height:6000px; position:relative; background:transparent;">
+  <div id="game-sticky" style="position:sticky; top:0; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; z-index:1;">
+    <div id="game-container" style="width:900px; max-width:calc(100vw - 20px); position:relative;">
+      <div class="reveal" style="text-align:center; margin-bottom:16px;">
+        <span class="section-label">Tvůj příběh</span>
+        <h2 class="section-title" style="font-size:24px; margin-top:8px;">Z Česka do Švýcarska 🎮</h2>
+      </div>
+      <canvas id="game-canvas" style="width:100%; border-radius:12px; border:2px solid rgba(57,255,110,0.2); background:#0a0a12; display:block; image-rendering:pixelated;"></canvas>
+    </div>
+  </div>
+</div>
+<script src="/game/sprites.js"></script>
+<script src="/game/levels.js"></script>
+<script src="/game/parallax.js"></script>
+<script src="/game/woker-game.js"></script>
+<script>
+  if (document.getElementById('game-canvas')) {
+    WokerGame.init('game-canvas');
+  }
+</script>
+
 <!-- FOUNDER + TESTIMONIALS -->
 <div class="trust-section">
   <div class="section" style="text-align:center;">
