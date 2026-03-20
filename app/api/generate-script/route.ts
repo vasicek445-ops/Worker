@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
       transcriptionBlock += '--- KONEC PŘEPISŮ ---\n'
     }
 
-    const systemPrompt = `Jsi elitní scenárista virálních videí. Tvým úkolem je psát scénáře které zaujmou diváky v prvních sekundách a donutí je sledovat až do konce.
+    const systemPrompt = `Jsi elitní scenárista virálních videí. Píšeš scénáře které zaujmou diváky v prvních sekundách.
 ${transcriptionBlock}
 
 TVŮJ STYL:
@@ -70,35 +70,35 @@ TVŮJ STYL:
 - Napodobuj styl a vzorce z referenčních přepisů — NE generický AI styl
 - Používej krátké, úderné věty
 - Každá věta musí mít důvod proč tam je
-- Hook musí být nečekaný, kontroverzní nebo emocionální
 
 PLATFORMA:
 ${PLATFORM_CONSTRAINTS[platformKey]}
 
-FORMÁT VÝSTUPU (dodržuj přesně):
+FORMÁT VÝSTUPU (dodržuj PŘESNĚ tento formát, nic jiného nepřidávej):
 
-🎬 HOOK (0-3s):
-[úderný začátek který zastaví scrollování]
+HOOK:
+[1-2 věty — úderný začátek který zastaví scrollování. MAX 15 slov. Žádná analýza, žádné vysvětlování.]
 
-📖 TĚLO (3-25s):
-[hlavní obsah s poznámkami o timingu]
+TĚLO:
+[hlavní obsah videa s poznámkami o timingu v hranatých závorkách, např. [5s], [10s]. Mluvený text který řekneš do kamery.]
 
-📢 CTA (posledních 3-5s):
-[výzva k akci]
+CTA:
+[1-2 věty — výzva k akci. Komentář, follow, sdílení.]
 
-🎥 B-ROLL:
+B-ROLL:
 - [vizuální návrh 1]
 - [vizuální návrh 2]
 - [vizuální návrh 3]
 
-⏱️ Celková délka: Xs
-📊 Hashtags: #tag1 #tag2 #tag3
+DÉLKA: Xs
+HASHTAGS: #tag1 #tag2 #tag3
 
-DŮLEŽITÉ:
-- Hook je NEJDŮLEŽITĚJŠÍ část — pokud nezaujmeš v 1-3 sekundách, divák odejde
+KRITICKÁ PRAVIDLA:
+- ŽÁDNÝ markdown — žádné hvězdičky (**), žádné nadpisy (#), žádná kurzíva (*). Pouze čistý text.
+- ŽÁDNÉ komentáře, analýzy nebo poznámky mimo formát výše
+- Hook je MAX 2 věty. Žádná analýza "proč to bude fungovat"
+- Tělo je mluvený text — piš co řekneš do kamery, ne poznámky pro sebe
 - Nepiš "Ahoj lidi" nebo jiné nudné začátky
-- Hashtags musí být mix populárních a niche tagů
-- B-roll návrhy musí být prakticky natočitelné
 - Délka musí odpovídat platformě`
 
     const response = await anthropic.messages.create({

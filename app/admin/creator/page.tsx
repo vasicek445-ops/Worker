@@ -312,15 +312,24 @@ export default function ContentCreatorPage() {
     }
   };
 
+  function stripMarkdown(text: string): string {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, "$1") // **bold**
+      .replace(/\*(.*?)\*/g, "$1") // *italic*
+      .replace(/^#{1,6}\s+/gm, "") // ### headings
+      .replace(/^>\s+/gm, "") // > blockquotes
+      .trim();
+  }
+
   function parseScript(text: string): GeneratedScript {
     const sections: Record<string, string> = {};
-    // Match labels with optional emojis, brackets, timing info
     const labelPatterns: [string, RegExp][] = [
-      ["HOOK", /HOOK/i],
-      ["BODY", /(?:TĚLO|BODY)/i],
-      ["CTA", /CTA/i],
-      ["B-ROLL", /B-?ROLL/i],
-      ["DÉLKA", /(?:DÉLKA|CELKOVÁ|Celkov|⏱|Hashtag|📊)/i],
+      ["HOOK", /^(?:🎬\s*)?HOOK/i],
+      ["BODY", /^(?:📖\s*)?(?:TĚLO|BODY)/i],
+      ["CTA", /^(?:📢\s*)?CTA/i],
+      ["B-ROLL", /^(?:🎥\s*)?B-?ROLL/i],
+      ["DÉLKA", /^(?:⏱️?\s*)?(?:DÉLKA|CELKOVÁ|Celkov)/i],
+      ["HASHTAGS", /^(?:📊\s*)?HASHTAGS?/i],
     ];
 
     let current = "";
@@ -331,7 +340,6 @@ export default function ContentCreatorPage() {
       const matched = labelPatterns.find(([, regex]) => regex.test(trimmed));
       if (matched) {
         current = matched[0];
-        // Extract text after the colon if present
         const colonIdx = trimmed.indexOf(":");
         const afterLabel = colonIdx !== -1 ? trimmed.slice(colonIdx + 1).trim() : "";
         if (afterLabel) {
@@ -342,12 +350,16 @@ export default function ContentCreatorPage() {
       }
     }
 
+    const duration = [sections["DÉLKA"], sections["HASHTAGS"]]
+      .filter(Boolean)
+      .join("\n");
+
     return {
-      hook: (sections["HOOK"] || "").trim(),
-      body: (sections["BODY"] || "").trim(),
-      cta: (sections["CTA"] || "").trim(),
-      broll: (sections["B-ROLL"] || "").trim(),
-      duration: (sections["DÉLKA"] || "").trim(),
+      hook: stripMarkdown(sections["HOOK"] || ""),
+      body: stripMarkdown(sections["BODY"] || ""),
+      cta: stripMarkdown(sections["CTA"] || ""),
+      broll: stripMarkdown(sections["B-ROLL"] || ""),
+      duration: stripMarkdown(duration),
     };
   }
 
