@@ -20,6 +20,7 @@ interface Transcription {
   segments: Segment[];
   duration: number;
   date: string;
+  created_at: string;
 }
 
 interface GeneratedScript {
@@ -31,26 +32,10 @@ interface GeneratedScript {
 }
 
 // ─── Helpers ─────────────────────────────────────────────────
-const STORAGE_KEY = "woker-transcriptions";
-
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;
-}
-
-function loadTranscriptions(): Transcription[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveTranscriptions(items: Transcription[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
 }
 
 // ─── Accordion Section ──────────────────────────────────────
@@ -130,10 +115,21 @@ export default function ContentCreatorPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load library from localStorage
-  useEffect(() => {
-    setLibrary(loadTranscriptions());
+  // Fetch library from API
+  const fetchLibrary = useCallback(async () => {
+    try {
+      const res = await fetch("/api/transcriptions");
+      const data = await res.json();
+      if (data.success) setLibrary(data.data);
+    } catch (err) {
+      console.error("Failed to load transcriptions:", err);
+    }
   }, []);
+
+  // Load library from API on mount
+  useEffect(() => {
+    fetchLibrary();
+  }, [fetchLibrary]);
 
   // ─── Upload handlers ────────────────────────────────────
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -194,42 +190,59 @@ export default function ContentCreatorPage() {
   };
 
   // ─── Save to library ───────────────────────────────────
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!transcriptionResult) return;
     if (!meta.title.trim()) {
       alert("Vyplň název videa");
       return;
     }
 
-    const newItem: Transcription = {
-      id: crypto.randomUUID(),
-      title: meta.title,
-      creator: meta.creator,
-      platform: meta.platform,
-      views: meta.views,
-      tags: meta.tags,
-      text: transcriptionResult.text,
-      segments: transcriptionResult.segments,
-      duration: transcriptionResult.duration,
-      date: new Date().toISOString(),
-    };
+    try {
+      const res = await fetch("/api/transcriptions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: meta.title,
+          creator: meta.creator,
+          platform: meta.platform,
+          views: meta.views,
+          tags: meta.tags,
+          text: transcriptionResult.text,
+          segments: transcriptionResult.segments,
+          duration: transcriptionResult.duration,
+        }),
+      });
 
-    const updated = [newItem, ...library];
-    setLibrary(updated);
-    saveTranscriptions(updated);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Chyba při ukládání");
 
-    // Reset form
-    setTranscriptionResult(null);
-    setFile(null);
-    setMeta({ title: "", creator: "", platform: "TikTok", views: "", tags: "" });
-    if (fileInputRef.current) fileInputRef.current.value = "";
+      // Refresh library from API
+      await fetchLibrary();
+
+      // Reset form
+      setTranscriptionResult(null);
+      setFile(null);
+      setMeta({ title: "", creator: "", platform: "TikTok", views: "", tags: "" });
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Chyba při ukládání");
+    }
   };
 
   // ─── Delete from library ───────────────────────────────
-  const handleDelete = (id: string) => {
-    const updated = library.filter((t) => t.id !== id);
-    setLibrary(updated);
-    saveTranscriptions(updated);
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/transcriptions?id=${id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || "Chyba při mazání");
+
+      // Refresh library from API
+      await fetchLibrary();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Chyba při mazání");
+    }
   };
 
   // ─── Generate script ───────────────────────────────────
