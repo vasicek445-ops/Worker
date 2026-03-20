@@ -113,6 +113,7 @@ export default function ContentCreatorPage() {
   const [tone, setTone] = useState("Informativní");
   const [generating, setGenerating] = useState(false);
   const [script, setScript] = useState<GeneratedScript | null>(null);
+  const [rawScript, setRawScript] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -336,7 +337,8 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
       if (!res.ok) throw new Error("Chyba při generování");
 
       const data = await res.json();
-      const parsed = parseScript(data.script);
+      setRawScript(data.script || "");
+      const parsed = parseScript(data.script || "");
       setScript(parsed);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Chyba při generování");
@@ -831,6 +833,14 @@ ${examples ? `PŘÍKLADY VIRÁLNÍCH VIDEÍ PRO INSPIRACI:\n${examples}` : "Žá
                 <div className="flex items-center gap-2 text-[#39ff6e] font-medium text-lg">
                   <span>🎬</span> Vygenerovaný script
                 </div>
+
+                {/* Raw output fallback if parser found nothing */}
+                {!script.hook && !script.body && rawScript && (
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                    <div className="text-white/40 text-xs mb-2 uppercase tracking-wide">Raw output</div>
+                    <pre className="text-white/90 whitespace-pre-wrap text-sm leading-relaxed">{rawScript}</pre>
+                  </div>
+                )}
 
                 {/* Hook */}
                 {script.hook && (
