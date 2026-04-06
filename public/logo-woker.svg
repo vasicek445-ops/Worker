@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="96" fill="#e63920"/>
+
+  <!-- Brain outline - left hemisphere -->
+  <path d="M200 160 C160 160 130 190 130 230 C130 250 140 265 155 275 C145 290 140 310 145 330 C152 360 178 380 210 380 L210 260 C210 260 200 250 200 235 C200 220 210 210 225 210 L225 180 C225 170 215 160 200 160Z"
+        fill="rgba(255,255,255,0.9)"
+        stroke="white" stroke-width="3"/>
+
+  <!-- Brain outline - right hemisphere -->
+  <path d="M260 160 C300 160 330 190 330 230 C330 250 320 265 305 275 C315 290 320 310 315 330 C308 360 282 380 250 380 L250 260 C250 260 260 250 260 235 C260 220 250 210 235 210 L235 180 C235 170 245 160 260 160Z"
+        fill="rgba(255,255,255,0.9)"
+        stroke="white" stroke-width="3"/>
+
+  <!-- Brain center line details -->
+  <line x1="230" y1="180" x2="230" y2="380" stroke="#e63920" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Brain folds - left -->
+  <path d="M160 230 Q180 245 200 235" stroke="#e63920" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M155 280 Q175 295 205 285" stroke="#e63920" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M165 325 Q185 340 210 330" stroke="#e63920" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Brain folds - right -->
+  <path d="M300 230 Q280 245 260 235" stroke="#e63920" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M305 280 Q285 295 255 285" stroke="#e63920" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M295 325 Q275 340 250 330" stroke="#e63920" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Lightning bolt - overlapping brain, slightly right -->
+  <path d="M280 120 L250 230 L290 230 L245 370 L310 215 L270 215 L300 120Z"
+        fill="#39ff6e" stroke="#2bcc58" stroke-width="3" stroke-linejoin="round"
+        opacity="0.95"/>
+
+  <!-- Lightning glow -->
+  <path d="M280 120 L250 230 L290 230 L245 370 L310 215 L270 215 L300 120Z"
+        fill="none" stroke="#39ff6e" stroke-width="6" stroke-linejoin="round"
+        opacity="0.3"/>
+
+  <!-- Small sparkles around brain -->
+  <circle cx="120" cy="200" r="4" fill="#39ff6e" opacity="0.7"/>
+  <circle cx="340" cy="180" r="3" fill="#39ff6e" opacity="0.5"/>
+  <circle cx="355" cy="310" r="4" fill="#39ff6e" opacity="0.6"/>
+  <circle cx="105" cy="300" r="3" fill="#39ff6e" opacity="0.5"/>
+  <circle cx="145" cy="150" r="3" fill="#39ff6e" opacity="0.4"/>
+  <circle cx="330" cy="360" r="3" fill="#39ff6e" opacity="0.4"/>
+
+  <!-- WOKER text at bottom -->
+  <text x="256" y="450" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="64" letter-spacing="8" fill="white">WOKER</text>
+
+  <!-- Swiss cross - small, top-left -->
+  <rect x="52" y="52" width="32" height="10" rx="3" fill="rgba(255,255,255,0.35)"/>
+  <rect x="63" y="41" width="10" height="32" rx="3" fill="rgba(255,255,255,0.35)"/>
+</svg>

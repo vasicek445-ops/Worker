@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); cmd=$(echo \"$input\" | jq -r '.tool_input.command // empty'); if echo \"$cmd\" | grep -qiE '\\b(DROP|TRUNCATE|DELETE FROM|rm -rf|git push --force|git reset --hard)\\b'; then echo 'BLOCKED: Destructive command detected. Ask user for confirmation first.' >&2; exit 2; fi; exit 0"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$CLAUDE_FILE_PATH\" | grep -qE '\\.(ts|tsx)$'; then cd /Users/vaclav/Desktop/eurojob.py/woker && npx eslint --fix \"$CLAUDE_FILE_PATH\" 2>/dev/null || true; fi"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude potřebuje tvůj input\" with title \"Claude Code\" sound name \"Glass\"'"
+          }
+        ]
+      }
+    ]
+  }
+}

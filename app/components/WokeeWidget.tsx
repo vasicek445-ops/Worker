@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { supabase } from "../supabase";
 
 type Message = {
   role: "user" | "assistant";
@@ -175,9 +176,13 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
         ? [{ role: "user" as const, content: apiMessages[0].content + profileContext }, ...apiMessages.slice(1)]
         : [{ role: "user" as const, content: cleanText + profileContext }];
 
+      const { data: { session } } = await supabase.auth.getSession();
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
         body: JSON.stringify({ messages: enrichedMessages, stream: true }),
         signal: controller.signal,
       });

@@ -208,10 +208,14 @@ export default function Profil() {
     if (deleteText !== 'SMAZAT') return
     setDeleting(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) throw new Error('Not authenticated')
       const res = await fetch('/api/delete-account', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
       })
       if (!res.ok) throw new Error('Chyba při mazání')
       await supabase.auth.signOut()

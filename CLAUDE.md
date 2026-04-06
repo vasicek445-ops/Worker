@@ -102,11 +102,57 @@ src/                        Additional source code
 - **Sidebar:** Uses `wooky-wave-sm.png` as nav icon
 - **Landing page:** Interactive 3D model + chat FAB widget
 
+## Dev Tooling & MCP Servers
+
+### MCP Servers (configured in `~/.claude/settings.json`)
+- **Supabase** — direct DB queries, schema inspection, migrations
+- **GitHub** — repo management, PRs, issues, code search (PAT token in settings)
+- **Playwright** — browser automation, E2E testing
+- **Stripe** — subscription debugging, customer management, webhook logs
+- **Vercel** — deployment logs, build status
+- **Notion** — workspace management, pages, databases, CRM, project tracking (via Notion API, free tier)
+- **Apple Notes** — read/write/search macOS notes, folders, checklists
+- **WhatsApp** — read/send messages (⚠️ never send autonomously, ban risk)
+- **Firecrawl** — AI web scraping, structured data extraction (API key, free tier 500 credits)
+- **Whisper STT** — voice input, lokální Whisper daemon na localhost:8765, voice hook (`v` → mluv → `s`)
+- **n8n** — workflow automation engine (self-hosted Docker, localhost:5678)
+
+### Docker Services (auto-restart)
+- **changedetection.io** — website change monitoring, localhost:5001, competitive intel pipeline
+- **n8n** — workflow automation, localhost:5678, orchestrace automatizací
+
+### Planned MCP Integrations
+- **Google Calendar** — booking flow (Hepner), scheduling, time blocking
+- **Slack** — client communication, deployment notifications, Megan alerts
+- **Gmail** — email automation, client follow-ups, inbox management
+- **Sentry** — error monitoring for Woker production (gowoker.com)
+
+### Hooks (configured in `.claude/hooks.json` + `~/.claude/settings.json`)
+- **ESLint auto-fix** (PostToolUse) — runs `eslint --fix` on every .ts/.tsx file after Edit/Write
+- **Security gate** (PreToolUse) — blocks destructive commands (`DROP`, `TRUNCATE`, `DELETE FROM`, `rm -rf`, `git push --force`, `git reset --hard`) before execution
+- **macOS notification** (Notification) — desktop alert with sound when Claude needs user input
+- **Lessons loader** (SessionStart) — auto-loads `~/.claude/lessons.md` (self-improvement loop)
+- **Voice hook** (UserPromptSubmit) — Whisper voice input (`v` start, `s` stop)
+
+### Installed Skills & Plugins
+- **Superpowers v5.0.7** — brainstorming → planning → execution workflow, TDD, systematic debugging, code review, parallel agents
+- **Trail of Bits** (30+ skills) — security audits, YARA rules, supply chain analysis, differential review
+- **planning-with-files** — persistent plans that survive context compaction (`/plan`)
+- **AI Marketing** (15 skills) — `/market audit`, `/market competitors`, `/market proposal`, `/market seo`
+- **ccproxy** — intelligent model routing proxy, Haiku for simple / Sonnet for complex (`ccproxy start --detach`)
+
+### Knowledge Base
+- **Wiki** — `~/Desktop/transcripts/wiki/` — 24 stránek, Karpathy LLM Wiki metodologie, backlinks, hot cache
+- **lessons.md** — `~/.claude/lessons.md` — self-improvement loop, logování chyb, auto-load každou session
+- **Memory** — `~/.claude/projects/.../memory/` — long-term memory across conversations
+
 ## Current Focus
 
 - **Landing page animations** — countUp numbers, scroll-triggered reveals, hover effects, progress bars
-- **Megan** — self-healing autonomous bot (tool use, proactive monitoring, voice interface planned)
-- **Future:** Megan PWA dashboard (Jarvis-style sci-fi HUD, voice I/O via ElevenLabs + Whisper)
+- **Megan** — self-healing autonomous bot (tool use, proactive monitoring, voice interface active via Whisper)
+- **MCP integrations** — expanding agent capabilities (next: Google Calendar, Slack, Gmail, Sentry)
+- **Competitive intel** — changedetection.io monitoring pipeline, AI marketing audits
+- **Future:** Megan PWA dashboard (Jarvis-style sci-fi HUD, ElevenLabs TTS for natural voice output)
 
 ## Never Do
 
@@ -160,6 +206,50 @@ GUIDE_PDF_URL=
 5. **Never modify the Stripe webhook** (`app/api/stripe/webhook/route.ts`) without explicitly notifying the user — changes can break payments
 6. **Always include i18n** for all new user-facing text — add translations for all 11 languages in `LanguageContext`
 7. **Use Claude Haiku** (`claude-haiku-4-5-20251001`) for all AI API routes — cost efficiency is critical, never use Sonnet/Opus for user-facing generation
+
+## Autonomous Mode
+
+### Branch & Commit Rules
+- Always work on feature branch, never commit directly to main
+- Branch naming: `feature/nazev-tasku`
+- Commit after every completed subtask with descriptive message
+- Each commit must be atomic — independently revertable
+- After all subtasks done, add a summary comment to the PR
+
+### Scope Limits
+- Max **10 changed files** per subtask — if more needed, split into smaller commits
+- Max **3 consecutive errors** before stopping and documenting the blocker in TODO.md
+- If completely blocked — document in TODO.md and move to next task
+
+### Confirmation Rules
+- **No confirmation needed:** code changes, linting, formatting, tests, commits to feature branch
+- **Always ask before:** DB schema changes, auth logic changes, API contract changes, adding/removing API routes, changing middleware
+
+### Quality Gates (must pass before each commit)
+- `npm run lint` — zero errors
+- `npm run build` — must compile successfully
+- Fix all errors automatically before committing
+
+### Safety Rules
+- Never modify Stripe webhook, never delete database data
+- Never commit `.env*` files or any secrets/credentials
+- Write tests for new functions where possible
+- Document all changes in CHANGELOG.md
+
+### Stop Conditions
+- 3 consecutive failing builds/lint errors on the same issue → stop, document in TODO.md
+- Task requires changes outside the defined scope (DB schema, auth, Stripe) without user online → stop
+- Unsure about business logic → stop and document question in TODO.md
+
+## Starting Autonomous Session
+
+1. Create feature branch
+2. Implement task
+3. Run `npm run lint` + `npm run build` — fix all errors
+4. Write tests
+5. Commit (atomic, revertable)
+6. Document in CHANGELOG.md
+7. Repeat 2–6 for each subtask
 
 ## Session Management
 

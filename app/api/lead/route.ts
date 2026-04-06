@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         from: 'Václav z Wokeru <vaclav@gowoker.com>',
         to: cleanEmail,
         subject: '📥 Váš průvodce: 5 kroků k práci ve Švýcarsku',
-        html: getWelcomeEmail(cleanName || 'příteli'),
+        html: getWelcomeEmail(cleanName || 'příteli', cleanEmail),
       });
 
       await supabase
@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function getWelcomeEmail(name: string): string {
+function getWelcomeEmail(name: string, email: string): string {
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background:#0a0a12;font-family:Arial,sans-serif;">
@@ -110,7 +110,7 @@ function getWelcomeEmail(name: string): string {
       Václav z Wokeru | <a href="https://gowoker.com" style="color:#39ff6e;text-decoration:none;">gowoker.com</a>
     </p>
     <p style="color:#555577;font-size:11px;margin-top:8px;">
-      <a href="https://gowoker.com/api/unsubscribe?email=${encodeURIComponent(name)}" style="color:#555577;text-decoration:underline;">Odhlásit se</a>
+      <a href="https://gowoker.com/api/unsubscribe?email=${encodeURIComponent(email)}" style="color:#555577;text-decoration:underline;">Odhlásit se</a>
     </p>
   </div>
 </div>

@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '@supabase/supabase-js'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 })
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 const SYSTEM_PROMPT = `Jsi Wooky — AI Team Leader platformy Woker. Vedeš tým AI nástrojů, které pomáhají Čechům a Slovákům najít práci ve Švýcarsku.
 
@@ -204,6 +210,29 @@ Příklad: [CHIPS: Vytvořit CV na míru? | Kolik budu vydělávat? | Spustit Sm
 
 export async function POST(req: NextRequest) {
   try {
+    // Auth + subscription check
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: sub } = await supabaseAdmin
+      .from('subscriptions')
+      .select('status')
+      .eq('user_id', user.id)
+      .single()
+
+    if (sub?.status !== 'active') {
+      return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
+    }
+
     const { messages, stream: wantStream } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
