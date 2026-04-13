@@ -40,17 +40,15 @@ export async function GET(req: NextRequest) {
     const limit = 20
     const offset = (page - 1) * limit
 
-    // Gasthaus-finder data is premium-only
+    // Check premium for contact detail gating
     const premium = await isPremiumUser(req)
 
     let query = supabaseAdmin
       .from('housing')
       .select('id, title, address, city, zipcode, canton, price, price_unit, rooms, area_m2, object_type, is_furnished, is_temporary, available_from, url, image_url, agency_name, agency_contact, posted_at, source', { count: 'exact' })
 
-    // Non-premium users only see flatfox listings
-    if (!premium) {
-      query = query.eq('source', 'flatfox')
-    } else if (source) {
+    // Filter by source if requested
+    if (source) {
       query = query.eq('source', source)
     }
 
@@ -94,11 +92,20 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error
 
+    // Mask contact details for gasthaus listings if not premium
+    const listings = (data || []).map((item: Record<string, unknown>) => {
+      if (item.source === 'gasthaus-finder' && !premium) {
+        return { ...item, agency_contact: null, url: null, premium_locked: true }
+      }
+      return { ...item, premium_locked: false }
+    })
+
     return NextResponse.json({
-      listings: data || [],
+      listings,
       total: count || 0,
       page,
       totalPages: Math.ceil((count || 0) / limit),
+      premium,
     })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
