@@ -55,17 +55,17 @@ const SORT_OPTIONS = [
 
 const OBJECT_TYPES = [
   { label: 'Všechny typy', value: '' },
-  { label: 'Pro pracující', value: 'Pro pracující' },
-  { label: 'Pro studenty', value: 'Pro studenty' },
-  { label: 'Penziony & B&B', value: 'Penziony & B&B' },
-  { label: 'Hostely', value: 'Hostely' },
-  { label: 'Kláštery', value: 'Kláštery' },
-  { label: 'Semináře & kurzy', value: 'Semináře & kurzy' },
-  { label: 'Ubytovny', value: 'Ubytovny' },
-  { label: 'Byty & pokoje', value: 'Byty & pokoje' },
-  { label: 'Byt', value: 'Byt' },
+  { label: 'Byty & WG', value: 'Byt' },
   { label: 'Studio', value: 'Studio' },
   { label: 'Spolubydlení (WG)', value: 'Spolubydlení (WG)' },
+  { label: 'Penziony & B&B', value: 'Penziony & B&B' },
+  { label: 'Pro pracující', value: 'Pro pracující' },
+  { label: 'Hostely', value: 'Hostely' },
+  { label: 'Ubytovny', value: 'Ubytovny' },
+  { label: 'Kláštery', value: 'Kláštery' },
+  { label: 'Semináře & kurzy', value: 'Semináře & kurzy' },
+  { label: 'Pro studenty', value: 'Pro studenty' },
+  { label: 'Byty & pokoje', value: 'Byty & pokoje' },
 ]
 
 export default function Bydleni() {
@@ -83,7 +83,6 @@ export default function Bydleni() {
   const [searchInput, setSearchInput] = useState('')
   const [saved, setSaved] = useState<string[]>([])
   const [profileLoaded, setProfileLoaded] = useState(false)
-  const [sourceFilter, setSourceFilter] = useState('')
   const [objectType, setObjectType] = useState('')
   const [hasPrice, setHasPrice] = useState(false)
 
@@ -122,7 +121,6 @@ export default function Bydleni() {
       if (minRooms) params.set('minRooms', minRooms)
       if (furnished) params.set('furnished', 'true')
       if (sort !== 'newest') params.set('sort', sort)
-      if (sourceFilter) params.set('source', sourceFilter)
       if (objectType) params.set('type', objectType)
       if (hasPrice) params.set('hasPrice', 'true')
       params.set('page', page.toString())
@@ -143,7 +141,7 @@ export default function Bydleni() {
     } finally {
       setLoading(false)
     }
-  }, [search, canton, maxPrice, minRooms, furnished, sort, page, sourceFilter, objectType, hasPrice])
+  }, [search, canton, maxPrice, minRooms, furnished, sort, page, objectType, hasPrice])
 
   useEffect(() => {
     fetchListings()
@@ -158,7 +156,7 @@ export default function Bydleni() {
   const clearFilters = () => {
     setSearch(''); setSearchInput(''); setCanton(''); setMaxPrice('')
     setMinRooms(''); setFurnished(false); setSort('newest'); setPage(1)
-    setSourceFilter(''); setObjectType(''); setHasPrice(false)
+    setObjectType(''); setHasPrice(false)
   }
 
   const toggleSaved = (id: string) => {
@@ -167,7 +165,7 @@ export default function Bydleni() {
     localStorage.setItem('woker_saved_housing', JSON.stringify(updated))
   }
 
-  const hasFilters = search || canton || maxPrice || minRooms || furnished || sourceFilter || objectType || hasPrice
+  const hasFilters = search || canton || maxPrice || minRooms || furnished || objectType || hasPrice
 
   const [now] = useState(() => Date.now())
   function timeAgo(dateStr: string | null): string {
@@ -213,39 +211,7 @@ export default function Bydleni() {
           </div>
         </div>
 
-        {/* Source toggle tabs */}
-        <div className="mb-4 flex gap-2">
-          <button
-            onClick={() => { setSourceFilter(''); setPage(1) }}
-            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
-              sourceFilter === ''
-                ? 'bg-[#39ff6e]/10 text-[#39ff6e] border-[#39ff6e]/30'
-                : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
-            }`}
-          >
-            Byty
-          </button>
-          <button
-            onClick={() => { setSourceFilter('gasthaus-finder'); setPage(1) }}
-            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
-              sourceFilter === 'gasthaus-finder'
-                ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
-                : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
-            }`}
-          >
-            Penziony & Gasthaus
-          </button>
-          <button
-            onClick={() => { setSourceFilter('kloster-finder'); setPage(1) }}
-            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
-              sourceFilter === 'kloster-finder'
-                ? 'bg-purple-500/10 text-purple-400 border-purple-500/30'
-                : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
-            }`}
-          >
-            Ubytovny & Semináře
-          </button>
-        </div>
+        {/* removed source toggle — unified view with type filter */}
 
         {/* Search */}
         <div className="mb-4">
@@ -263,8 +229,8 @@ export default function Bydleni() {
           </form>
         </div>
 
-        {/* Info banner for gasthaus/kloster */}
-        {(sourceFilter === 'gasthaus-finder' || sourceFilter === 'kloster-finder') && (
+        {/* Info banner for pension/kloster types */}
+        {objectType && !['Byt', 'Studio', 'Spolubydlení (WG)'].includes(objectType) && (
           <div className="mb-4 p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl">
             <p className="text-white/50 text-xs m-0 leading-relaxed">
               Nabídky se průběžně aktualizují — ověřujeme ceny a dostupnost přímo u poskytovatelů.
