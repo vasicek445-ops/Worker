@@ -6,6 +6,24 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+async function isPremiumUser(req: NextRequest): Promise<boolean> {
+  try {
+    const token = req.headers.get('authorization')?.replace('Bearer ', '')
+      || req.cookies.get('sb-recyoezvcfiarmeizgqc-auth-token')?.value
+    if (!token) return false
+    const { data: { user } } = await supabaseAdmin.auth.getUser(token)
+    if (!user) return false
+    const { data: sub } = await supabaseAdmin
+      .from('subscriptions')
+      .select('status')
+      .eq('user_id', user.id)
+      .single()
+    return sub?.status === 'active'
+  } catch {
+    return false
+  }
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -17,13 +35,24 @@ export async function GET(req: NextRequest) {
     const objectType = searchParams.get('type') || ''
     const furnished = searchParams.get('furnished') || ''
     const sort = searchParams.get('sort') || 'newest'
+    const source = searchParams.get('source') || ''
     const page = parseInt(searchParams.get('page') || '1')
     const limit = 20
     const offset = (page - 1) * limit
 
+    // Gasthaus-finder data is premium-only
+    const premium = await isPremiumUser(req)
+
     let query = supabaseAdmin
       .from('housing')
-      .select('id, title, address, city, zipcode, canton, price, price_unit, rooms, area_m2, object_type, is_furnished, is_temporary, available_from, url, image_url, agency_name, agency_contact, posted_at', { count: 'exact' })
+      .select('id, title, address, city, zipcode, canton, price, price_unit, rooms, area_m2, object_type, is_furnished, is_temporary, available_from, url, image_url, agency_name, agency_contact, posted_at, source', { count: 'exact' })
+
+    // Non-premium users only see flatfox listings
+    if (!premium) {
+      query = query.eq('source', 'flatfox')
+    } else if (source) {
+      query = query.eq('source', source)
+    }
 
     if (search) {
       query = query.or(`title.ilike.%${search}%,city.ilike.%${search}%,address.ilike.%${search}%`)

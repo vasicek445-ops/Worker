@@ -25,6 +25,7 @@ type Listing = {
   agency_name: string | null
   agency_contact: string | null
   posted_at: string | null
+  source: string | null
 }
 
 const CANTONS: Record<string, string> = {
@@ -52,6 +53,17 @@ const SORT_OPTIONS = [
   { label: 'Plocha ↓', value: 'area_desc' },
 ]
 
+const OBJECT_TYPES = [
+  { label: 'Všechny typy', value: '' },
+  { label: 'Byt', value: 'Byt' },
+  { label: 'Studio', value: 'Studio' },
+  { label: 'Spolubydlení (WG)', value: 'Spolubydlení (WG)' },
+  { label: 'Penzion / Gasthaus', value: 'Penzion / Gasthaus' },
+  { label: 'Monteurzimmer', value: 'Monteurzimmer' },
+  { label: 'Hotel / Hostel', value: 'Hotel / Hostel' },
+  { label: 'Pokoj', value: 'Pokoj' },
+]
+
 export default function Bydleni() {
   const [listings, setListings] = useState<Listing[]>([])
   const [total, setTotal] = useState(0)
@@ -67,6 +79,8 @@ export default function Bydleni() {
   const [searchInput, setSearchInput] = useState('')
   const [saved, setSaved] = useState<string[]>([])
   const [profileLoaded, setProfileLoaded] = useState(false)
+  const [sourceFilter, setSourceFilter] = useState('')
+  const [objectType, setObjectType] = useState('')
 
   // Load saved listings & auto-fill canton from profile
   useEffect(() => {
@@ -103,6 +117,8 @@ export default function Bydleni() {
       if (minRooms) params.set('minRooms', minRooms)
       if (furnished) params.set('furnished', 'true')
       if (sort !== 'newest') params.set('sort', sort)
+      if (sourceFilter) params.set('source', sourceFilter)
+      if (objectType) params.set('type', objectType)
       params.set('page', page.toString())
 
       const res = await fetch(`/api/housing?${params}`)
@@ -115,7 +131,7 @@ export default function Bydleni() {
     } finally {
       setLoading(false)
     }
-  }, [search, canton, maxPrice, minRooms, furnished, sort, page])
+  }, [search, canton, maxPrice, minRooms, furnished, sort, page, sourceFilter, objectType])
 
   useEffect(() => {
     fetchListings()
@@ -130,6 +146,7 @@ export default function Bydleni() {
   const clearFilters = () => {
     setSearch(''); setSearchInput(''); setCanton(''); setMaxPrice('')
     setMinRooms(''); setFurnished(false); setSort('newest'); setPage(1)
+    setSourceFilter(''); setObjectType('')
   }
 
   const toggleSaved = (id: string) => {
@@ -138,7 +155,7 @@ export default function Bydleni() {
     localStorage.setItem('woker_saved_housing', JSON.stringify(updated))
   }
 
-  const hasFilters = search || canton || maxPrice || minRooms || furnished
+  const hasFilters = search || canton || maxPrice || minRooms || furnished || sourceFilter || objectType
 
   const [now] = useState(() => Date.now())
   function timeAgo(dateStr: string | null): string {
@@ -157,6 +174,8 @@ export default function Bydleni() {
     const d = new Date(dateStr)
     return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short' })
   }
+
+  const isGasthaus = (listing: Listing) => listing.source === 'gasthaus-finder'
 
   const selectClass = "bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#39ff6e]/30 appearance-none flex-shrink-0 transition"
 
@@ -180,6 +199,30 @@ export default function Bydleni() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Source toggle tabs */}
+        <div className="mb-4 flex gap-2">
+          <button
+            onClick={() => { setSourceFilter(''); setPage(1) }}
+            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
+              sourceFilter === ''
+                ? 'bg-[#39ff6e]/10 text-[#39ff6e] border-[#39ff6e]/30'
+                : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
+            }`}
+          >
+            Byty
+          </button>
+          <button
+            onClick={() => { setSourceFilter('gasthaus-finder'); setPage(1) }}
+            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
+              sourceFilter === 'gasthaus-finder'
+                ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30'
+                : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
+            }`}
+          >
+            Penziony & Gasthaus
+          </button>
         </div>
 
         {/* Search */}
@@ -224,6 +267,12 @@ export default function Bydleni() {
               <option value="3">3+</option>
               <option value="3.5">3.5+</option>
               <option value="4">4+</option>
+            </select>
+
+            <select value={objectType} onChange={(e) => { setObjectType(e.target.value); setPage(1) }} className={selectClass}>
+              {OBJECT_TYPES.map(t => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
             </select>
 
             <button
@@ -302,6 +351,11 @@ export default function Bydleni() {
                         Zařízeno
                       </span>
                     )}
+                    {isGasthaus(listing) && (
+                      <span className="bg-cyan-500/20 backdrop-blur-sm text-cyan-400 text-[10px] font-bold px-2 py-1 rounded-lg">
+                        Penzion
+                      </span>
+                    )}
                   </div>
                   {/* Save button */}
                   <button
@@ -325,20 +379,58 @@ export default function Bydleni() {
                 <div className="p-4">
                   {/* Price */}
                   <div className="flex items-baseline justify-between mb-1.5">
-                    <h4 className="text-white font-extrabold text-lg m-0 tracking-tight">
-                      {listing.price ? `CHF ${listing.price.toLocaleString()}` : 'Na dotaz'}
-                      {listing.price_unit === 'monthly' && <span className="text-white/30 font-normal text-sm">/m</span>}
-                    </h4>
+                    {isGasthaus(listing) ? (
+                      <h4 className="text-white font-extrabold text-lg m-0 tracking-tight">
+                        {listing.price ? (
+                          <>
+                            <span className="text-[#39ff6e]">CHF {listing.price.toLocaleString()}</span>
+                            <span className="text-white/30 font-normal text-sm">/měsíc</span>
+                          </>
+                        ) : (
+                          <span className="text-amber-400">Kontaktujte pro cenu</span>
+                        )}
+                      </h4>
+                    ) : (
+                      <h4 className="text-white font-extrabold text-lg m-0 tracking-tight">
+                        {listing.price ? `CHF ${listing.price.toLocaleString()}` : 'Na dotaz'}
+                        {listing.price_unit === 'monthly' && <span className="text-white/30 font-normal text-sm">/m</span>}
+                      </h4>
+                    )}
                     {listing.rooms && (
                       <span className="text-cyan-400 text-xs font-bold">{listing.rooms} pok.</span>
                     )}
                   </div>
+
+                  {/* Gasthaus: price hint */}
+                  {isGasthaus(listing) && !listing.price && (
+                    <p className="text-amber-400/60 text-[11px] m-0 mb-2">
+                      Zavolejte nebo napište pro aktuální cenu
+                    </p>
+                  )}
 
                   {/* Address */}
                   <p className="text-white/40 text-sm m-0 mb-2.5 truncate">
                     {listing.address || listing.city}
                     {listing.canton && ` · ${CANTONS[listing.canton] || listing.canton}`}
                   </p>
+
+                  {/* Gasthaus: phone & website */}
+                  {isGasthaus(listing) && (
+                    <div className="flex flex-col gap-1.5 mb-3">
+                      {listing.agency_contact && (
+                        <a href={`tel:${listing.agency_contact}`} className="flex items-center gap-2 text-cyan-400 text-sm no-underline hover:text-cyan-300 transition">
+                          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                          <span className="font-semibold">{listing.agency_contact}</span>
+                        </a>
+                      )}
+                      {listing.url && (
+                        <a href={listing.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white/40 text-xs no-underline hover:text-white/60 transition truncate">
+                          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                          <span className="truncate">{listing.url.replace(/^https?:\/\//, '').replace(/\/$/, '')}</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
 
                   {/* Quick stats */}
                   <div className="flex flex-wrap gap-1.5 mb-3">
@@ -357,8 +449,13 @@ export default function Bydleni() {
                         Od {formatDate(listing.available_from)}
                       </span>
                     )}
-                    {listing.agency_name && (
+                    {listing.agency_name && !isGasthaus(listing) && (
                       <span className="bg-white/[0.04] border border-white/[0.06] text-white/30 rounded-lg px-2 py-0.5 text-[10px] font-medium truncate max-w-[150px]">
+                        {listing.agency_name}
+                      </span>
+                    )}
+                    {isGasthaus(listing) && listing.agency_name && (
+                      <span className="bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 rounded-lg px-2 py-0.5 text-[10px] font-bold truncate max-w-[200px]">
                         {listing.agency_name}
                       </span>
                     )}
@@ -366,17 +463,37 @@ export default function Bydleni() {
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    {listing.url && (
-                      <a href={listing.url} target="_blank" rel="noopener noreferrer"
-                        className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(57,255,110,0.25)] hover:scale-[1.02] transition-all">
-                        Zobrazit
-                      </a>
+                    {isGasthaus(listing) ? (
+                      <>
+                        {listing.url && (
+                          <a href={listing.url} target="_blank" rel="noopener noreferrer"
+                            className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(57,255,110,0.25)] hover:scale-[1.02] transition-all">
+                            Zobrazit
+                          </a>
+                        )}
+                        {listing.agency_contact && (
+                          <a href={`tel:${listing.agency_contact}`}
+                            className="bg-gradient-to-r from-cyan-500 to-cyan-400 text-[#0a0a12] text-center py-2.5 px-4 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(6,182,212,0.3)] hover:scale-[1.02] transition-all flex items-center gap-1.5">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                            Zavolat
+                          </a>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {listing.url && (
+                          <a href={listing.url} target="_blank" rel="noopener noreferrer"
+                            className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(57,255,110,0.25)] hover:scale-[1.02] transition-all">
+                            Zobrazit
+                          </a>
+                        )}
+                        <Link href="/pruvodce/sablony/bydleni"
+                          className="bg-white/[0.04] border border-white/[0.06] text-white/40 hover:text-white py-2.5 px-3.5 rounded-xl text-sm font-medium no-underline hover:bg-white/[0.08] transition flex items-center gap-1.5">
+                          <Image src="/images/3d/document.png" alt="" width={14} height={14} />
+                          AI dopis
+                        </Link>
+                      </>
                     )}
-                    <Link href="/pruvodce/sablony/bydleni"
-                      className="bg-white/[0.04] border border-white/[0.06] text-white/40 hover:text-white py-2.5 px-3.5 rounded-xl text-sm font-medium no-underline hover:bg-white/[0.08] transition flex items-center gap-1.5">
-                      <Image src="/images/3d/document.png" alt="" width={14} height={14} />
-                      AI dopis
-                    </Link>
                   </div>
                 </div>
               </div>
