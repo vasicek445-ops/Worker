@@ -53,43 +53,43 @@ const CROSS = (
 );
 
 const FREE_FEATURES = [
-  { label: "Hledani prace", included: true },
-  { label: "Zakladni nabidky bydleni", included: true },
-  { label: "Pruvodce Svycarskem", included: true },
+  { label: "Hledání práce", included: true },
+  { label: "Základní nabídky bydlení", included: true },
+  { label: "Průvodce Švýcarskem", included: true },
   { label: "Komunita", included: true },
-  { label: "3188 ubytovani s kontakty", included: false },
+  { label: "3188 ubytování s kontakty", included: false },
   { label: "1007 agentur s kontakty", included: false },
-  { label: "Dokumenty v nemcine", included: false },
+  { label: "Dokumenty v němčině", included: false },
   { label: "Smart Matching", included: false },
-  { label: "Prioritni podpora", included: false },
+  { label: "Prioritní podpora", included: false },
 ];
 
 const PREMIUM_FEATURES = [
-  { label: "Vse z Free planu", included: true },
-  { label: "3188 ubytovani s kontakty", included: true },
+  { label: "Vše z Free plánu", included: true },
+  { label: "3188 ubytování s kontakty", included: true },
   { label: "1007 agentur s kontakty", included: true },
-  { label: "Dokumenty v nemcine", included: true },
+  { label: "Dokumenty v němčině", included: true },
   { label: "Smart Matching", included: true },
-  { label: "Prioritni podpora", included: true },
+  { label: "Prioritní podpora", included: true },
   { label: "Export do PDF", included: true },
 ];
 
 const FAQ = [
   {
-    q: "Musim zadat kreditku?",
-    a: "Ne. Free plan je bez kreditky, bez zavazku. Premium muzes kdykoliv zrusit.",
+    q: "Musím zadat kreditku?",
+    a: "Ne. Free plán je bez kreditky, bez závazku. Premium můžeš kdykoliv zrušit.",
   },
   {
-    q: "Co kdyz premium nepotrebuju?",
-    a: "Free plan staci na hledani prace a zakladni bydleni. Premium odemkne kontakty, dokumenty a smart matching.",
+    q: "Co když premium nepotřebuju?",
+    a: "Free plán stačí na hledání práce a základní bydlení. Premium odemkne kontakty, dokumenty a smart matching.",
   },
   {
-    q: "Kolik stoji agentura?",
-    a: "Agentury typicky uctuji 500 az 2000 EUR za zprostredkovani. Woker Premium stoji 19.99 EUR mesicne a das veci si resis sam.",
+    q: "Kolik stojí agentura?",
+    a: "Agentury typicky účtují 500 až 2000 EUR za zprostředkování. Woker Premium stojí 19.99 EUR měsíčně a dáš věci si řešíš sám.",
   },
   {
-    q: "Muzu Premium zrusit?",
-    a: "Ano, kdykoliv. Zadne sankce, zadne skryte poplatky. Zrusis jednim kliknutim.",
+    q: "Můžu Premium zrušit?",
+    a: "Ano, kdykoliv. Žádné sankce, žádné skryté poplatky. Zrušíš jedním kliknutím.",
   },
 ];
 
@@ -109,7 +109,7 @@ export default function CenikPage() {
             href="/registrace"
             className="px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
           >
-            Zacit zdarma
+            Začít zdarma
           </Link>
         </div>
       </nav>
@@ -118,12 +118,12 @@ export default function CenikPage() {
         <div className="max-w-4xl mx-auto">
           <FadeIn>
             <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-center mb-4">
-              Plany a ceny
+              Plány a ceny
             </h1>
           </FadeIn>
           <FadeIn delay={0.05}>
             <p className="text-center text-white/50 text-lg mb-14 max-w-xl mx-auto">
-              Zacni zdarma. Upgradni, az budes potrebovat vic.
+              Začni zdarma. Upgradni, až budeš potřebovat víc.
             </p>
           </FadeIn>
 
@@ -153,7 +153,7 @@ export default function CenikPage() {
                   href="/registrace"
                   className="block text-center px-6 py-3 rounded-xl text-sm font-semibold border border-white/[0.15] text-white hover:bg-white/[0.05] transition-all"
                 >
-                  Zacit zdarma
+                  Začít zdarma
                 </Link>
               </div>
             </FadeIn>
@@ -162,17 +162,17 @@ export default function CenikPage() {
             <FadeIn delay={0.15}>
               <div className="relative rounded-2xl bg-white/[0.03] border-2 border-[#39ff6e]/40 p-6 sm:p-8 h-full flex flex-col">
                 <span className="absolute -top-3 left-6 px-3 py-0.5 text-xs font-bold bg-[#39ff6e] text-[#0a0a12] rounded-full">
-                  Nejoblibenejsi
+                  Nejoblíbenější
                 </span>
                 <h2 className="text-lg font-bold text-white mb-1">Premium</h2>
                 <p className="text-4xl font-extrabold text-white mb-1">
                   19.99 EUR
                   <span className="text-base font-normal text-white/40">
-                    /mesic
+                    /měsíc
                   </span>
                 </p>
                 <p className="text-xs text-white/30 mb-6">
-                  Agentury uctuji 500-2000 EUR
+                  Agentury účtují 500-2000 EUR
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {PREMIUM_FEATURES.map((f) => (
@@ -192,7 +192,7 @@ export default function CenikPage() {
                   Zkusit Premium
                 </Link>
                 <p className="text-xs text-white/30 text-center mt-3">
-                  Bez zavazku. Zrusis kdykoliv.
+                  Bez závazku. Zrušíš kdykoliv.
                 </p>
               </div>
             </FadeIn>
@@ -201,7 +201,7 @@ export default function CenikPage() {
           {/* FAQ */}
           <FadeIn>
             <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10">
-              Caste otazky
+              Časté otázky
             </h2>
           </FadeIn>
           <div className="max-w-xl mx-auto space-y-4">
@@ -220,10 +220,10 @@ export default function CenikPage() {
       {/* Footer minimal */}
       <footer className="border-t border-white/[0.06] py-8 px-4 text-center">
         <p className="text-xs text-white/30">
-          &copy; 2026 Woker &middot; Prace a bydleni ve Svycarsku
+          &copy; 2026 Woker &middot; Práce a bydlení ve Švýcarsku
         </p>
         <p className="text-xs text-white/20 mt-1">
-          Zadne skryte poplatky. Tva data nikdy neprodavame.
+          Žádné skryté poplatky. Tvá data nikdy neprodáváme.
         </p>
       </footer>
     </div>

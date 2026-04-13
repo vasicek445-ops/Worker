@@ -61,18 +61,18 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
 /* ─── Navbar dropdown data ─── */
 const NAV_PRACE = [
   {
-    label: "Nabidky prace",
-    desc: "Aktualni pozice ve Svycarsku",
+    label: "Nabídky práce",
+    desc: "Aktuální pozice ve Švýcarsku",
     href: "/dashboard/nabidky-prace",
   },
   {
     label: "Smart Matching",
-    desc: "Najde ti praci podle toho co umis",
+    desc: "Najde ti práci podle toho co umíš",
     href: "/dashboard/smart-matching",
   },
   {
     label: "Kontakty na agentury",
-    desc: "1007 overenych agentur",
+    desc: "1007 ověřených agentur",
     href: "/dashboard/kontakty",
   },
 ];
@@ -80,22 +80,22 @@ const NAV_PRACE = [
 const NAV_BYDLENI = [
   {
     label: "Byty & WG",
-    desc: "Klasicke pronajmy",
+    desc: "Klasické pronájmy",
     href: "/dashboard/bydleni",
   },
   {
     label: "Penziony & B&B",
-    desc: "Mesicni ubytovani v penzionech",
+    desc: "Měsíční ubytování v penzionech",
     href: "/dashboard/bydleni?typ=penziony",
   },
   {
-    label: "Pro pracujici",
-    desc: "Levne pokoje blizko prace",
+    label: "Pro pracující",
+    desc: "Levné pokoje blízko práce",
     href: "/dashboard/bydleni?typ=pracujici",
   },
   {
     label: "Hostely & ubytovny",
-    desc: "Levne alternativy",
+    desc: "Levné alternativy",
     href: "/dashboard/bydleni?typ=hostely",
   },
 ];
@@ -182,8 +182,8 @@ function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-7">
-          <DropdownTrigger label="Prace" id="prace" items={NAV_PRACE} />
-          <DropdownTrigger label="Bydleni" id="bydleni" items={NAV_BYDLENI} />
+          <DropdownTrigger label="Práce" id="prace" items={NAV_PRACE} />
+          <DropdownTrigger label="Bydlení" id="bydleni" items={NAV_BYDLENI} />
           <Link
             href="/dokumenty"
             className="text-sm text-white/70 hover:text-white transition-colors"
@@ -194,13 +194,13 @@ function Navbar() {
             href="/cenik"
             className="text-sm text-white/70 hover:text-white transition-colors"
           >
-            Plany
+            Plány
           </Link>
           <Link
             href="/registrace"
             className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
           >
-            Zacit zdarma
+            Začít zdarma
           </Link>
         </div>
 
@@ -208,7 +208,7 @@ function Navbar() {
         <button
           className="md:hidden text-white/70 hover:text-white"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label={mobileOpen ? "Zavrit menu" : "Otevrit menu"}
+          aria-label={mobileOpen ? "Zavřít menu" : "Otevřít menu"}
         >
           {mobileOpen ? (
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -226,7 +226,7 @@ function Navbar() {
       {mobileOpen && (
         <div className="md:hidden bg-[#0a0a12]/95 backdrop-blur-xl border-t border-white/[0.06] px-4 pb-6 pt-2">
           <p className="text-xs text-white/40 uppercase tracking-wider mt-3 mb-1 px-2">
-            Prace
+            Práce
           </p>
           {NAV_PRACE.map((item) => (
             <Link
@@ -239,7 +239,7 @@ function Navbar() {
             </Link>
           ))}
           <p className="text-xs text-white/40 uppercase tracking-wider mt-4 mb-1 px-2">
-            Bydleni
+            Bydlení
           </p>
           {NAV_BYDLENI.map((item) => (
             <Link
@@ -264,14 +264,14 @@ function Navbar() {
               className="px-2 py-2 text-sm text-white/70 hover:text-white"
               onClick={() => setMobileOpen(false)}
             >
-              Plany
+              Plány
             </Link>
             <Link
               href="/registrace"
               className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
-              Zacit zdarma
+              Začít zdarma
             </Link>
           </div>
         </div>
@@ -339,35 +339,35 @@ function ComparisonTable() {
   const rows = [
     { label: "Cena", woker: "Od 0 EUR", agentura: "500-2000 EUR", sam: "Zdarma" },
     {
-      label: "Nabidky prace",
+      label: "Nabídky práce",
       woker: "Matching podle tebe",
-      agentura: "Omezene",
-      sam: "Hledas sam",
+      agentura: "Omezené",
+      sam: "Hledáš sám",
     },
-    { label: "Bydleni", woker: "3188 nabidek", agentura: "Nic", sam: "Hledas sam" },
+    { label: "Bydlení", woker: "3188 nabídek", agentura: "Nic", sam: "Hledáš sám" },
     {
       label: "Dokumenty",
-      woker: "Nemcina za minutu",
-      agentura: "Sablona",
-      sam: "Sam pises",
+      woker: "Němčina za minutu",
+      agentura: "Šablona",
+      sam: "Sám píšeš",
     },
     {
       label: "Jazyk",
-      woker: "Cesky, slovensky, polsky",
-      agentura: "Nemecky",
-      sam: "Nemecky",
+      woker: "Česky, slovensky, polsky",
+      agentura: "Německy",
+      sam: "Německy",
     },
     {
       label: "Podpora",
       woker: "Komunita",
-      agentura: "Az po zaplaceni",
+      agentura: "Až po zaplacení",
       sam: "Nikdo",
     },
     {
       label: "Rychlost",
       woker: "Pod 5 minut",
-      agentura: "2-6 tydnu",
-      sam: "Kdo vi",
+      agentura: "2-6 týdnů",
+      sam: "Kdo ví",
     },
   ];
 
@@ -379,7 +379,7 @@ function ComparisonTable() {
             <th className="text-left py-3 px-4 text-white/40 font-medium" />
             <th className="text-left py-3 px-4 text-[#39ff6e] font-bold">Woker</th>
             <th className="text-left py-3 px-4 text-white/40 font-medium">Agentura</th>
-            <th className="text-left py-3 px-4 text-white/40 font-medium">Sam</th>
+            <th className="text-left py-3 px-4 text-white/40 font-medium">Sám</th>
           </tr>
         </thead>
         <tbody>
@@ -404,34 +404,34 @@ function ComparisonTable() {
 function Footer() {
   const cols = [
     {
-      title: "Prace",
+      title: "Práce",
       links: [
-        { label: "Nabidky prace", href: "/dashboard/nabidky-prace" },
+        { label: "Nabídky práce", href: "/dashboard/nabidky-prace" },
         { label: "Smart Matching", href: "/dashboard/smart-matching" },
         { label: "Kontakty", href: "/dashboard/kontakty" },
       ],
     },
     {
-      title: "Bydleni",
+      title: "Bydlení",
       links: [
         { label: "Byty & WG", href: "/dashboard/bydleni" },
         { label: "Penziony", href: "/dashboard/bydleni?typ=penziony" },
-        { label: "Pro pracujici", href: "/dashboard/bydleni?typ=pracujici" },
+        { label: "Pro pracující", href: "/dashboard/bydleni?typ=pracujici" },
         { label: "Hostely", href: "/dashboard/bydleni?typ=hostely" },
       ],
     },
     {
       title: "Dokumenty",
       links: [
-        { label: "Zivotopis", href: "/dokumenty" },
-        { label: "Motivacni dopis", href: "/dokumenty" },
+        { label: "Životopis", href: "/dokumenty" },
+        { label: "Motivační dopis", href: "/dokumenty" },
         { label: "Bewerbung", href: "/dokumenty" },
       ],
     },
     {
-      title: "O nas",
+      title: "O nás",
       links: [
-        { label: "Podminky", href: "/podminky" },
+        { label: "Podmínky", href: "/podminky" },
         { label: "Ochrana dat", href: "/ochrana-udaju" },
         { label: "Kontakt", href: "/kontakty" },
       ],
@@ -463,10 +463,10 @@ function Footer() {
         <div className="border-t border-white/[0.06] pt-8">
           <p className="text-xl font-extrabold tracking-tight text-white mb-3">WOKER</p>
           <p className="text-xs text-white/30">
-            &copy; 2026 Woker &middot; Prace a bydleni ve Svycarsku
+            &copy; 2026 Woker &middot; Práce a bydlení ve Švýcarsku
           </p>
           <p className="text-xs text-white/20 mt-1">
-            Zadne skryte poplatky. Tva data nikdy neprodavame.
+            Žádné skryté poplatky. Tvá data nikdy neprodáváme.
           </p>
         </div>
       </div>
@@ -539,25 +539,25 @@ export default function MarketingPage() {
         <div className="relative max-w-4xl mx-auto text-center">
           <FadeIn>
             <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
-              Prace a bydleni
+              Práce a bydlení
               <br />
-              ve Svycarsku.{" "}
+              ve Švýcarsku.{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-cyan-400">
-                Jednoduse.
+                Jednoduše.
               </span>
             </h1>
           </FadeIn>
           <FadeIn delay={0.1}>
             <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-8 leading-relaxed">
-              Nabidky prace, bydleni po celem Svycarsku a dokumenty v nemcine
-              &mdash; bez poplatku.
+              Nabídky práce, bydlení po celém Švýcarsku a dokumenty v němčině
+              &mdash; bez poplatků.
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
             <p className="text-sm text-white/30 mb-10">
-              <Counter target={3188} /> ubytovani &middot;{" "}
-              <Counter target={1007} /> agentur &middot; 500+ uspesnych
-              prestehovani
+              <Counter target={3188} /> ubytování &middot;{" "}
+              <Counter target={1007} /> agentur &middot; 500+ úspěšných
+              přestěhování
             </p>
           </FadeIn>
           <FadeIn delay={0.2}>
@@ -566,13 +566,13 @@ export default function MarketingPage() {
                 href="/registrace"
                 className="px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
               >
-                Zacit zdarma &rarr;
+                Začít zdarma &rarr;
               </Link>
               <Link
                 href="/dashboard/bydleni"
                 className="px-8 py-3.5 rounded-xl text-base font-medium border border-white/[0.15] text-white hover:bg-white/[0.05] hover:border-white/[0.25] transition-all"
               >
-                Prohlednout nabidky
+                Prohlédnout nabídky
               </Link>
             </div>
           </FadeIn>
@@ -584,16 +584,16 @@ export default function MarketingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <FadeIn>
             <p className="text-2xl sm:text-3xl font-bold text-white mb-8">
-              Vime, jak to je.
+              Víme, jak to je.
             </p>
           </FadeIn>
           <FadeIn delay={0.1}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
               {[
-                "Vsechno je nemecky",
-                "Nevis kde zacit",
-                "Bojis se, ze ti nekdo slibi praci a pak zmizi",
-                "Agentury chteji tisice eur",
+                "Všechno je německy",
+                "Nevíš kde začít",
+                "Bojíš se, že ti někdo slíbí práci a pak zmizí",
+                "Agentury chtějí tisíce eur",
               ].map((pain) => (
                 <div
                   key={pain}
@@ -606,7 +606,7 @@ export default function MarketingPage() {
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="text-lg font-bold text-white">
-              Proto jsme udelali Woker.
+              Proto jsme udělali Woker.
             </p>
           </FadeIn>
         </div>
@@ -617,24 +617,24 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Co Woker resi
+              Co Woker řeší
             </h2>
           </FadeIn>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <BentoCard
               large
-              headline="Najdi praci ve Svycarsku"
-              text="Aktualni nabidky prace a prime kontakty na 1007 overenych agentur. Zadne poplatky za zprostredkovani."
-              cta="Hledat praci &rarr;"
+              headline="Najdi práci ve Švýcarsku"
+              text="Aktuální nabídky práce a přímé kontakty na 1007 ověřených agentur. Žádné poplatky za zprostředkování."
+              cta="Hledat práci &rarr;"
               href="/dashboard/nabidky-prace"
               accent="green"
               delay={0.05}
             />
             <BentoCard
               large
-              headline="Bydleni od prvniho dne"
-              text="3188 ubytovani po celem Svycarsku — byty, penziony, ubytovny. S cenami a primym kontaktem."
-              cta="Hledat bydleni &rarr;"
+              headline="Bydlení od prvního dne"
+              text="3188 ubytování po celém Švýcarsku — byty, penziony, ubytovny. S cenami a přímým kontaktem."
+              cta="Hledat bydlení &rarr;"
               href="/dashboard/bydleni"
               accent="cyan"
               delay={0.1}
@@ -642,32 +642,32 @@ export default function MarketingPage() {
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <BentoCard
-              headline="Dokumenty v nemcine za minutu"
-              text="Profesionalni zivotopis a Bewerbungsdossier. Napiseme to za tebe — spravne, nemecky."
-              cta="Vyzkouset &rarr;"
+              headline="Dokumenty v němčině za minutu"
+              text="Profesionální životopis a Bewerbungsdossier. Napíšeme to za tebe — správně, německy."
+              cta="Vyzkoušet &rarr;"
               href="/dokumenty"
               accent="green"
               delay={0.15}
             />
             <BentoCard
-              headline="Zavolej primo zamestnavateli"
-              text="Primy kontakt na zamestnavatele a pronajmatele. Zadny prostredni."
+              headline="Zavolej přímo zaměstnavateli"
+              text="Přímý kontakt na zaměstnavatele a pronajímatele. Žádný prostředník."
               cta="Zobrazit &rarr;"
               href="/dashboard/kontakty"
               accent="cyan"
               delay={0.2}
             />
             <BentoCard
-              headline="Povoleni, pojisteni, dane"
-              text="Vse vysvetlene jednoduse, krok za krokem, v tvem jazyce."
-              cta="Cist &rarr;"
+              headline="Povolení, pojištění, daně"
+              text="Vše vysvětlené jednoduše, krok za krokem, v tvém jazyce."
+              cta="Číst &rarr;"
               href="/dashboard/pruvodce"
               accent="green"
               delay={0.25}
             />
             <BentoCard
-              headline="Nejsi v tom sam"
-              text="Zeptej se tech, co to uz zvladli. Tisice lidi co ve Svycarsku ziji."
+              headline="Nejsi v tom sám"
+              text="Zeptej se těch, co to už zvládli. Tisíce lidí co ve Švýcarsku žijí."
               cta="Vstoupit &rarr;"
               href="/komunita"
               accent="cyan"
@@ -690,17 +690,17 @@ export default function MarketingPage() {
               {
                 num: "1",
                 title: "Zaregistruj se zdarma",
-                desc: "Zadna kreditka, zadny zavazek. Za 2 minuty mas ucet.",
+                desc: "Žádná kreditka, žádný závazek. Za 2 minuty máš účet.",
               },
               {
                 num: "2",
-                title: "Vyber si co potrebujes",
-                desc: "Praci, bydleni, nebo dokumenty. Ukazeme ti presne to co hledas.",
+                title: "Vyber si co potřebuješ",
+                desc: "Práci, bydlení, nebo dokumenty. Ukážeme ti přesně to co hledáš.",
               },
               {
                 num: "3",
-                title: "Oslovuj zamestnavatele",
-                desc: "Mas kontakty, mas dokumenty. Zavolej a domluv se.",
+                title: "Oslovuj zaměstnavatele",
+                desc: "Máš kontakty, máš dokumenty. Zavolej a domluv se.",
               },
             ].map((step, i) => (
               <FadeIn key={step.num} delay={i * 0.1}>
@@ -732,7 +732,7 @@ export default function MarketingPage() {
         <div className="max-w-5xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Pribehy lidi jako ty
+              Příběhy lidí jako ty
             </h2>
           </FadeIn>
 
@@ -740,9 +740,9 @@ export default function MarketingPage() {
           <FadeIn delay={0.05}>
             <div className="grid grid-cols-3 gap-4 mb-14">
               {[
-                { target: 3188, label: "ubytovani" },
+                { target: 3188, label: "ubytování" },
                 { target: 1007, label: "agentur" },
-                { target: 500, label: "prestehovani", suffix: "+" },
+                { target: 500, label: "přestěhování", suffix: "+" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <p className="text-3xl sm:text-4xl font-extrabold text-white">
@@ -757,23 +757,23 @@ export default function MarketingPage() {
           {/* Testimonials */}
           <div className="grid sm:grid-cols-3 gap-4">
             <TestimonialCard
-              quote="Prijel jsem bez kontaktu a bez nemciny. Pres Woker jsem za 3 tydny nasel praci a bydleni v Zurichu."
+              quote="Přijel jsem bez kontaktů a bez němčiny. Přes Woker jsem za 3 týdny našel práci a bydlení v Zürichu."
               name="Martin"
-              role="skladnik"
-              origin="Cesko &rarr; Zurich"
+              role="skladník"
+              origin="Česko &rarr; Zürich"
               delay={0.1}
             />
             <TestimonialCard
-              quote="Agentura mi chcela uctovat 500 EUR. Na Wokeri som si nasla pracu sama, zadarmo."
+              quote="Agentúra mi chcela účtovať 500 EUR. Na Wokeri som si našla prácu sama, zadarmo."
               name="Katarina"
-              role="upratovacka"
+              role="upratovačka"
               origin="Slovensko &rarr; Bern"
               delay={0.15}
             />
             <TestimonialCard
-              quote="Bewerbungsdossier bylo lepsi nez to co mi napsala agentura. A mel jsem ho hotovy driv nez dorazil kafe."
+              quote="Bewerbungsdossier bylo lepší než to co mi napsala agentura. A měl jsem ho hotový dřív než dorazil kafe."
               name="Tomek"
-              role="stavbar"
+              role="stavbař"
               origin="Polsko &rarr; Basel"
               delay={0.2}
             />
@@ -786,7 +786,7 @@ export default function MarketingPage() {
         <div className="max-w-3xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Proc Woker?
+              Proč Woker?
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
@@ -802,7 +802,7 @@ export default function MarketingPage() {
         <div className="max-w-4xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Plany
+              Plány
             </h2>
           </FadeIn>
           <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
@@ -815,9 +815,9 @@ export default function MarketingPage() {
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
-                    "Hledani prace",
-                    "Zakladni nabidky bydleni",
-                    "Pruvodce",
+                    "Hledání práce",
+                    "Základní nabídky bydlení",
+                    "Průvodce",
                     "Komunita",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-white/60">
@@ -842,7 +842,7 @@ export default function MarketingPage() {
                   href="/registrace"
                   className="block text-center px-6 py-3 rounded-xl text-sm font-semibold border border-white/[0.15] text-white hover:bg-white/[0.05] transition-all"
                 >
-                  Zacit zdarma
+                  Začít zdarma
                 </Link>
               </div>
             </FadeIn>
@@ -851,26 +851,26 @@ export default function MarketingPage() {
             <FadeIn delay={0.1}>
               <div className="relative rounded-2xl bg-white/[0.03] border-2 border-[#39ff6e]/40 p-6 sm:p-8 h-full flex flex-col">
                 <span className="absolute -top-3 left-6 px-3 py-0.5 text-xs font-bold bg-[#39ff6e] text-[#0a0a12] rounded-full">
-                  Nejoblibenejsi
+                  Nejoblíbenější
                 </span>
                 <h3 className="text-lg font-bold text-white mb-1">Premium</h3>
                 <p className="text-3xl font-extrabold text-white mb-1">
                   19.99 EUR
                   <span className="text-base font-normal text-white/40">
-                    /mesic
+                    /měsíc
                   </span>
                 </p>
                 <p className="text-xs text-white/30 mb-6">
-                  Agentury uctuji 500-2000 EUR
+                  Agentury účtují 500-2000 EUR
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
-                    "Vse z Free +",
-                    "3188 ubytovani s kontakty",
+                    "Vše z Free +",
+                    "3188 ubytování s kontakty",
                     "1007 agentur s kontakty",
-                    "Dokumenty v nemcine",
+                    "Dokumenty v němčině",
                     "Smart Matching",
-                    "Prioritni podpora",
+                    "Prioritní podpora",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-white/80">
                       <svg
@@ -897,7 +897,7 @@ export default function MarketingPage() {
                   Zkusit Premium
                 </Link>
                 <p className="text-xs text-white/30 text-center mt-3">
-                  Bez zavazku. Zrusis kdykoliv.
+                  Bez závazku. Zrušíš kdykoliv.
                 </p>
               </div>
             </FadeIn>
@@ -911,12 +911,12 @@ export default function MarketingPage() {
         <div className="relative max-w-3xl mx-auto text-center">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
-              Praci, bydleni i dokumenty v nemcine &mdash; mas to na dosah.
+              Práci, bydlení i dokumenty v němčině &mdash; máš to na dosah.
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
             <p className="text-white/50 mb-8">
-              Martin z Ceska nasel praci za 3 tydny. Ty muzes byt dalsi.
+              Martin z Česka našel práci za 3 týdny. Ty můžeš být další.
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
@@ -924,10 +924,10 @@ export default function MarketingPage() {
               href="/registrace"
               className="inline-block px-10 py-4 rounded-xl text-lg font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
             >
-              Zacit zdarma &rarr;
+              Začít zdarma &rarr;
             </Link>
             <p className="text-xs text-white/30 mt-4">
-              Staci 2 minuty. Bez kreditky, bez zavazku.
+              Stačí 2 minuty. Bez kreditky, bez závazku.
             </p>
           </FadeIn>
         </div>
