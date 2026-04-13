@@ -265,6 +265,17 @@ export default function Bydleni() {
           </form>
         </div>
 
+        {/* Info banner for gasthaus/kloster */}
+        {(sourceFilter === 'gasthaus-finder' || sourceFilter === 'kloster-finder') && (
+          <div className="mb-4 p-3.5 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+            <p className="text-white/50 text-xs m-0 leading-relaxed">
+              Nabídky se průběžně aktualizují — ověřujeme ceny a dostupnost přímo u poskytovatelů.
+              Kde zatím chybí cena, kontaktujte poskytovatele přes telefon, e-mail nebo web pro aktuální informace.
+              Nabídky bez ubytování budou postupně odfiltrovány.
+            </p>
+          </div>
+        )}
+
         {/* Filters */}
         <div className="mb-5 flex flex-col gap-2">
           <div className="flex gap-2 overflow-x-auto pb-1">
