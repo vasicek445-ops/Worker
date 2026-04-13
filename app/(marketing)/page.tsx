@@ -308,11 +308,46 @@ function BentoCard({
             large ? "sm:p-8" : "sm:p-6"
           } transition-all duration-300 hover:border-white/[0.12] hover:scale-[1.01] overflow-hidden`}
         >
-          {/* GRAFIKA: sem přijde obrázek/screenshot */}
-          {imagePlaceholder && large && (
-            <div className="mb-5 h-40 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center overflow-hidden">
-              {/* TODO: nahradit za <Image src={imagePlaceholder} /> */}
-              <span className="text-white/20 text-sm">{imagePlaceholder}</span>
+          {imagePlaceholder === "jobs" && large && (
+            <div className="mb-5 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 overflow-hidden">
+              {[
+                { title: "Skladník — Zürich", company: "Emmi AG", salary: "CHF 4 200/měs.", tag: "Nové" },
+                { title: "Elektrikář — Bern", company: "ABB Schweiz", salary: "CHF 5 100/měs.", tag: "Hot" },
+                { title: "Čistič — Basel", company: "ISS Facility", salary: "CHF 3 800/měs.", tag: "" },
+              ].map((job, i) => (
+                <div key={i} className={`flex items-center justify-between py-2.5 ${i < 2 ? "border-b border-white/[0.06]" : ""}`}>
+                  <div>
+                    <p className="text-white text-xs font-semibold m-0">{job.title}</p>
+                    <p className="text-white/30 text-[10px] m-0">{job.company}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {job.tag && (
+                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${job.tag === "Nové" ? "bg-[#39ff6e]/20 text-[#39ff6e]" : "bg-amber-500/20 text-amber-400"}`}>{job.tag}</span>
+                    )}
+                    <span className="text-[#39ff6e] text-[11px] font-bold">{job.salary}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {imagePlaceholder === "housing" && large && (
+            <div className="mb-5 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 overflow-hidden">
+              {[
+                { title: "Pension Susanna — Luzern", price: "CHF 850", type: "Penzion", hasPhone: true },
+                { title: "SMART DEPART — Zug", price: "CHF 654", type: "Pro pracující", hasPhone: true },
+                { title: "TomoDomo Coliving — Basel", price: "CHF 574", type: "Ubytovna", hasPhone: false },
+              ].map((h, i) => (
+                <div key={i} className={`flex items-center justify-between py-2.5 ${i < 2 ? "border-b border-white/[0.06]" : ""}`}>
+                  <div>
+                    <p className="text-white text-xs font-semibold m-0">{h.title}</p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-[9px] bg-cyan-500/20 text-cyan-400 font-bold px-1.5 py-0.5 rounded">{h.type}</span>
+                      {h.hasPhone && <span className="text-[9px] text-white/30">📞 kontakt</span>}
+                    </div>
+                  </div>
+                  <span className="text-cyan-400 text-[11px] font-bold">{h.price}/měs.</span>
+                </div>
+              ))}
             </div>
           )}
           <div
@@ -638,7 +673,7 @@ export default function MarketingPage() {
               href="/registrace"
               accent="green"
               delay={0.05}
-              imagePlaceholder="Screenshot: nabídky práce"
+              imagePlaceholder="jobs"
             />
             <BentoCard
               large
@@ -648,7 +683,7 @@ export default function MarketingPage() {
               href="/registrace"
               accent="cyan"
               delay={0.1}
-              imagePlaceholder="Screenshot: nabídky bydlení"
+              imagePlaceholder="housing"
             />
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
