@@ -62,6 +62,12 @@ const OBJECT_TYPES = [
   { label: 'Monteurzimmer', value: 'Monteurzimmer' },
   { label: 'Hotel / Hostel', value: 'Hotel / Hostel' },
   { label: 'Pokoj', value: 'Pokoj' },
+  { label: 'Klášter', value: 'Klášter' },
+  { label: 'Seminarhotel', value: 'Seminarhotel' },
+  { label: 'Ubytovna', value: 'Ubytovna' },
+  { label: 'Poutní dům', value: 'Poutní dům' },
+  { label: 'Církevní ubytování', value: 'Církevní ubytování' },
+  { label: 'Komunita', value: 'Komunita' },
 ]
 
 export default function Bydleni() {
@@ -183,7 +189,7 @@ export default function Bydleni() {
     return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short' })
   }
 
-  const isGasthaus = (listing: Listing) => listing.source === 'gasthaus-finder'
+  const isGasthaus = (listing: Listing) => listing.source === 'gasthaus-finder' || listing.source === 'kloster-finder'
 
   const selectClass = "bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#39ff6e]/30 appearance-none flex-shrink-0 transition"
 
@@ -230,6 +236,16 @@ export default function Bydleni() {
             }`}
           >
             Penziony & Gasthaus
+          </button>
+          <button
+            onClick={() => { setSourceFilter('kloster-finder'); setPage(1) }}
+            className={`px-4 py-2 rounded-xl text-sm font-bold border transition-all ${
+              sourceFilter === 'kloster-finder'
+                ? 'bg-purple-500/10 text-purple-400 border-purple-500/30'
+                : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
+            }`}
+          >
+            Ubytovny & Semináře
           </button>
         </div>
 

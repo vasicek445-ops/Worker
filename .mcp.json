@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "code-review-graph": {
+      "command": "/Users/vaclav/.local/share/code-review-graph-venv/bin/code-review-graph",
+      "args": [
+        "serve"
+      ],
+      "type": "stdio"
+    }
+  }
+}
