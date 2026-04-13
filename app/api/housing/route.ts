@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
     const furnished = searchParams.get('furnished') || ''
     const sort = searchParams.get('sort') || 'newest'
     const source = searchParams.get('source') || ''
+    const hasPrice = searchParams.get('hasPrice') === 'true'
     const page = parseInt(searchParams.get('page') || '1')
     const limit = 20
     const offset = (page - 1) * limit
@@ -72,6 +73,9 @@ export async function GET(req: NextRequest) {
     }
     if (furnished === 'true') {
       query = query.eq('is_furnished', true)
+    }
+    if (hasPrice) {
+      query = query.not('price', 'is', null).gt('price', 0)
     }
 
     if (sort === 'price_asc') {

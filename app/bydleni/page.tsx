@@ -81,6 +81,7 @@ export default function Bydleni() {
   const [profileLoaded, setProfileLoaded] = useState(false)
   const [sourceFilter, setSourceFilter] = useState('')
   const [objectType, setObjectType] = useState('')
+  const [hasPrice, setHasPrice] = useState(false)
 
   // Load saved listings & auto-fill canton from profile
   useEffect(() => {
@@ -119,9 +120,16 @@ export default function Bydleni() {
       if (sort !== 'newest') params.set('sort', sort)
       if (sourceFilter) params.set('source', sourceFilter)
       if (objectType) params.set('type', objectType)
+      if (hasPrice) params.set('hasPrice', 'true')
       params.set('page', page.toString())
 
-      const res = await fetch(`/api/housing?${params}`)
+      // Pass auth token for premium detection
+      const { data: { session } } = await supabase.auth.getSession()
+      const headers: Record<string, string> = {}
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`
+      }
+      const res = await fetch(`/api/housing?${params}`, { headers })
       const data = await res.json()
       setListings(data.listings || [])
       setTotal(data.total || 0)
@@ -131,7 +139,7 @@ export default function Bydleni() {
     } finally {
       setLoading(false)
     }
-  }, [search, canton, maxPrice, minRooms, furnished, sort, page, sourceFilter, objectType])
+  }, [search, canton, maxPrice, minRooms, furnished, sort, page, sourceFilter, objectType, hasPrice])
 
   useEffect(() => {
     fetchListings()
@@ -146,7 +154,7 @@ export default function Bydleni() {
   const clearFilters = () => {
     setSearch(''); setSearchInput(''); setCanton(''); setMaxPrice('')
     setMinRooms(''); setFurnished(false); setSort('newest'); setPage(1)
-    setSourceFilter(''); setObjectType('')
+    setSourceFilter(''); setObjectType(''); setHasPrice(false)
   }
 
   const toggleSaved = (id: string) => {
@@ -155,7 +163,7 @@ export default function Bydleni() {
     localStorage.setItem('woker_saved_housing', JSON.stringify(updated))
   }
 
-  const hasFilters = search || canton || maxPrice || minRooms || furnished || sourceFilter || objectType
+  const hasFilters = search || canton || maxPrice || minRooms || furnished || sourceFilter || objectType || hasPrice
 
   const [now] = useState(() => Date.now())
   function timeAgo(dateStr: string | null): string {
@@ -284,6 +292,17 @@ export default function Bydleni() {
               }`}
             >
               Zařízeno
+            </button>
+
+            <button
+              onClick={() => { setHasPrice(!hasPrice); setPage(1) }}
+              className={`px-3 py-2.5 rounded-xl text-xs font-semibold border flex-shrink-0 transition ${
+                hasPrice
+                  ? 'bg-[#39ff6e]/10 text-[#39ff6e] border-[#39ff6e]/30'
+                  : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
+              }`}
+            >
+              S cenou
             </button>
 
             <select value={sort} onChange={(e) => { setSort(e.target.value); setPage(1) }} className={selectClass}>
