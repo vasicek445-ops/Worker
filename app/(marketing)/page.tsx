@@ -63,17 +63,17 @@ const NAV_PRACE = [
   {
     label: "Nabídky práce",
     desc: "Aktuální pozice ve Švýcarsku",
-    href: "/dashboard/nabidky-prace",
+    href: "/registrace",
   },
   {
     label: "Smart Matching",
     desc: "Najde ti práci podle toho co umíš",
-    href: "/dashboard/smart-matching",
+    href: "/registrace",
   },
   {
     label: "Kontakty na agentury",
     desc: "1007 ověřených agentur",
-    href: "/dashboard/kontakty",
+    href: "/registrace",
   },
 ];
 
@@ -81,22 +81,22 @@ const NAV_BYDLENI = [
   {
     label: "Byty & WG",
     desc: "Klasické pronájmy",
-    href: "/dashboard/bydleni",
+    href: "/registrace",
   },
   {
     label: "Penziony & B&B",
     desc: "Měsíční ubytování v penzionech",
-    href: "/dashboard/bydleni?typ=penziony",
+    href: "/registrace",
   },
   {
     label: "Pro pracující",
     desc: "Levné pokoje blízko práce",
-    href: "/dashboard/bydleni?typ=pracujici",
+    href: "/registrace",
   },
   {
     label: "Hostely & ubytovny",
     desc: "Levné alternativy",
-    href: "/dashboard/bydleni?typ=hostely",
+    href: "/registrace",
   },
 ];
 
@@ -185,7 +185,7 @@ function Navbar() {
           <DropdownTrigger label="Práce" id="prace" items={NAV_PRACE} />
           <DropdownTrigger label="Bydlení" id="bydleni" items={NAV_BYDLENI} />
           <Link
-            href="/dokumenty"
+            href="/registrace"
             className="text-sm text-white/70 hover:text-white transition-colors"
           >
             Dokumenty
@@ -253,7 +253,7 @@ function Navbar() {
           ))}
           <div className="border-t border-white/[0.06] mt-4 pt-4 flex flex-col gap-2">
             <Link
-              href="/dokumenty"
+              href="/registrace"
               className="px-2 py-2 text-sm text-white/70 hover:text-white"
               onClick={() => setMobileOpen(false)}
             >
@@ -289,6 +289,7 @@ function BentoCard({
   accent = "green",
   large = false,
   delay = 0,
+  imagePlaceholder,
 }: {
   headline: string;
   text: string;
@@ -297,6 +298,7 @@ function BentoCard({
   accent?: "green" | "cyan";
   large?: boolean;
   delay?: number;
+  imagePlaceholder?: string;
 }) {
   return (
     <FadeIn delay={delay} className={large ? "md:col-span-1" : ""}>
@@ -306,8 +308,15 @@ function BentoCard({
             large ? "sm:p-8" : "sm:p-6"
           } transition-all duration-300 hover:border-white/[0.12] hover:scale-[1.01] overflow-hidden`}
         >
+          {/* GRAFIKA: sem přijde obrázek/screenshot */}
+          {imagePlaceholder && large && (
+            <div className="mb-5 h-40 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center overflow-hidden">
+              {/* TODO: nahradit za <Image src={imagePlaceholder} /> */}
+              <span className="text-white/20 text-sm">{imagePlaceholder}</span>
+            </div>
+          )}
           <div
-            className={`absolute left-0 top-6 bottom-6 w-[3px] rounded-full ${
+            className={`absolute left-0 ${large ? "top-6 bottom-6" : "top-6 bottom-6"} w-[3px] rounded-full ${
               accent === "green" ? "bg-[#39ff6e]" : "bg-cyan-400"
             }`}
           />
@@ -569,7 +578,7 @@ export default function MarketingPage() {
                 Začít zdarma &rarr;
               </Link>
               <Link
-                href="/dashboard/bydleni"
+                href="/registrace"
                 className="px-8 py-3.5 rounded-xl text-base font-medium border border-white/[0.15] text-white hover:bg-white/[0.05] hover:border-white/[0.25] transition-all"
               >
                 Prohlédnout nabídky
@@ -626,18 +635,20 @@ export default function MarketingPage() {
               headline="Najdi práci ve Švýcarsku"
               text="Aktuální nabídky práce a přímé kontakty na 1007 ověřených agentur. Žádné poplatky za zprostředkování."
               cta="Hledat práci &rarr;"
-              href="/dashboard/nabidky-prace"
+              href="/registrace"
               accent="green"
               delay={0.05}
+              imagePlaceholder="Screenshot: nabídky práce"
             />
             <BentoCard
               large
               headline="Bydlení od prvního dne"
               text="3188 ubytování po celém Švýcarsku — byty, penziony, ubytovny. S cenami a přímým kontaktem."
               cta="Hledat bydlení &rarr;"
-              href="/dashboard/bydleni"
+              href="/registrace"
               accent="cyan"
               delay={0.1}
+              imagePlaceholder="Screenshot: nabídky bydlení"
             />
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -645,7 +656,7 @@ export default function MarketingPage() {
               headline="Dokumenty v němčině za minutu"
               text="Profesionální životopis a Bewerbungsdossier. Napíšeme to za tebe — správně, německy."
               cta="Vyzkoušet &rarr;"
-              href="/dokumenty"
+              href="/registrace"
               accent="green"
               delay={0.15}
             />
@@ -653,7 +664,7 @@ export default function MarketingPage() {
               headline="Zavolej přímo zaměstnavateli"
               text="Přímý kontakt na zaměstnavatele a pronajímatele. Žádný prostředník."
               cta="Zobrazit &rarr;"
-              href="/dashboard/kontakty"
+              href="/registrace"
               accent="cyan"
               delay={0.2}
             />
@@ -661,7 +672,7 @@ export default function MarketingPage() {
               headline="Povolení, pojištění, daně"
               text="Vše vysvětlené jednoduše, krok za krokem, v tvém jazyce."
               cta="Číst &rarr;"
-              href="/dashboard/pruvodce"
+              href="/registrace"
               accent="green"
               delay={0.25}
             />
@@ -669,7 +680,7 @@ export default function MarketingPage() {
               headline="Nejsi v tom sám"
               text="Zeptej se těch, co to už zvládli. Tisíce lidí co ve Švýcarsku žijí."
               cta="Vstoupit &rarr;"
-              href="/komunita"
+              href="/registrace"
               accent="cyan"
               delay={0.3}
             />
