@@ -55,19 +55,17 @@ const SORT_OPTIONS = [
 
 const OBJECT_TYPES = [
   { label: 'Všechny typy', value: '' },
+  { label: 'Pro pracující', value: 'Pro pracující' },
+  { label: 'Pro studenty', value: 'Pro studenty' },
+  { label: 'Penziony & B&B', value: 'Penziony & B&B' },
+  { label: 'Hostely', value: 'Hostely' },
+  { label: 'Kláštery', value: 'Kláštery' },
+  { label: 'Semináře & kurzy', value: 'Semináře & kurzy' },
+  { label: 'Ubytovny', value: 'Ubytovny' },
+  { label: 'Byty & pokoje', value: 'Byty & pokoje' },
   { label: 'Byt', value: 'Byt' },
   { label: 'Studio', value: 'Studio' },
   { label: 'Spolubydlení (WG)', value: 'Spolubydlení (WG)' },
-  { label: 'Penzion / Gasthaus', value: 'Penzion / Gasthaus' },
-  { label: 'Monteurzimmer', value: 'Monteurzimmer' },
-  { label: 'Hotel / Hostel', value: 'Hotel / Hostel' },
-  { label: 'Pokoj', value: 'Pokoj' },
-  { label: 'Klášter', value: 'Klášter' },
-  { label: 'Seminarhotel', value: 'Seminarhotel' },
-  { label: 'Ubytovna', value: 'Ubytovna' },
-  { label: 'Poutní dům', value: 'Poutní dům' },
-  { label: 'Církevní ubytování', value: 'Církevní ubytování' },
-  { label: 'Komunita', value: 'Komunita' },
 ]
 
 export default function Bydleni() {
