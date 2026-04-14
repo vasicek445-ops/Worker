@@ -197,7 +197,7 @@ function Navbar() {
           <DropdownTrigger label="Práce" id="prace" items={NAV_PRACE} />
           <DropdownTrigger label="Bydlení" id="bydleni" items={NAV_BYDLENI} />
           <Link
-            href="/registrace"
+            href="/zdarma"
             className="text-sm text-white/70 hover:text-white transition-colors"
           >
             Dokumenty
@@ -209,7 +209,7 @@ function Navbar() {
             Plány
           </Link>
           <Link
-            href="/registrace"
+            href="/zdarma"
             className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Začít zdarma
@@ -265,7 +265,7 @@ function Navbar() {
           ))}
           <div className="border-t border-white/[0.06] mt-4 pt-4 flex flex-col gap-2">
             <Link
-              href="/registrace"
+              href="/zdarma"
               className="px-2 py-2 text-sm text-white/70 hover:text-white"
               onClick={() => setMobileOpen(false)}
             >
@@ -279,7 +279,7 @@ function Navbar() {
               Plány
             </Link>
             <Link
-              href="/registrace"
+              href="/zdarma"
               className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
@@ -293,6 +293,100 @@ function Navbar() {
 }
 
 /* ─── Bento Card ─── */
+/* ─── Animated Feed: Jobs ─── */
+function AnimatedJobsFeed() {
+  const allJobs = [
+    { title: "Skladník — Zürich", company: "Emmi AG", salary: "CHF 4 200", tag: "Nové" },
+    { title: "Elektrikář — Bern", company: "ABB Schweiz", salary: "CHF 5 100", tag: "Hot" },
+    { title: "Čistič — Basel", company: "ISS Facility", salary: "CHF 3 800", tag: "" },
+    { title: "Svářeč — Winterthur", company: "Sulzer AG", salary: "CHF 5 400", tag: "Nové" },
+    { title: "Kuchař — Luzern", company: "SV Group", salary: "CHF 4 500", tag: "" },
+    { title: "Řidič — Aargau", company: "Planzer AG", salary: "CHF 4 800", tag: "Hot" },
+    { title: "Malíř — St. Gallen", company: "Malerbetrieb Huber", salary: "CHF 4 600", tag: "Nové" },
+    { title: "Instalatér — Zug", company: "Meier Haustechnik", salary: "CHF 5 200", tag: "" },
+    { title: "Pomocný dělník — Schaffhausen", company: "Strabag AG", salary: "CHF 3 900", tag: "" },
+  ];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIdx(i => (i + 1) % (allJobs.length - 2)), 2500);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const visible = allJobs.slice(idx, idx + 3);
+
+  return (
+    <div className="mb-5 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 overflow-hidden">
+      {visible.map((job, i) => (
+        <motion.div
+          key={job.title}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: i * 0.08 }}
+          className={`flex items-center justify-between py-2.5 ${i < 2 ? "border-b border-white/[0.06]" : ""}`}
+        >
+          <div>
+            <p className="text-white text-xs font-semibold m-0">{job.title}</p>
+            <p className="text-white/30 text-[10px] m-0">{job.company}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {job.tag && (
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${job.tag === "Nové" ? "bg-[#39ff6e]/20 text-[#39ff6e]" : "bg-amber-500/20 text-amber-400"}`}>
+                {job.tag}
+              </span>
+            )}
+            <span className="text-[#39ff6e] text-[11px] font-bold whitespace-nowrap">{job.salary}</span>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Animated Feed: Housing ─── */
+function AnimatedHousingFeed() {
+  const allHousing = [
+    { title: "Pension Susanna — Luzern", price: "CHF 850", type: "Penzion", phone: "+41 76 541 43 04" },
+    { title: "SMART DEPART — Zug", price: "CHF 654", type: "Pro pracující", phone: "+41 79 950 06 47" },
+    { title: "TomoDomo Coliving — Basel", price: "CHF 574", type: "Ubytovna", phone: "" },
+    { title: "Hotel Sternen — Aargau", price: "CHF 990", type: "Penzion", phone: "+41 56 616 90 16" },
+    { title: "Il Castagno — Ticino", price: "CHF 417", type: "Komunita", phone: "+41 91 611 40 50" },
+    { title: "Gästehaus Koller — Appenzell", price: "CHF 780", type: "Penzion", phone: "+41 71 787 02 22" },
+    { title: "Casa Fortuna — Suhr", price: "CHF 1 620", type: "Penzion", phone: "+41 76 325 89 20" },
+    { title: "flexy.motel — Aargau", price: "CHF 600", type: "Pro pracující", phone: "" },
+    { title: "Lake Lucerne Apt — Nidwalden", price: "CHF 1 107", type: "Byty", phone: "+41 41 620 73 73" },
+  ];
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setIdx(i => (i + 1) % (allHousing.length - 2)), 3000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const visible = allHousing.slice(idx, idx + 3);
+
+  return (
+    <div className="mb-5 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 overflow-hidden">
+      {visible.map((h, i) => (
+        <motion.div
+          key={h.title}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: i * 0.08 }}
+          className={`flex items-center justify-between py-2.5 ${i < 2 ? "border-b border-white/[0.06]" : ""}`}
+        >
+          <div>
+            <p className="text-white text-xs font-semibold m-0">{h.title}</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-[9px] bg-cyan-500/20 text-cyan-400 font-bold px-1.5 py-0.5 rounded">{h.type}</span>
+              {h.phone && <span className="text-[9px] text-white/30">📞</span>}
+            </div>
+          </div>
+          <span className="text-cyan-400 text-[11px] font-bold whitespace-nowrap">{h.price}/měs.</span>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
 function BentoCard({
   headline,
   text,
@@ -320,48 +414,8 @@ function BentoCard({
             large ? "sm:p-8" : "sm:p-6"
           } transition-all duration-300 hover:border-white/[0.12] hover:scale-[1.01] overflow-hidden`}
         >
-          {imagePlaceholder === "jobs" && large && (
-            <div className="mb-5 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 overflow-hidden">
-              {[
-                { title: "Skladník — Zürich", company: "Emmi AG", salary: "CHF 4 200/měs.", tag: "Nové" },
-                { title: "Elektrikář — Bern", company: "ABB Schweiz", salary: "CHF 5 100/měs.", tag: "Hot" },
-                { title: "Čistič — Basel", company: "ISS Facility", salary: "CHF 3 800/měs.", tag: "" },
-              ].map((job, i) => (
-                <div key={i} className={`flex items-center justify-between py-2.5 ${i < 2 ? "border-b border-white/[0.06]" : ""}`}>
-                  <div>
-                    <p className="text-white text-xs font-semibold m-0">{job.title}</p>
-                    <p className="text-white/30 text-[10px] m-0">{job.company}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {job.tag && (
-                      <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${job.tag === "Nové" ? "bg-[#39ff6e]/20 text-[#39ff6e]" : "bg-amber-500/20 text-amber-400"}`}>{job.tag}</span>
-                    )}
-                    <span className="text-[#39ff6e] text-[11px] font-bold">{job.salary}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          {imagePlaceholder === "housing" && large && (
-            <div className="mb-5 rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 overflow-hidden">
-              {[
-                { title: "Pension Susanna — Luzern", price: "CHF 850", type: "Penzion", hasPhone: true },
-                { title: "SMART DEPART — Zug", price: "CHF 654", type: "Pro pracující", hasPhone: true },
-                { title: "TomoDomo Coliving — Basel", price: "CHF 574", type: "Ubytovna", hasPhone: false },
-              ].map((h, i) => (
-                <div key={i} className={`flex items-center justify-between py-2.5 ${i < 2 ? "border-b border-white/[0.06]" : ""}`}>
-                  <div>
-                    <p className="text-white text-xs font-semibold m-0">{h.title}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="text-[9px] bg-cyan-500/20 text-cyan-400 font-bold px-1.5 py-0.5 rounded">{h.type}</span>
-                      {h.hasPhone && <span className="text-[9px] text-white/30">📞 kontakt</span>}
-                    </div>
-                  </div>
-                  <span className="text-cyan-400 text-[11px] font-bold">{h.price}/měs.</span>
-                </div>
-              ))}
-            </div>
-          )}
+          {imagePlaceholder === "jobs" && large && <AnimatedJobsFeed />}
+          {imagePlaceholder === "housing" && large && <AnimatedHousingFeed />}
           <div
             className={`absolute left-0 ${large ? "top-6 bottom-6" : "top-6 bottom-6"} w-[3px] rounded-full ${
               accent === "green" ? "bg-[#39ff6e]" : "bg-cyan-400"
@@ -619,13 +673,13 @@ export default function MarketingPage() {
           <FadeIn delay={0.2}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/registrace"
+                href="/zdarma"
                 className="px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
               >
                 Začít zdarma &rarr;
               </Link>
               <Link
-                href="/registrace"
+                href="/zdarma"
                 className="px-8 py-3.5 rounded-xl text-base font-medium border border-white/[0.15] text-white hover:bg-white/[0.05] hover:border-white/[0.25] transition-all"
               >
                 Prohlédnout nabídky
@@ -682,7 +736,7 @@ export default function MarketingPage() {
               headline="Najdi práci ve Švýcarsku"
               text="Aktuální nabídky práce a přímé kontakty na 1007 ověřených agentur. Žádné poplatky za zprostředkování."
               cta="Hledat práci &rarr;"
-              href="/registrace"
+              href="/zdarma"
               accent="green"
               delay={0.05}
               imagePlaceholder="jobs"
@@ -692,7 +746,7 @@ export default function MarketingPage() {
               headline="Bydlení od prvního dne"
               text="3188 ubytování po celém Švýcarsku — byty, penziony, ubytovny. S cenami a přímým kontaktem."
               cta="Hledat bydlení &rarr;"
-              href="/registrace"
+              href="/zdarma"
               accent="cyan"
               delay={0.1}
               imagePlaceholder="housing"
@@ -703,7 +757,7 @@ export default function MarketingPage() {
               headline="Dokumenty v němčině za minutu"
               text="Profesionální životopis a Bewerbungsdossier. Napíšeme to za tebe — správně, německy."
               cta="Vyzkoušet &rarr;"
-              href="/registrace"
+              href="/zdarma"
               accent="green"
               delay={0.15}
             />
@@ -711,7 +765,7 @@ export default function MarketingPage() {
               headline="Zavolej přímo zaměstnavateli"
               text="Přímý kontakt na zaměstnavatele a pronajímatele. Žádný prostředník."
               cta="Zobrazit &rarr;"
-              href="/registrace"
+              href="/zdarma"
               accent="cyan"
               delay={0.2}
             />
@@ -719,7 +773,7 @@ export default function MarketingPage() {
               headline="Povolení, pojištění, daně"
               text="Vše vysvětlené jednoduše, krok za krokem, v tvém jazyce."
               cta="Číst &rarr;"
-              href="/registrace"
+              href="/zdarma"
               accent="green"
               delay={0.25}
             />
@@ -727,7 +781,7 @@ export default function MarketingPage() {
               headline="Nejsi v tom sám"
               text="Zeptej se těch, co to už zvládli. Tisíce lidí co ve Švýcarsku žijí."
               cta="Vstoupit &rarr;"
-              href="/registrace"
+              href="/zdarma"
               accent="cyan"
               delay={0.3}
             />
@@ -775,7 +829,7 @@ export default function MarketingPage() {
           <FadeIn delay={0.3}>
             <div className="text-center mt-12">
               <Link
-                href="/registrace"
+                href="/zdarma"
                 className="inline-block px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
               >
                 Zaregistrovat se zdarma &rarr;
@@ -897,7 +951,7 @@ export default function MarketingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/registrace"
+                  href="/zdarma"
                   className="block text-center px-6 py-3 rounded-xl text-sm font-semibold border border-white/[0.15] text-white hover:bg-white/[0.05] transition-all"
                 >
                   Začít zdarma
@@ -979,7 +1033,7 @@ export default function MarketingPage() {
           </FadeIn>
           <FadeIn delay={0.15}>
             <Link
-              href="/registrace"
+              href="/zdarma"
               className="inline-block px-10 py-4 rounded-xl text-lg font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
             >
               Začít zdarma &rarr;
