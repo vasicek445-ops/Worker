@@ -581,56 +581,20 @@ function MockupMatching() {
 
 /* ─── Mockup 3: CV Generator ─── */
 function MockupCV() {
-  const [charIndex, setCharIndex] = useState(0);
-
-  const cvLines = [
-    "LEBENSLAUF",
-    "",
-    "Martin Novák",
-    "Elektroinstallateur",
-    "",
-    "Berufserfahrung",
-    "2019-2024 | Elektrikář | Praha",
-    "Installation und Wartung",
-    "von Elektrosystemen",
-    "",
-    "Ausbildung",
-    "2016-2019 | Lehre Elektrotechnik",
-  ];
-  const fullText = cvLines.join("\n");
-  const CYCLE = 12000;
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let start = Date.now();
-    let frame: ReturnType<typeof setTimeout>;
+    const t = setTimeout(() => setVisible(true), 600);
+    return () => clearTimeout(t);
+  }, []);
 
-    function tick() {
-      const elapsed = (Date.now() - start) % CYCLE;
-
-      if (elapsed < 1500) {
-        setCharIndex(0);
-      } else if (elapsed < 9000) {
-        const typingTime = elapsed - 1500;
-        const chars = Math.min(fullText.length, Math.floor(typingTime / 45));
-        setCharIndex(chars);
-      } else if (elapsed < 11500) {
-        setCharIndex(fullText.length);
-      } else {
-        start = Date.now();
-      }
-
-      frame = setTimeout(tick, 40);
-    }
-    tick();
-    return () => clearTimeout(frame);
-  }, [fullText.length]);
-
-  const displayedText = fullText.slice(0, charIndex);
-
-  const formFields = [
-    { label: "Jméno", value: "Martin Novák" },
-    { label: "Pozice", value: "Elektrikář" },
-    { label: "Zkušenosti", value: "5 let" },
+  const skills = [
+    "Flurförderfahrzeuge",
+    "Lagerverwaltungssysteme",
+    "Wareneingang",
+    "Bestandsverwaltung",
+    "Versandvorbereitung",
+    "Arbeitssicherheit",
   ];
 
   return (
@@ -641,62 +605,108 @@ function MockupCV() {
         <h3 className="text-white font-bold text-base sm:text-lg">AI Životopis</h3>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Left: Form */}
-        <div className="space-y-2.5">
-          {formFields.map((f) => (
-            <div key={f.label}>
-              <p className="text-white/30 text-[10px] uppercase tracking-wider mb-1">{f.label}</p>
-              <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2 text-sm text-white">
-                {f.value}
-              </div>
-            </div>
-          ))}
-          <div className="pt-2">
-            <div className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] font-bold text-xs text-center cursor-default">
-              Vygenerovat CV
-            </div>
+      {/* CV Document */}
+      <div className={`rounded-xl bg-white overflow-hidden transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        {/* CV Header - dark */}
+        <div className="bg-[#1a1a2e] px-5 py-4 flex items-start gap-4">
+          <div className="w-14 h-14 rounded-lg bg-gray-600 flex-shrink-0 flex items-center justify-center overflow-hidden">
+            <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
           </div>
-
-          {/* Template switcher */}
-          <div className="flex gap-2 pt-1">
-            {["Klasický", "Moderní", "Swiss"].map((t, i) => (
-              <div
-                key={t}
-                className={`flex-1 text-center text-[10px] py-1.5 rounded-md cursor-default transition-all ${
-                  i === 0
-                    ? "bg-[#39ff6e]/15 text-[#39ff6e] font-bold border border-[#39ff6e]/30"
-                    : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
-                }`}
-              >
-                {t}
-              </div>
-            ))}
+          <div className="min-w-0">
+            <h4 className="text-white font-bold text-lg leading-tight">Václav Kočka</h4>
+            <p className="text-white/50 text-[11px] uppercase tracking-wider mt-0.5">Lagerlogistiker / Staplerfahrer</p>
+            <p className="text-white/30 text-[10px] mt-1">Hauptstrasse 15, 6004 Luzern &middot; +41 76 266 59 75</p>
           </div>
         </div>
 
-        {/* Right: CV Output */}
-        <div className="rounded-xl bg-[#111120] border border-white/[0.06] p-4 font-mono text-[11px] sm:text-xs leading-relaxed min-h-[220px] relative overflow-hidden">
-          <pre className="text-white/80 whitespace-pre-wrap">
-            {displayedText}
-            {charIndex < fullText.length && charIndex > 0 && (
-              <span className="inline-block w-[6px] h-[14px] bg-[#39ff6e] ml-0.5 animate-pulse" />
-            )}
-          </pre>
-          {charIndex >= fullText.length && charIndex > 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute top-3 right-3"
-            >
-              <div className="w-6 h-6 rounded-full bg-[#39ff6e]/20 flex items-center justify-center">
-                <svg className="w-3.5 h-3.5 text-[#39ff6e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+        {/* CV Body */}
+        <div className="px-5 py-4 grid grid-cols-5 gap-4 text-[10px] leading-relaxed">
+          {/* Left column - 3/5 */}
+          <div className="col-span-3 space-y-3">
+            {/* Summary */}
+            <p className="text-gray-500 text-[9px] leading-relaxed">
+              Motivierter und zuverlässiger Logistiker mit praktischer Erfahrung im Lager- und Materialflussmanagement.
+            </p>
+
+            {/* Experience */}
+            <div>
+              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Berufserfahrung</h5>
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-gray-900 font-semibold text-[10px]">Lagerlogistiker / Staplerfahrer</p>
+                  <p className="text-gray-400 text-[9px] italic">Turbo Express Logistik · Tschechien</p>
+                </div>
+                <span className="text-red-500 text-[9px] whitespace-nowrap">01.2023 – Aktuell</span>
               </div>
-            </motion.div>
-          )}
+              <ul className="mt-1 space-y-0.5 text-gray-600 text-[9px]">
+                <li className="flex gap-1"><span className="text-red-400">→</span> Führen von Flurförderfahrzeugen</li>
+                <li className="flex gap-1"><span className="text-red-400">→</span> Organisieren von Warenbeständen</li>
+                <li className="flex gap-1"><span className="text-red-400">→</span> Wareneingangs- und Ausgangsprüfungen</li>
+              </ul>
+            </div>
+
+            {/* Education */}
+            <div>
+              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Ausbildung</h5>
+              <div className="flex justify-between">
+                <div>
+                  <p className="text-gray-900 font-semibold text-[9px]">Flurförderfahrzeugführerschein</p>
+                  <p className="text-gray-400 text-[9px] italic">Berufsbildungszentrum für Logistik</p>
+                </div>
+                <span className="text-red-500 text-[9px]">2021 – 2023</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column - 2/5 */}
+          <div className="col-span-2 space-y-3">
+            {/* Languages */}
+            <div>
+              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Sprachen</h5>
+              <div className="space-y-1.5">
+                {[["Tschechisch", "Muttersprache", "100%"], ["Deutsch", "B1", "60%"], ["Englisch", "A2", "35%"]].map(([lang, level, w]) => (
+                  <div key={lang}>
+                    <div className="flex justify-between text-[9px]">
+                      <span className="text-gray-800 font-medium">{lang}</span>
+                      <span className="text-gray-400">{level}</span>
+                    </div>
+                    <div className="h-1 rounded-full bg-gray-200 mt-0.5">
+                      <div className="h-full rounded-full bg-red-500/70" style={{ width: w }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Skills */}
+            <div>
+              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Fachkenntnisse</h5>
+              <div className="flex flex-wrap gap-1">
+                {skills.map((s) => (
+                  <span key={s} className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-700 text-[8px] font-medium">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Template switcher */}
+      <div className="flex gap-2">
+        {["Klasický", "Moderní", "Swiss"].map((t, i) => (
+          <div
+            key={t}
+            className={`flex-1 text-center text-[10px] py-1.5 rounded-md cursor-default transition-all ${
+              i === 0
+                ? "bg-[#39ff6e]/15 text-[#39ff6e] font-bold border border-[#39ff6e]/30"
+                : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
+            }`}
+          >
+            {t}
+          </div>
+        ))}
       </div>
     </div>
   );
