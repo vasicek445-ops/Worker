@@ -187,8 +187,8 @@ function Navbar() {
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="text-xl font-extrabold tracking-tight text-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-center gap-8">
+        <Link href="/" className="text-xl font-extrabold tracking-tight text-white mr-auto md:mr-0">
           WOKER
         </Link>
 
@@ -209,13 +209,19 @@ function Navbar() {
             Plány
           </Link>
           <Link
-            href="/zdarma"
+            href="/blog"
+            className="text-sm text-white/70 hover:text-white transition-colors"
+          >
+            Blog
+          </Link>
+          <Link
+            href="/login"
             className="text-sm text-white/70 hover:text-white transition-colors"
           >
             Přihlásit se
           </Link>
           <Link
-            href="/zdarma"
+            href="/registrace"
             className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Registrace
@@ -285,14 +291,21 @@ function Navbar() {
               Plány
             </Link>
             <Link
-              href="/zdarma"
+              href="/blog"
+              className="px-2 py-2 text-sm text-white/70 hover:text-white"
+              onClick={() => setMobileOpen(false)}
+            >
+              Blog
+            </Link>
+            <Link
+              href="/login"
               className="px-2 py-2 text-sm text-white/70 hover:text-white"
               onClick={() => setMobileOpen(false)}
             >
               Přihlásit se
             </Link>
             <Link
-              href="/zdarma"
+              href="/registrace"
               className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
