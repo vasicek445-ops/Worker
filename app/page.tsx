@@ -210,6 +210,12 @@ function Navbar() {
           </Link>
           <Link
             href="/zdarma"
+            className="text-sm text-white/70 hover:text-white transition-colors"
+          >
+            Přihlásit se
+          </Link>
+          <Link
+            href="/zdarma"
             className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Začít zdarma
@@ -277,6 +283,13 @@ function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               Plány
+            </Link>
+            <Link
+              href="/zdarma"
+              className="px-2 py-2 text-sm text-white/70 hover:text-white"
+              onClick={() => setMobileOpen(false)}
+            >
+              Přihlásit se
             </Link>
             <Link
               href="/zdarma"
