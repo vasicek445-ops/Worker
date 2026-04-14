@@ -291,6 +291,516 @@ function Footer() {
   );
 }
 
+/* ─── Browser Chrome wrapper for mockups ─── */
+function BrowserFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] overflow-hidden bg-[#0a0a12] shadow-2xl shadow-black/40">
+      {/* Browser bar */}
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-[#111120] border-b border-white/[0.06]">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+        </div>
+        <div className="flex-1 flex justify-center">
+          <div className="px-4 py-1 rounded-md bg-white/[0.06] text-[11px] text-white/30 font-mono">
+            gowoker.com/dashboard
+          </div>
+        </div>
+        <div className="w-[52px]" />
+      </div>
+      {/* Content */}
+      <div className="p-4 sm:p-6 min-h-[340px] sm:min-h-[400px]">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ─── SVG Progress Ring ─── */
+function ProgressRing({ progress }: { progress: number }) {
+  const r = 18;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (progress / 100) * circ;
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" className="shrink-0">
+      <circle cx="24" cy="24" r={r} fill="none" stroke="white" strokeOpacity={0.08} strokeWidth={4} />
+      <circle
+        cx="24"
+        cy="24"
+        r={r}
+        fill="none"
+        stroke="#39ff6e"
+        strokeWidth={4}
+        strokeLinecap="round"
+        strokeDasharray={circ}
+        strokeDashoffset={offset}
+        transform="rotate(-90 24 24)"
+        className="transition-all duration-700 ease-out"
+      />
+      <text x="24" y="24" textAnchor="middle" dominantBaseline="central" fill="white" fontSize="11" fontWeight="bold">
+        {progress}%
+      </text>
+    </svg>
+  );
+}
+
+/* ─── Mockup 1: Dashboard Overview ─── */
+function MockupDashboard() {
+  const [progress, setProgress] = useState(0);
+  const [step, setStep] = useState(0);
+  const CYCLE = 8000;
+
+  useEffect(() => {
+    let start = Date.now();
+    let frame: ReturnType<typeof setTimeout>;
+
+    function tick() {
+      const elapsed = (Date.now() - start) % CYCLE;
+      const pct = Math.min(75, Math.floor((elapsed / 3000) * 75));
+      setProgress(pct);
+
+      if (elapsed < 2000) setStep(0);
+      else if (elapsed < 3500) setStep(1);
+      else if (elapsed < 5500) setStep(2);
+      else if (elapsed < 7000) setStep(3);
+      else {
+        start = Date.now();
+        setStep(0);
+      }
+
+      frame = setTimeout(tick, 50);
+    }
+    tick();
+    return () => clearTimeout(frame);
+  }, []);
+
+  const stats = [
+    { label: "Práce", value: "999", gradient: "from-orange-500 to-amber-500" },
+    { label: "Bydlení", value: "4 600", gradient: "from-cyan-500 to-blue-500" },
+    { label: "Agentur", value: "1 007", gradient: "from-purple-500 to-pink-500" },
+    { label: "Přihlášky", value: "3", gradient: "from-[#39ff6e] to-emerald-500" },
+  ];
+
+  const steps = ["Profil", "CV", "Matching", "Přihláška"];
+
+  return (
+    <div className="space-y-5">
+      {/* Greeting row */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-white font-bold text-base sm:text-lg">
+            Ahoj, Martin <span className="inline-block" aria-hidden="true">👋</span>
+          </h3>
+          <p className="text-white/40 text-xs mt-0.5">Tvůj profil je skoro hotový</p>
+        </div>
+        <ProgressRing progress={progress} />
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+        {stats.map((s) => (
+          <div
+            key={s.label}
+            className="rounded-xl bg-[#111120] border border-white/[0.06] p-3 text-center"
+          >
+            <p className={`text-lg sm:text-xl font-extrabold bg-gradient-to-r ${s.gradient} bg-clip-text text-transparent`}>
+              {s.value}
+            </p>
+            <p className="text-white/40 text-[10px] sm:text-xs mt-0.5">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Progress stepper */}
+      <div className="relative">
+        {/* Connector lines */}
+        <div className="absolute top-[14px] sm:top-[16px] left-[14%] right-[14%] flex gap-0" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex-1 px-1">
+              <div
+                className={`h-0.5 rounded-full transition-all duration-500 ${
+                  i < step ? "bg-[#39ff6e]" : "bg-white/[0.06]"
+                }`}
+              />
+            </div>
+          ))}
+        </div>
+        <div className="flex items-start justify-between relative z-10">
+          {steps.map((label, i) => {
+            const done = i < step;
+            const active = i === step;
+            return (
+              <div key={label} className="flex flex-col items-center gap-1.5" style={{ width: "25%" }}>
+                <div
+                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${
+                    done
+                      ? "bg-[#39ff6e] text-[#0a0a12]"
+                      : active
+                      ? "bg-[#39ff6e]/20 text-[#39ff6e] ring-2 ring-[#39ff6e]/40 animate-pulse"
+                      : "bg-white/[0.06] text-white/30"
+                  }`}
+                >
+                  {done ? (
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    i + 1
+                  )}
+                </div>
+                <span className={`text-[10px] sm:text-xs transition-colors text-center ${done || active ? "text-white/70" : "text-white/30"}`}>
+                  {label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Mockup 2: Smart Matching ─── */
+function MockupMatching() {
+  const [phase, setPhase] = useState<"idle" | "loading" | "results">("idle");
+  const [visibleResults, setVisibleResults] = useState(0);
+  const CYCLE = 10000;
+
+  useEffect(() => {
+    let start = Date.now();
+    let frame: ReturnType<typeof setTimeout>;
+
+    function tick() {
+      const elapsed = (Date.now() - start) % CYCLE;
+
+      if (elapsed < 2500) {
+        setPhase("idle");
+        setVisibleResults(0);
+      } else if (elapsed < 4000) {
+        setPhase("loading");
+        setVisibleResults(0);
+      } else if (elapsed < 9500) {
+        setPhase("results");
+        const resultTime = elapsed - 4000;
+        if (resultTime < 600) setVisibleResults(1);
+        else if (resultTime < 1200) setVisibleResults(2);
+        else setVisibleResults(3);
+      } else {
+        start = Date.now();
+      }
+
+      frame = setTimeout(tick, 80);
+    }
+    tick();
+    return () => clearTimeout(frame);
+  }, []);
+
+  const results = [
+    { name: "Adecco Schweiz AG", loc: "Zürich", match: 92, color: "text-[#39ff6e] bg-[#39ff6e]/15", phone: "+41 44 123 45 67" },
+    { name: "Manpower AG", loc: "Bern", match: 87, color: "text-[#39ff6e] bg-[#39ff6e]/15", phone: "+41 31 987 65 43" },
+    { name: "Kelly Services", loc: "Luzern", match: 78, color: "text-cyan-400 bg-cyan-400/15", phone: "+41 41 555 12 34" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <span className="text-xl" aria-hidden="true">🎯</span>
+        <h3 className="text-white font-bold text-base sm:text-lg">Smart Matching</h3>
+      </div>
+
+      {/* Profile summary */}
+      <div className="grid grid-cols-2 gap-2">
+        {[
+          { label: "Obor", value: "Stavebnictví" },
+          { label: "Pozice", value: "Elektrikář" },
+          { label: "Kanton", value: "Zürich" },
+          { label: "Němčina", value: "A2" },
+        ].map((f) => (
+          <div key={f.label} className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
+            <p className="text-white/30 text-[10px] uppercase tracking-wider">{f.label}</p>
+            <p className="text-white text-sm font-medium">{f.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Button / Loading / Results */}
+      {phase === "idle" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex justify-center pt-2"
+        >
+          <div className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] font-bold text-sm cursor-default shadow-lg shadow-[#39ff6e]/20">
+            Spustit matching
+          </div>
+        </motion.div>
+      )}
+
+      {phase === "loading" && (
+        <div className="flex flex-col items-center gap-3 py-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+            className="w-8 h-8 rounded-full border-2 border-[#39ff6e]/30 border-t-[#39ff6e]"
+          />
+          <p className="text-white/50 text-xs">Hledám nejlepší agentury...</p>
+        </div>
+      )}
+
+      {phase === "results" && (
+        <div className="space-y-2">
+          {results.slice(0, visibleResults).map((r, i) => (
+            <motion.div
+              key={r.name}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.35, delay: i * 0.05 }}
+              className="flex items-center justify-between rounded-xl bg-[#111120] border border-white/[0.06] px-3 sm:px-4 py-3"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-white font-semibold text-sm truncate">{r.name}</p>
+                <p className="text-white/40 text-[11px]">{r.loc} &middot; {r.phone}</p>
+              </div>
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-2">
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${r.color}`}>
+                  {r.match}%
+                </span>
+                <div className="hidden sm:block px-3 py-1 rounded-lg bg-white/[0.06] text-white/60 text-[11px] font-medium cursor-default hover:bg-white/[0.1] transition-colors">
+                  Přihlásit se
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Mockup 3: CV Generator ─── */
+function MockupCV() {
+  const [charIndex, setCharIndex] = useState(0);
+
+  const cvLines = [
+    "LEBENSLAUF",
+    "",
+    "Martin Novák",
+    "Elektroinstallateur",
+    "",
+    "Berufserfahrung",
+    "2019-2024 | Elektrikář | Praha",
+    "Installation und Wartung",
+    "von Elektrosystemen",
+    "",
+    "Ausbildung",
+    "2016-2019 | Lehre Elektrotechnik",
+  ];
+  const fullText = cvLines.join("\n");
+  const CYCLE = 12000;
+
+  useEffect(() => {
+    let start = Date.now();
+    let frame: ReturnType<typeof setTimeout>;
+
+    function tick() {
+      const elapsed = (Date.now() - start) % CYCLE;
+
+      if (elapsed < 1500) {
+        setCharIndex(0);
+      } else if (elapsed < 9000) {
+        const typingTime = elapsed - 1500;
+        const chars = Math.min(fullText.length, Math.floor(typingTime / 45));
+        setCharIndex(chars);
+      } else if (elapsed < 11500) {
+        setCharIndex(fullText.length);
+      } else {
+        start = Date.now();
+      }
+
+      frame = setTimeout(tick, 40);
+    }
+    tick();
+    return () => clearTimeout(frame);
+  }, [fullText.length]);
+
+  const displayedText = fullText.slice(0, charIndex);
+
+  const formFields = [
+    { label: "Jméno", value: "Martin Novák" },
+    { label: "Pozice", value: "Elektrikář" },
+    { label: "Zkušenosti", value: "5 let" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <span className="text-xl" aria-hidden="true">📄</span>
+        <h3 className="text-white font-bold text-base sm:text-lg">AI Životopis</h3>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Left: Form */}
+        <div className="space-y-2.5">
+          {formFields.map((f) => (
+            <div key={f.label}>
+              <p className="text-white/30 text-[10px] uppercase tracking-wider mb-1">{f.label}</p>
+              <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2 text-sm text-white">
+                {f.value}
+              </div>
+            </div>
+          ))}
+          <div className="pt-2">
+            <div className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] font-bold text-xs text-center cursor-default">
+              Vygenerovat CV
+            </div>
+          </div>
+
+          {/* Template switcher */}
+          <div className="flex gap-2 pt-1">
+            {["Klasický", "Moderní", "Swiss"].map((t, i) => (
+              <div
+                key={t}
+                className={`flex-1 text-center text-[10px] py-1.5 rounded-md cursor-default transition-all ${
+                  i === 0
+                    ? "bg-[#39ff6e]/15 text-[#39ff6e] font-bold border border-[#39ff6e]/30"
+                    : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
+                }`}
+              >
+                {t}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: CV Output */}
+        <div className="rounded-xl bg-[#111120] border border-white/[0.06] p-4 font-mono text-[11px] sm:text-xs leading-relaxed min-h-[220px] relative overflow-hidden">
+          <pre className="text-white/80 whitespace-pre-wrap">
+            {displayedText}
+            {charIndex < fullText.length && charIndex > 0 && (
+              <span className="inline-block w-[6px] h-[14px] bg-[#39ff6e] ml-0.5 animate-pulse" />
+            )}
+          </pre>
+          {charIndex >= fullText.length && charIndex > 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="absolute top-3 right-3"
+            >
+              <div className="w-6 h-6 rounded-full bg-[#39ff6e]/20 flex items-center justify-center">
+                <svg className="w-3.5 h-3.5 text-[#39ff6e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Dashboard Showcase (tabbed mockups) ─── */
+function DashboardShowcase() {
+  const [activeTab, setActiveTab] = useState(0);
+  const tabs = [
+    { label: "Dashboard", icon: "📊" },
+    { label: "Smart Matching", icon: "🎯" },
+    { label: "Životopis", icon: "📄" },
+  ];
+
+  return (
+    <section className="pt-16 pb-8 px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto">
+        <FadeIn>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
+            Podívej se jak to{" "}
+            <span className="text-[#39ff6e]">funguje</span>
+          </h2>
+          <p className="text-white/40 text-center text-sm mb-8 max-w-lg mx-auto">
+            Tohle všechno se děje automaticky. Ty jen klikneš.
+          </p>
+        </FadeIn>
+
+        <FadeIn delay={0.15}>
+          {/* Tab bar */}
+          <div className="flex justify-center gap-1 sm:gap-2 mb-6" role="tablist">
+            {tabs.map((tab, i) => (
+              <button
+                key={tab.label}
+                role="tab"
+                aria-selected={activeTab === i}
+                onClick={() => setActiveTab(i)}
+                className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                  activeTab === i
+                    ? "bg-[#39ff6e]/15 text-[#39ff6e] border border-[#39ff6e]/30"
+                    : "bg-white/[0.04] text-white/40 border border-white/[0.06] hover:text-white/60 hover:border-white/[0.12]"
+                }`}
+              >
+                <span className="mr-1.5" aria-hidden="true">{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Mockup container */}
+          <BrowserFrame>
+            <AnimatePresence mode="wait">
+              {activeTab === 0 && (
+                <motion.div
+                  key="dashboard"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  role="tabpanel"
+                >
+                  <MockupDashboard />
+                </motion.div>
+              )}
+              {activeTab === 1 && (
+                <motion.div
+                  key="matching"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  role="tabpanel"
+                >
+                  <MockupMatching />
+                </motion.div>
+              )}
+              {activeTab === 2 && (
+                <motion.div
+                  key="cv"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  role="tabpanel"
+                >
+                  <MockupCV />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </BrowserFrame>
+
+          <div className="mt-8 text-center">
+            <Link
+              href="/zdarma"
+              className="inline-block px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#39ff6e]/20"
+            >
+              Vyzkoušet zdarma →
+            </Link>
+          </div>
+        </FadeIn>
+      </div>
+    </section>
+  );
+}
+
 /* ─── Page ─── */
 export default function PracePage() {
   return (
@@ -365,80 +875,7 @@ export default function PracePage() {
       </section>
 
       {/* Automation showcase */}
-      <section className="pt-16 pb-8 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <FadeIn>
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
-              Co za tebe Woker udělá{" "}
-              <span className="text-[#39ff6e]">automaticky</span>
-            </h2>
-            <p className="text-white/40 text-center text-sm mb-10 max-w-lg mx-auto">
-              Žádné hodiny na německých webech. Woker pracuje za tebe.
-            </p>
-          </FadeIn>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              {
-                icon: "🎯",
-                title: "Smart Matching",
-                desc: "Řekneš co umíš a kde chceš bydlet. AI ti vybere nabídky co sedí přesně tobě.",
-                detail: "Každé ráno nové nabídky v emailu",
-              },
-              {
-                icon: "📄",
-                title: "Životopis v němčině",
-                desc: "Napíšeš česky co umíš. Za 90 sekund máš profesionální německý Lebenslauf.",
-                detail: "Bewerbungsdossier, motivační dopis",
-              },
-              {
-                icon: "📨",
-                title: "Automatické přihlášky",
-                desc: "Jedním kliknutím se přihlásíš na pozici. Woker pošle tvůj životopis agentuře.",
-                detail: "Nemusíš psát každý email zvlášť",
-              },
-              {
-                icon: "📞",
-                title: "Přímé kontakty",
-                desc: "1 007 agentur s telefonem a emailem. Zavoláš přímo, žádný prostředník.",
-                detail: "Adecco, Manpower, Randstad a další",
-              },
-              {
-                icon: "🏠",
-                title: "Bydlení + práce najednou",
-                desc: "4 600 ubytování po celém Švýcarsku. Hledáš práci i byt z jednoho místa.",
-                detail: "Penziony od CHF 417/měsíc",
-              },
-              {
-                icon: "🔔",
-                title: "Notifikace nových nabídek",
-                desc: "Nastavíš si co hledáš. Jakmile se objeví nová pozice, dostaneš upozornění.",
-                detail: "Email nebo push notifikace",
-              },
-            ].map((item, i) => (
-              <FadeIn key={item.title} delay={i * 0.08}>
-                <div className="h-full rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5 hover:border-white/[0.12] transition-all">
-                  <div className="text-2xl mb-3">{item.icon}</div>
-                  <h3 className="text-white font-bold text-base mb-1.5">{item.title}</h3>
-                  <p className="text-white/50 text-sm leading-relaxed mb-2">{item.desc}</p>
-                  <p className="text-[#39ff6e]/60 text-xs">{item.detail}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-
-          <FadeIn delay={0.5}>
-            <div className="mt-8 text-center">
-              <Link
-                href="/zdarma"
-                className="inline-block px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#39ff6e]/20"
-              >
-                Vyzkoušet zdarma →
-              </Link>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
+      <DashboardShowcase />
 
       {/* Stats */}
       <section className="pt-20 pb-12 px-4 sm:px-6">
