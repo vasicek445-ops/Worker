@@ -218,7 +218,7 @@ function Navbar() {
             href="/zdarma"
             className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
           >
-            Začít zdarma
+            Registrace
           </Link>
         </div>
 
@@ -296,7 +296,7 @@ function Navbar() {
               className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
-              Začít zdarma
+              Registrace
             </Link>
           </div>
         </div>
