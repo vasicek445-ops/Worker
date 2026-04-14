@@ -79,12 +79,12 @@ const NAV_PRACE = [
   },
   {
     label: "Smart Matching",
-    desc: "Najde ti práci podle toho co umíš",
+    desc: "AI ti vybere nabídky podle tvých skillů",
     href: "/prace",
   },
   {
     label: "Kontakty na agentury",
-    desc: "1007 ověřených agentur",
+    desc: "1 007 ověřených agentur s telefonem",
     href: "/kontakty-preview",
   },
 ];
@@ -102,7 +102,7 @@ const NAV_BYDLENI = [
   },
   {
     label: "Pro pracující",
-    desc: "Levné pokoje blízko práce",
+    desc: "Pokoje od CHF 417/měsíc blízko práce",
     href: "/bydleni-preview",
   },
   {
@@ -460,19 +460,19 @@ function BentoCard({
 /* ─── Comparison Table ─── */
 function ComparisonTable() {
   const rows = [
-    { label: "Cena", woker: "Od 0 EUR", agentura: "500-2000 EUR", sam: "Zdarma" },
+    { label: "Cena", woker: "Od 0 EUR", agentura: "500-2 000 EUR", sam: "0 EUR" },
     {
       label: "Nabídky práce",
-      woker: "Matching podle tebe",
-      agentura: "Omezené",
-      sam: "Hledáš sám",
+      woker: "AI ti vybere za 5 minut",
+      agentura: "Co zrovna mají",
+      sam: "Scrolluješ hodiny sám",
     },
-    { label: "Bydlení", woker: "3188 nabídek", agentura: "Nic", sam: "Hledáš sám" },
+    { label: "Bydlení", woker: "3 188 nabídek s telefonem", agentura: "Neřešíme", sam: "Hledáš na německých webech" },
     {
       label: "Dokumenty",
-      woker: "Němčina za minutu",
-      agentura: "Šablona",
-      sam: "Sám píšeš",
+      woker: "Německy za 90 sekund",
+      agentura: "Word šablona",
+      sam: "Google Translate",
     },
     {
       label: "Jazyk",
@@ -482,7 +482,7 @@ function ComparisonTable() {
     },
     {
       label: "Podpora",
-      woker: "Komunita",
+      woker: "Komunita lidí co tam žijou",
       agentura: "Až po zaplacení",
       sam: "Nikdo",
     },
@@ -490,7 +490,7 @@ function ComparisonTable() {
       label: "Rychlost",
       woker: "Pod 5 minut",
       agentura: "2-6 týdnů",
-      sam: "Kdo ví",
+      sam: "Týdny googlení",
     },
   ];
 
@@ -662,18 +662,18 @@ export default function MarketingPage() {
         <div className="relative max-w-4xl mx-auto text-center">
           <FadeIn>
             <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
-              Práce a bydlení
+              3 188 ubytování.
               <br />
-              ve Švýcarsku.{" "}
+              1 007 agentur.{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-cyan-400">
-                Jednoduše.
+                Vše česky.
               </span>
             </h1>
           </FadeIn>
           <FadeIn delay={0.1}>
             <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-8 leading-relaxed">
-              Nabídky práce, bydlení po celém Švýcarsku a dokumenty v němčině
-              &mdash; bez poplatků.
+              Práce, bydlení a dokumenty v němčině pro Čechy, Slováky a Poláky
+              &mdash; na jednom místě, od 0 EUR.
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
@@ -707,16 +707,16 @@ export default function MarketingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <FadeIn>
             <p className="text-2xl sm:text-3xl font-bold text-white mb-8">
-              Víme, jak to je.
+              Taky jsme tam stáli. Na letišti. Se dvěma kuframa.
             </p>
           </FadeIn>
           <FadeIn delay={0.1}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
               {[
-                "Všechno je německy",
-                "Nevíš kde začít",
-                "Bojíš se, že ti někdo slíbí práci a pak zmizí",
-                "Agentury chtějí tisíce eur",
+                "Googlíš německy a nerozumíš ani nadpisům",
+                "Agentura chce 1 500 EUR dřív než ti řekne adresu",
+                "Na byt v Zürichu odpovídá 200 lidí. Ty jsi 201.",
+                "Nevíš jestli ti ten chlap na Facebooku fakt sežene práci",
               ].map((pain) => (
                 <div
                   key={pain}
@@ -729,7 +729,7 @@ export default function MarketingPage() {
           </FadeIn>
           <FadeIn delay={0.2}>
             <p className="text-lg font-bold text-white">
-              Proto jsme udělali Woker.
+              Woker existuje, protože jsme to zažili sami.
             </p>
           </FadeIn>
         </div>
@@ -740,14 +740,14 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Co Woker řeší
+              Vše co potřebuješ. Na jednom místě.
             </h2>
           </FadeIn>
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <BentoCard
               large
-              headline="Najdi práci ve Švýcarsku"
-              text="Aktuální nabídky práce a přímé kontakty na 1007 ověřených agentur. Žádné poplatky za zprostředkování."
+              headline="1 007 agentur. Telefon, email, adresa."
+              text="Zeptej se přímo. Žádný prostředník, žádný poplatek za číslo. Filtruj podle kantonu, jazyka nebo oboru."
               cta="Hledat práci &rarr;"
               href="/zdarma"
               accent="green"
@@ -756,8 +756,8 @@ export default function MarketingPage() {
             />
             <BentoCard
               large
-              headline="Bydlení od prvního dne"
-              text="3188 ubytování po celém Švýcarsku — byty, penziony, ubytovny. S cenami a přímým kontaktem."
+              headline="3 188 ubytování. Od CHF 417/měsíc."
+              text="Penziony, byty, ubytovny, WG — s cenou a přímým kontaktem. Nastěhuj se dřív než začneš pracovat."
               cta="Hledat bydlení &rarr;"
               href="/zdarma"
               accent="cyan"
@@ -767,32 +767,32 @@ export default function MarketingPage() {
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <BentoCard
-              headline="Dokumenty v němčině za minutu"
-              text="Profesionální životopis a Bewerbungsdossier. Napíšeme to za tebe — správně, německy."
+              headline="Německý životopis za 90 sekund"
+              text="Zadej česky, dostaneš německý Bewerbungsdossier. Hotovo dřív než dopíješ kafe."
               cta="Vyzkoušet &rarr;"
               href="/zdarma"
               accent="green"
               delay={0.15}
             />
             <BentoCard
-              headline="Zavolej přímo zaměstnavateli"
-              text="Přímý kontakt na zaměstnavatele a pronajímatele. Žádný prostředník."
+              headline="Volej přímo zaměstnavateli"
+              text="Každá nabídka má telefon nebo email. Žádné formuláře, žádné čekání."
               cta="Zobrazit &rarr;"
               href="/zdarma"
               accent="cyan"
               delay={0.2}
             />
             <BentoCard
-              headline="Povolení, pojištění, daně"
-              text="Vše vysvětlené jednoduše, krok za krokem, v tvém jazyce."
+              headline="Povolení, pojištění, daně — česky"
+              text="Co je L-povolení? Kde se přihlásíš na Gemeinde? Krok za krokem, bez úřadničiny."
               cta="Číst &rarr;"
               href="/zdarma"
               accent="green"
               delay={0.25}
             />
             <BentoCard
-              headline="Nejsi v tom sám"
-              text="Zeptej se těch, co to už zvládli. Tisíce lidí co ve Švýcarsku žijí."
+              headline="4 827 lidí co už tam žijou"
+              text="Zeptej se něco v komunitě. Odpoví ti skladník z Zürichu, ne chatbot."
               cta="Vstoupit &rarr;"
               href="/zdarma"
               accent="cyan"
@@ -807,25 +807,25 @@ export default function MarketingPage() {
         <div className="max-w-4xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-14">
-              Jak to funguje
+              3 kroky. 5 minut. Hotovo.
             </h2>
           </FadeIn>
           <div className="grid sm:grid-cols-3 gap-8 sm:gap-6">
             {[
               {
                 num: "1",
-                title: "Zaregistruj se zdarma",
-                desc: "Žádná kreditka, žádný závazek. Za 2 minuty máš účet.",
+                title: "Zaregistruj se za 2 minuty",
+                desc: "Žádná kreditka. Žádný závazek. Stačí email.",
               },
               {
                 num: "2",
-                title: "Vyber si co potřebuješ",
-                desc: "Práci, bydlení, nebo dokumenty. Ukážeme ti přesně to co hledáš.",
+                title: "Řekni nám co hledáš",
+                desc: "Práci v Zürichu? Byt v Bernu? Životopis německy? Klikni a máš to.",
               },
               {
                 num: "3",
-                title: "Oslovuj zaměstnavatele",
-                desc: "Máš kontakty, máš dokumenty. Zavolej a domluv se.",
+                title: "Zavolej a domluv se",
+                desc: "Vidíš telefon, vidíš cenu. Žádný prostředník. Zvedneš a mluvíš.",
               },
             ].map((step, i) => (
               <FadeIn key={step.num} delay={i * 0.1}>
@@ -857,7 +857,7 @@ export default function MarketingPage() {
         <div className="max-w-5xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Příběhy lidí jako ty
+              Nemusíš nám věřit. Poslechni si je.
             </h2>
           </FadeIn>
 
@@ -865,9 +865,9 @@ export default function MarketingPage() {
           <FadeIn delay={0.05}>
             <div className="grid grid-cols-3 gap-4 mb-14">
               {[
-                { target: 3188, label: "ubytování" },
-                { target: 1007, label: "agentur" },
-                { target: 500, label: "přestěhování", suffix: "+" },
+                { target: 3188, label: "ubytování v databázi" },
+                { target: 1007, label: "ověřených agentur" },
+                { target: 500, label: "přestěhování za 2025", suffix: "+" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <p className="text-3xl sm:text-4xl font-extrabold text-white">
@@ -882,21 +882,21 @@ export default function MarketingPage() {
           {/* Testimonials */}
           <div className="grid sm:grid-cols-3 gap-4">
             <TestimonialCard
-              quote="Přijel jsem bez kontaktů a bez němčiny. Přes Woker jsem za 3 týdny našel práci a bydlení v Zürichu."
+              quote="Přistál jsem v Zürichu v neděli. V pondělí ráno jsem přes Woker volal do agentury. Ve středu jsem nastoupil na sklad. 3 týdny od registrace — práce i byt."
               name="Martin"
               role="skladník"
               origin="Česko &rarr; Zürich"
               delay={0.1}
             />
             <TestimonialCard
-              quote="Agentúra mi chcela účtovať 500 EUR. Na Wokeri som si našla prácu sama, zadarmo."
-              name="Katarina"
+              quote="Agentúra mi chcela účtovať 500 EUR len za číslo na zamestnávateľa. Na Wokeri som si ho našla sama. Zadarmo. Za 10 minút."
+              name="Katarína"
               role="upratovačka"
               origin="Slovensko &rarr; Bern"
               delay={0.15}
             />
             <TestimonialCard
-              quote="Bewerbungsdossier bylo lepší než to co mi napsala agentura. A měl jsem ho hotový dřív než dorazil kafe."
+              quote="Napsal jsem česky co umím. Za 90 sekund mi vypadl německý Bewerbungsdossier. Lepší než to co mi za 200 EUR napsala agentura."
               name="Tomek"
               role="stavbař"
               origin="Polsko &rarr; Basel"
@@ -911,7 +911,7 @@ export default function MarketingPage() {
         <div className="max-w-3xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Proč Woker?
+              Woker vs. agentura vs. na vlastní pěst
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
@@ -927,7 +927,7 @@ export default function MarketingPage() {
         <div className="max-w-4xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Plány
+              Cena jednoho oběda. Nebo 1 500 EUR agentuře.
             </h2>
           </FadeIn>
           <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
@@ -940,10 +940,10 @@ export default function MarketingPage() {
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
-                    "Hledání práce",
+                    "Hledání práce a základní filtry",
                     "Základní nabídky bydlení",
-                    "Průvodce",
-                    "Komunita",
+                    "Průvodce krok za krokem",
+                    "Přístup do komunity",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-white/60">
                       <svg
@@ -980,21 +980,21 @@ export default function MarketingPage() {
                 </span>
                 <h3 className="text-lg font-bold text-white mb-1">Premium</h3>
                 <p className="text-3xl font-extrabold text-white mb-1">
-                  19.99 EUR
+                  19,99 EUR
                   <span className="text-base font-normal text-white/40">
                     /měsíc
                   </span>
                 </p>
                 <p className="text-xs text-white/30 mb-6">
-                  Agentury účtují 500-2000 EUR
+                  = cena jednoho oběda. Agentury účtujou 500-2 000 EUR.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
                     "Vše z Free +",
-                    "3188 ubytování s kontakty",
-                    "1007 agentur s kontakty",
-                    "Dokumenty v němčině",
-                    "Smart Matching",
+                    "3 188 ubytování s telefonem a emailem",
+                    "1 007 agentur s přímým kontaktem",
+                    "Německý životopis a Bewerbung za 90s",
+                    "AI Smart Matching — práce podle tvých skillů",
                     "Prioritní podpora",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-white/80">
@@ -1022,7 +1022,7 @@ export default function MarketingPage() {
                   Zkusit Premium
                 </Link>
                 <p className="text-xs text-white/30 text-center mt-3">
-                  Bez závazku. Zrušíš kdykoliv.
+                  Bez závazku. Zrušíš kdykoliv jedním klikem.
                 </p>
               </div>
             </FadeIn>
@@ -1036,12 +1036,12 @@ export default function MarketingPage() {
         <div className="relative max-w-3xl mx-auto text-center">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
-              Práci, bydlení i dokumenty v němčině &mdash; máš to na dosah.
+              Zítra v tuhle dobu můžeš mít práci v Zürichu.
             </h2>
           </FadeIn>
           <FadeIn delay={0.1}>
             <p className="text-white/50 mb-8">
-              Martin z Česka našel práci za 3 týdny. Ty můžeš být další.
+              Martin to zvládl za 3 týdny. Katarína za 10 minut našla co agentura za 500 EUR.
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
@@ -1052,7 +1052,7 @@ export default function MarketingPage() {
               Začít zdarma &rarr;
             </Link>
             <p className="text-xs text-white/30 mt-4">
-              Stačí 2 minuty. Bez kreditky, bez závazku.
+              2 minuty. Žádná kreditka. Žádný závazek.
             </p>
           </FadeIn>
         </div>
