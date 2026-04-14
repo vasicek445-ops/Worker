@@ -460,14 +460,14 @@ function BentoCard({
 /* ─── Comparison Table ─── */
 function ComparisonTable() {
   const rows = [
-    { label: "Cena", woker: "Od 0 EUR", agentura: "500-2 000 EUR", sam: "0 EUR" },
+    { label: "Cena", woker: "Od 0 EUR", agentura: "~600 EUR", sam: "0 EUR" },
     {
       label: "Nabídky práce",
       woker: "AI ti vybere za 5 minut",
       agentura: "Co zrovna mají",
       sam: "Scrolluješ hodiny sám",
     },
-    { label: "Bydlení", woker: "3 188 nabídek s telefonem", agentura: "Neřešíme", sam: "Hledáš na německých webech" },
+    { label: "Bydlení", woker: "4 600 nabídek s telefonem", agentura: "Neřešíme", sam: "Hledáš na německých webech" },
     {
       label: "Dokumenty",
       woker: "Německy za 90 sekund",
@@ -662,7 +662,7 @@ export default function MarketingPage() {
         <div className="relative max-w-4xl mx-auto text-center">
           <FadeIn>
             <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
-              3 188 ubytování.
+              4 600 ubytování.
               <br />
               1 007 agentur.{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-cyan-400">
@@ -678,8 +678,8 @@ export default function MarketingPage() {
           </FadeIn>
           <FadeIn delay={0.15}>
             <p className="text-sm text-white/30 mb-10">
-              <Counter target={3188} /> ubytování &middot;{" "}
-              <Counter target={1007} /> agentur &middot; 500+ úspěšných
+              <Counter target={4600} /> ubytování &middot;{" "}
+              <Counter target={1007} /> agentur &middot; 50+ úspěšných
               přestěhování
             </p>
           </FadeIn>
@@ -714,7 +714,7 @@ export default function MarketingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
               {[
                 "Googlíš německy a nerozumíš ani nadpisům",
-                "Agentura chce 1 500 EUR dřív než ti řekne adresu",
+                "Zahraniční zprostředkovatelé chtějí 600 EUR jen za kontakt na firmu",
                 "Na byt v Zürichu odpovídá 200 lidí. Ty jsi 201.",
                 "Nevíš jestli ti ten chlap na Facebooku fakt sežene práci",
               ].map((pain) => (
@@ -756,7 +756,7 @@ export default function MarketingPage() {
             />
             <BentoCard
               large
-              headline="3 188 ubytování. Od CHF 417/měsíc."
+              headline="4 600 ubytování. Od CHF 417/měsíc."
               text="Penziony, byty, ubytovny, WG — s cenou a přímým kontaktem. Nastěhuj se dřív než začneš pracovat."
               cta="Hledat bydlení &rarr;"
               href="/zdarma"
@@ -791,7 +791,7 @@ export default function MarketingPage() {
               delay={0.25}
             />
             <BentoCard
-              headline="4 827 lidí co už tam žijou"
+              headline="Komunita lidí co už tam žijou"
               text="Zeptej se něco v komunitě. Odpoví ti skladník z Zürichu, ne chatbot."
               cta="Vstoupit &rarr;"
               href="/zdarma"
@@ -865,9 +865,9 @@ export default function MarketingPage() {
           <FadeIn delay={0.05}>
             <div className="grid grid-cols-3 gap-4 mb-14">
               {[
-                { target: 3188, label: "ubytování v databázi" },
+                { target: 4600, label: "ubytování v databázi" },
                 { target: 1007, label: "ověřených agentur" },
-                { target: 500, label: "přestěhování za 2025", suffix: "+" },
+                { target: 50, label: "přestěhování díky Wokeru", suffix: "+" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <p className="text-3xl sm:text-4xl font-extrabold text-white">
@@ -889,7 +889,7 @@ export default function MarketingPage() {
               delay={0.1}
             />
             <TestimonialCard
-              quote="Agentúra mi chcela účtovať 500 EUR len za číslo na zamestnávateľa. Na Wokeri som si ho našla sama. Zadarmo. Za 10 minút."
+              quote="Agentúra mi chcela účtovať 600 EUR len za číslo na zamestnávateľa. Na Wokeri som si ho našla sama. Zadarmo. Za 10 minút."
               name="Katarína"
               role="upratovačka"
               origin="Slovensko &rarr; Bern"
@@ -927,7 +927,7 @@ export default function MarketingPage() {
         <div className="max-w-4xl mx-auto">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Cena jednoho oběda. Nebo 1 500 EUR agentuře.
+              Cena jednoho oběda. Nebo 600 EUR zprostředkovateli.
             </h2>
           </FadeIn>
           <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
@@ -986,12 +986,12 @@ export default function MarketingPage() {
                   </span>
                 </p>
                 <p className="text-xs text-white/30 mb-6">
-                  = cena jednoho oběda. Agentury účtujou 500-2 000 EUR.
+                  = cena jednoho oběda. Zprostředkovatelé účtují ~600 EUR.
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
                     "Vše z Free +",
-                    "3 188 ubytování s telefonem a emailem",
+                    "4 600 ubytování s telefonem a emailem",
                     "1 007 agentur s přímým kontaktem",
                     "Německý životopis a Bewerbung za 90s",
                     "AI Smart Matching — práce podle tvých skillů",
@@ -1041,7 +1041,7 @@ export default function MarketingPage() {
           </FadeIn>
           <FadeIn delay={0.1}>
             <p className="text-white/50 mb-8">
-              Martin to zvládl za 3 týdny. Katarína za 10 minut našla co agentura za 500 EUR.
+              Martin to zvládl za 3 týdny. Katarína za 10 minut našla co zprostředkovatel za 600 EUR.
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
