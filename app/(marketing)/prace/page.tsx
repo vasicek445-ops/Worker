@@ -581,136 +581,232 @@ function MockupMatching() {
 
 /* ─── Mockup 3: CV Generator ─── */
 function MockupCV() {
-  const [visible, setVisible] = useState(false);
+  const [step, setStep] = useState<"form" | "generating" | "result">("form");
+  const [typedName, setTypedName] = useState("");
+  const [typedPos, setTypedPos] = useState("");
+  const [formFields, setFormFields] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("");
+  const [showBtn, setShowBtn] = useState(false);
+
+  const nameText = "Václav Kočka";
+  const posText = "Skladník / Logistik";
+  const statuses = ["Analyzuji pozici...", "Překládám do němčiny...", "Generuji Berufserfahrung...", "Přidávám Sprachkenntnisse...", "Vytvářím PDF..."];
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 600);
-    return () => clearTimeout(t);
-  }, []);
+    const CYCLE = 18000;
+    let start = Date.now();
+    let frame: ReturnType<typeof setTimeout>;
 
-  const skills = [
-    "Flurförderfahrzeuge",
-    "Lagerverwaltungssysteme",
-    "Wareneingang",
-    "Bestandsverwaltung",
-    "Versandvorbereitung",
-    "Arbeitssicherheit",
-  ];
+    function tick() {
+      const e = (Date.now() - start) % CYCLE;
+
+      if (e < 4000) {
+        setStep("form");
+        setProgress(0);
+        setShowBtn(false);
+        if (e < 1000) {
+          setFormFields(1);
+          setTypedName(nameText.slice(0, Math.floor((e / 1000) * nameText.length)));
+          setTypedPos("");
+        } else if (e < 2000) {
+          setFormFields(2);
+          setTypedName(nameText);
+          setTypedPos(posText.slice(0, Math.floor(((e - 1000) / 1000) * posText.length)));
+        } else {
+          setFormFields(3);
+          setTypedPos(posText);
+          if (e > 3000) setShowBtn(true);
+        }
+      }
+      else if (e < 7000) {
+        setStep("generating");
+        const p = Math.min(100, Math.floor(((e - 4000) / 3000) * 100));
+        setProgress(p);
+        setStatusText(statuses[Math.min(Math.floor(p / 20), statuses.length - 1)]);
+      }
+      else if (e < 17000) {
+        setStep("result");
+      }
+      else {
+        start = Date.now();
+        setStep("form");
+        setFormFields(0);
+        setTypedName(""); setTypedPos("");
+        setShowBtn(false);
+        setProgress(0);
+      }
+
+      frame = setTimeout(tick, 50);
+    }
+    tick();
+    return () => clearTimeout(frame);
+  }, []);
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center gap-2">
         <span className="text-xl" aria-hidden="true">📄</span>
         <h3 className="text-white font-bold text-base sm:text-lg">AI Životopis</h3>
       </div>
 
-      {/* CV Document */}
-      <div className={`rounded-xl bg-white overflow-hidden transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-        {/* CV Header - dark */}
-        <div className="bg-[#1a1a2e] px-5 py-4 flex items-start gap-4">
-          <div className="w-14 h-14 rounded-lg bg-gray-600 flex-shrink-0 flex items-center justify-center overflow-hidden">
-            <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      {/* Step 1: Form */}
+      {step === "form" && (
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            {formFields >= 1 && (
+              <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
+                <p className="text-white/30 text-[10px] uppercase tracking-wider">Jméno</p>
+                <p className="text-white text-sm font-medium">{typedName}<span className="inline-block w-[2px] h-[14px] bg-[#39ff6e] ml-0.5 animate-pulse align-middle" /></p>
+              </div>
+            )}
+            {formFields >= 2 && (
+              <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
+                <p className="text-white/30 text-[10px] uppercase tracking-wider">Pozice</p>
+                <p className="text-white text-sm font-medium">{typedPos}{formFields === 2 && <span className="inline-block w-[2px] h-[14px] bg-[#39ff6e] ml-0.5 animate-pulse align-middle" />}</p>
+              </div>
+            )}
+            {formFields >= 3 && (
+              <>
+                <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
+                  <p className="text-white/30 text-[10px] uppercase tracking-wider">Zkušenosti</p>
+                  <p className="text-white text-sm font-medium">3 roky</p>
+                </div>
+                <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
+                  <p className="text-white/30 text-[10px] uppercase tracking-wider">Němčina</p>
+                  <p className="text-[#39ff6e] text-sm font-medium">A2 — základy</p>
+                </div>
+              </>
+            )}
           </div>
-          <div className="min-w-0">
-            <h4 className="text-white font-bold text-lg leading-tight">Václav Kočka</h4>
-            <p className="text-white/50 text-[11px] uppercase tracking-wider mt-0.5">Lagerlogistiker / Staplerfahrer</p>
-            <p className="text-white/30 text-[10px] mt-1">Hauptstrasse 15, 6004 Luzern &middot; +41 76 266 59 75</p>
-          </div>
+
+          {formFields >= 3 && (
+            <div className="flex gap-2">
+              {["Klassisch", "Modern", "Kreativ", "Elegant"].map((t, i) => (
+                <div key={t} className={`text-center text-[10px] px-3 py-1.5 rounded-md cursor-default ${
+                  i === 2 ? "bg-[#39ff6e]/15 text-[#39ff6e] font-bold border border-[#39ff6e]/30"
+                    : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
+                }`}>{t}</div>
+              ))}
+            </div>
+          )}
+
+          {showBtn && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center pt-1">
+              <div className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] font-bold text-sm cursor-default shadow-lg shadow-[#39ff6e]/20">
+                Generovat CV →
+              </div>
+            </motion.div>
+          )}
         </div>
+      )}
 
-        {/* CV Body */}
-        <div className="px-5 py-4 grid grid-cols-5 gap-4 text-[10px] leading-relaxed">
-          {/* Left column - 3/5 */}
-          <div className="col-span-3 space-y-3">
-            {/* Summary */}
-            <p className="text-gray-500 text-[9px] leading-relaxed">
-              Motivierter und zuverlässiger Logistiker mit praktischer Erfahrung im Lager- und Materialflussmanagement.
-            </p>
-
-            {/* Experience */}
-            <div>
-              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Berufserfahrung</h5>
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-900 font-semibold text-[10px]">Lagerlogistiker / Staplerfahrer</p>
-                  <p className="text-gray-400 text-[9px] italic">Turbo Express Logistik · Tschechien</p>
-                </div>
-                <span className="text-red-500 text-[9px] whitespace-nowrap">01.2023 – Aktuell</span>
-              </div>
-              <ul className="mt-1 space-y-0.5 text-gray-600 text-[9px]">
-                <li className="flex gap-1"><span className="text-red-400">→</span> Führen von Flurförderfahrzeugen</li>
-                <li className="flex gap-1"><span className="text-red-400">→</span> Organisieren von Warenbeständen</li>
-                <li className="flex gap-1"><span className="text-red-400">→</span> Wareneingangs- und Ausgangsprüfungen</li>
-              </ul>
-            </div>
-
-            {/* Education */}
-            <div>
-              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Ausbildung</h5>
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-gray-900 font-semibold text-[9px]">Flurförderfahrzeugführerschein</p>
-                  <p className="text-gray-400 text-[9px] italic">Berufsbildungszentrum für Logistik</p>
-                </div>
-                <span className="text-red-500 text-[9px]">2021 – 2023</span>
-              </div>
-            </div>
+      {/* Step 2: Generating */}
+      {step === "generating" && (
+        <div className="flex flex-col items-center gap-3 py-6">
+          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-8 h-8 rounded-full border-2 border-[#39ff6e]/30 border-t-[#39ff6e]" />
+          <div className="w-48 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+            <div className="h-full rounded-full bg-gradient-to-r from-[#39ff6e] to-[#32e060] transition-all duration-200" style={{ width: `${progress}%` }} />
           </div>
+          <p className="text-white/50 text-xs">{statusText}</p>
+        </div>
+      )}
 
-          {/* Right column - 2/5 */}
-          <div className="col-span-2 space-y-3">
-            {/* Languages */}
-            <div>
-              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Sprachen</h5>
-              <div className="space-y-1.5">
-                {[["Tschechisch", "Muttersprache", "100%"], ["Deutsch", "B1", "60%"], ["Englisch", "A2", "35%"]].map(([lang, level, w]) => (
-                  <div key={lang}>
-                    <div className="flex justify-between text-[9px]">
-                      <span className="text-gray-800 font-medium">{lang}</span>
-                      <span className="text-gray-400">{level}</span>
-                    </div>
-                    <div className="h-1 rounded-full bg-gray-200 mt-0.5">
-                      <div className="h-full rounded-full bg-red-500/70" style={{ width: w }} />
-                    </div>
+      {/* Step 3: Result — realistic white CV document, fill BrowserFrame */}
+      {step === "result" && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="-mx-4 sm:-mx-6 -mb-4 sm:-mb-6">
+          <div className="overflow-hidden">
+            {/* CV Header — colored bar */}
+            <div className="bg-gradient-to-r from-blue-700 to-blue-600 px-5 py-4 flex items-center gap-4">
+              <img src="/images/founder-beanie.jpg" alt="Profil" className="w-16 h-16 rounded-full object-cover border-2 border-white/30 shadow-lg" />
+              <div>
+                <h4 className="text-white font-bold text-xl leading-tight">Václav Kočka</h4>
+                <p className="text-white/80 text-xs font-medium mt-0.5">Lagerlogistiker / Staplerfahrer</p>
+                <div className="flex gap-3 mt-1.5 text-white/50 text-[10px]">
+                  <span>📍 Luzern, Schweiz</span>
+                  <span>📧 vaclav@email.ch</span>
+                  <span>📞 +41 76 266 59 75</span>
+                </div>
+              </div>
+            </div>
+
+            {/* CV Body — white background, two columns */}
+            <div className="bg-white flex min-h-[280px]">
+              {/* Left column — main content */}
+              <div className="flex-1 px-5 py-4 space-y-3">
+                {/* Profil */}
+                <div>
+                  <h5 className="text-blue-700 text-[11px] font-bold uppercase tracking-wider border-b-2 border-blue-700 pb-0.5 mb-1.5">Profil</h5>
+                  <p className="text-gray-600 text-[10px] leading-relaxed">Motivierter Logistiker mit Erfahrung im Lager- und Materialflussmanagement. Teamfähig und belastbar.</p>
+                </div>
+                {/* Berufserfahrung */}
+                <div>
+                  <h5 className="text-blue-700 text-[11px] font-bold uppercase tracking-wider border-b-2 border-blue-700 pb-0.5 mb-1.5">Berufserfahrung</h5>
+                  <div className="pl-2.5 border-l-2 border-blue-700/30">
+                    <p className="text-gray-900 text-[11px] font-semibold">Lagerlogistiker</p>
+                    <p className="text-gray-400 text-[9px]">Turbo Express Logistik · 01.2023 – Aktuell</p>
+                    <p className="text-gray-600 text-[9px] mt-0.5 leading-relaxed">• Führen von Flurförderfahrzeugen<br/>• Wareneingang und -ausgang<br/>• Lagerverwaltungssystem</p>
                   </div>
-                ))}
+                </div>
+                {/* Ausbildung */}
+                <div>
+                  <h5 className="text-blue-700 text-[11px] font-bold uppercase tracking-wider border-b-2 border-blue-700 pb-0.5 mb-1.5">Ausbildung</h5>
+                  <p className="text-gray-900 text-[11px] font-semibold">Flurförderfahrzeugführerschein</p>
+                  <p className="text-gray-400 text-[9px]">Berufsbildungszentrum · 2021 – 2023</p>
+                </div>
               </div>
-            </div>
 
-            {/* Skills */}
-            <div>
-              <h5 className="text-red-600 font-bold text-[10px] uppercase tracking-wider border-b border-red-600/20 pb-1 mb-2">Fachkenntnisse</h5>
-              <div className="flex flex-wrap gap-1">
-                {skills.map((s) => (
-                  <span key={s} className="px-1.5 py-0.5 rounded bg-red-500/10 text-red-700 text-[8px] font-medium">
-                    {s}
-                  </span>
-                ))}
+              {/* Right column — sidebar */}
+              <div className="w-[38%] bg-gray-50 px-4 py-4 space-y-3 border-l border-gray-100">
+                {/* Sprachen */}
+                <div>
+                  <h5 className="text-blue-700 text-[11px] font-bold uppercase tracking-wider border-b-2 border-blue-700 pb-0.5 mb-1.5">Sprachen</h5>
+                  <div className="space-y-1.5">
+                    {[["Tschechisch", 100], ["Deutsch", 60], ["Englisch", 35]].map(([lang, pct]) => (
+                      <div key={lang as string}>
+                        <p className="text-gray-700 text-[10px] font-medium">{lang as string}</p>
+                        <div className="flex gap-0.5 mt-0.5">
+                          {[1,2,3,4,5].map((dot) => (
+                            <div key={dot} className={`w-4 h-1.5 rounded-sm ${dot <= Math.ceil((pct as number) / 20) ? "bg-blue-600" : "bg-gray-200"}`} />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Kenntnisse */}
+                <div>
+                  <h5 className="text-blue-700 text-[11px] font-bold uppercase tracking-wider border-b-2 border-blue-700 pb-0.5 mb-1.5">Kenntnisse</h5>
+                  <div className="space-y-1">
+                    {["Flurförderfahrzeuge", "Lagerverwaltung", "Wareneingang", "Arbeitssicherheit", "MS Office"].map((s) => (
+                      <div key={s} className="flex items-center gap-1.5">
+                        <div className="w-1 h-1 rounded-full bg-blue-600" />
+                        <span className="text-gray-600 text-[9px]">{s}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Zertifikate */}
+                <div>
+                  <h5 className="text-blue-700 text-[11px] font-bold uppercase tracking-wider border-b-2 border-blue-700 pb-0.5 mb-1.5">Zertifikate</h5>
+                  <p className="text-gray-600 text-[9px]">→ Staplerführerschein</p>
+                  <p className="text-gray-600 text-[9px]">→ SUVA Sicherheitskurs</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Template switcher */}
-      <div className="flex gap-2">
-        {["Klasický", "Moderní", "Swiss"].map((t, i) => (
-          <div
-            key={t}
-            className={`flex-1 text-center text-[10px] py-1.5 rounded-md cursor-default transition-all ${
-              i === 0
-                ? "bg-[#39ff6e]/15 text-[#39ff6e] font-bold border border-[#39ff6e]/30"
-                : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
-            }`}
-          >
-            {t}
+          {/* Generated badge */}
+          <div className="flex items-center justify-center gap-2 bg-[#0a0a12] py-3">
+            <svg className="w-4 h-4 text-[#39ff6e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            <span className="text-xs font-semibold text-[#39ff6e]">CV vygenerováno v němčině</span>
           </div>
-        ))}
-      </div>
+        </motion.div>
+      )}
     </div>
   );
 }
+
 
 /* ─── Dashboard Showcase (tabbed mockups) ─── */
 function DashboardShowcase() {

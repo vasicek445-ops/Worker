@@ -473,7 +473,7 @@ function BentoCard({
 /* ─── Comparison Table ─── */
 function ComparisonTable() {
   const rows = [
-    { label: "Cena", woker: "Od 0 EUR", agentura: "~600 EUR", sam: "0 EUR" },
+    { label: "Cena", woker: "19,99 EUR/měs", agentura: "~600 EUR", sam: "0 EUR" },
     {
       label: "Nabídky práce",
       woker: "AI ti vybere za 5 minut",
@@ -686,7 +686,7 @@ export default function MarketingPage() {
           <FadeIn delay={0.1}>
             <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-8 leading-relaxed">
               Práce, bydlení a dokumenty v němčině pro Čechy, Slováky a Poláky
-              &mdash; na jednom místě, od 0 EUR.
+              &mdash; na jednom místě, od 19,99 EUR.
             </p>
           </FadeIn>
           <FadeIn delay={0.15}>
@@ -932,114 +932,6 @@ export default function MarketingPage() {
               <ComparisonTable />
             </div>
           </FadeIn>
-        </div>
-      </section>
-
-      {/* ── PRICING PREVIEW ── */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-[#111128]/40">
-        <div className="max-w-4xl mx-auto">
-          <FadeIn>
-            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Cena jednoho oběda. Nebo 600 EUR zprostředkovateli.
-            </h2>
-          </FadeIn>
-          <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {/* Free */}
-            <FadeIn delay={0.05}>
-              <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-6 sm:p-8 h-full flex flex-col">
-                <h3 className="text-lg font-bold text-white mb-1">Zdarma</h3>
-                <p className="text-3xl font-extrabold text-white mb-6">
-                  0 EUR
-                </p>
-                <ul className="space-y-3 mb-8 flex-1">
-                  {[
-                    "Hledání práce a základní filtry",
-                    "Základní nabídky bydlení",
-                    "Průvodce krok za krokem",
-                    "Přístup do komunity",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-white/60">
-                      <svg
-                        className="w-4 h-4 text-white/30 mt-0.5 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/zdarma"
-                  className="block text-center px-6 py-3 rounded-xl text-sm font-semibold border border-white/[0.15] text-white hover:bg-white/[0.05] transition-all"
-                >
-                  Začít zdarma
-                </Link>
-              </div>
-            </FadeIn>
-
-            {/* Premium */}
-            <FadeIn delay={0.1}>
-              <div className="relative rounded-2xl bg-white/[0.03] border-2 border-[#39ff6e]/40 p-6 sm:p-8 h-full flex flex-col">
-                <span className="absolute -top-3 left-6 px-3 py-0.5 text-xs font-bold bg-[#39ff6e] text-[#0a0a12] rounded-full">
-                  Nejoblíbenější
-                </span>
-                <h3 className="text-lg font-bold text-white mb-1">Premium</h3>
-                <p className="text-3xl font-extrabold text-white mb-1">
-                  19,99 EUR
-                  <span className="text-base font-normal text-white/40">
-                    /měsíc
-                  </span>
-                </p>
-                <p className="text-xs text-white/30 mb-6">
-                  = cena jednoho oběda. Zprostředkovatelé účtují ~600 EUR.
-                </p>
-                <ul className="space-y-3 mb-8 flex-1">
-                  {[
-                    "Vše z Free +",
-                    "4 600 ubytování s telefonem a emailem",
-                    "1 007 agentur s přímým kontaktem",
-                    "Německý životopis a Bewerbung za 90s",
-                    "AI Smart Matching — práce podle tvých skillů",
-                    "Prioritní podpora",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-white/80">
-                      <svg
-                        className="w-4 h-4 text-[#39ff6e] mt-0.5 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/registrace?plan=premium"
-                  className="block text-center px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
-                >
-                  Zkusit Premium
-                </Link>
-                <p className="text-xs text-white/30 text-center mt-3">
-                  Bez závazku. Zrušíš kdykoliv jedním klikem.
-                </p>
-              </div>
-            </FadeIn>
-          </div>
         </div>
       </section>
 
