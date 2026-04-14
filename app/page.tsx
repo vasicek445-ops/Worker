@@ -221,7 +221,7 @@ function Navbar() {
             Přihlásit se
           </Link>
           <Link
-            href="/registrace"
+            href="/login?tab=register"
             className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Registrace
@@ -305,7 +305,7 @@ function Navbar() {
               Přihlásit se
             </Link>
             <Link
-              href="/registrace"
+              href="/login?tab=register"
               className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
