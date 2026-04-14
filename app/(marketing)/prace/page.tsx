@@ -364,6 +364,82 @@ export default function PracePage() {
         </div>
       </section>
 
+      {/* Automation showcase */}
+      <section className="pt-16 pb-8 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <FadeIn>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
+              Co za tebe Woker udělá{" "}
+              <span className="text-[#39ff6e]">automaticky</span>
+            </h2>
+            <p className="text-white/40 text-center text-sm mb-10 max-w-lg mx-auto">
+              Žádné hodiny na německých webech. Woker pracuje za tebe.
+            </p>
+          </FadeIn>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              {
+                icon: "🎯",
+                title: "Smart Matching",
+                desc: "Řekneš co umíš a kde chceš bydlet. AI ti vybere nabídky co sedí přesně tobě.",
+                detail: "Každé ráno nové nabídky v emailu",
+              },
+              {
+                icon: "📄",
+                title: "Životopis v němčině",
+                desc: "Napíšeš česky co umíš. Za 90 sekund máš profesionální německý Lebenslauf.",
+                detail: "Bewerbungsdossier, motivační dopis",
+              },
+              {
+                icon: "📨",
+                title: "Automatické přihlášky",
+                desc: "Jedním kliknutím se přihlásíš na pozici. Woker pošle tvůj životopis agentuře.",
+                detail: "Nemusíš psát každý email zvlášť",
+              },
+              {
+                icon: "📞",
+                title: "Přímé kontakty",
+                desc: "1 007 agentur s telefonem a emailem. Zavoláš přímo, žádný prostředník.",
+                detail: "Adecco, Manpower, Randstad a další",
+              },
+              {
+                icon: "🏠",
+                title: "Bydlení + práce najednou",
+                desc: "4 600 ubytování po celém Švýcarsku. Hledáš práci i byt z jednoho místa.",
+                detail: "Penziony od CHF 417/měsíc",
+              },
+              {
+                icon: "🔔",
+                title: "Notifikace nových nabídek",
+                desc: "Nastavíš si co hledáš. Jakmile se objeví nová pozice, dostaneš upozornění.",
+                detail: "Email nebo push notifikace",
+              },
+            ].map((item, i) => (
+              <FadeIn key={item.title} delay={i * 0.08}>
+                <div className="h-full rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5 hover:border-white/[0.12] transition-all">
+                  <div className="text-2xl mb-3">{item.icon}</div>
+                  <h3 className="text-white font-bold text-base mb-1.5">{item.title}</h3>
+                  <p className="text-white/50 text-sm leading-relaxed mb-2">{item.desc}</p>
+                  <p className="text-[#39ff6e]/60 text-xs">{item.detail}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+
+          <FadeIn delay={0.5}>
+            <div className="mt-8 text-center">
+              <Link
+                href="/zdarma"
+                className="inline-block px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#39ff6e]/20"
+              >
+                Vyzkoušet zdarma →
+              </Link>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* Stats */}
       <section className="pt-20 pb-12 px-4 sm:px-6">
         <FadeIn>
