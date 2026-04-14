@@ -75,17 +75,17 @@ const NAV_PRACE = [
   {
     label: "Nabídky práce",
     desc: "Aktuální pozice ve Švýcarsku",
-    href: "/registrace",
+    href: "/prace",
   },
   {
     label: "Smart Matching",
     desc: "Najde ti práci podle toho co umíš",
-    href: "/registrace",
+    href: "/prace",
   },
   {
     label: "Kontakty na agentury",
     desc: "1007 ověřených agentur",
-    href: "/registrace",
+    href: "/kontakty-preview",
   },
 ];
 
@@ -93,22 +93,22 @@ const NAV_BYDLENI = [
   {
     label: "Byty & WG",
     desc: "Klasické pronájmy",
-    href: "/registrace",
+    href: "/bydleni-preview",
   },
   {
     label: "Penziony & B&B",
     desc: "Měsíční ubytování v penzionech",
-    href: "/registrace",
+    href: "/bydleni-preview",
   },
   {
     label: "Pro pracující",
     desc: "Levné pokoje blízko práce",
-    href: "/registrace",
+    href: "/bydleni-preview",
   },
   {
     label: "Hostely & ubytovny",
     desc: "Levné alternativy",
-    href: "/registrace",
+    href: "/bydleni-preview",
   },
 ];
 
@@ -197,7 +197,7 @@ function Navbar() {
           <DropdownTrigger label="Práce" id="prace" items={NAV_PRACE} />
           <DropdownTrigger label="Bydlení" id="bydleni" items={NAV_BYDLENI} />
           <Link
-            href="/zdarma"
+            href="/dokumenty-preview"
             className="text-sm text-white/70 hover:text-white transition-colors"
           >
             Dokumenty
@@ -271,7 +271,7 @@ function Navbar() {
           ))}
           <div className="border-t border-white/[0.06] mt-4 pt-4 flex flex-col gap-2">
             <Link
-              href="/zdarma"
+              href="/dokumenty-preview"
               className="px-2 py-2 text-sm text-white/70 hover:text-white"
               onClick={() => setMobileOpen(false)}
             >
