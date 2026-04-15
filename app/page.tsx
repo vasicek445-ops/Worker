@@ -70,53 +70,19 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
   );
 }
 
-/* ─── Navbar dropdown data ─── */
-const NAV_PRACE = [
-  {
-    label: "Nabídky práce",
-    desc: "Aktuální pozice ve Švýcarsku",
-    href: "/prace",
-  },
-  {
-    label: "Smart Matching",
-    desc: "AI ti vybere nabídky podle tvých skillů",
-    href: "/prace",
-  },
-  {
-    label: "Kontakty na agentury",
-    desc: "1 007 ověřených agentur s telefonem",
-    href: "/kontakty-preview",
-  },
+/* ─── Navbar links ─── */
+const NAV_LINKS = [
+  { label: "Práce", href: "/prace" },
+  { label: "Bydlení", href: "/bydleni-preview" },
+  { label: "Dokumenty", href: "/dokumenty-preview" },
+  { label: "Plány", href: "/cenik" },
+  { label: "Blog", href: "/blog" },
 ];
 
-const NAV_BYDLENI = [
-  {
-    label: "Byty & WG",
-    desc: "Klasické pronájmy",
-    href: "/bydleni-preview",
-  },
-  {
-    label: "Penziony & B&B",
-    desc: "Měsíční ubytování v penzionech",
-    href: "/bydleni-preview",
-  },
-  {
-    label: "Pro pracující",
-    desc: "Pokoje od CHF 417/měsíc blízko práce",
-    href: "/bydleni-preview",
-  },
-  {
-    label: "Hostely & ubytovny",
-    desc: "Levné alternativy",
-    href: "/bydleni-preview",
-  },
-];
-
-/* ─── Navbar ─── */
+/* ─── Navbar — Flixy style: white bg, logo left, links center, auth right ─── */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -124,113 +90,52 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  function DropdownTrigger({
-    label,
-    id,
-    items,
-  }: {
-    label: string;
-    id: string;
-    items: typeof NAV_PRACE;
-  }) {
-    const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-    return (
-      <div
-        className="relative"
-        onMouseEnter={() => {
-          clearTimeout(timeoutRef.current);
-          setOpenDropdown(id);
-        }}
-        onMouseLeave={() => {
-          timeoutRef.current = setTimeout(() => setOpenDropdown(null), 150);
-        }}
-      >
-        <button
-          className="flex items-center gap-1 text-sm text-white/70 hover:text-white transition-colors"
-          onClick={() => setOpenDropdown(openDropdown === id ? null : id)}
-        >
-          {label}
-          <svg
-            className={`w-3.5 h-3.5 transition-transform ${openDropdown === id ? "rotate-180" : ""}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        {openDropdown === id && (
-          <div className="absolute top-full left-0 mt-2 w-64 rounded-xl bg-[#111128]/95 backdrop-blur-xl border border-white/[0.08] p-2 shadow-2xl z-50">
-            {items.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block rounded-lg px-3 py-2.5 hover:bg-white/[0.06] transition-colors"
-                onClick={() => setOpenDropdown(null)}
-              >
-                <div className="text-sm font-medium text-white">{item.label}</div>
-                <div className="text-xs text-white/40 mt-0.5">{item.desc}</div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
           ? "bg-[#0a0a12]/90 backdrop-blur-xl border-b border-white/[0.06]"
-          : "bg-transparent"
+          : "bg-[#0a0a12]"
       }`}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-center gap-8">
-        <Link href="/" className="text-xl font-extrabold tracking-tight text-white mr-auto md:mr-0">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center">
+        {/* Logo — left */}
+        <Link href="/" className="text-xl font-extrabold tracking-tight text-white">
           WOKER
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-7">
-          <DropdownTrigger label="Práce" id="prace" items={NAV_PRACE} />
-          <DropdownTrigger label="Bydlení" id="bydleni" items={NAV_BYDLENI} />
-          <Link
-            href="/dokumenty-preview"
-            className="text-sm text-white/70 hover:text-white transition-colors"
-          >
-            Dokumenty
-          </Link>
-          <Link
-            href="/cenik"
-            className="text-sm text-white/70 hover:text-white transition-colors"
-          >
-            Plány
-          </Link>
-          <Link
-            href="/blog"
-            className="text-sm text-white/70 hover:text-white transition-colors"
-          >
-            Blog
-          </Link>
+        {/* Desktop nav — center, pushed right */}
+        <div className="hidden md:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-sm text-white/70 hover:text-white transition-colors font-medium"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Auth — right */}
+        <div className="hidden md:flex items-center gap-4 ml-auto">
           <Link
             href="/login"
-            className="text-sm text-white/70 hover:text-white transition-colors"
+            className="text-sm text-white/70 hover:text-white transition-colors font-medium"
           >
             Přihlásit se
           </Link>
           <Link
             href="/login?tab=register"
-            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+            className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-[#39ff6e] text-[#0a0a12] hover:bg-[#32e060] transition-all"
           >
-            Registrace
+            Začni ZDARMA
           </Link>
         </div>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden text-white/70 hover:text-white"
+          className="md:hidden text-white/70 hover:text-white ml-auto"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Zavřít menu" : "Otevřít menu"}
         >
@@ -249,67 +154,32 @@ function Navbar() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden bg-[#0a0a12]/95 backdrop-blur-xl border-t border-white/[0.06] px-4 pb-6 pt-2">
-          <p className="text-xs text-white/40 uppercase tracking-wider mt-3 mb-1 px-2">
-            Práce
-          </p>
-          {NAV_PRACE.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="block px-2 py-2 text-sm text-white/70 hover:text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <p className="text-xs text-white/40 uppercase tracking-wider mt-4 mb-1 px-2">
-            Bydlení
-          </p>
-          {NAV_BYDLENI.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="block px-2 py-2 text-sm text-white/70 hover:text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <div className="border-t border-white/[0.06] mt-4 pt-4 flex flex-col gap-2">
-            <Link
-              href="/dokumenty-preview"
-              className="px-2 py-2 text-sm text-white/70 hover:text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              Dokumenty
-            </Link>
-            <Link
-              href="/cenik"
-              className="px-2 py-2 text-sm text-white/70 hover:text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              Plány
-            </Link>
-            <Link
-              href="/blog"
-              className="px-2 py-2 text-sm text-white/70 hover:text-white"
-              onClick={() => setMobileOpen(false)}
-            >
-              Blog
-            </Link>
+          <div className="flex flex-col gap-1">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="px-2 py-2.5 text-sm text-white/70 hover:text-white font-medium"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div className="border-t border-white/[0.06] mt-3 pt-3 flex flex-col gap-2">
             <Link
               href="/login"
-              className="px-2 py-2 text-sm text-white/70 hover:text-white"
+              className="px-2 py-2.5 text-sm text-white/70 hover:text-white font-medium"
               onClick={() => setMobileOpen(false)}
             >
               Přihlásit se
             </Link>
             <Link
               href="/login?tab=register"
-              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
+              className="mt-1 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-[#39ff6e] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
-              Registrace
+              Začni ZDARMA
             </Link>
           </div>
         </div>
@@ -657,59 +527,76 @@ export default function MarketingPage() {
     >
       <Navbar />
 
-      {/* ── HERO ── */}
-      <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 px-4 sm:px-6 overflow-hidden">
-        {/* Ambient blobs */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-[#39ff6e]/[0.04] blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-400/[0.03] blur-[120px] pointer-events-none" />
-        {/* Dot grid */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
-          }}
-        />
+      {/* ── HERO — Flixy style: text left, graphic right ── */}
+      <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 px-4 sm:px-6 overflow-hidden">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          {/* Left — text */}
+          <div>
+            <FadeIn>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] mb-6">
+                <span>🚀</span>
+                <span className="text-sm text-white/60">Ušetři čas, peníze i nervy při stěhování do Švýcarska</span>
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.05}>
+              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white">
+                Začni vydělávat ve Švýcarsku už do 30 dní.
+              </h1>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <p className="text-base sm:text-lg text-white/50 mb-8 leading-relaxed">
+                <strong className="text-white">#1 AI powered platforma</strong> co za tebe vyřeší celý proces během 10 minut.
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.15}>
+              <ul className="space-y-3 mb-8">
+                {[
+                  "1 007 agentur s přímými kontakty — nejrychlejší start ve Švýcarsku",
+                  "4 000+ ubytování s přímými kontakty — byty, WG, Gasthaus — od 400 CHF/měsíc podle kantonu",
+                  "AI nástroje co za tebe napíšou životopis, motivační dopis, zkontrolují smlouvy a mnohem víc — na pár kliknutí",
+                  "Smart Matching — vyplníš profil, AI najde agentury co hledají přesně tebe a odešle přihlášku jedním kliknutím",
+                  "Kompletní průvodce pojištěním, daněmi a pracovním povolením ve Švýcarsku",
+                  "Spoj se s lidmi co už ve Švýcarsku jsou nebo se tam chystají — tak jako právě ty",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-white/70">
+                    <svg className="w-5 h-5 text-[#39ff6e] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </FadeIn>
+            <FadeIn delay={0.2}>
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <Link
+                  href="/login?tab=register"
+                  className="px-7 py-3.5 rounded-xl text-base font-bold bg-[#39ff6e] text-[#0a0a12] hover:bg-[#32e060] transition-all shadow-lg shadow-[#39ff6e]/20"
+                >
+                  Zaregistruj se a prozkoumej Woker &rarr;
+                </Link>
+                <Link
+                  href="/prace"
+                  className="flex items-center gap-2 px-4 py-3.5 text-base font-medium text-white/70 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Jak to funguje
+                </Link>
+              </div>
+            </FadeIn>
+          </div>
 
-        <div className="relative max-w-4xl mx-auto text-center">
-          <FadeIn>
-            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
-              4 600 ubytování.
-              <br />
-              1 007 agentur.{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-cyan-400">
-                Vše česky.
-              </span>
-            </h1>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <p className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-8 leading-relaxed">
-              Práce, bydlení a dokumenty v němčině pro Čechy, Slováky a Poláky
-              &mdash; na jednom místě, od 19,99 EUR.
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.15}>
-            <p className="text-sm text-white/30 mb-10">
-              <Counter target={4600} /> ubytování &middot;{" "}
-              <Counter target={1007} /> agentur &middot; 50+ úspěšných
-              přestěhování
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/zdarma"
-                className="px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
-              >
-                Začít zdarma &rarr;
-              </Link>
-              <Link
-                href="/zdarma"
-                className="px-8 py-3.5 rounded-xl text-base font-medium border border-white/[0.15] text-white hover:bg-white/[0.05] hover:border-white/[0.25] transition-all"
-              >
-                Prohlédnout nabídky
-              </Link>
+          {/* Right — MacBook mockup */}
+          <FadeIn delay={0.25}>
+            <div className="relative flex justify-center md:justify-end">
+              <img
+                src="/images/macbook-mockup.png"
+                alt="Woker platforma"
+                className="w-full max-w-[500px] drop-shadow-2xl"
+              />
             </div>
           </FadeIn>
         </div>
