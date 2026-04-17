@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iPhone Mockup Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { min-height: 100vh; background: #0a0a12; display: flex; align-items: center; justify-content: center; font-family: -apple-system, sans-serif; overflow: hidden; }
+  .phone-wrapper { position: relative; width: 340px; transform: perspective(1000px) rotateY(-14deg) rotateX(3deg) rotateZ(2deg); transition: transform 0.5s ease; }
+  .phone-wrapper:hover { transform: perspective(1000px) rotateY(-7deg) rotateX(1deg) rotateZ(1deg); }
+  .phone-frame-img { position: relative; z-index: 2; width: 100%; height: auto; display: block; pointer-events: none; filter: drop-shadow(0 40px 80px rgba(0,0,0,0.5)) drop-shadow(0 15px 30px rgba(0,0,0,0.4)); }
+  .screen-content { position: absolute; top: 1.8%; left: 5.2%; width: 89.6%; height: 96.8%; border-radius: 38px; overflow: hidden; z-index: 1; background: #0a0a12; }
+  .placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 50px 20px 20px; color: white; background: #0a0a12; }
+  .placeholder .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .placeholder .logo { width: 36px; height: 36px; border-radius: 10px; background: #39ff6e; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #0a0a12; }
+  .placeholder .brand { font-weight: 700; font-size: 16px; }
+  .placeholder .greeting { font-weight: 700; font-size: 18px; margin-bottom: 4px; }
+  .placeholder .subtitle { color: rgba(255,255,255,0.4); font-size: 12px; margin-bottom: 20px; }
+  .placeholder .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .placeholder .card-title { font-weight: 600; font-size: 13px; }
+  .placeholder .card-sub { color: rgba(255,255,255,0.35); font-size: 11px; margin-top: 2px; }
+  .placeholder .match { font-weight: 700; font-size: 13px; color: #39ff6e; }
+  .placeholder .cta { background: rgba(57,255,110,0.1); border: 1px solid rgba(57,255,110,0.2); border-radius: 14px; padding: 14px; text-align: center; color: #39ff6e; font-weight: 700; font-size: 13px; margin-top: 10px; }
+  .label { position: absolute; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; z-index: 20; animation: float 3s ease-in-out infinite; }
+  .label-1 { top: -10px; right: -60px; background: #39ff6e; color: #0a0a12; }
+  .label-2 { top: 40%; left: -80px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: white; border: 1px solid rgba(255,255,255,0.15); animation-delay: 1s; }
+  .label-3 { bottom: 15%; right: -70px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: white; border: 1px solid rgba(255,255,255,0.15); animation-delay: 2s; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .info { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.3); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="phone-wrapper">
+  <div class="label label-1">AI Matching</div>
+  <div class="label label-2">1 007 agentur</div>
+  <div class="label label-3">CV za 90s</div>
+  <div class="screen-content">
+    <div class="placeholder">
+      <div class="header"><div class="logo">W</div><div class="brand">Woker</div></div>
+      <div class="greeting">Ahoj, Martin \U0001f44b</div>
+      <div class="subtitle">3 nove nabidky odpovidaji tvemu profilu</div>
+      <div class="card"><div><div class="card-title">Elektrikar</div><div class="card-sub">Zurich - Adecco AG</div></div><div class="match">92%</div></div>
+      <div class="card"><div><div class="card-title">Skladnik</div><div class="card-sub">Bern - Manpower AG</div></div><div class="match">87%</div></div>
+      <div class="card"><div><div class="card-title">Ridic</div><div class="card-sub">Basel - Kelly Services</div></div><div class="match">78%</div></div>
+      <div class="cta">Prihlasit se jednim klikem</div>
+    </div>
+  </div>
+  <img src="/images/iphone-frame.png" alt="" class="phone-frame-img">
+</div>
+<div class="info">PNG frame overlay - Hover pro mensi natoceni</div>
+</body>
+</html>

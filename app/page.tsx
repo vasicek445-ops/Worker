@@ -522,16 +522,16 @@ export default function MarketingPage() {
   }, []);
   return (
     <div
-      className="min-h-screen bg-[#0a0a12] text-white overflow-x-hidden"
-      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+      className="min-h-screen bg-[#0a0a12] text-white overflow-x-hidden overflow-y-auto"
+      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", maxWidth: "100vw" }}
     >
       <Navbar />
 
       {/* ── HERO — Flixy style: text left, graphic right ── */}
       <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 px-4 sm:px-6 overflow-hidden">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-[1fr_auto] gap-8 items-center">
           {/* Left — text */}
-          <div>
+          <div className="max-w-xl">
             <FadeIn>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] mb-6">
                 <span>🚀</span>
@@ -589,16 +589,183 @@ export default function MarketingPage() {
             </FadeIn>
           </div>
 
-          {/* Right — MacBook mockup */}
+          {/* Right — MacBook mockup, overflow right edge like Flixy */}
           <FadeIn delay={0.25}>
-            <div className="relative flex justify-center md:justify-end">
+            <div className="hidden md:block relative">
               <img
                 src="/images/macbook-mockup.png"
                 alt="Woker platforma"
-                className="w-full max-w-[500px] drop-shadow-2xl"
+                className="w-[550px] max-w-none drop-shadow-2xl"
               />
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* ── AI TOOLS MARQUEE ── */}
+      <div className="relative overflow-hidden border-y border-blue-500/20 bg-blue-950/30 py-4">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {[...Array(2)].map((_, copy) => (
+            <div key={copy} className="flex items-center gap-8 px-4">
+              {[
+                "🤖 AI Životopis v němčině",
+                "📝 AI Motivační dopis",
+                "🎯 Smart Matching",
+                "📄 AI Analýza inzerátu",
+                "📧 AI Email pro HR",
+                "🗣️ AI Příprava na pohovor",
+                "📋 AI Analýza smlouvy",
+                "💬 AI Asistent Wooky",
+                "🏠 AI Hledání bydlení",
+                "🇩🇪 AI Němčina pro práci",
+              ].map((tool) => (
+                <span key={tool} className="text-sm font-medium text-white/50 flex items-center gap-2">
+                  {tool}
+                  <span className="text-white/10">•</span>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+        <style jsx>{`
+          @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-marquee {
+            animation: marquee 30s linear infinite;
+          }
+        `}</style>
+      </div>
+
+      {/* ── 3 STEPS ── */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-16 text-white">
+              Získej práci ve Švýcarsku ve{" "}
+              <span className="text-[#39ff6e]">3 krocích:</span>
+            </h2>
+          </FadeIn>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left — steps */}
+            <div className="space-y-6">
+              {[
+                {
+                  num: "1",
+                  title: "Vyplň profil",
+                  desc: "Řekni nám co umíš, kde chceš pracovat a jakou máš němčinu.",
+                  icon: "/images/profile-card-icon.svg",
+                },
+                {
+                  num: "2",
+                  title: "AI vyřeší zbytek",
+                  desc: "Woker ti najde agentury, napíše životopis v němčině a odešle přihlášky.",
+                  icon: "/images/ai-automation-icon.svg",
+                },
+                {
+                  num: "3",
+                  title: "Začni vydělávat",
+                  desc: "Nastoupíš do práce ve Švýcarsku. Průměrně do 30 dní.",
+                  icon: "/images/earning-icon.svg",
+                },
+              ].map((step, i) => (
+                <FadeIn key={step.num} delay={i * 0.1}>
+                  <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-7 sm:p-8 flex items-start gap-6">
+                    <div className="w-20 h-20 rounded-xl bg-[#39ff6e]/10 border border-[#39ff6e]/20 flex items-center justify-center shrink-0 overflow-hidden">
+                      <img src={step.icon} alt={step.title} className="w-14 h-14 object-contain" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-xl mb-2">{step.title}</h3>
+                      <p className="text-white/50 text-base leading-relaxed">{step.desc}</p>
+                    </div>
+                  </div>
+                </FadeIn>
+              ))}
+            </div>
+
+            {/* Right — mockup placeholder */}
+            <FadeIn delay={0.3}>
+              <div className="hidden md:flex justify-center">
+                <img
+                  src="/images/macbook-mockup.png"
+                  alt="Woker platforma"
+                  className="w-[480px] max-w-none drop-shadow-2xl"
+                />
+              </div>
+            </FadeIn>
+          </div>
+
+          <FadeIn delay={0.4}>
+            <div className="flex justify-center mt-12">
+              <Link
+                href="/login?tab=register"
+                className="px-7 py-3.5 rounded-xl text-base font-bold bg-[#39ff6e] text-[#0a0a12] hover:bg-[#32e060] transition-all shadow-lg shadow-[#39ff6e]/20"
+              >
+                Zaregistruj se a prozkoumej Woker &rarr;
+              </Link>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* ── VALUE PROP ── */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          {/* Left — phone mockup */}
+          <FadeIn>
+            <div className="flex justify-center">
+              <div className="relative">
+                <div className="w-[280px] h-[560px] rounded-[40px] border-[6px] border-white/10 bg-[#111128] overflow-hidden shadow-2xl shadow-[#39ff6e]/5">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[28px] bg-[#0a0a12] rounded-b-2xl" />
+                  <img
+                    src="/images/macbook-mockup.png"
+                    alt="Woker app"
+                    className="w-full h-full object-cover opacity-80"
+                  />
+                </div>
+                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full bg-[#39ff6e]/5 blur-3xl" />
+              </div>
+            </div>
+          </FadeIn>
+
+          {/* Right — headline + features */}
+          <div>
+            <FadeIn delay={0.1}>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-6">
+                Celá tvá cesta za prací ve Švýcarsku v{" "}
+                <span className="text-[#39ff6e]">1 AI nástroji</span>
+              </h2>
+            </FadeIn>
+
+            <FadeIn delay={0.2}>
+              <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-6 mb-6">
+                <p className="text-white/60 text-base leading-relaxed italic">
+                  &ldquo;Měsíc jsem googlil agentury, psal emaily německy přes Google Translate a nikdo neodpovídal. Přes Woker jsem za večer měl hotový životopis v němčině, seznam agentur v mém kantonu a tři přihlášky odeslané. Za 3 týdny jsem nastoupil.&rdquo;
+                </p>
+                <div className="flex items-center gap-3 mt-4">
+                  <img src="/images/testimonial-martin.png" alt="Martin K." className="w-10 h-10 rounded-full object-cover" />
+                  <div>
+                    <p className="text-white font-semibold text-sm">Martin K.</p>
+                    <p className="text-white/40 text-xs">Elektrikář, kanton Zürich</p>
+                  </div>
+                  <div className="ml-auto flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className="text-[#39ff6e] text-lg">★</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={0.3}>
+              <div className="flex items-center gap-2 text-white/50 text-sm">
+                <span className="text-[#39ff6e]">↗</span>
+                <span>AI asistent, životopis, agentury — vše na jednom místě</span>
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
