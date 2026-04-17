@@ -589,14 +589,31 @@ export default function MarketingPage() {
             </FadeIn>
           </div>
 
-          {/* Right — MacBook mockup, overflow right edge like Flixy */}
+          {/* Right — iPhone mockup, Flixy-style tilt + modrý kruh za telefonem */}
           <FadeIn delay={0.25}>
-            <div className="hidden md:block relative">
-              <img
-                src="/images/macbook-mockup.png"
-                alt="Woker platforma"
-                className="w-[550px] max-w-none drop-shadow-2xl"
-              />
+            <div className="hidden md:flex justify-center items-center relative">
+              {/* modrý gradient kruh za telefonem */}
+              <div className="absolute w-[340px] h-[340px] rounded-full bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 blur-[2px]" />
+
+              {/* iPhone frame s tvým screenshotem uvnitř (tilt cca 12°) */}
+              <div
+                className="relative w-[300px]"
+                style={{ transform: "rotate(-12deg) perspective(1200px) rotateY(-8deg)" }}
+              >
+                {/* tvůj app screenshot — prosvítá skrz průhledný displej iPhone frame */}
+                <img
+                  src="/images/woker-screenshot.png"
+                  alt="Woker aplikace"
+                  className="absolute top-[2.5%] left-[6%] w-[88%] rounded-[32px]"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+                {/* iPhone rámeček navrchu (transparentní uprostřed) */}
+                <img
+                  src="/images/iphone-frame.png"
+                  alt="iPhone"
+                  className="relative w-full drop-shadow-2xl"
+                />
+              </div>
             </div>
           </FadeIn>
         </div>
