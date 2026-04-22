@@ -802,6 +802,65 @@ export default function MarketingPage() {
         </div>
       </section>
 
+      {/* ── VALUE PROPS (2-panel) ── */}
+      <section className="py-16 sm:py-20 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto">
+          <FadeIn>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-white mb-12">
+              Pomáháme Čechům a Slovákům ve Švýcarsku s:
+            </h2>
+          </FadeIn>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Panel 1: Insurance */}
+            <FadeIn delay={0.1}>
+              <div className="relative h-full rounded-2xl bg-white/[0.03] border border-white/[0.06] p-7 hover:border-[#39ff6e]/30 transition-colors">
+                <div className="text-5xl mb-5">🏥</div>
+                <h3 className="text-xl font-bold text-white mb-3 leading-tight">
+                  Pojištění na autopilota
+                </h3>
+                <p className="text-white/60 text-sm leading-relaxed mb-6">
+                  Každý listopad najdeme nejlevnější zdravotní pojišťovnu pro
+                  tvoji situaci. Doporučíme optimální franchise a doplňkové
+                  krytí. Ty jen potvrdíš v appce.
+                </p>
+                <div className="inline-flex items-baseline gap-2 rounded-lg bg-black/40 border border-white/[0.06] px-4 py-3">
+                  <span className="text-[#39ff6e] text-2xl font-extrabold">
+                    1 500 CHF
+                  </span>
+                  <span className="text-white/50 text-xs">
+                    průměrná úspora / rok
+                  </span>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* Panel 2: Housing & onboarding */}
+            <FadeIn delay={0.2}>
+              <div className="relative h-full rounded-2xl bg-white/[0.03] border border-white/[0.06] p-7 hover:border-[#39ff6e]/30 transition-colors">
+                <div className="text-5xl mb-5">🏠</div>
+                <h3 className="text-xl font-bold text-white mb-3 leading-tight">
+                  Bydlení a první týdny v CH
+                </h3>
+                <p className="text-white/60 text-sm leading-relaxed mb-6">
+                  Databáze 450+ bydlení mimo ImmoScout. Step-by-step guide od
+                  Anmeldung po B-permit. AI asistent 24/7 v češtině a
+                  slovenštině.
+                </p>
+                <div className="inline-flex items-baseline gap-2 rounded-lg bg-black/40 border border-white/[0.06] px-4 py-3">
+                  <span className="text-[#39ff6e] text-2xl font-extrabold">
+                    3 měsíce
+                  </span>
+                  <span className="text-white/50 text-xs">
+                    co neztratíš hledáním sám
+                  </span>
+                </div>
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
       {/* ── BENTO GRID ── */}
       <section className="py-16 sm:py-24 px-4 sm:px-6 bg-[#111128]/40">
         <div className="max-w-6xl mx-auto">
