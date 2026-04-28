@@ -8,7 +8,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       {!hideSidebar && <Sidebar />}
-      <div className={`flex-1 min-h-screen ${hideSidebar ? '' : 'md:ml-[260px]'}`}>
+      <div className={`flex-1 min-h-screen ${hideSidebar ? '' : 'md:ml-[240px]'}`}>
         {children}
       </div>
     </div>
