@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../supabase";
-import { Settings, ArrowLeft, Save, Loader2, Plus, X } from "lucide-react";
+import { Settings, ArrowLeft, Save, Loader2, Plus, X, Search, Sparkles } from "lucide-react";
 
 type AgentConfig = {
   positions: string[];
@@ -43,6 +43,12 @@ export default function AgentSettingsPage() {
 
   const [newPosition, setNewPosition] = useState("");
   const [newLocation, setNewLocation] = useState("");
+  const [discovering, setDiscovering] = useState(false);
+  const [discoveryResult, setDiscoveryResult] = useState<
+    | { kind: "ok"; found: number; inserted: number; bySource: Record<string, number> }
+    | { kind: "err"; message: string }
+    | null
+  >(null);
 
   useEffect(() => {
     void load();
@@ -114,6 +120,34 @@ export default function AgentSettingsPage() {
   function removeLocation(p: string) {
     setConfig((c) => ({ ...c, locations: c.locations.filter((x) => x !== p) }));
   }
+  async function runDiscovery() {
+    setDiscovering(true);
+    setDiscoveryResult(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch("/api/jobs/discover", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setDiscoveryResult({ kind: "err", message: json.error || "discover_failed" });
+      } else {
+        setDiscoveryResult({
+          kind: "ok",
+          found: json.found ?? 0,
+          inserted: json.inserted ?? 0,
+          bySource: json.by_source ?? {},
+        });
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setDiscoveryResult({ kind: "err", message: err?.message || "network_error" });
+    } finally {
+      setDiscovering(false);
+    }
+  }
+
   function toggleLanguage(code: string) {
     setConfig((c) => ({
       ...c,
@@ -298,7 +332,7 @@ export default function AgentSettingsPage() {
         </section>
 
         {/* SAVE */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mb-8">
           <button
             disabled={saving}
             onClick={save}
@@ -313,6 +347,49 @@ export default function AgentSettingsPage() {
             </span>
           )}
         </div>
+
+        {/* DISCOVERY — manual trigger before cron is wired */}
+        <section className="rounded-2xl border border-[#ff8c2b]/30 bg-gradient-to-br from-[#ff8c2b]/5 to-transparent p-6">
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles size={18} className="text-[#ff8c2b]" />
+            <h2 className="text-base font-bold m-0">Vyzkoušet teď</h2>
+          </div>
+          <p className="text-white/50 text-sm mb-4">
+            Spusť discovery ručně — agent prohledá Adzuna podle tvých preferencí
+            a uloží kandidáty do tvé fronty matchů.
+          </p>
+          <button
+            disabled={discovering || !config.positions.length}
+            onClick={runDiscovery}
+            className="bg-white/10 hover:bg-white/15 border border-white/20 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2"
+          >
+            {discovering ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+            {discovering ? "Hledám…" : "Najdi dnešní pozice"}
+          </button>
+          {!config.positions.length && (
+            <p className="text-white/30 text-xs mt-2">Nejdřív přidej alespoň jednu pozici výše a ulož.</p>
+          )}
+          {discoveryResult?.kind === "ok" && (
+            <div className="mt-4 p-3 rounded-xl bg-[#39ff6e]/5 border border-[#39ff6e]/20 text-sm">
+              <div className="text-[#39ff6e] font-semibold">
+                ✅ Nalezeno {discoveryResult.found} pozic, uloženo {discoveryResult.inserted} nových
+              </div>
+              <div className="text-white/40 text-xs mt-1">
+                {Object.entries(discoveryResult.bySource).map(([src, n]) => `${src}: ${n}`).join(" · ")}
+              </div>
+              {discoveryResult.inserted > 0 && (
+                <Link href="/profil/matches" className="text-[#ff8c2b] text-xs mt-2 inline-block no-underline hover:underline">
+                  → Otevřít fronta matchů
+                </Link>
+              )}
+            </div>
+          )}
+          {discoveryResult?.kind === "err" && (
+            <div className="mt-4 p-3 rounded-xl bg-red-500/5 border border-red-500/20 text-red-300 text-sm">
+              ❌ {discoveryResult.message}
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
