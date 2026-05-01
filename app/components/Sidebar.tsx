@@ -14,6 +14,7 @@ import {
   MessageCircle,
   Sparkles,
   LogOut,
+  Mail,
   X,
   Menu,
 } from "lucide-react";
@@ -106,6 +107,12 @@ export default function Sidebar() {
           },
           { href: "/prihlasky", icon: MailOpen, label: "Moje přihlášky" },
           { href: "/dokumenty", icon: FileText, label: "Moje dokumenty" },
+          {
+            href: "/profil/gmail",
+            icon: Mail,
+            label: "Smart Apply",
+            badge: { text: "BETA", className: "bg-[#39ff6e]/15 text-[#39ff6e]" },
+          },
         ].map((it) => {
           const active = isActivePath(it.href);
           const Icon = it.icon;
