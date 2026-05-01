@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { exchangeCodeForTokens, getAuthorizedGmail } from '@/lib/gmail'
+import { exchangeCodeForTokens, decodeIdToken } from '@/lib/gmail'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,10 +37,12 @@ export async function GET(req: NextRequest) {
       return redirectToApp(req, 'error=no_refresh_token&hint=revoke_in_google_account_first')
     }
 
-    // Fetch the actual gmail address from Google profile
-    const gmail = await getAuthorizedGmail(tokens.access_token!, tokens.refresh_token)
-    const profile = await gmail.users.getProfile({ userId: 'me' })
-    const email = profile.data.emailAddress!
+    // Get email from id_token (no extra Gmail scope required — `email` OIDC scope covers it)
+    const idTokenPayload = tokens.id_token ? decodeIdToken(tokens.id_token) : {}
+    const email = idTokenPayload.email
+    if (!email) {
+      return redirectToApp(req, 'error=missing_email_in_id_token')
+    }
 
     // Upsert into email_oauth_tokens (one row per member+provider)
     const { error: dbError } = await supabaseAdmin

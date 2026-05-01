@@ -1,6 +1,20 @@
 import { google } from 'googleapis'
 
-export const GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+export const GMAIL_SCOPES = [
+  'openid',
+  'email',
+  'https://www.googleapis.com/auth/gmail.send',
+]
+
+/**
+ * Decode an unverified Google id_token payload — Google already signs/verifies it,
+ * we only need the email + sub claim.
+ */
+export function decodeIdToken(idToken: string): { email?: string; sub?: string } {
+  const [, payload] = idToken.split('.')
+  if (!payload) return {}
+  return JSON.parse(Buffer.from(payload, 'base64').toString('utf8'))
+}
 
 export function getOAuthClient(redirectUri?: string) {
   const clientId = process.env.GOOGLE_CLIENT_ID
