@@ -18,13 +18,6 @@ type AdzunaResponse = {
   }>
 }
 
-const COUNTRY_BY_LANG: Record<string, string> = {
-  de: 'ch', // Swiss-German speakers default to CH
-  fr: 'ch',
-  it: 'ch',
-  en: 'ch',
-}
-
 /**
  * Search Adzuna for jobs matching the member's positions × locations.
  * Adzuna allows ~25 results/request, free tier ~1000/month — cap aggressively.
