@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../supabase";
-import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Settings, Wand2, ChevronDown, ChevronUp, Check, AlertTriangle, ThumbsDown, Send, Mail } from "lucide-react";
+import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Settings, Wand2, ChevronDown, ChevronUp, Check, AlertTriangle, ThumbsDown, Send, Mail, Search } from "lucide-react";
 
 const VERDICT_META = {
   good:    { label: "Sedí ti to",       cls: "bg-[#39ff6e]/10 border-[#39ff6e]/30 text-[#39ff6e]", Icon: Check },
@@ -51,6 +51,8 @@ export default function MatchesPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [draftingId, setDraftingId] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [findingEmailId, setFindingEmailId] = useState<string | null>(null);
+  const [findEmailHint, setFindEmailHint] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [recipientOverrides, setRecipientOverrides] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +105,31 @@ export default function MatchesPage() {
       setError(err?.message || "Generování selhalo");
     } finally {
       setDraftingId(null);
+    }
+  }
+
+  async function findEmail(id: string) {
+    setFindingEmailId(id);
+    setFindEmailHint((h) => ({ ...h, [id]: "" }));
+    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const res = await fetch(`/api/matches/${id}/find-email`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+      });
+      const json = await res.json();
+      if (json.ok && json.email) {
+        setMatches((m) => m.map((x) => (x.id === id ? { ...x, recipient_email: json.email } : x)));
+        setRecipientOverrides((o) => ({ ...o, [id]: json.email }));
+        setFindEmailHint((h) => ({ ...h, [id]: `✅ Našel jsem: ${json.email}` }));
+      } else {
+        setFindEmailHint((h) => ({ ...h, [id]: json.hint || json.error || "Email nenalezen" }));
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setFindEmailHint((h) => ({ ...h, [id]: err?.message || "Hledání selhalo" }));
+    } finally {
+      setFindingEmailId(null);
     }
   }
 
@@ -387,14 +414,28 @@ export default function MatchesPage() {
                             className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-lg text-sm focus:outline-none focus:border-[#ff8c2b]"
                           />
                           <button
+                            disabled={findingEmailId === m.id || !m.job_url}
+                            onClick={() => findEmail(m.id)}
+                            title="Načte stránku inzerátu a pokusí se najít email"
+                            className="bg-white/5 hover:bg-white/10 border border-white/15 disabled:opacity-50 text-white/80 font-semibold px-3 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm"
+                          >
+                            {findingEmailId === m.id ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+                            {findingEmailId === m.id ? "Hledám…" : "Najít z inzerátu"}
+                          </button>
+                          <button
                             disabled={sendingId === m.id}
                             onClick={() => sendMatch(m.id)}
                             className="bg-[#ff8c2b] hover:bg-[#ff6a1f] disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm"
                           >
                             {sendingId === m.id ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                            {sendingId === m.id ? "Posílám…" : "Pošli z mého Gmailu"}
+                            {sendingId === m.id ? "Posílám…" : "Pošli"}
                           </button>
                         </div>
+                        {findEmailHint[m.id] && (
+                          <p className={`text-[11px] mt-2 m-0 ${findEmailHint[m.id].startsWith("✅") ? "text-[#39ff6e]" : "text-white/40"}`}>
+                            {findEmailHint[m.id]}
+                          </p>
+                        )}
                         <p className="text-[10px] text-white/30 mt-2 m-0">
                           Email se pošle z tvého Gmailu — máš nad ním plnou kontrolu, odpovědi chodí přímo do tvého Inboxu.
                         </p>
