@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../../supabase";
@@ -13,6 +13,14 @@ type ConnectionStatus =
   | { state: "error"; message: string };
 
 export default function GmailConnectPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-[#0a0a12]" />}>
+      <GmailConnectContent />
+    </Suspense>
+  );
+}
+
+function GmailConnectContent() {
   const router = useRouter();
   const params = useSearchParams();
   const [status, setStatus] = useState<ConnectionStatus>({ state: "loading" });
