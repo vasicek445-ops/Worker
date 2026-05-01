@@ -85,12 +85,14 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     }, { status: 500 })
   }
 
-  // 5. Persist draft + score
+  // 5. Persist draft + structured analysis
   const { data: updated, error: updateErr } = await supabaseAdmin
     .from('daily_matches')
     .update({
-      match_score: draft.match_score,
-      match_reasoning: draft.match_reasoning,
+      verdict: draft.verdict,
+      strengths: draft.strengths,
+      gaps: draft.gaps,
+      recommendation: draft.recommendation,
       draft_subject: draft.draft_subject,
       draft_body: draft.draft_body,
       language: draft.language,

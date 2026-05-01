@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../supabase";
-import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Sparkles, Settings, Wand2, ChevronDown, ChevronUp } from "lucide-react";
+import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Settings, Wand2, ChevronDown, ChevronUp, Check, AlertTriangle, ThumbsDown } from "lucide-react";
+
+const VERDICT_META = {
+  good:    { label: "Sedí ti to",       cls: "bg-[#39ff6e]/10 border-[#39ff6e]/30 text-[#39ff6e]", Icon: Check },
+  partial: { label: "Stojí za pokus",   cls: "bg-[#ff8c2b]/10 border-[#ff8c2b]/30 text-[#ff8c2b]", Icon: AlertTriangle },
+  poor:    { label: "Nesedí",           cls: "bg-red-500/10 border-red-500/30 text-red-300",       Icon: ThumbsDown },
+} as const;
 
 type Match = {
   id: string;
@@ -16,8 +22,10 @@ type Match = {
   salary_text: string | null;
   description: string | null;
   language: string | null;
-  match_score: number | null;
-  match_reasoning?: string | null;
+  verdict: "good" | "partial" | "poor" | null;
+  strengths: string[] | null;
+  gaps: string[] | null;
+  recommendation: string | null;
   draft_subject: string | null;
   draft_body: string | null;
   status: "pending" | "sent" | "skipped" | "edited" | "expired";
@@ -203,11 +211,14 @@ export default function MatchesPage() {
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <h3 className="text-base font-bold m-0 leading-tight">{m.position}</h3>
-                  {m.match_score !== null && (
-                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#39ff6e]/10 border border-[#39ff6e]/30 text-[#39ff6e] text-xs font-bold">
-                      <Sparkles size={11} /> {m.match_score}%
-                    </span>
-                  )}
+                  {m.verdict && (() => {
+                    const v = VERDICT_META[m.verdict];
+                    return (
+                      <span className={`flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border ${v.cls}`}>
+                        <v.Icon size={11} /> {v.label}
+                      </span>
+                    );
+                  })()}
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/50 mb-3">
                   {m.company && (
@@ -229,10 +240,32 @@ export default function MatchesPage() {
                   </p>
                 )}
 
-                {m.match_reasoning && (
-                  <p className="text-white/40 text-[11px] italic m-0 mb-3">
-                    💡 {m.match_reasoning}
-                  </p>
+                {(m.strengths?.length || m.gaps?.length || m.recommendation) && (
+                  <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 mb-3 space-y-2">
+                    {m.strengths?.length ? (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-wide text-[#39ff6e]/70 font-bold mb-1">Splňuješ</div>
+                        <ul className="m-0 pl-4 space-y-0.5">
+                          {m.strengths.map((s, i) => (
+                            <li key={i} className="text-xs text-white/80">{s}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {m.gaps?.length ? (
+                      <div>
+                        <div className="text-[11px] uppercase tracking-wide text-[#ff8c2b]/70 font-bold mb-1">Chybí ti</div>
+                        <ul className="m-0 pl-4 space-y-0.5">
+                          {m.gaps.map((g, i) => (
+                            <li key={i} className="text-xs text-white/80">{g}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {m.recommendation && (
+                      <p className="text-xs text-white/60 italic m-0 pt-1">{m.recommendation}</p>
+                    )}
+                  </div>
                 )}
 
                 <div className="flex flex-wrap items-center gap-2">

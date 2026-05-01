@@ -29,8 +29,10 @@ export type JobInput = {
 }
 
 export type DraftResult = {
-  match_score: number // 0-100
-  match_reasoning: string // 1-2 věty proč/proč ne
+  verdict: 'good' | 'partial' | 'poor' // bucket místo procent
+  strengths: string[] // co uchazeč splňuje (konkrétně)
+  gaps: string[] // co mu chybí / je slabé (konkrétně)
+  recommendation: string // 1 věta poradě česky: poslat / nechat / opatrně
   draft_subject: string
   draft_body: string // plain text, language matches job
   language: string // detected/used language for the email
@@ -38,27 +40,35 @@ export type DraftResult = {
 
 const SYSTEM_PROMPT = `Jsi expert na švýcarský pracovní trh a píšeš stručné, přesvědčivé pracovní přihlášky.
 
-Tvým úkolem je analyzovat shodu mezi uchazečovým CV a konkrétní pracovní nabídkou, a vygenerovat draft emailu, který uchazeč pošle ze svého Gmailu na firmu.
+Tvým úkolem je analyzovat shodu mezi uchazečovým CV a konkrétní pracovní nabídkou, a vygenerovat draft emailu pro Gmail uchazeče.
+
+DŮLEŽITÉ — žádná procenta, žádná skóre. Mluv s uchazečem jako kámoš který ví:
+- "Splňuješ vše kromě toho, že chtějí FR a ty máš jen DE."
+- "Sedí ti to: 5 let v logistice + řidičák. Chybí ti zkušenost se SAP, ale je to gettable."
+- "Nepošli to — chtějí ucp. svářeč C/W, ty máš jen základ."
 
 PRAVIDLA:
 1. Vrať JEN validní JSON, žádný markdown, žádné code-fence bloky.
 2. JSON struktura:
    {
-     "match_score": <0-100>,
-     "match_reasoning": "<1-2 věty česky proč shoda funguje nebo nefunguje>",
+     "verdict": "good" | "partial" | "poor",
+     "strengths": ["<co uchazeč splňuje, 1-3 položky, konkrétní — citace z CV>"],
+     "gaps": ["<co chybí nebo je slabé, 0-3 položky, konkrétní — co po něm chtějí ale nemá>"],
+     "recommendation": "<1 věta česky, ne robot — co s tím>",
      "draft_subject": "<předmět emailu v JAZYCE POZICE>",
      "draft_body": "<tělo emailu v JAZYCE POZICE, plain text, 80-150 slov>",
      "language": "<de|en|fr|it — jazyk emailu>"
    }
-3. Email PIŠ V JAZYCE INZERÁTU (typicky DE pro CH-Deutsch). Pokud inzerát anglicky, piš anglicky.
-4. Email má být osobní — odkaž na 1-2 konkrétní body z CV které sedí na pozici.
-5. NEPIŠ jako AI/bot. Žádné "Sehr geehrte Damen und Herren, ich bewerbe mich hiermit..." — buď přirozený, lehce neformální, ale profesionální.
-6. NEPŘIDÁVEJ podpis (uchazečovo jméno, telefon) — Gmail to dodá automaticky.
-7. NEPŘIDÁVEJ "P.S." nebo emoji.
-8. Match score:
-   - 80-100: silná shoda (zkušenosti + jazyk + lokalita sedí)
-   - 50-79: částečná shoda (chybí 1-2 klíčové věci, ale stojí to za pokus)
-   - 0-49: slabá shoda (poslat by byl plonk)`
+3. Verdict pravidla:
+   - "good" — všechny klíčové požadavky sedí, jazyk OK, lokalita OK
+   - "partial" — chybí 1-2 věci ale stojí to za pokus (učitelné / nice-to-have)
+   - "poor" — chybí must-have (jazyk / hlavní zkušenost / certifikát) — neposílat, ztráta času
+4. Email PIŠ V JAZYCE INZERÁTU (typicky DE pro CH-Deutsch). Pokud inzerát anglicky, piš anglicky.
+5. Email má být osobní — odkaž na 1-2 konkrétní body ze strengths (ne obecné fráze).
+6. NEPIŠ jako AI/bot. Žádné "Sehr geehrte Damen und Herren, ich bewerbe mich hiermit..." — buď přirozený, lehce neformální, ale profesionální.
+7. NEPŘIDÁVEJ podpis (uchazečovo jméno, telefon) — Gmail to dodá automaticky.
+8. NEPŘIDÁVEJ "P.S." ani emoji.
+9. strengths/gaps: maximálně 3 položky, každá max 12 slov, konkrétně — žádné "soft skills", "týmovost" apod.`
 
 /**
  * Generate match score + email draft for a job, given the candidate's CV.
@@ -113,16 +123,18 @@ Vygeneruj match analýzu a draft emailu podle pravidel ze system promptu. Vrať 
   const parsed = JSON.parse(stripped) as DraftResult
 
   // Validation
-  if (typeof parsed.match_score !== 'number' || parsed.match_score < 0 || parsed.match_score > 100) {
-    throw new Error('Invalid match_score in response')
+  if (!['good', 'partial', 'poor'].includes(parsed.verdict)) {
+    throw new Error('Invalid verdict in response')
   }
   if (!parsed.draft_subject || !parsed.draft_body) {
     throw new Error('Missing draft_subject or draft_body')
   }
 
   return {
-    match_score: Math.round(parsed.match_score),
-    match_reasoning: parsed.match_reasoning ?? '',
+    verdict: parsed.verdict,
+    strengths: Array.isArray(parsed.strengths) ? parsed.strengths.slice(0, 3) : [],
+    gaps: Array.isArray(parsed.gaps) ? parsed.gaps.slice(0, 3) : [],
+    recommendation: parsed.recommendation ?? '',
     draft_subject: parsed.draft_subject.slice(0, 200),
     draft_body: parsed.draft_body,
     language: parsed.language || job.language || 'de',
