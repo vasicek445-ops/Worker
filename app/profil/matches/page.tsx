@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../supabase";
-import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Sparkles, Settings } from "lucide-react";
+import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Sparkles, Settings, Wand2, ChevronDown, ChevronUp } from "lucide-react";
 
 type Match = {
   id: string;
@@ -17,6 +17,7 @@ type Match = {
   description: string | null;
   language: string | null;
   match_score: number | null;
+  match_reasoning?: string | null;
   draft_subject: string | null;
   draft_body: string | null;
   status: "pending" | "sent" | "skipped" | "edited" | "expired";
@@ -39,6 +40,8 @@ export default function MatchesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [filter, setFilter] = useState<Filter>("pending");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [draftingId, setDraftingId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -66,6 +69,29 @@ export default function MatchesPage() {
       setError(err?.message || "Načtení selhalo");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function generateDraftFor(id: string) {
+    setDraftingId(id);
+    setError(null);
+    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const res = await fetch(`/api/matches/${id}/draft`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.hint || json.message || json.error || "draft_failed");
+      }
+      setMatches((m) => m.map((x) => (x.id === id ? { ...x, ...json.match } : x)));
+      setExpanded((e) => ({ ...e, [id]: true }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setError(err?.message || "Generování selhalo");
+    } finally {
+      setDraftingId(null);
     }
   }
 
@@ -203,6 +229,12 @@ export default function MatchesPage() {
                   </p>
                 )}
 
+                {m.match_reasoning && (
+                  <p className="text-white/40 text-[11px] italic m-0 mb-3">
+                    💡 {m.match_reasoning}
+                  </p>
+                )}
+
                 <div className="flex flex-wrap items-center gap-2">
                   {m.job_url && (
                     <a
@@ -216,6 +248,24 @@ export default function MatchesPage() {
                   )}
                   {m.status === "pending" && (
                     <>
+                      {!m.draft_body ? (
+                        <button
+                          disabled={draftingId === m.id}
+                          onClick={() => generateDraftFor(m.id)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#ff8c2b]/15 hover:bg-[#ff8c2b]/25 border border-[#ff8c2b]/40 rounded-lg text-xs text-[#ff8c2b] font-semibold disabled:opacity-50"
+                        >
+                          {draftingId === m.id ? <Loader2 size={12} className="animate-spin" /> : <Wand2 size={12} />}
+                          {draftingId === m.id ? "AI píše…" : "Vygeneruj návrh"}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setExpanded((e) => ({ ...e, [m.id]: !e[m.id] }))}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#39ff6e]/10 hover:bg-[#39ff6e]/20 border border-[#39ff6e]/30 rounded-lg text-xs text-[#39ff6e] font-semibold"
+                        >
+                          {expanded[m.id] ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                          {expanded[m.id] ? "Skrýt draft" : "Zobrazit draft"}
+                        </button>
+                      )}
                       <button
                         disabled={busyId === m.id}
                         onClick={() => updateStatus(m.id, "skipped")}
@@ -224,9 +274,6 @@ export default function MatchesPage() {
                         {busyId === m.id ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
                         Přeskočit
                       </button>
-                      <span className="text-[10px] text-white/30 ml-auto italic">
-                        Email draft + odeslání: brzy
-                      </span>
                     </>
                   )}
                   {m.status === "sent" && (
@@ -238,6 +285,20 @@ export default function MatchesPage() {
                     <span className="text-white/30 text-xs italic">Přeskočeno</span>
                   )}
                 </div>
+
+                {expanded[m.id] && m.draft_body && (
+                  <div className="mt-4 pt-4 border-t border-white/[0.06] space-y-2">
+                    <div className="text-xs text-white/40">Předmět</div>
+                    <div className="text-sm font-semibold text-white">{m.draft_subject}</div>
+                    <div className="text-xs text-white/40 mt-3">Tělo emailu ({m.language ?? "—"})</div>
+                    <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans m-0 leading-relaxed">
+                      {m.draft_body}
+                    </pre>
+                    <div className="text-[10px] text-white/30 italic mt-3">
+                      Tlačítko „Pošli&ldquo; bude dostupné v dalším milníku — propojí se s tvým Gmailem.
+                    </div>
+                  </div>
+                )}
               </article>
             ))}
           </div>
