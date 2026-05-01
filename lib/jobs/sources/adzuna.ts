@@ -50,7 +50,11 @@ export async function searchAdzuna(params: {
       url.searchParams.set('app_key', appKey)
       url.searchParams.set('results_per_page', String(perPage))
       url.searchParams.set('content-type', 'application/json')
-      if (position) url.searchParams.set('what', position)
+      if (position) {
+        // Match position only in job title — avoids spurious matches in
+        // description body ("Spolupráce s logistikou výhodou" → logistik recruiter etc).
+        url.searchParams.set('title_only', position)
+      }
       if (location) url.searchParams.set('where', location)
 
       try {
