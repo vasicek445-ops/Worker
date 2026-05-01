@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../../supabase";
-import { Mail, CheckCircle2, AlertCircle, ArrowLeft, Send, Loader2 } from "lucide-react";
+import { Mail, CheckCircle2, AlertCircle, ArrowLeft, Send, Loader2, Settings } from "lucide-react";
 
 type ConnectionStatus =
   | { state: "loading" }
@@ -194,13 +194,21 @@ function GmailConnectContent() {
               <p className="text-white/30 text-xs mb-5">
                 Připojeno {new Date(status.connectedAt).toLocaleString("cs-CZ")}
               </p>
-              <button
-                disabled={busy}
-                onClick={handleDisconnect}
-                className="text-red-400 hover:text-red-300 disabled:opacity-50 text-sm underline"
-              >
-                Odpojit Gmail
-              </button>
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/profil/agent"
+                  className="bg-[#ff8c2b]/10 hover:bg-[#ff8c2b]/20 border border-[#ff8c2b]/30 text-[#ff8c2b] text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-2 no-underline"
+                >
+                  <Settings size={14} /> Nastavit agenta
+                </Link>
+                <button
+                  disabled={busy}
+                  onClick={handleDisconnect}
+                  className="text-red-400 hover:text-red-300 disabled:opacity-50 text-sm underline"
+                >
+                  Odpojit Gmail
+                </button>
+              </div>
             </>
           )}
 
