@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
     salary_text: j.salary_text,
     description: j.description.slice(0, 2000),
     language: j.language,
+    recipient_email: j.recipient_email,
     status: 'pending' as const,
   }))
 
@@ -81,6 +82,8 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     found: result.jobs.length,
     inserted,
+    raw_count: result.raw_count,
+    dropped_no_email: result.dropped_no_email,
     by_source: result.by_source,
     errors: result.errors,
   })

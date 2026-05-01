@@ -26,8 +26,12 @@ export type DiscoverConfig = {
   salary_min_chf: number | null
 }
 
+export type EnrichedJob = NormalizedJob & { recipient_email: string }
+
 export type DiscoverResult = {
-  jobs: NormalizedJob[]
+  jobs: EnrichedJob[] // every job has a verified hiring email
   by_source: Record<string, number>
+  raw_count: number // how many jobs sources returned before email enrichment
+  dropped_no_email: number // how many were dropped because portal-only
   errors: { source: string; error: string }[]
 }

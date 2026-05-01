@@ -45,7 +45,7 @@ export default function AgentSettingsPage() {
   const [newLocation, setNewLocation] = useState("");
   const [discovering, setDiscovering] = useState(false);
   const [discoveryResult, setDiscoveryResult] = useState<
-    | { kind: "ok"; found: number; inserted: number; bySource: Record<string, number> }
+    | { kind: "ok"; found: number; inserted: number; rawCount: number; droppedNoEmail: number; bySource: Record<string, number> }
     | { kind: "err"; message: string }
     | null
   >(null);
@@ -141,6 +141,8 @@ export default function AgentSettingsPage() {
           kind: "ok",
           found: json.found ?? 0,
           inserted: json.inserted ?? 0,
+          rawCount: json.raw_count ?? 0,
+          droppedNoEmail: json.dropped_no_email ?? 0,
           bySource: json.by_source ?? {},
         });
       }
@@ -376,15 +378,27 @@ export default function AgentSettingsPage() {
           {discoveryResult?.kind === "ok" && (
             <div className="mt-4 p-3 rounded-xl bg-[#39ff6e]/5 border border-[#39ff6e]/20 text-sm">
               <div className="text-[#39ff6e] font-semibold">
-                ✅ Nalezeno {discoveryResult.found} pozic, uloženo {discoveryResult.inserted} nových
+                ✅ {discoveryResult.inserted} nových pozic ready k odeslání
               </div>
-              <div className="text-white/40 text-xs mt-1">
-                {Object.entries(discoveryResult.bySource).map(([src, n]) => `${src}: ${n}`).join(" · ")}
+              <div className="text-white/50 text-xs mt-1.5 space-y-0.5">
+                <div>Surové výsledky ze zdrojů: {discoveryResult.rawCount}</div>
+                <div className="text-white/30">
+                  Vyřazeno {discoveryResult.droppedNoEmail} pozic bez emailu (jen portál — Smart Apply tam nemůže)
+                </div>
+                <div className="text-white/30">
+                  Zdroje: {Object.entries(discoveryResult.bySource).map(([src, n]) => `${src} ${n}`).join(" · ")}
+                </div>
               </div>
               {discoveryResult.inserted > 0 && (
-                <Link href="/profil/matches" className="text-[#ff8c2b] text-xs mt-2 inline-block no-underline hover:underline">
+                <Link href="/profil/matches" className="text-[#ff8c2b] text-xs mt-3 inline-block no-underline hover:underline">
                   → Otevřít fronta matchů
                 </Link>
+              )}
+              {discoveryResult.inserted === 0 && discoveryResult.rawCount > 0 && (
+                <div className="text-[#ff8c2b] text-xs mt-3">
+                  Žádná z {discoveryResult.rawCount} pozic nemá email — všechny jsou portal-only.
+                  Zkus jiné keywords (gastro/cleaning/spedice mívají častěji email).
+                </div>
               )}
             </div>
           )}

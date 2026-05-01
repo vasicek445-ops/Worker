@@ -1,5 +1,59 @@
 import { searchAdzuna } from './sources/adzuna'
+import { extractRecipientEmail } from '@/lib/matching/extract'
 import type { DiscoverConfig, DiscoverResult, NormalizedJob } from './types'
+
+const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
+
+/**
+ * Fetch the job's URL, follow redirects, extract a hiring email from HTML.
+ * Returns null if no email found (job is portal-only).
+ */
+async function tryExtractEmail(jobUrl: string): Promise<string | null> {
+  try {
+    const res = await fetch(jobUrl, {
+      headers: { 'User-Agent': UA, Accept: 'text/html,*/*' },
+      redirect: 'follow',
+      signal: AbortSignal.timeout(8_000),
+    })
+    if (!res.ok) return null
+    const html = await res.text()
+    const decoded = html
+      .replace(/&#0*64;/g, '@')
+      .replace(/&#x40;/gi, '@')
+      .replace(/&amp;/g, '&')
+      .replace(/\(at\)/gi, '@')
+      .replace(/\s\[at\]\s/gi, '@')
+      .replace(/<[^>]+>/g, ' ')
+    return extractRecipientEmail(decoded)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Enrich a list of jobs with hiring emails by fetching each redirect URL in
+ * parallel (capped concurrency). Jobs without a discoverable email are dropped
+ * — Smart Apply can't auto-send to portal-only postings.
+ */
+async function enrichWithEmails(
+  jobs: NormalizedJob[],
+  concurrency = 5,
+): Promise<{ enriched: (NormalizedJob & { recipient_email: string })[]; dropped: number }> {
+  const enriched: (NormalizedJob & { recipient_email: string })[] = []
+  let dropped = 0
+  let cursor = 0
+  const workers = Array.from({ length: Math.min(concurrency, jobs.length) }, async () => {
+    while (cursor < jobs.length) {
+      const i = cursor++
+      const job = jobs[i]
+      const email = await tryExtractEmail(job.url)
+      if (email) enriched.push({ ...job, recipient_email: email })
+      else dropped++
+    }
+  })
+  await Promise.all(workers)
+  return { enriched, dropped }
+}
 
 /**
  * Run all enabled sources for a member's config, dedupe by URL, filter by salary.
@@ -46,9 +100,15 @@ export async function discoverJobs(config: DiscoverConfig): Promise<DiscoverResu
   // Filter by language preference (heuristic: detect from description)
   const langFiltered = filterByLanguage(filtered, config.languages)
 
+  // Enrich with hiring emails — drop jobs without an email since Smart Apply
+  // can't auto-send to portal-only postings (Workday/SAP/etc).
+  const { enriched, dropped } = await enrichWithEmails(langFiltered, 6)
+
   return {
-    jobs: langFiltered,
+    jobs: enriched,
     by_source: bySource,
+    raw_count: langFiltered.length,
+    dropped_no_email: dropped,
     errors,
   }
 }
