@@ -1,6 +1,7 @@
 import { searchAdzuna } from './sources/adzuna'
+import { searchAgencies } from './sources/agencies'
 import { extractRecipientEmail } from '@/lib/matching/extract'
-import type { DiscoverConfig, DiscoverResult, NormalizedJob } from './types'
+import type { DiscoverConfig, DiscoverResult, EnrichedJob, NormalizedJob } from './types'
 
 const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
 
@@ -63,11 +64,14 @@ export async function discoverJobs(config: DiscoverConfig): Promise<DiscoverResu
   const errors: DiscoverResult['errors'] = []
   const bySource: Record<string, number> = {}
   const all: NormalizedJob[] = []
+  // Jobs that already have a verified email (e.g. our agencies DB) skip the
+  // expensive scrape-and-enrich step.
+  const preEnriched: EnrichedJob[] = []
 
   // Per-source result cap: enough candidates for scoring without blowing free tier
   const perQuery = Math.min(20, Math.max(5, config.daily_limit * 3))
 
-  // Adzuna (Switzerland primary)
+  // Adzuna (Switzerland — broad job board, mostly portal-only, will need enrichment)
   try {
     const { jobs } = await searchAdzuna({
       positions: config.positions,
@@ -80,6 +84,21 @@ export async function discoverJobs(config: DiscoverConfig): Promise<DiscoverResu
   } catch (err) {
     errors.push({ source: 'adzuna', error: (err as Error).message })
     bySource.adzuna = 0
+  }
+
+  // Agencies (local DB, 1000+ Swiss personnel agencies — emails pre-verified)
+  try {
+    const { jobs } = await searchAgencies({
+      positions: config.positions,
+      locations: config.locations,
+      languages: config.languages,
+      limit: Math.max(15, config.daily_limit * 5),
+    })
+    bySource.agencies = jobs.length
+    preEnriched.push(...jobs)
+  } catch (err) {
+    errors.push({ source: 'agencies', error: (err as Error).message })
+    bySource.agencies = 0
   }
 
   // Dedupe by URL (canonicalized)
@@ -100,14 +119,25 @@ export async function discoverJobs(config: DiscoverConfig): Promise<DiscoverResu
   // Filter by language preference (heuristic: detect from description)
   const langFiltered = filterByLanguage(filtered, config.languages)
 
-  // Enrich with hiring emails — drop jobs without an email since Smart Apply
-  // can't auto-send to portal-only postings (Workday/SAP/etc).
+  // Enrich Adzuna-style jobs with hiring emails — drop portal-only postings.
   const { enriched, dropped } = await enrichWithEmails(langFiltered, 6)
 
+  // Combine: agency jobs (pre-verified emails) + scraped/enriched job-board jobs.
+  // Dedupe again by recipient_email to avoid double-applying to same agency.
+  const combined: EnrichedJob[] = [...preEnriched, ...enriched]
+  const seenEmails = new Set<string>()
+  const finalJobs: EnrichedJob[] = []
+  for (const j of combined) {
+    const k = j.recipient_email.toLowerCase()
+    if (seenEmails.has(k)) continue
+    seenEmails.add(k)
+    finalJobs.push(j)
+  }
+
   return {
-    jobs: enriched,
+    jobs: finalJobs,
     by_source: bySource,
-    raw_count: langFiltered.length,
+    raw_count: langFiltered.length + preEnriched.length,
     dropped_no_email: dropped,
     errors,
   }
