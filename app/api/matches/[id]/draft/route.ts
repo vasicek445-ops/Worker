@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { generateDraft, type CVData } from '@/lib/matching/draft'
+import { extractRecipientEmail } from '@/lib/matching/extract'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -85,7 +86,9 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     }, { status: 500 })
   }
 
-  // 5. Persist draft + structured analysis
+  // 5. Persist draft + structured analysis + extracted recipient email
+  const recipientEmail = extractRecipientEmail(match.description)
+
   const { data: updated, error: updateErr } = await supabaseAdmin
     .from('daily_matches')
     .update({
@@ -96,6 +99,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       draft_subject: draft.draft_subject,
       draft_body: draft.draft_body,
       language: draft.language,
+      recipient_email: recipientEmail,
     })
     .eq('id', id)
     .eq('member_id', user.id)

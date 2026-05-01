@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../supabase";
-import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Settings, Wand2, ChevronDown, ChevronUp, Check, AlertTriangle, ThumbsDown } from "lucide-react";
+import { Inbox, ArrowLeft, ExternalLink, X, Loader2, Building2, MapPin, Coins, Settings, Wand2, ChevronDown, ChevronUp, Check, AlertTriangle, ThumbsDown, Send, Mail } from "lucide-react";
 
 const VERDICT_META = {
   good:    { label: "Sedí ti to",       cls: "bg-[#39ff6e]/10 border-[#39ff6e]/30 text-[#39ff6e]", Icon: Check },
@@ -28,6 +28,7 @@ type Match = {
   recommendation: string | null;
   draft_subject: string | null;
   draft_body: string | null;
+  recipient_email: string | null;
   status: "pending" | "sent" | "skipped" | "edited" | "expired";
   generated_at: string;
   sent_at: string | null;
@@ -49,7 +50,9 @@ export default function MatchesPage() {
   const [filter, setFilter] = useState<Filter>("pending");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [draftingId, setDraftingId] = useState<string | null>(null);
+  const [sendingId, setSendingId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [recipientOverrides, setRecipientOverrides] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -100,6 +103,39 @@ export default function MatchesPage() {
       setError(err?.message || "Generování selhalo");
     } finally {
       setDraftingId(null);
+    }
+  }
+
+  async function sendMatch(id: string) {
+    const m = matches.find((x) => x.id === id);
+    if (!m) return;
+    const recipient = (recipientOverrides[id] || m.recipient_email || "").trim();
+    if (!recipient) {
+      setError("Doplň email příjemce (firma neměla email v inzerátu).");
+      return;
+    }
+    if (!confirm(`Odeslat email na ${recipient}? Posílá se z tvého Gmailu.`)) return;
+    setSendingId(id);
+    setError(null);
+    const { data: { session } } = await supabase.auth.getSession();
+    try {
+      const res = await fetch(`/api/matches/${id}/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session!.access_token}`,
+        },
+        body: JSON.stringify({ recipient_email: recipient }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.hint || json.message || json.error || "send_failed");
+      // Update locally — match disappears from pending filter
+      setMatches((arr) => arr.map((x) => (x.id === id ? { ...x, status: "sent", sent_at: json.sent_at } : x)));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setError(err?.message || "Odeslání selhalo");
+    } finally {
+      setSendingId(null);
     }
   }
 
@@ -320,16 +356,50 @@ export default function MatchesPage() {
                 </div>
 
                 {expanded[m.id] && m.draft_body && (
-                  <div className="mt-4 pt-4 border-t border-white/[0.06] space-y-2">
-                    <div className="text-xs text-white/40">Předmět</div>
-                    <div className="text-sm font-semibold text-white">{m.draft_subject}</div>
-                    <div className="text-xs text-white/40 mt-3">Tělo emailu ({m.language ?? "—"})</div>
-                    <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans m-0 leading-relaxed">
-                      {m.draft_body}
-                    </pre>
-                    <div className="text-[10px] text-white/30 italic mt-3">
-                      Tlačítko „Pošli&ldquo; bude dostupné v dalším milníku — propojí se s tvým Gmailem.
+                  <div className="mt-4 pt-4 border-t border-white/[0.06] space-y-3">
+                    <div>
+                      <div className="text-xs text-white/40 mb-1">Předmět</div>
+                      <div className="text-sm font-semibold text-white">{m.draft_subject}</div>
                     </div>
+                    <div>
+                      <div className="text-xs text-white/40 mb-1">Tělo emailu ({m.language ?? "—"})</div>
+                      <pre className="text-sm text-white/80 whitespace-pre-wrap font-sans m-0 leading-relaxed">
+                        {m.draft_body}
+                      </pre>
+                    </div>
+                    {m.status === "pending" && (
+                      <div className="pt-2 border-t border-white/[0.06]">
+                        <label className="block text-xs text-white/40 mb-1.5 flex items-center gap-1.5">
+                          <Mail size={11} /> Email příjemce
+                          {m.recipient_email && (
+                            <span className="text-[10px] text-[#39ff6e]/70">(automaticky z inzerátu)</span>
+                          )}
+                          {!m.recipient_email && (
+                            <span className="text-[10px] text-[#ff8c2b]/70">(doplň ručně — v inzerátu nebyl)</span>
+                          )}
+                        </label>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="email"
+                            value={recipientOverrides[m.id] ?? m.recipient_email ?? ""}
+                            onChange={(e) => setRecipientOverrides((o) => ({ ...o, [m.id]: e.target.value }))}
+                            placeholder="hr@firma.ch"
+                            className="flex-1 px-3 py-2 bg-white/[0.04] border border-white/10 rounded-lg text-sm focus:outline-none focus:border-[#ff8c2b]"
+                          />
+                          <button
+                            disabled={sendingId === m.id}
+                            onClick={() => sendMatch(m.id)}
+                            className="bg-[#ff8c2b] hover:bg-[#ff6a1f] disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg flex items-center justify-center gap-1.5 text-sm"
+                          >
+                            {sendingId === m.id ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                            {sendingId === m.id ? "Posílám…" : "Pošli z mého Gmailu"}
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-white/30 mt-2 m-0">
+                          Email se pošle z tvého Gmailu — máš nad ním plnou kontrolu, odpovědi chodí přímo do tvého Inboxu.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </article>

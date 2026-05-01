@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
   let query = supabaseAdmin
     .from('daily_matches')
-    .select('id, job_url, job_source, company, position, location, salary_text, description, language, verdict, strengths, gaps, recommendation, draft_subject, draft_body, status, generated_at, sent_at')
+    .select('id, job_url, job_source, company, position, location, salary_text, description, language, verdict, strengths, gaps, recommendation, draft_subject, draft_body, recipient_email, status, generated_at, sent_at')
     .eq('member_id', user.id)
     .order('generated_at', { ascending: false })
     .limit(100)
