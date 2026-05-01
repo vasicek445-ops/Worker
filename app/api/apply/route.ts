@@ -236,8 +236,8 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
     }
 
     // Convert HTML documents to PDF using single browser session
-    let cvPdfBase64: string | null = null
-    let letterPdfBase64: string | null = null
+    let cvPdfBuffer: Buffer | null = null
+    let letterPdfBuffer: Buffer | null = null
     const needsBrowser = cvHtml || letterHtml
 
     if (needsBrowser) {
@@ -247,6 +247,8 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
         executablePath: await chromium.executablePath(CHROMIUM_URL),
         headless: true,
       })
+
+      try {
 
       if (cvHtml) {
         const fullCvHtml = cvHtml.trim().startsWith('<!DOCTYPE') || cvHtml.trim().startsWith('<html')
@@ -259,10 +261,10 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
 <body>${cvHtml}</body>
 </html>`
         const cvPage = await browser.newPage()
-        await cvPage.setContent(fullCvHtml, { waitUntil: 'networkidle0' })
+        await cvPage.setContent(fullCvHtml, { waitUntil: 'domcontentloaded', timeout: 15000 })
         const cvPdf = await cvPage.pdf({ format: 'A4', printBackground: true, margin: { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' } })
         await cvPage.close()
-        cvPdfBase64 = Buffer.from(cvPdf).toString('base64')
+        cvPdfBuffer = Buffer.from(cvPdf)
       }
 
       if (letterHtml) {
@@ -276,22 +278,23 @@ Vzdělání: ${profile.vzdelani || 'neuvedeno'}`
 <body>${letterHtml}</body>
 </html>`
         const letterPage = await browser.newPage()
-        await letterPage.setContent(fullLetterHtml, { waitUntil: 'networkidle0' })
+        await letterPage.setContent(fullLetterHtml, { waitUntil: 'domcontentloaded', timeout: 15000 })
         const letterPdf = await letterPage.pdf({ format: 'A4', printBackground: true, margin: { top: '10mm', right: '10mm', bottom: '10mm', left: '10mm' } })
         await letterPage.close()
-        letterPdfBase64 = Buffer.from(letterPdf).toString('base64')
+        letterPdfBuffer = Buffer.from(letterPdf)
       }
-
-      await browser.close()
+      } finally {
+        await browser.close()
+      }
     }
 
-    // Build attachments array
-    const attachments: Array<{ filename: string; content: string }> = []
-    if (letterPdfBase64) {
-      attachments.push({ filename: `Bewerbungsschreiben_${candidateName.replace(/\s+/g, '_')}.pdf`, content: letterPdfBase64 })
+    // Build attachments array (Buffer = raw bytes; Resend SDK base64-encodes internally)
+    const attachments: Array<{ filename: string; content: Buffer }> = []
+    if (letterPdfBuffer) {
+      attachments.push({ filename: `Bewerbungsschreiben_${candidateName.replace(/\s+/g, '_')}.pdf`, content: letterPdfBuffer })
     }
-    if (cvPdfBase64) {
-      attachments.push({ filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.pdf`, content: cvPdfBase64 })
+    if (cvPdfBuffer) {
+      attachments.push({ filename: `Lebenslauf_${candidateName.replace(/\s+/g, '_')}.pdf`, content: cvPdfBuffer })
     }
 
     // Build email HTML body
@@ -313,7 +316,7 @@ Im Anhang finden Sie meine Bewerbungsunterlagen.
 </body></html>`
 
     // Send email
-    await resend.emails.send({
+    const sendResult = await resend.emails.send({
       from: `${candidateName} – Bewerbung <bewerbung@gowoker.com>`,
       to: agency.email,
       replyTo: user.email!,
@@ -322,6 +325,12 @@ Im Anhang finden Sie meine Bewerbungsunterlagen.
       html: emailHtml,
       ...(attachments.length > 0 ? { attachments } : {}),
     })
+
+    if (sendResult.error) {
+      console.error('Resend error:', JSON.stringify(sendResult.error), { to: agency.email, attachments: attachments.length })
+      return NextResponse.json({ error: `Email selhal: ${sendResult.error.message || 'unknown'}` }, { status: 502 })
+    }
+    console.log('Resend sent:', sendResult.data?.id, 'to', agency.email, 'attachments:', attachments.length)
 
     // Record application in database
     await supabaseAdmin.from('applications').insert({
