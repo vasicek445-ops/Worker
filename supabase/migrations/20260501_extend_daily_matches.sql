@@ -11,10 +11,14 @@ alter table public.daily_matches
 -- Allow null company (some Adzuna feeds don't include it)
 alter table public.daily_matches alter column company drop not null;
 
--- Dedupe per member: (member_id, job_url) must be unique
-create unique index if not exists uniq_daily_matches_member_url
-  on public.daily_matches (member_id, job_url)
-  where job_url is not null;
+-- Dedupe per member: (member_id, job_url) must be unique.
+-- Note: ON CONFLICT in Supabase upsert does NOT work with partial indexes
+-- (WHERE clause), so we use a full unique constraint instead.
+do $$ begin
+  alter table public.daily_matches
+    add constraint daily_matches_member_url_unique unique (member_id, job_url);
+exception when duplicate_object then null;
+end $$;
 
 create index if not exists idx_daily_matches_match_date
   on public.daily_matches (member_id, match_date desc);
