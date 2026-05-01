@@ -131,7 +131,11 @@ export default function AgentSettingsPage() {
       });
       const json = await res.json();
       if (!res.ok) {
-        setDiscoveryResult({ kind: "err", message: json.error || "discover_failed" });
+        const detail = json.message || json.hint || "";
+        setDiscoveryResult({
+          kind: "err",
+          message: detail ? `${json.error || "discover_failed"}: ${detail}` : (json.error || "discover_failed"),
+        });
       } else {
         setDiscoveryResult({
           kind: "ok",
