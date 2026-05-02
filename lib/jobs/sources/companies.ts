@@ -41,8 +41,10 @@ export async function searchCompanies(params: {
 
   let query = supabaseAdmin
     .from('companies')
-    .select('id, source, name, email, phone, website, city, canton, region, branche, positions')
+    .select('id, source, name, email, email_role, phone, website, city, canton, region, branche, positions')
     .not('email', 'is', null)
+    // Prefer HR-tagged + person-specific emails over generic info@; skip sales@
+    .not('email_role', 'eq', 'sales')
 
   const regions = languages.map((l) => LANG_REGION[l]).filter(Boolean)
   if (regions.length) query = query.in('region', regions)
@@ -67,7 +69,8 @@ export async function searchCompanies(params: {
     if (ors) query = query.or(ors)
   }
 
-  const { data, error } = await query.limit(limit)
+  // Order by email tier so 'hr' and 'specific' come first
+  const { data, error } = await query.order('email_role', { ascending: true }).limit(limit)
   if (error) throw new Error(`companies: ${error.message}`)
 
   const jobs: (NormalizedJob & { recipient_email: string })[] = (data ?? []).map((c: CompanyRow) =>
