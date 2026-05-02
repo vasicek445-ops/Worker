@@ -15,6 +15,10 @@
     {
       "path": "/api/cron/scrape-housing",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-localch",
+      "schedule": "0 4 * * *"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { searchAdzuna } from './sources/adzuna'
 import { searchAgencies } from './sources/agencies'
+import { searchCompanies } from './sources/companies'
 import { extractRecipientEmail } from '@/lib/matching/extract'
 import type { DiscoverConfig, DiscoverResult, EnrichedJob, NormalizedJob } from './types'
 
@@ -101,6 +102,21 @@ export async function discoverJobs(config: DiscoverConfig): Promise<DiscoverResu
   } catch (err) {
     errors.push({ source: 'agencies', error: (err as Error).message })
     bySource.agencies = 0
+  }
+
+  // Companies (Smart Apply's growing index of swiss SMEs from local.ch + future sources)
+  try {
+    const { jobs } = await searchCompanies({
+      positions: config.positions,
+      locations: config.locations,
+      languages: config.languages,
+      limit: Math.max(20, config.daily_limit * 8),
+    })
+    bySource.companies = jobs.length
+    preEnriched.push(...jobs)
+  } catch (err) {
+    errors.push({ source: 'companies', error: (err as Error).message })
+    bySource.companies = 0
   }
 
   // Dedupe by URL (canonicalized)
