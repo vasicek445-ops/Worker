@@ -90,20 +90,19 @@ export async function scrapeLocalChListing(params: {
 }
 
 function extractNearestName(window: string): string | null {
-  // Try common patterns local.ch uses
-  const patterns = [
-    /aria-label="([^"]{3,80})"\s*[^>]*href="\/[^"]*\/d\//, // detail link
+  // All patterns must be global so matchAll works.
+  const patterns: RegExp[] = [
+    /aria-label="([^"]{3,80})"\s*[^>]*href="\/[^"]*\/d\//g,
     /<h[23][^>]*>([^<]{3,80})<\/h[23]>/g,
     /"name"\s*:\s*"([^"]{3,80})"/g,
     /title="([^"]{3,80})"/g,
   ]
   let best: string | null = null
   for (const re of patterns) {
-    const matches = Array.from(window.matchAll(typeof re === 'string' ? new RegExp(re, 'g') : re as RegExp))
-    if (matches.length) {
-      const last = matches[matches.length - 1][1]
-      if (last && (!best || last.length > best.length)) best = last
-    }
+    const matches = Array.from(window.matchAll(re))
+    if (!matches.length) continue
+    const last = matches[matches.length - 1][1]
+    if (last && (!best || last.length > best.length)) best = last
   }
   return best ? best.trim().slice(0, 120) : null
 }
