@@ -66,7 +66,8 @@ export async function POST(req: NextRequest) {
       const rows = companies.map((c) => ({
         source: 'localch',
         external_id: null,
-        name: c.name ?? null,
+        // Fallback when name extraction failed: use email domain as company name
+        name: c.name ?? domainToName(c.email),
         email: c.email,
         phone: c.phone,
         website: c.website,
@@ -157,4 +158,10 @@ const BRANCHE_POSITIONS: Record<string, string[]> = {
 
 function brancheToPositions(branche: string): string[] {
   return BRANCHE_POSITIONS[branche] ?? []
+}
+
+function domainToName(email: string): string {
+  const domain = email.split('@')[1] ?? 'unknown'
+  const root = domain.replace(/^www\./, '').split('.')[0]
+  return root.charAt(0).toUpperCase() + root.slice(1)
 }
