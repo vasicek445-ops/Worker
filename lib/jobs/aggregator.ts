@@ -71,19 +71,21 @@ export async function discoverJobs(config: DiscoverConfig): Promise<DiscoverResu
   // Per-source result cap: enough candidates for scoring without blowing free tier
   const perQuery = Math.min(20, Math.max(5, config.daily_limit * 3))
 
-  // Adzuna (Switzerland — broad job board, mostly portal-only, will need enrichment)
+  // Adzuna (multi-country fan-out: CH + DE + AT for DE speakers, etc).
+  // SMEs in DE/AT still mailbox-apply more than CH enterprises.
   try {
-    const { jobs } = await searchAdzuna({
+    const { jobs, byCountry } = await searchAdzuna({
       positions: config.positions,
       locations: config.locations,
+      languages: config.languages,
       resultsPerQuery: perQuery,
-      country: 'ch',
     })
-    bySource.adzuna = jobs.length
+    for (const [country, n] of Object.entries(byCountry)) {
+      bySource[`adzuna_${country}`] = n
+    }
     all.push(...jobs)
   } catch (err) {
     errors.push({ source: 'adzuna', error: (err as Error).message })
-    bySource.adzuna = 0
   }
 
   // Agencies (local DB, 1000+ Swiss personnel agencies — emails pre-verified)
