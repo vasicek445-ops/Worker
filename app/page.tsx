@@ -769,39 +769,6 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* ── EMPATHY ── */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <FadeIn>
-            <p className="text-2xl sm:text-3xl font-bold text-white mb-8">
-              Taky jsme tam stáli. Na letišti. Se dvěma kuframa.
-            </p>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-              {[
-                "Googlíš německy a nerozumíš ani nadpisům",
-                "Zahraniční zprostředkovatelé chtějí 600 EUR jen za kontakt na firmu",
-                "Na byt v Zürichu odpovídá 200 lidí. Ty jsi 201.",
-                "Nevíš jestli ti ten chlap na Facebooku fakt sežene práci",
-              ].map((pain) => (
-                <div
-                  key={pain}
-                  className="rounded-xl bg-white/[0.03] border border-white/[0.06] px-5 py-3 text-sm text-white/50"
-                >
-                  {pain}
-                </div>
-              ))}
-            </div>
-          </FadeIn>
-          <FadeIn delay={0.2}>
-            <p className="text-lg font-bold text-white">
-              Woker existuje, protože jsme to zažili sami.
-            </p>
-          </FadeIn>
-        </div>
-      </section>
-
       {/* ── VALUE PROPS HEADLINE ── */}
       <section className="pt-12 sm:pt-16 pb-2 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto text-center">
