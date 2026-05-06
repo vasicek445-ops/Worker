@@ -806,8 +806,12 @@ export default function MarketingPage() {
       <section className="pt-12 sm:pt-16 pb-2 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto text-center">
           <FadeIn>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
-              Pomáháme Čechům a Slovákům ve Švýcarsku s:
+            <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+              Připoj Gmail a Woker za tebe osloví{" "}
+              <span className="text-orange-400">
+                švýcarské firmy, 1007 pracovních agentur a majitele bytů
+              </span>{" "}
+              na míru tvé situaci:
             </h2>
           </FadeIn>
         </div>
