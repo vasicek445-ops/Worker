@@ -127,7 +127,7 @@ function Navbar() {
           </Link>
           <Link
             href="/login?tab=register"
-            className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-[#39ff6e] text-[#0a0a12] hover:bg-[#32e060] transition-all"
+            className="px-5 py-2.5 text-sm font-semibold rounded-lg bg-[#fb923c] text-[#0a0a12] hover:bg-[#f97316] transition-all"
           >
             Začni ZDARMA
           </Link>
@@ -176,7 +176,7 @@ function Navbar() {
             </Link>
             <Link
               href="/login?tab=register"
-              className="mt-1 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-[#39ff6e] text-[#0a0a12]"
+              className="mt-1 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-[#fb923c] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
               Začni ZDARMA
@@ -571,7 +571,7 @@ export default function MarketingPage() {
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <Link
                   href="/login?tab=register"
-                  className="px-7 py-3.5 rounded-xl text-base font-bold bg-[#39ff6e] text-[#0a0a12] hover:bg-[#32e060] transition-all shadow-lg shadow-[#39ff6e]/20"
+                  className="px-7 py-3.5 rounded-xl text-base font-bold bg-[#fb923c] text-[#0a0a12] hover:bg-[#f97316] transition-all shadow-lg shadow-[#fb923c]/20"
                 >
                   Zaregistruj se a prozkoumej Woker &rarr;
                 </Link>
@@ -644,7 +644,7 @@ export default function MarketingPage() {
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-center mb-16 text-white">
               Získej práci ve Švýcarsku ve{" "}
-              <span className="text-[#39ff6e]">3 krocích:</span>
+              <span className="text-[#fb923c]">3 krocích:</span>
             </h2>
           </FadeIn>
 
@@ -656,25 +656,26 @@ export default function MarketingPage() {
                   num: "1",
                   title: "Vyplň profil",
                   desc: "Řekni nám co umíš, kde chceš pracovat a jakou máš němčinu.",
-                  icon: "/images/profile-card-icon.svg",
+                  icon: "/illustrations/steps/01-profile.png?v=3",
                 },
                 {
                   num: "2",
                   title: "AI vyřeší zbytek",
                   desc: "Woker ti najde agentury, napíše životopis v němčině a odešle přihlášky.",
-                  icon: "/images/ai-automation-icon.svg",
+                  icon: "/illustrations/steps/02-ai.png?v=3",
                 },
                 {
                   num: "3",
                   title: "Začni vydělávat",
                   desc: "Nastoupíš do práce ve Švýcarsku. Průměrně do 30 dní.",
-                  icon: "/images/earning-icon.svg",
+                  icon: "/illustrations/steps/03-earning.png?v=3",
                 },
               ].map((step, i) => (
                 <FadeIn key={step.num} delay={i * 0.1}>
                   <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-7 sm:p-8 flex items-start gap-6">
-                    <div className="w-20 h-20 rounded-xl bg-[#39ff6e]/10 border border-[#39ff6e]/20 flex items-center justify-center shrink-0 overflow-hidden">
-                      <img src={step.icon} alt={step.title} className="w-14 h-14 object-contain" />
+                    <div className="w-20 h-20 flex items-center justify-center shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={step.icon} alt={step.title} className="w-full h-full object-contain" />
                     </div>
                     <div>
                       <h3 className="text-white font-bold text-xl mb-2">{step.title}</h3>
@@ -701,7 +702,7 @@ export default function MarketingPage() {
             <div className="flex justify-center mt-12">
               <Link
                 href="/login?tab=register"
-                className="px-7 py-3.5 rounded-xl text-base font-bold bg-[#39ff6e] text-[#0a0a12] hover:bg-[#32e060] transition-all shadow-lg shadow-[#39ff6e]/20"
+                className="px-7 py-3.5 rounded-xl text-base font-bold bg-[#fb923c] text-[#0a0a12] hover:bg-[#f97316] transition-all shadow-lg shadow-[#fb923c]/20"
               >
                 Zaregistruj se a prozkoumej Woker &rarr;
               </Link>
@@ -784,106 +785,69 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <FadeIn>
-            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-14">
-              3 kroky. 5 minut. Hotovo.
-            </h2>
-          </FadeIn>
-          <div className="grid sm:grid-cols-3 gap-8 sm:gap-6">
+      {/* ── FEATURE CARDS (Flixy-style) ── */}
+      <section className="py-10 sm:py-16 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
             {[
               {
-                num: "1",
-                title: "Zaregistruj se za 2 minuty",
-                desc: "Žádná kreditka. Žádný závazek. Stačí email.",
+                image: "/illustrations/cards/01-outreach.png?v=3",
+                tag: "Smart Apply",
+                title: "Chytrá žádost o práci i bydlení",
+                desc: "Připoj Gmail a Woker za tebe napíše profesionální německé zprávy zaměstnavatelům, agenturám i na bydlení — dle švýcarských standardů. Ty klikneš send a emaily vypadají, jako bys je napsal sám — nejsou generické a odcházejí z tvé schránky. Odpovědi chodí přímo tobě.",
               },
               {
-                num: "2",
-                title: "Řekni nám co hledáš",
-                desc: "Práci v Zürichu? Byt v Bernu? Životopis německy? Klikni a máš to.",
+                image: "/illustrations/cards/02-prace.png?v=3",
+                tag: "Smart Jobs",
+                title: "1007 pracovních agentur a stovky švýcarských firem",
+                desc: "Volej rovnou tomu, kdo rozhoduje — manuálně nebo přes Smart Apply. Filtruj podle kantonu, jazyka i oboru; u každé najdeš telefon, e-mail i adresu. Agentury jsou nejrychlejší cesta do práce — nástup během několika dní. Firmy jsou pro ty, co přes agenturu pracují delší dobu a chtějí se posunout.",
               },
               {
-                num: "3",
-                title: "Zavolej a domluv se",
-                desc: "Vidíš telefon, vidíš cenu. Žádný prostředník. Zvedneš a mluvíš.",
+                image: "/illustrations/cards/03-bydleni.png?v=3",
+                tag: "Smart Housing",
+                title: "Woker za tebe najde cenově dostupné bydlení",
+                desc: "S přímým kontaktem na majitele, neustále zajišťujeme v reálném čase cenu a dostupnost bydlení — tak abys přijel přímo do svého ubytování, než začneš pracovat. Ceny i dostupnost pravidelně aktualizujeme. Průměrný nájem ve Švýcarsku: 400–900+ CHF pro jednotlivce podle kantonu. Pro dvojice či skupiny je to vždy výhodnější — na osobu to vychází průměrně 600–750 CHF na měsíc.",
               },
-            ].map((step, i) => (
-              <FadeIn key={step.num} delay={i * 0.1}>
-                <div className="text-center sm:text-left">
-                  <span className="inline-block text-5xl font-extrabold text-[#39ff6e]/20 mb-3">
-                    {step.num}
-                  </span>
-                  <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                  <p className="text-sm text-white/50 leading-relaxed">{step.desc}</p>
+              {
+                image: "/illustrations/cards/04-cv.png?v=4",
+                tag: "Smart AI",
+                title: "Tvůj AI tým na hledání práce ve Švýcarsku",
+                desc: "Životopis, motivační dopis, Bewerbungsdossier, analýza inzerátu, analýza smlouvy i příprava na pohovor — každý nástroj je trénovaný na švýcarský trh a otestovaný švýcarskými náboráři tak, abys dostal nejvyšší možnou kvalitu připravenou k odeslání. Zadáš nám pár jednoduchých informací o sobě, zbytek si AI vezme z tvého profilu — a dřív než si stihneš vypít kafe, máš v ruce životopis nebo motivační dopis na míru, který Švýcaři okamžitě poznají jako svůj.",
+              },
+              {
+                image: "/illustrations/cards/05-pohovor.png?v=2",
+                tag: "Smart Interview",
+                title: "Nauč se rozumět tomu, co se tě v pohovoru ptají — a odpověz správně",
+                desc: "10 otázek šitých na tvou pozici a obor, vzorové odpovědi v němčině podle tvé úrovně (A1-C1), 5 varování, 10 klíčových frází i tip na Lohnvorstellung. AI co si nevymýšlí — pracuje jen s tím, co o sobě napíšeš. Většina lidí ve Švýcarsku začíná bez jazyka — tohle ti dá konkurenční výhodu. A i generické HR otázky ('Hast du Auto?', 'Wann kannst du anfangen?') tě nezaseknou, když je čekáš.",
+              },
+              {
+                image: "/images/3d/wooky-wave.png",
+                tag: "Smart Wooky",
+                title: "Máš otázky k povolení, daním nebo pojištění? Wooky ti rád odpoví — 24/7.",
+                desc: "Wooky je vyladěný na švýcarský trh a je tu, aby ti odpověděl na veškeré otázky od povolení přes daně, pomůže i s pojištěním a registrací na Gemeinde. Najdeš ho zdarma tady na webu i uvnitř Wokeru, kde tě provede celým procesem. Stačí se ho zeptat.",
+              },
+            ].map((card, i) => (
+              <FadeIn key={card.title} delay={i * 0.05}>
+                <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-6 sm:p-8 h-full">
+                  <div className="text-orange-400 text-xs sm:text-sm font-semibold uppercase tracking-wide mb-4">
+                    {card.tag}
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-tight">
+                    {card.title}
+                    {" "}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={card.image}
+                      alt=""
+                      className="inline-block w-10 h-10 sm:w-12 sm:h-12 align-middle object-contain"
+                    />
+                  </h3>
+                  <p className="text-white/60 leading-relaxed text-sm sm:text-base">
+                    {card.desc}
+                  </p>
                 </div>
               </FadeIn>
             ))}
-          </div>
-          <FadeIn delay={0.3}>
-            <div className="text-center mt-12">
-              <Link
-                href="/zdarma"
-                className="inline-block px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
-              >
-                Zaregistrovat se zdarma &rarr;
-              </Link>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* ── SOCIAL PROOF ── */}
-      <section className="py-16 sm:py-24 px-4 sm:px-6 bg-[#111128]/40">
-        <div className="max-w-5xl mx-auto">
-          <FadeIn>
-            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Nemusíš nám věřit. Poslechni si je.
-            </h2>
-          </FadeIn>
-
-          {/* Stats */}
-          <FadeIn delay={0.05}>
-            <div className="grid grid-cols-3 gap-4 mb-14">
-              {[
-                { target: 4600, label: "ubytování v databázi" },
-                { target: 1007, label: "ověřených agentur" },
-                { target: 50, label: "přestěhování díky Wokeru", suffix: "+" },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <p className="text-3xl sm:text-4xl font-extrabold text-white">
-                    <Counter target={stat.target} suffix={stat.suffix} />
-                  </p>
-                  <p className="text-sm text-white/40 mt-1">{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </FadeIn>
-
-          {/* Testimonials */}
-          <div className="grid sm:grid-cols-3 gap-4">
-            <TestimonialCard
-              quote="Přistál jsem v Zürichu v neděli. V pondělí ráno jsem přes Woker volal do agentury. Ve středu jsem nastoupil na sklad. 3 týdny od registrace — práce i byt."
-              name="Martin"
-              role="skladník"
-              origin="Česko &rarr; Zürich"
-              delay={0.1}
-            />
-            <TestimonialCard
-              quote="Agentúra mi chcela účtovať 600 EUR len za číslo na zamestnávateľa. Na Wokeri som si ho našla sama. Zadarmo. Za 10 minút."
-              name="Katarína"
-              role="upratovačka"
-              origin="Slovensko &rarr; Bern"
-              delay={0.15}
-            />
-            <TestimonialCard
-              quote="Napsal jsem česky co umím. Za 90 sekund mi vypadl německý Bewerbungsdossier. Lepší než to co mi za 200 EUR napsala agentura."
-              name="Tomek"
-              role="stavbař"
-              origin="Polsko &rarr; Basel"
-              delay={0.2}
-            />
           </div>
         </div>
       </section>
