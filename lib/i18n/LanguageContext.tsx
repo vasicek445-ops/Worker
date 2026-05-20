@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { Locale, Translation } from "./types";
 import translations from "./translations";
 
@@ -15,21 +15,17 @@ const LanguageContext = createContext<LanguageContextType>({
   setLocale: () => {},
 });
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
+function detectLocale(): Locale {
+  if (typeof window === "undefined") return "en";
+  const saved = document.cookie.match(/woker-lang=(\w+)/)?.[1] as Locale;
+  if (saved && translations[saved]) return saved;
+  const browserLang = navigator.language.split("-")[0] as Locale;
+  if (translations[browserLang]) return browserLang;
+  return "en";
+}
 
-  useEffect(() => {
-    const saved = document.cookie.match(/woker-lang=(\w+)/)?.[1] as Locale;
-    if (saved && translations[saved]) {
-      setLocaleState(saved);
-    } else {
-      // Auto-detect from browser
-      const browserLang = navigator.language.split("-")[0] as Locale;
-      if (translations[browserLang]) {
-        setLocaleState(browserLang);
-      }
-    }
-  }, []);
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [locale, setLocaleState] = useState<Locale>(detectLocale);
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);

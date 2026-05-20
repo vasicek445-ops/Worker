@@ -23,6 +23,14 @@
     {
       "path": "/api/cron/scrape-karriere",
       "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-indeed",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/enrich-emails",
+      "schedule": "30 8 * * *"
     }
   ]
 }

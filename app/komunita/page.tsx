@@ -111,7 +111,7 @@ export default function KomunitaPage() {
       })
       if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
       setShowForm(false); setForm({ category: 'dotaz' }); setFormImages([]); fetchPosts()
-    } catch (err: any) { setError(err.message) }
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : 'Chyba') }
     finally { setSubmitting(false) }
   }
 

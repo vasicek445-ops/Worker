@@ -18,7 +18,7 @@ export default function NotFound() {
           style={{
             fontSize: "80px",
             fontWeight: 900,
-            background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+            background: "linear-gradient(135deg, #fb923c, #f97316)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             lineHeight: 1,
@@ -51,7 +51,7 @@ export default function NotFound() {
           <Link
             href="/"
             style={{
-              background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+              background: "linear-gradient(135deg, #fb923c, #f97316)",
               color: "#0a0a12",
               padding: "14px 28px",
               borderRadius: "12px",

@@ -96,8 +96,8 @@ export default async function BlogArticlePage({ params }: Props) {
                 style={{
                   fontSize: 12,
                   fontWeight: 600,
-                  color: "#39ff6e",
-                  background: "rgba(57,255,110,0.08)",
+                  color: "#fb923c",
+                  background: "rgba(251,146,60,0.08)",
                   padding: "4px 10px",
                   borderRadius: 6,
                 }}
@@ -168,7 +168,7 @@ export default async function BlogArticlePage({ params }: Props) {
           style={{
             marginTop: 48,
             background: "linear-gradient(135deg, #1a3a22 0%, #0f2818 100%)",
-            border: "1px solid rgba(57,255,110,0.2)",
+            border: "1px solid rgba(251,146,60,0.2)",
             borderRadius: 16,
             padding: "36px 32px",
             textAlign: "center",
@@ -199,7 +199,7 @@ export default async function BlogArticlePage({ params }: Props) {
             href="/login"
             style={{
               display: "inline-block",
-              background: "#39ff6e",
+              background: "#fb923c",
               color: "#0a0a12",
               fontWeight: 700,
               fontSize: 15,
@@ -249,7 +249,7 @@ export default async function BlogArticlePage({ params }: Props) {
           font-weight: 600;
         }
         .blog-content a {
-          color: #39ff6e;
+          color: #fb923c;
           text-decoration: underline;
           text-underline-offset: 3px;
         }
@@ -282,8 +282,8 @@ export default async function BlogArticlePage({ params }: Props) {
         }
         .blog-content .info-box {
           background: #111120;
-          border: 1px solid rgba(57,255,110,0.12);
-          border-left: 3px solid #39ff6e;
+          border: 1px solid rgba(251,146,60,0.12);
+          border-left: 3px solid #fb923c;
           border-radius: 10px;
           padding: 18px 20px;
           margin: 24px 0;
@@ -292,10 +292,10 @@ export default async function BlogArticlePage({ params }: Props) {
           color: rgba(255,255,255,0.7);
         }
         .blog-content .info-box strong {
-          color: #39ff6e;
+          color: #fb923c;
         }
         .blog-content .info-box a {
-          color: #39ff6e;
+          color: #fb923c;
         }
       `}</style>
     </main>

@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
+    if ((sub?.status !== 'active' && sub?.status !== 'trialing')) return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
     // Check for force refresh param
     const body = await req.json().catch(() => ({}))

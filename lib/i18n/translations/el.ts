@@ -10,7 +10,7 @@ const el: Translation = {
     guides_title: "Οδηγός Ελβετίας", guides_all: "Όλα",
     premium_title: "Woker Premium",
     premium_desc: "Ξεκλείδωσε 1.000+ επαφές, premium οδηγούς και AI βοηθό για εργασία στην Ελβετία.",
-    premium_cta: "Ενεργοποίηση 9,99 €/μήνα", premium_trial: "Χωρίς δέσμευση",
+    premium_cta: "Δοκιμάστε 7 ημέρες δωρεάν", premium_trial: "Χωρίς δέσμευση",
     wooky_name: "Βοηθός Wooky", wooky_online: "Online 24/7",
     wooky_message: "Γεια! 👋 Είμαι ο Wooky, ο βοηθός σου για εργασία στην Ελβετία. Βοηθάω με άδειες, στέγαση και αναζήτηση εργασίας.",
     wooky_open: "Άνοιγμα chat →",
@@ -26,7 +26,7 @@ const el: Translation = {
   paywall: {
     title: "Ξεκλείδωσε πλήρη πρόσβαση",
     description: "Απόκτησε επαφές εταιρειών, οδηγούς και AI βοηθό",
-    cta: "Συνδρομή 9,99 €/μήνα",
+    cta: "Δοκιμάστε 7 ημέρες δωρεάν",
     disclaimer: "Ακύρωση ανά πάσα στιγμή • 7 ημέρες δωρεάν",
   },
   home: {

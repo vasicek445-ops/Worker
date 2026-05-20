@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
 import { stripe } from '@/lib/stripe'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-function safeDate(timestamp: any): string {
+function safeDate(timestamp: number | string | null | undefined): string {
   try {
     if (!timestamp) return new Date().toISOString()
     const ms = typeof timestamp === 'number' && timestamp < 1e12 ? timestamp * 1000 : timestamp
@@ -17,12 +18,12 @@ function safeDate(timestamp: any): string {
 export async function POST(req: NextRequest) {
   const body = await req.text()
   const signature = req.headers.get('stripe-signature')!
-  let event: any
+  let event: Stripe.Event
 
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
-  } catch (err: any) {
-    console.error('Signature error:', err.message)
+  } catch (err: unknown) {
+    console.error('Signature error:', err instanceof Error ? err.message : String(err))
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
         let cancelAtPeriodEnd = false
         if (session.subscription) {
           try {
-           const sub = await stripe.subscriptions.retrieve(session.subscription as string) as any
+           const sub = await stripe.subscriptions.retrieve(session.subscription as string) as Stripe.Subscription & { current_period_end?: number }
            periodEnd = safeDate(sub.current_period_end)
            cancelAtPeriodEnd = sub.cancel_at_period_end || false
           } catch (e) {
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
         break
       }
       case 'customer.subscription.updated': {
-        const sub = event.data.object
+        const sub = event.data.object as Stripe.Subscription & { current_period_end?: number }
         const { error } = await supabaseAdmin.from('subscriptions').update({
           status: sub.status,
           current_period_end: safeDate(sub.current_period_end),
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
         break
       }
       case 'invoice.payment_failed': {
-        const invoice = event.data.object
+        const invoice = event.data.object as Stripe.Invoice & { subscription?: string | null }
         if (!invoice.subscription) break
         const { error } = await supabaseAdmin.from('subscriptions').update({
           status: 'past_due',

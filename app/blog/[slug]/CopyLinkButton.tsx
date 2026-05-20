@@ -27,11 +27,11 @@ export default function CopyLinkButton() {
     <button
       onClick={handleCopy}
       style={{
-        background: copied ? "rgba(57,255,110,0.15)" : "rgba(255,255,255,0.06)",
+        background: copied ? "rgba(251,146,60,0.15)" : "rgba(255,255,255,0.06)",
         border: "1px solid rgba(255,255,255,0.08)",
         borderRadius: 8,
         padding: "8px 16px",
-        color: copied ? "#39ff6e" : "rgba(255,255,255,0.55)",
+        color: copied ? "#fb923c" : "rgba(255,255,255,0.55)",
         fontSize: 13,
         fontWeight: 500,
         cursor: "pointer",

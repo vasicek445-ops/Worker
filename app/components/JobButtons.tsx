@@ -1,26 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSyncExternalStore, useCallback } from "react";
+
+function subscribe(callback: () => void) {
+  window.addEventListener("storage", callback);
+  return () => window.removeEventListener("storage", callback);
+}
+
+function getLocalList(key: string): number[] {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function getServerSnapshot(): number[] {
+  return [];
+}
 
 export function SaveButton({ jobId }: { jobId: number }) {
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    const list = JSON.parse(localStorage.getItem("woker_saved") || "[]");
-    setSaved(list.includes(jobId));
-  }, [jobId]);
+  const list = useSyncExternalStore(
+    subscribe,
+    useCallback(() => getLocalList("woker_saved"), []),
+    getServerSnapshot,
+  );
+  const saved = list.includes(jobId);
 
   function toggle() {
-    const list = JSON.parse(localStorage.getItem("woker_saved") || "[]");
-    let updated;
-    if (list.includes(jobId)) {
-      updated = list.filter((id: number) => id !== jobId);
-      setSaved(false);
-    } else {
-      updated = [...list, jobId];
-      setSaved(true);
-    }
+    const current = getLocalList("woker_saved");
+    const updated = current.includes(jobId)
+      ? current.filter((id: number) => id !== jobId)
+      : [...current, jobId];
     localStorage.setItem("woker_saved", JSON.stringify(updated));
+    window.dispatchEvent(new Event("storage"));
   }
 
   return (
@@ -38,20 +51,24 @@ export function SaveButton({ jobId }: { jobId: number }) {
 }
 
 export function ApplyButton({ jobId, jobTitle }: { jobId: number; jobTitle: string }) {
-  const [applied, setApplied] = useState(false);
-
-  useEffect(() => {
-    const list = JSON.parse(localStorage.getItem("woker_applied") || "[]");
-    setApplied(list.some((a: any) => a.id === jobId));
-  }, [jobId]);
+  const list = useSyncExternalStore(
+    subscribe,
+    useCallback(() => getLocalList("woker_applied"), []),
+    getServerSnapshot,
+  );
+  const applied = list.some((a: { id: number } | number) =>
+    typeof a === "object" ? a.id === jobId : a === jobId
+  );
 
   function apply() {
     if (applied) return;
-    const list = JSON.parse(localStorage.getItem("woker_applied") || "[]");
+    const current: Array<{ id: number; date: string; status: string }> = JSON.parse(
+      localStorage.getItem("woker_applied") || "[]"
+    );
     const today = new Date().toLocaleDateString("cs-CZ");
-    list.push({ id: jobId, date: today, status: "Odesláno" });
-    localStorage.setItem("woker_applied", JSON.stringify(list));
-    setApplied(true);
+    current.push({ id: jobId, date: today, status: "Odesláno" });
+    localStorage.setItem("woker_applied", JSON.stringify(current));
+    window.dispatchEvent(new Event("storage"));
   }
 
   return (

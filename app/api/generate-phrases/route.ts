@@ -53,7 +53,7 @@ Rozděl do 4-5 kategorií podle situací v tomto oboru. Fráze musí být specif
 
     const data = JSON.parse(jsonMatch[0]);
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message || "Chyba serveru" }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Chyba serveru" }, { status: 500 });
   }
 }

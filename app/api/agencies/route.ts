@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
         .select('status')
         .eq('user_id', user.id)
         .single()
-      hasSubscription = sub?.status === 'active'
+      hasSubscription = (sub?.status === 'active' || sub?.status === 'trialing')
     }
   }
 

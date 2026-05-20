@@ -41,7 +41,7 @@ export default function LanguageSwitcher() {
                   style={{
                     width: "100%", display: "flex", alignItems: "center", gap: "12px",
                     padding: "12px 14px", border: "none", cursor: "pointer",
-                    background: locale === l.code ? "rgba(57,255,110,0.08)" : "transparent",
+                    background: locale === l.code ? "rgba(251,146,60,0.08)" : "transparent",
                     fontFamily: "inherit", textAlign: "left",
                     transition: "background 0.15s",
                   }}
@@ -50,7 +50,7 @@ export default function LanguageSwitcher() {
                 >
                   <span style={{ fontSize: "18px" }}>{l.flag}</span>
                   <span style={{ fontSize: "14px", color: "white", fontWeight: 500, flex: 1 }}>{l.name}</span>
-                  {locale === l.code && <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#39ff6e" }} />}
+                  {locale === l.code && <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#fb923c" }} />}
                 </button>
               ))}
             </div>

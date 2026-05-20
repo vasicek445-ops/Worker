@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 import { useLanguage } from "../../lib/i18n/LanguageContext";
-import LanguageSwitcher from "./LanguageSwitcher";
 import WookyChat from "./WokeeWidget";
 import { useSubscription } from "../../hooks/useSubscription";
 
@@ -34,6 +33,8 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
   const [user, setUser] = useState<any>(null);
   const [appCount, setAppCount] = useState(0);
   const [matchCount, setMatchCount] = useState(0);
+  const [hasCv, setHasCv] = useState(false);
+  const [emailStats, setEmailStats] = useState({ sent: 0, opened: 0, replied: 0 });
 
   useEffect(() => {
     const load = async () => {
@@ -46,6 +47,14 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
       setAppCount(ac || 0);
       const { count: mc } = await supabase.from("applications").select("*", { count: "exact", head: true }).eq("user_id", u.id).not("match_score", "is", null);
       setMatchCount(mc || 0);
+      const { count: cv } = await supabase.from("documents").select("*", { count: "exact", head: true }).eq("user_id", u.id).eq("type", "cv");
+      setHasCv((cv || 0) > 0);
+      const [{ count: sent }, { count: opened }, { count: replied }] = await Promise.all([
+        supabase.from("email_send_log").select("*", { count: "exact", head: true }).eq("member_id", u.id),
+        supabase.from("email_send_log").select("*", { count: "exact", head: true }).eq("member_id", u.id).eq("opened", true),
+        supabase.from("email_send_log").select("*", { count: "exact", head: true }).eq("member_id", u.id).eq("replied", true),
+      ]);
+      setEmailStats({ sent: sent || 0, opened: opened || 0, replied: replied || 0 });
     };
     load();
   }, []);
@@ -57,12 +66,12 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
   const profilePercent = Math.round((filledFields / profileFields.length) * 100);
   const isProfileComplete = profilePercent === 100;
 
-  // Progress steps
+  // Onboarding kroky
   const steps = [
-    { label: "Profil", done: isProfileComplete, href: "/profil", img: "/images/3d/key.png" },
-    { label: "CV", done: false, href: "/pruvodce/sablony/cv", img: "/images/3d/document.png" },
-    { label: "Matching", done: matchCount > 0, href: "/pruvodce/matching", img: "/images/3d/target.png" },
-    { label: "Přihláška", done: appCount > 0, href: "/prihlasky", img: "/images/3d/envelope.png" },
+    { label: "Vyplň svůj profil", desc: "Základ pro všechno — AI z něj tvoří tvoje CV, dopisy i matching.", done: isProfileComplete, href: "/profil" },
+    { label: "Vytvoř si životopis", desc: "Německé CV optimalizované pro švýcarský trh, za pár minut.", done: hasCv, href: "/pruvodce/sablony/cv" },
+    { label: "Najdi práci přes Smart Apply", desc: "AI ti najde agentury i firmy na míru tvému profilu — ty si vybereš kam se hlásit.", done: matchCount > 0, href: "/profil/gmail" },
+    { label: "Pošli přihlášku přes Smart Apply", desc: "AI za tebe odešle přihlášku přímo firmě. Pak jen sleduješ odpovědi ve statistikách.", done: appCount > 0, href: "/profil/gmail" },
   ];
   const currentStep = steps.findIndex(s => !s.done);
 
@@ -81,7 +90,7 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
       <main className="min-h-screen bg-[#0a0a12] pb-[100px] relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
 
         {/* Ambient glow effects */}
-        <div className="fixed w-[800px] h-[800px] rounded-full blur-[180px] pointer-events-none z-0 opacity-15 -top-[300px] -right-[200px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+        <div className="fixed w-[800px] h-[800px] rounded-full blur-[180px] pointer-events-none z-0 opacity-15 -top-[300px] -right-[200px]" style={{ background: "radial-gradient(circle, rgba(251,146,60,0.25), transparent 70%)" }} />
         <div className="fixed w-[600px] h-[600px] rounded-full blur-[160px] pointer-events-none z-0 opacity-10 top-[400px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
         <div className="fixed w-[500px] h-[500px] rounded-full blur-[140px] pointer-events-none z-0 opacity-10 bottom-[100px] right-[100px]" style={{ background: "radial-gradient(circle, rgba(232,48,42,0.15), transparent 70%)" }} />
         {/* Global dot grid pattern */}
@@ -99,9 +108,9 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
             <div className="flex items-center gap-4">
               <Link href="/profil" className="no-underline">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="" className="w-12 h-12 rounded-2xl object-cover border-2 border-white/10 hover:border-[#39ff6e]/40 transition" />
+                  <img src={avatarUrl} alt="" className="w-12 h-12 rounded-2xl object-cover border-2 border-white/10 hover:border-[#fb923c]/40 transition" />
                 ) : (
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center text-[#0a0a12] text-lg font-extrabold">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#fb923c] to-[#f97316] flex items-center justify-center text-[#0a0a12] text-lg font-extrabold">
                     {firstName[0]?.toUpperCase() || "W"}
                   </div>
                 )}
@@ -112,11 +121,10 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <LanguageSwitcher />
               {isActive && (
-                <div className="hidden sm:flex items-center gap-1.5 bg-[#39ff6e]/10 border border-[#39ff6e]/20 rounded-full px-3 py-1.5">
+                <div className="hidden sm:flex items-center gap-1.5 bg-[#fb923c]/10 border border-[#fb923c]/20 rounded-full px-3 py-1.5">
                   <Image src="/images/3d/crown.png" alt="" width={16} height={16} />
-                  <span className="text-[11px] font-bold text-[#39ff6e]">Premium</span>
+                  <span className="text-[11px] font-bold text-[#fb923c]">Premium</span>
                 </div>
               )}
             </div>
@@ -124,31 +132,19 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
 
           {/* ═══ HERO CARD ═══ */}
           <div className="mt-5 rounded-3xl overflow-hidden relative" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
-            {/* Decorative mountain silhouette */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <svg className="absolute bottom-0 left-0 w-full h-[60%] opacity-[0.04]" viewBox="0 0 1200 300" preserveAspectRatio="none">
-                <path d="M0,300 L0,200 L80,180 L150,120 L200,160 L280,80 L340,140 L400,60 L460,130 L520,90 L580,150 L650,40 L720,120 L780,70 L840,130 L900,50 L960,110 L1020,80 L1080,140 L1140,100 L1200,160 L1200,300 Z" fill="white"/>
-              </svg>
-              {/* Dot grid pattern */}
-              <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
-                <pattern id="heroGrid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-                  <circle cx="1" cy="1" r="1" fill="white"/>
-                </pattern>
-                <rect width="100%" height="100%" fill="url(#heroGrid)"/>
-              </svg>
-              {/* Floating sparkles */}
-              <div className="absolute top-8 right-[15%] w-1.5 h-1.5 bg-[#39ff6e] rounded-full animate-pulse opacity-40" />
-              <div className="absolute top-16 right-[25%] w-1 h-1 bg-blue-400 rounded-full animate-pulse opacity-30" style={{ animationDelay: "0.5s" }} />
-              <div className="absolute top-12 right-[35%] w-1 h-1 bg-purple-400 rounded-full animate-pulse opacity-25" style={{ animationDelay: "1s" }} />
-              <div className="absolute bottom-20 left-[10%] w-1 h-1 bg-[#39ff6e] rounded-full animate-pulse opacity-20" style={{ animationDelay: "1.5s" }} />
-            </div>
-            <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(100,60,255,0.1), transparent 60%)" }} />
+            {/* Švýcarsko — foto pozadí */}
+            <Image src="/images/svycarsko-hero.jpg" alt="" fill priority sizes="100vw" className="object-cover object-center" />
+            {/* Tmavý gradient overlay — čitelnost textu */}
+            <div className="absolute inset-0" style={{ background: "linear-gradient(100deg, rgba(10,10,18,0.96) 0%, rgba(10,10,18,0.9) 32%, rgba(13,16,28,0.68) 62%, rgba(13,16,28,0.5) 100%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,10,18,0.75) 0%, transparent 55%)" }} />
+            {/* Oranžový glow akcent */}
+            <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at 80% 22%, rgba(251,146,60,0.2), transparent 55%)" }} />
             <div className="relative p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-2 h-2 rounded-full bg-[#39ff6e] animate-pulse" />
-                    <span className="text-[11px] font-semibold text-[#39ff6e]/80 uppercase tracking-widest">Tvůj přehled</span>
+                    <div className="w-2 h-2 rounded-full bg-[#fb923c] animate-pulse" />
+                    <span className="text-[11px] font-semibold text-[#fb923c]/80 uppercase tracking-widest">Tvůj přehled</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white m-0 leading-tight">
                     {isProfileComplete
@@ -157,13 +153,13 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
                   </h2>
                   <p className="text-sm text-white/40 mt-2 mb-5 max-w-md">
                     {isProfileComplete
-                      ? "Spusť Smart Matching a nech AI najít ideální agentury pro tebe."
-                      : "Kompletní profil odemkne Smart Matching a personalizované nabídky."}
+                      ? "Spusť Smart Apply a nech agenta hledat práci i agentury za tebe."
+                      : "Kompletní profil odemkne Smart Apply a personalizované nabídky."}
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <Link href={isProfileComplete ? "/pruvodce/matching" : "/profil"}
-                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold text-sm py-3 px-6 rounded-xl no-underline shadow-[0_4px_24px_rgba(57,255,110,0.3)] hover:shadow-[0_4px_32px_rgba(57,255,110,0.5)] transition-all hover:scale-[1.03]">
-                      {isProfileComplete ? "🎯 Spustit Matching" : "👤 Dokončit profil"}
+                    <Link href={isProfileComplete ? "/profil/gmail" : "/profil"}
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold text-sm py-3 px-6 rounded-xl no-underline shadow-[0_4px_24px_rgba(251,146,60,0.3)] hover:shadow-[0_4px_32px_rgba(251,146,60,0.5)] transition-all hover:scale-[1.03]">
+                      {isProfileComplete ? "🎯 Spustit Smart Apply" : "👤 Dokončit profil"}
                     </Link>
                     <Link href="/pruvodce/sablony/cv"
                       className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-sm text-white font-bold text-sm py-3 px-6 rounded-xl no-underline border border-white/[0.08] hover:bg-white/[0.1] hover:scale-[1.03] transition-all">
@@ -175,15 +171,15 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
                 {/* Profile progress ring with glow */}
                 <div className="hidden sm:flex flex-col items-center gap-3">
                   <div className="relative w-28 h-28">
-                    <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ background: `conic-gradient(#39ff6e ${profilePercent}%, transparent ${profilePercent}%)` }} />
+                    <div className="absolute inset-0 rounded-full blur-xl opacity-20" style={{ background: `conic-gradient(#fb923c ${profilePercent}%, transparent ${profilePercent}%)` }} />
                     <svg className="w-28 h-28 -rotate-90 relative" viewBox="0 0 100 100">
                       <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="6" />
                       <circle cx="50" cy="50" r="42" fill="none" stroke="url(#progressGrad)" strokeWidth="6" strokeLinecap="round"
                         strokeDasharray={`${profilePercent * 2.64} 264`} className="transition-all duration-1000" />
                       <defs>
                         <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#39ff6e" />
-                          <stop offset="100%" stopColor="#2bcc58" />
+                          <stop offset="0%" stopColor="#fb923c" />
+                          <stop offset="100%" stopColor="#f97316" />
                         </linearGradient>
                       </defs>
                     </svg>
@@ -197,66 +193,70 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
             </div>
           </div>
 
-          {/* ═══ STATS ROW ═══ */}
+          {/* ═══ STATS ROW — foto karty ═══ */}
           <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { value: jobCount.toLocaleString(), label: "Nabídek práce", color: "from-orange-500/20 to-orange-500/5", glow: "shadow-orange-500/10", accent: "#f97316", img: "/images/3d/briefcase.png" },
-              { value: housingCount.toLocaleString(), label: "Nabídek bydlení", color: "from-cyan-500/20 to-cyan-500/5", glow: "shadow-cyan-500/10", accent: "#06b6d4", img: "/images/3d/house.png" },
-              { value: agencyCount.toLocaleString(), label: "Agentur", color: "from-purple-500/20 to-purple-500/5", glow: "shadow-purple-500/10", accent: "#a855f7", img: "/images/3d/handshake.png" },
-              { value: appCount.toString(), label: "Tvých přihlášek", color: "from-[#39ff6e]/20 to-[#39ff6e]/5", glow: "shadow-[#39ff6e]/10", accent: "#39ff6e", img: "/images/3d/envelope.png" },
+              { value: jobCount.toLocaleString(), label: "Nabídek práce", img: "/images/stats/stat-prace.jpg", href: "/nabidky" },
+              { value: housingCount.toLocaleString(), label: "Nabídek bydlení", img: "/images/stats/stat-bydleni.jpg", href: "/bydleni" },
+              { value: agencyCount.toLocaleString(), label: "Temporärbüra", img: "/images/stats/stat-agentury.jpg", href: "/kontakty" },
+              { value: appCount.toString(), label: "Tvých přihlášek", img: "/images/stats/stat-prihlasky.jpg", href: "/prihlasky" },
             ].map((s, i) => (
-              <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 border border-white/[0.06] backdrop-blur-sm shadow-lg ${s.glow} relative overflow-hidden group hover:scale-[1.03] transition-all`}>
-                {/* 3D object background */}
-                <Image src={s.img} alt="" width={80} height={80} className="absolute -right-2 -bottom-2 opacity-[0.12] group-hover:opacity-25 group-hover:scale-110 transition-all duration-500 drop-shadow-2xl" />
-                <div className="absolute -right-3 -top-3 w-20 h-20 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition" style={{ background: s.accent }} />
-                <div className="relative">
-                  <div className="mb-3">
-                    <Image src={s.img} alt="" width={40} height={40} className="drop-shadow-lg" />
-                  </div>
-                  <div className="text-2xl font-extrabold text-white tracking-tight">{s.value}</div>
-                  <div className="text-[11px] text-white/35 mt-0.5 font-medium">{s.label}</div>
+              <Link key={i} href={s.href} className="relative block aspect-[3/2] rounded-2xl overflow-hidden border border-white/[0.06] hover:border-[#fb923c]/30 transition-all group no-underline">
+                <Image src={s.img} alt="" fill sizes="(max-width:640px) 50vw, 25vw" className="object-cover group-hover:scale-[1.06] transition-transform duration-500" />
+                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(10,10,18,0.97) 0%, rgba(10,10,18,0.75) 38%, rgba(10,10,18,0.2) 72%, rgba(10,10,18,0.4) 100%)" }} />
+                <div className="absolute inset-x-0 bottom-0 p-4">
+                  <div className="text-2xl font-extrabold text-white tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">{s.value}</div>
+                  <div className="text-[11px] text-white/60 mt-0.5 font-medium">{s.label}</div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
-          {/* ═══ PROGRESS TRACKER ═══ */}
-          <div className="mt-5 bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 relative overflow-hidden">
-            {/* Subtle chevron pattern */}
-            <svg className="absolute right-0 top-0 w-48 h-full opacity-[0.02]" viewBox="0 0 100 80" preserveAspectRatio="none">
-              <path d="M60 0L80 40L60 80M40 0L60 40L40 80M20 0L40 40L20 80" fill="none" stroke="white" strokeWidth="2"/>
-            </svg>
-            <div className="flex items-center gap-2 mb-4">
-              <Image src="/images/3d/rocket.png" alt="" width={20} height={20} className="drop-shadow-lg" />
-              <span className="text-sm font-bold text-white">Tvoje cesta do Švýcarska</span>
-              <span className="text-[10px] text-white/30 ml-auto font-medium">{steps.filter(s => s.done).length}/{steps.length} hotovo</span>
+          {/* ═══ ONBOARDING CHECKLIST (Huntr-style) ═══ */}
+          {steps.every((s) => s.done) ? (
+            <div className="mt-5 bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-[#fb923c]/20 p-5 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-[#fb923c]/15 border border-[#fb923c]/30 flex items-center justify-center shrink-0">
+                <svg width="16" height="16" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#fb923c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+              <div>
+                <p className="text-white font-bold text-sm m-0">Máš hotové všechny kroky! 🎉</p>
+                <p className="text-white/40 text-xs m-0 mt-0.5">Teď už jen posílej přihlášky a sleduj odpovědi ve statistikách.</p>
+              </div>
             </div>
-            <div className="flex items-center gap-0">
-              {steps.map((step, i) => (
-                <div key={i} className="flex items-center flex-1">
-                  <Link href={step.href} className="no-underline flex flex-col items-center gap-1.5 group flex-1">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+          ) : (
+            <div className="mt-5 bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-white">Vítej, {firstName || "ve Wokeru"}! 👋</h2>
+              <p className="text-white/45 text-[13px] mt-1 mb-5">
+                Projdi těchto pár kroků a jsi připraven hledat práci ve Švýcarsku.
+              </p>
+              <div className="flex flex-col gap-2.5">
+                {steps.map((step, i) => (
+                  <Link key={i} href={step.href} className="no-underline group">
+                    <div className={`flex items-start gap-3.5 rounded-xl p-4 border transition-all ${
                       step.done
-                        ? "bg-[#39ff6e]/15 border-2 border-[#39ff6e]/40 shadow-[0_0_16px_rgba(57,255,110,0.15)]"
+                        ? "bg-white/[0.02] border-white/[0.05]"
                         : i === currentStep
-                          ? "bg-white/[0.08] border-2 border-white/20 animate-pulse"
-                          : "bg-white/[0.03] border border-white/[0.06]"
-                    } group-hover:scale-110`}>
-                      {step.done ? <span className="text-[#39ff6e] text-sm">✓</span> : <Image src={step.img} alt="" width={22} height={22} className={i !== currentStep ? "opacity-40 grayscale" : ""} />}
+                          ? "bg-[#fb923c]/[0.06] border-[#fb923c]/25"
+                          : "bg-white/[0.02] border-white/[0.05] hover:border-white/[0.12]"
+                    }`}>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                        step.done ? "bg-[#fb923c]" : "border-2 border-white/20"
+                      }`}>
+                        {step.done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#0a0a12" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className={`text-sm font-bold m-0 ${step.done ? "text-white/40 line-through" : "text-white group-hover:text-[#fb923c] transition"}`}>{step.label}</p>
+                        <p className="text-[12px] text-white/40 m-0 mt-0.5 leading-relaxed">{step.desc}</p>
+                      </div>
+                      {!step.done && (
+                        <span className="text-[#fb923c] text-sm self-center shrink-0 opacity-0 group-hover:opacity-100 transition">→</span>
+                      )}
                     </div>
-                    <span className={`text-[10px] font-semibold ${step.done ? "text-[#39ff6e]/70" : i === currentStep ? "text-white/60" : "text-white/25"}`}>
-                      {step.label}
-                    </span>
                   </Link>
-                  {i < steps.length - 1 && (
-                    <div className={`h-[2px] flex-1 mx-1 rounded-full mt-[-18px] ${
-                      step.done ? "bg-[#39ff6e]/30" : "bg-white/[0.06]"
-                    }`} />
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* ═══ MAIN GRID ═══ */}
           <div className="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -268,7 +268,7 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
                   <div className="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20"><Image src="/images/3d/briefcase.png" alt="" width={20} height={20} /></div>
                   <span className="text-sm font-bold text-white">Nejnovější nabídky</span>
                 </div>
-                <Link href="/nabidky" className="text-[11px] text-[#39ff6e] font-semibold no-underline hover:text-[#39ff6e]/80 transition">Zobrazit vše →</Link>
+                <Link href="/nabidky" className="text-[11px] text-[#fb923c] font-semibold no-underline hover:text-[#fb923c]/80 transition">Zobrazit vše →</Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {latestJobs.slice(0, 6).map((job) => (
@@ -276,14 +276,14 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
                     <div className="bg-white/[0.02] hover:bg-white/[0.05] rounded-xl p-3.5 border border-white/[0.04] hover:border-white/[0.1] transition-all">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] font-semibold text-white m-0 truncate group-hover:text-[#39ff6e] transition">{job.title}</p>
+                          <p className="text-[13px] font-semibold text-white m-0 truncate group-hover:text-[#fb923c] transition">{job.title}</p>
                           <p className="text-[11px] text-white/35 m-0 mt-1 truncate">{job.company} · {job.canton}</p>
                         </div>
                         <span className="text-[9px] text-white/20 font-medium whitespace-nowrap mt-0.5">{timeAgo(job.created_at)}</span>
                       </div>
                       {job.salary_text && (
                         <div className="mt-2">
-                          <span className="text-[10px] font-semibold text-[#39ff6e]/70 bg-[#39ff6e]/[0.08] px-2 py-0.5 rounded-md">{job.salary_text}</span>
+                          <span className="text-[10px] font-semibold text-[#fb923c]/70 bg-[#fb923c]/[0.08] px-2 py-0.5 rounded-md">{job.salary_text}</span>
                         </div>
                       )}
                     </div>
@@ -307,7 +307,7 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
                 </div>
                 <div className="space-y-2">
                   {[
-                    { img: "/images/3d/target.png", label: "Smart Matching", desc: "AI najde agentury", href: "/pruvodce/matching", gradient: "from-blue-500/10 to-blue-500/5", border: "border-blue-500/15" },
+                    { img: "/images/3d/target.png", label: "Smart Apply", desc: "Práce i agentury", href: "/profil/gmail", gradient: "from-blue-500/10 to-blue-500/5", border: "border-blue-500/15" },
                     { img: "/images/3d/document.png", label: "Vytvořit CV", desc: "100 šablon", href: "/pruvodce/sablony/cv", gradient: "from-green-500/10 to-green-500/5", border: "border-green-500/15" },
                     { img: "/images/3d/envelope.png", label: "Motivační dopis", desc: "Německy s AI", href: "/pruvodce/sablony/motivacni-dopis", gradient: "from-purple-500/10 to-purple-500/5", border: "border-purple-500/15" },
                     { img: "/images/3d/speech.png", label: "Pohovor", desc: "AI příprava", href: "/pruvodce/sablony/pohovor", gradient: "from-amber-500/10 to-amber-500/5", border: "border-amber-500/15" },
@@ -316,7 +316,7 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
                     <Link key={i} href={a.href} className={`flex items-center gap-3 bg-gradient-to-r ${a.gradient} rounded-xl p-3 border ${a.border} no-underline group hover:scale-[1.02] transition-all`}>
                       <Image src={a.img} alt="" width={28} height={28} className="drop-shadow-lg group-hover:scale-110 transition-transform" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold text-white m-0 group-hover:text-[#39ff6e] transition">{a.label}</p>
+                        <p className="text-[13px] font-semibold text-white m-0 group-hover:text-[#fb923c] transition">{a.label}</p>
                         <p className="text-[10px] text-white/30 m-0">{a.desc}</p>
                       </div>
                       <span className="text-white/15 group-hover:text-white/40 transition text-sm">→</span>
@@ -328,27 +328,27 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
               {/* Premium / Status */}
               {!isActive ? (
                 <Link href="/pricing" className="no-underline block">
-                  <div className="rounded-2xl p-5 border border-[#39ff6e]/15 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111120, #0f1a14)" }}>
-                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20" style={{ background: "radial-gradient(circle, #39ff6e, transparent)" }} />
+                  <div className="rounded-2xl p-5 border border-[#fb923c]/15 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111120, #0f1a14)" }}>
+                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-[60px] opacity-20" style={{ background: "radial-gradient(circle, #fb923c, transparent)" }} />
                     <div className="relative">
                       <div className="flex items-center gap-2 mb-2">
                         <Image src="/images/3d/crown.png" alt="" width={24} height={24} className="drop-shadow-lg" />
                         <span className="text-sm font-extrabold text-white">{t.dashboard.premium_title}</span>
                       </div>
                       <p className="text-[12px] text-white/40 leading-relaxed mb-4">{t.dashboard.premium_desc}</p>
-                      <div className="bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] py-2.5 px-5 rounded-xl text-[13px] font-extrabold text-center shadow-[0_4px_20px_rgba(57,255,110,0.25)]">
+                      <div className="bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] py-2.5 px-5 rounded-xl text-[13px] font-extrabold text-center shadow-[0_4px_20px_rgba(251,146,60,0.25)]">
                         {t.dashboard.premium_cta}
                       </div>
                     </div>
                   </div>
                 </Link>
               ) : (
-                <div className="rounded-2xl p-4 border border-[#39ff6e]/15" style={{ background: "linear-gradient(135deg, #111120, #0f1a14)" }}>
+                <div className="rounded-2xl p-4 border border-[#fb923c]/15" style={{ background: "linear-gradient(135deg, #111120, #0f1a14)" }}>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center shadow-[0_0_20px_rgba(57,255,110,0.2)]"><Image src="/images/3d/crown.png" alt="" width={24} height={24} /></div>
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#fb923c] to-[#f97316] flex items-center justify-center shadow-[0_0_20px_rgba(251,146,60,0.2)]"><Image src="/images/3d/crown.png" alt="" width={24} height={24} /></div>
                     <div>
                       <p className="text-white font-extrabold text-sm m-0">Woker Premium</p>
-                      <p className="text-[#39ff6e] text-[11px] m-0 mt-0.5 font-medium">Aktivní — plný přístup</p>
+                      <p className="text-[#fb923c] text-[11px] m-0 mt-0.5 font-medium">Aktivní — plný přístup</p>
                     </div>
                   </div>
                 </div>
@@ -356,67 +356,41 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
             </div>
           </div>
 
-          {/* ═══ BOTTOM ROW ═══ */}
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-
-            {/* Bydlení */}
-            <Link href="/bydleni" className="bg-gradient-to-br from-cyan-500/15 to-cyan-500/5 rounded-2xl p-5 border border-cyan-500/15 no-underline group hover:scale-[1.02] transition-all backdrop-blur-sm relative overflow-hidden">
-              <Image src="/images/3d/house.png" alt="" width={90} height={90} className="absolute -right-2 -bottom-2 opacity-[0.12] group-hover:opacity-25 group-hover:scale-110 transition-all duration-500" />
-              <div className="relative">
-                <Image src="/images/3d/house.png" alt="" width={44} height={44} className="drop-shadow-lg mb-3" />
-                <p className="text-base font-bold text-white m-0 group-hover:text-cyan-300 transition">Bydlení</p>
-                <p className="text-[11px] text-white/35 m-0 mt-1">{housingCount.toLocaleString()} nabídek</p>
-              </div>
-            </Link>
-
-            {/* Agentury */}
-            <Link href="/kontakty" className="bg-gradient-to-br from-purple-500/15 to-purple-500/5 rounded-2xl p-5 border border-purple-500/15 no-underline group hover:scale-[1.02] transition-all backdrop-blur-sm relative overflow-hidden">
-              <Image src="/images/3d/handshake.png" alt="" width={90} height={90} className="absolute -right-2 -bottom-2 opacity-[0.12] group-hover:opacity-25 group-hover:scale-110 transition-all duration-500" />
-              <div className="relative">
-                <Image src="/images/3d/handshake.png" alt="" width={44} height={44} className="drop-shadow-lg mb-3" />
-                <p className="text-base font-bold text-white m-0 group-hover:text-purple-300 transition">Agentury</p>
-                <p className="text-[11px] text-white/35 m-0 mt-1">{agencyCount.toLocaleString()} kontaktů</p>
-              </div>
-            </Link>
-
-            {/* Komunita */}
-            <Link href="/komunita" className="bg-gradient-to-br from-pink-500/15 to-pink-500/5 rounded-2xl p-5 border border-pink-500/15 no-underline group hover:scale-[1.02] transition-all backdrop-blur-sm relative overflow-hidden">
-              <Image src="/images/3d/speech.png" alt="" width={90} height={90} className="absolute -right-2 -bottom-2 opacity-[0.12] group-hover:opacity-25 group-hover:scale-110 transition-all duration-500" />
-              <div className="relative">
-                <Image src="/images/3d/speech.png" alt="" width={44} height={44} className="drop-shadow-lg mb-3" />
-                <p className="text-base font-bold text-white m-0 group-hover:text-pink-300 transition">Komunita</p>
-                <p className="text-[11px] text-white/35 m-0 mt-1">Spolubydlení a tipy</p>
-              </div>
-            </Link>
-          </div>
-
-          {/* ═══ GUIDES ROW ═══ */}
+          {/* ═══ STATISTIKY ═══ */}
           <div className="mt-5 bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Image src="/images/3d/star.png" alt="" width={20} height={20} className="drop-shadow-lg" />
-                <span className="text-sm font-bold text-white">{t.dashboard.guides_title}</span>
+            <div className="flex items-center gap-2 mb-4">
+              <Image src="/images/3d/target.png" alt="" width={20} height={20} className="drop-shadow-lg" />
+              <span className="text-sm font-bold text-white">Tvoje statistiky</span>
+              {emailStats.sent > 0 && (
+                <span className="text-[10px] text-[#fb923c] ml-auto font-bold">
+                  úspěšnost {Math.round((emailStats.replied / emailStats.sent) * 100)}%
+                </span>
+              )}
+            </div>
+            {emailStats.sent === 0 ? (
+              <div className="text-center py-6 text-white/30 text-[13px] leading-relaxed">
+                Zatím jsi neodeslal žádné přihlášky. Jakmile začneš,<br />
+                uvidíš tady svůj pokrok — kolik firem email otevřelo a kolik odpovědělo.
               </div>
-              <Link href="/pruvodce" className="text-[11px] text-white/35 font-medium no-underline hover:text-white/50 transition">{t.dashboard.guides_all} →</Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              {[
-                { title: t.guides.permits_title, desc: t.guides.permits_desc, href: "/pruvodce/povoleni", tag: t.tags.important, tagColor: "text-red-400 bg-red-500/10", img: "/images/3d/document.png" },
-                { title: t.guides.insurance_title, desc: t.guides.insurance_desc, href: "/pruvodce/pojisteni", tag: t.tags.popular, tagColor: "text-blue-400 bg-blue-500/10", img: "/images/3d/shield.png" },
-                { title: t.guides.tax_title, desc: t.guides.tax_desc, href: "/pruvodce/dane", tag: t.tags.new_tag, tagColor: "text-green-400 bg-green-500/10", img: "/images/3d/money.png" },
-              ].map((g, i) => (
-                <Link key={i} href={g.href} className="flex items-center gap-3 bg-white/[0.02] hover:bg-white/[0.05] rounded-xl p-3.5 border border-white/[0.04] hover:border-white/[0.08] no-underline transition-all group">
-                  <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                    <Image src={g.img} alt="" width={32} height={32} className="drop-shadow-lg group-hover:scale-110 transition-transform" />
+            ) : (
+              <div className="flex flex-col gap-3">
+                {[
+                  { label: "Odeslané přihlášky", count: emailStats.sent },
+                  { label: "Odpovědi od firem", count: emailStats.replied },
+                ].map((row) => (
+                  <div key={row.label} className="flex items-center gap-3">
+                    <div className="w-40 sm:w-48 text-[12px] text-white/55 shrink-0">{row.label}</div>
+                    <div className="flex-1 h-6 bg-white/[0.04] rounded-lg overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#fb923c] to-[#f97316] rounded-lg transition-all duration-500"
+                        style={{ width: `${row.count > 0 ? Math.max((row.count / emailStats.sent) * 100, 6) : 0}%` }}
+                      />
+                    </div>
+                    <div className="w-8 text-right text-sm font-bold text-white shrink-0">{row.count}</div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-white m-0 truncate group-hover:text-[#39ff6e] transition">{g.title}</p>
-                    <p className="text-[10px] text-white/30 m-0 mt-0.5 truncate">{g.desc}</p>
-                  </div>
-                  <span className={`text-[9px] font-bold py-1 px-2 rounded-md whitespace-nowrap ${g.tagColor}`}>{g.tag}</span>
-                </Link>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* ═══ WOOKY AI CHAT ═══ */}
@@ -426,7 +400,7 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount, 
               profileData={profile}
               appCount={appCount}
               matchCount={matchCount}
-              hasCv={false}
+              hasCv={hasCv}
             />
           </div>
 

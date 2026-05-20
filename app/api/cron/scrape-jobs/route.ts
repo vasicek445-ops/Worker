@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+export const maxDuration = 300
+
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -268,9 +270,9 @@ export async function GET(req: NextRequest) {
       sources: sourceResults,
       timestamp: new Date().toISOString(),
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Scrape cron error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 })
   }
 }
 
@@ -457,14 +459,21 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
   let skipped = 0
   const seenIds = new Set<string>()
 
+  // Široký záběr — řemesla, logistika, výroba, stavba, péče i pohostinství.
+  // Agentury sem sypou Fest i Temporär nabídky napříč obory.
   const keywords = [
-    'hotel', 'Koch Küche', 'Restaurant Kellner', 'Housekeeping Zimmer',
-    'Saison Resort', 'Rezeption Empfang Hotel', 'Gastro Service',
-    'Barkeeper Barista', 'Spa Wellness',
+    'Schreiner', 'Zimmermann', 'Maurer', 'Maler Gipser', 'Elektriker',
+    'Heizung Sanitär Installateur', 'Monteur', 'Mechaniker', 'Schlosser',
+    'Lagermitarbeiter', 'Produktionsmitarbeiter', 'Chauffeur', 'Staplerfahrer',
+    'Bauarbeiter', 'Reinigung', 'Pflege Betreuung', 'Gärtner',
+    'Koch', 'Restaurant Service', 'Hotel Rezeption',
   ]
 
+  const deadline = Date.now() + 110_000 // strop pro jobs.ch, ať scrape-jobs cron nepřeteče
+
   for (const keyword of keywords) {
-    for (let page = 1; page <= 3; page++) { // Max 3 pages per keyword in cron (time limit)
+    if (Date.now() > deadline) break
+    for (let page = 1; page <= 2; page++) { // Max 2 stránky na klíčové slovo
       try {
         const url = `https://www.jobs.ch/en/vacancies/?term=${encodeURIComponent(keyword)}&page=${page}`
         const res = await fetch(url, {
@@ -486,7 +495,7 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
         if (endIdx < 0) endIdx = html.indexOf(';</script>', jsonStart)
         if (endIdx < 0) break
 
-        let results: any[] = []
+        let results: unknown[] = []
         try {
           const data = JSON.parse(html.substring(jsonStart, endIdx))
           results = data?.vacancy?.results?.main?.results || []
@@ -494,29 +503,34 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
 
         if (results.length === 0) break
 
-        for (const job of results) {
-          const jobId = job.id || ''
+        for (const _rawJob of results) {
+          const job = _rawJob as Record<string, unknown>
+          const jobId = String(job.id || '')
           if (!jobId || seenIds.has(jobId)) continue
           seenIds.add(jobId)
 
-          const title = (job.title || '').trim()
-          const company = job.company?.name || 'jobs.ch'
-          const place = (job.place || '').trim()
+          const title = String(job.title || '').trim()
+          const companyObj = job.company as Record<string, unknown> | undefined
+          const company = String(companyObj?.name || 'jobs.ch')
+          const place = String(job.place || '').trim()
           if (!title) continue
 
           let postedAt = null
           if (job.publicationDate) {
-            try { postedAt = new Date(job.publicationDate).toISOString() } catch {}
+            try { postedAt = new Date(job.publicationDate as string | number).toISOString() } catch {}
           }
 
-          const empTypes = job.employmentTypeIds || []
-          const jobType = empTypes.includes('2') || empTypes.includes('3') ? 'Temporary' : 'Full-time'
+          // jobs.ch v seznamu nedává typ smlouvy → heuristika z názvu (temp nabídky ho mají v titulu)
+          const jobType = /tempor|befristet|aushilf|vorübergehend|\btemp\b/.test(title.toLowerCase())
+            ? 'Temporary'
+            : 'Full-time'
 
           let salaryMin = null, salaryMax = null, salaryText = null
-          if (job.salary?.range) {
-            salaryMin = job.salary.range.min || null
-            salaryMax = job.salary.range.max || null
-            const currency = job.salary.currency || 'CHF'
+          const salaryObj = job.salary as { range?: { min?: unknown; max?: unknown }; currency?: unknown } | undefined
+          if (salaryObj?.range) {
+            salaryMin = (salaryObj.range.min as number) || null
+            salaryMax = (salaryObj.range.max as number) || null
+            const currency = String(salaryObj.currency || 'CHF')
             salaryText = `${currency} ${salaryMin || '?'} - ${salaryMax || '?'}`
           }
 
@@ -553,27 +567,28 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
   return { added, skipped }
 }
 
-async function upsertRobertHalfJob(job: any): Promise<boolean> {
-  const title = (job.jobtitle || job.title || '').trim()
-  const city = (job.city || job.location || '').trim()
+async function upsertRobertHalfJob(job: Record<string, unknown>): Promise<boolean> {
+  const title = String(job.jobtitle || job.title || '').trim()
+  const city = String(job.city || job.location || '').trim()
   const jobId = job.google_job_id || job.unique_job_number || job.job_id || ''
   if (!title || !jobId) return false
 
-  const empType = (job.emptype || job.employment_type || '').toLowerCase()
+  const empType = String(job.emptype || job.employment_type || '').toLowerCase()
   let jobType = 'Full-time'
   if (empType.includes('temp') || empType.includes('contract')) jobType = 'Temporary'
 
   let postedAt = null
   if (job.date_posted) {
-    try { postedAt = new Date(job.date_posted).toISOString() } catch {}
+    try { postedAt = new Date(job.date_posted as string | number).toISOString() } catch {}
   }
 
-  const salaryMin = job.payrate_min ? parseInt(job.payrate_min) : null
-  const salaryMax = job.payrate_max ? parseInt(job.payrate_max) : null
+  const salaryMin = job.payrate_min ? parseInt(String(job.payrate_min)) : null
+  const salaryMax = job.payrate_max ? parseInt(String(job.payrate_max)) : null
 
-  const description = cleanHtml(job.description || '')
-  const url = job.job_detail_url
-    ? (job.job_detail_url.startsWith('http') ? job.job_detail_url : `https://www.roberthalf.com${job.job_detail_url}`)
+  const description = cleanHtml(String(job.description || ''))
+  const jobDetailUrl = String(job.job_detail_url || '')
+  const url = jobDetailUrl
+    ? (jobDetailUrl.startsWith('http') ? jobDetailUrl : `https://www.roberthalf.com${jobDetailUrl}`)
     : ''
 
   try {
@@ -587,11 +602,11 @@ async function upsertRobertHalfJob(job: any): Promise<boolean> {
       description,
       salary_min: salaryMin && salaryMin > 1000 ? salaryMin : null,
       salary_max: salaryMax && salaryMax > 1000 ? salaryMax : null,
-      salary_text: (salaryMin || salaryMax) ? `${job.salary_currency || 'CHF'} ${salaryMin || '?'} - ${salaryMax || '?'}` : null,
+      salary_text: (salaryMin || salaryMax) ? `${String(job.salary_currency || 'CHF')} ${salaryMin || '?'} - ${salaryMax || '?'}` : null,
       job_type: jobType,
       category: detectCategory(title),
       url,
-      remote: (job.remote || '').toLowerCase().includes('remote'),
+      remote: String(job.remote || '').toLowerCase().includes('remote'),
       posted_at: postedAt,
     }, { onConflict: 'source,external_id' })
     return true

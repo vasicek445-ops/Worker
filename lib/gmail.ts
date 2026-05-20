@@ -36,7 +36,6 @@ export function buildAuthUrl(state: string, redirectUri?: string) {
     prompt: 'consent',
     scope: GMAIL_SCOPES,
     state,
-    include_granted_scopes: true,
   })
 }
 
@@ -64,18 +63,61 @@ export async function sendGmailMessage(params: {
   subject: string
   bodyHtml: string
   replyTo?: string
+  attachments?: { filename: string; mimeType: string; contentBase64: string }[]
 }) {
   const gmail = await getAuthorizedGmail(params.accessToken, params.refreshToken)
-  const headers: string[] = [
-    `From: "${params.fromName}" <${params.fromEmail}>`,
+
+  // From display name — RFC 2047 zakódování pro diakritiku (jinak mojibake u příjemce)
+  const fromDisplay = /^[\x00-\x7F]*$/.test(params.fromName)
+    ? `"${params.fromName}"`
+    : encodeMimeHeader(params.fromName)
+  const baseHeaders: string[] = [
+    `From: ${fromDisplay} <${params.fromEmail}>`,
     `To: ${params.to}`,
     `Subject: ${encodeMimeHeader(params.subject)}`,
     'MIME-Version: 1.0',
-    'Content-Type: text/html; charset=UTF-8',
-    'Content-Transfer-Encoding: 8bit',
   ]
-  if (params.replyTo) headers.push(`Reply-To: ${params.replyTo}`)
-  const raw = [...headers, '', params.bodyHtml].join('\r\n')
+  if (params.replyTo) baseHeaders.push(`Reply-To: ${params.replyTo}`)
+
+  let raw: string
+  if (params.attachments?.length) {
+    // multipart/mixed — HTML tělo + přílohy (CV PDF)
+    const boundary = `woker_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
+    const bodyPart = [
+      `--${boundary}`,
+      'Content-Type: text/html; charset=UTF-8',
+      'Content-Transfer-Encoding: 8bit',
+      '',
+      params.bodyHtml,
+    ].join('\r\n')
+    const attParts = params.attachments.map((att) =>
+      [
+        `--${boundary}`,
+        `Content-Type: ${att.mimeType}; name="${att.filename}"`,
+        'Content-Transfer-Encoding: base64',
+        `Content-Disposition: attachment; filename="${att.filename}"`,
+        '',
+        att.contentBase64.replace(/(.{76})/g, '$1\r\n'),
+      ].join('\r\n'),
+    )
+    raw = [
+      ...baseHeaders,
+      `Content-Type: multipart/mixed; boundary="${boundary}"`,
+      '',
+      bodyPart,
+      ...attParts,
+      `--${boundary}--`,
+    ].join('\r\n')
+  } else {
+    raw = [
+      ...baseHeaders,
+      'Content-Type: text/html; charset=UTF-8',
+      'Content-Transfer-Encoding: 8bit',
+      '',
+      params.bodyHtml,
+    ].join('\r\n')
+  }
+
   const encoded = Buffer.from(raw, 'utf8').toString('base64')
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
   const result = await gmail.users.messages.send({ userId: 'me', requestBody: { raw: encoded } })

@@ -3,11 +3,10 @@ import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "../lib/i18n/LanguageContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastProvider } from "./components/Toast";
-import Script from "next/script";
+import CookieConsent from "./components/CookieConsent";
 import type { Metadata } from "next";
 import "./globals.css"
 import AppShell from "./components/AppShell";
-import LeadMagnetOverlay from "./components/LeadMagnetOverlay";
 
 export const metadata: Metadata = {
   title: {
@@ -41,29 +40,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="cs">
+    <html lang="cs" translate="no">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0a0a12" />
         <meta name="trustpilot-one-time-domain-verification-id" content="3d5c0f39-baa2-4aef-a607-cba4e23fdbee" />
       </head>
       <body className="bg-[#0a0a0c]">
-        {/* Facebook Pixel */}
-        <Script id="fb-pixel" strategy="afterInteractive">{`
-          !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
-          (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-          fbq('init','1450061966530469');fbq('track','PageView');
-        `}</Script>
-        {/* Google Ads — přidej až budeš mít ID */}
-
         <ThemeProvider><ErrorBoundary><ToastProvider>
           <LanguageProvider><AppShell>{children}</AppShell></LanguageProvider>
         </ToastProvider></ErrorBoundary></ThemeProvider>
-      <LeadMagnetOverlay />
-            <Analytics /></body>
+        <CookieConsent />
+        <Analytics /></body>
     </html>
   );
 }

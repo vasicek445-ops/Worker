@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
+    if ((sub?.status !== 'active' && sub?.status !== 'trialing')) return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
     const { formData } = await req.json()
     if (!formData || typeof formData !== 'object') return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })

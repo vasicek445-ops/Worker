@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
+    if ((sub?.status !== 'active' && sub?.status !== 'trialing')) return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
     const { agency, matchScore, matchReasoning, attachCv = true, attachLetter = true } = await req.json()
 
@@ -317,7 +317,7 @@ Im Anhang finden Sie meine Bewerbungsunterlagen.
 
     // Send email
     const sendResult = await resend.emails.send({
-      from: `${candidateName} – Bewerbung <bewerbung@gowoker.com>`,
+      from: `${candidateName} – Bewerbung <info@gowoker.com>`,
       to: agency.email,
       replyTo: user.email!,
       bcc: user.email!,

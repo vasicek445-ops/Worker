@@ -10,7 +10,7 @@ const hu: Translation = {
     guides_title: "Svájci útmutató", guides_all: "Mind",
     premium_title: "Woker Premium",
     premium_desc: "Hozzáférés 1000+ kapcsolathoz, prémium útmutatókhoz és AI asszisztenshez a svájci munkához.",
-    premium_cta: "Aktiválás 9,99 €/hó", premium_trial: "Kötelezettség nélkül",
+    premium_cta: "Próbáld ki 7 napig ingyen", premium_trial: "Kötelezettség nélkül",
     wooky_name: "Wooky asszisztens", wooky_online: "Online 24/7",
     wooky_message: "Szia! 👋 Wooky vagyok, a személyes asszisztensed a svájci munkához. Segítek engedélyekkel, lakhatással és álláskeresésben.",
     wooky_open: "Chat megnyitása →",
@@ -26,7 +26,7 @@ const hu: Translation = {
   paywall: {
     title: "Teljes hozzáférés feloldása",
     description: "Szerezd meg a céges kapcsolatokat, útmutatókat és AI asszisztenst",
-    cta: "Előfizetés 9,99 €/hó",
+    cta: "Próbáld ki 7 napig ingyen",
     disclaimer: "Bármikor lemondható • 7 nap ingyenes",
   },
   home: {

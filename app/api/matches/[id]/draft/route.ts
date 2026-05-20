@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   // 1. Fetch the match (ownership check via member_id eq)
   const { data: match, error: matchErr } = await supabaseAdmin
     .from('daily_matches')
-    .select('id, position, company, location, description, language')
+    .select('id, position, company, location, description, language, recipient_email')
     .eq('id', id)
     .eq('member_id', user.id)
     .maybeSingle()
@@ -86,8 +86,10 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     }, { status: 500 })
   }
 
-  // 5. Persist draft + structured analysis + extracted recipient email
-  const recipientEmail = extractRecipientEmail(match.description)
+  // 5. Persist draft + structured analysis + extracted recipient email.
+  // Keep an already-known recipient (e.g. Indeed jobs carry a verified email)
+  // — only override it if the description yields one.
+  const recipientEmail = extractRecipientEmail(match.description) ?? match.recipient_email ?? null
 
   const { data: updated, error: updateErr } = await supabaseAdmin
     .from('daily_matches')

@@ -10,7 +10,7 @@ const cs: Translation = {
     guides_title: "Průvodce Švýcarskem", guides_all: "Vše",
     premium_title: "Woker Premium",
     premium_desc: "Odemkni 1 000+ kontaktů, prémiové průvodce a AI asistenta za práci ve Švýcarsku.",
-    premium_cta: "Aktivovat za 9,99 €/měsíc", premium_trial: "Bez závazků",
+    premium_cta: "Vyzkoušet 7 dní zdarma", premium_trial: "Bez závazků",
     wooky_name: "Wooky — Team Leader", wooky_online: "Online 24/7",
     wooky_message: "Jsem Wooky, tvůj AI Team Leader. Vedu tým nástrojů které ti pomůžou najít práci ve Švýcarsku — od CV po pohovor.",
     wooky_open: "Otevřít chat →",
@@ -26,7 +26,7 @@ const cs: Translation = {
   paywall: {
     title: "Odemkni plný přístup",
     description: "Získej kontakty na firmy, průvodce procesem a AI asistenta",
-    cta: "Předplatit za 9,99 €/měsíc",
+    cta: "Vyzkoušet 7 dní zdarma",
     disclaimer: "Zrušíš kdykoliv • Bez závazků",
   },
   home: {

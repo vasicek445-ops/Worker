@@ -10,7 +10,7 @@ const pt: Translation = {
     guides_title: "Guia da Suíça", guides_all: "Tudo",
     premium_title: "Woker Premium",
     premium_desc: "Desbloqueie mais de 1.000 contactos, guias premium e assistente AI para trabalhar na Suíça.",
-    premium_cta: "Ativar por 9,99 €/mês", premium_trial: "Sem compromisso",
+    premium_cta: "Experimenta 7 dias grátis", premium_trial: "Sem compromisso",
     wooky_name: "Assistente Wooky", wooky_online: "Online 24/7",
     wooky_message: "Olá! 👋 Sou o Wooky, o teu assistente para trabalhar na Suíça. Ajudo-te com autorizações, alojamento e procura de emprego.",
     wooky_open: "Abrir chat →",
@@ -26,7 +26,7 @@ const pt: Translation = {
   paywall: {
     title: "Desbloqueie o acesso completo",
     description: "Obtenha contactos de empresas, guias e assistente AI",
-    cta: "Subscrever por 9,99 €/mês",
+    cta: "Experimenta 7 dias grátis",
     disclaimer: "Cancele a qualquer momento • 7 dias grátis",
   },
   home: {

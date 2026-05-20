@@ -66,7 +66,7 @@ export default function Onboarding() {
           opacity: 0.25,
           top: "-100px",
           left: "-100px",
-          background: "radial-gradient(circle, rgba(57,255,110,0.2), transparent 70%)",
+          background: "radial-gradient(circle, rgba(251,146,60,0.2), transparent 70%)",
         }}
       />
 
@@ -89,9 +89,9 @@ export default function Onboarding() {
                 borderRadius: "100px",
                 background:
                   i === step
-                    ? "linear-gradient(135deg, #39ff6e, #2bcc58)"
+                    ? "linear-gradient(135deg, #fb923c, #f97316)"
                     : i < step
-                    ? "rgba(57,255,110,0.3)"
+                    ? "rgba(251,146,60,0.3)"
                     : "rgba(255,255,255,0.1)",
                 transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
               }}
@@ -135,7 +135,7 @@ export default function Onboarding() {
           onClick={handleNext}
           style={{
             width: "100%",
-            background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+            background: "linear-gradient(135deg, #fb923c, #f97316)",
             color: "#0a0a12",
             border: "none",
             padding: "16px",
@@ -144,7 +144,7 @@ export default function Onboarding() {
             fontWeight: 800,
             cursor: "pointer",
             fontFamily: "inherit",
-            boxShadow: "0 4px 24px rgba(57,255,110,0.25)",
+            boxShadow: "0 4px 24px rgba(251,146,60,0.25)",
             transition: "all 0.2s",
           }}
         >

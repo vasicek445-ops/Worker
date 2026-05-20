@@ -32,7 +32,7 @@ export default function ResetHeslo() {
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <div style={{
             width: "44px", height: "44px", borderRadius: "12px",
-            background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+            background: "linear-gradient(135deg, #fb923c, #f97316)",
             display: "inline-flex", alignItems: "center", justifyContent: "center",
             fontWeight: 800, fontSize: "20px", color: "#0a0a12", marginBottom: "16px",
           }}>W</div>
@@ -50,8 +50,8 @@ export default function ResetHeslo() {
         }}>
           {done ? (
             <div style={{
-              background: "rgba(57,255,110,0.1)", border: "1px solid rgba(57,255,110,0.2)",
-              color: "#39ff6e", fontSize: "14px", borderRadius: "12px", padding: "16px",
+              background: "rgba(251,146,60,0.1)", border: "1px solid rgba(251,146,60,0.2)",
+              color: "#fb923c", fontSize: "14px", borderRadius: "12px", padding: "16px",
               textAlign: "center",
             }}>
               ✅ Heslo změněno! Přesměrovávám na dashboard...
@@ -83,11 +83,11 @@ export default function ResetHeslo() {
                 }}>{error}</div>
               )}
               <button type="submit" disabled={loading} style={{
-                width: "100%", background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+                width: "100%", background: "linear-gradient(135deg, #fb923c, #f97316)",
                 color: "#0a0a12", border: "none", padding: "14px", borderRadius: "12px",
                 fontSize: "15px", fontWeight: 700, cursor: loading ? "wait" : "pointer",
                 fontFamily: "inherit", opacity: loading ? 0.6 : 1,
-                boxShadow: "0 4px 20px rgba(57,255,110,0.2)", marginTop: "4px",
+                boxShadow: "0 4px 20px rgba(251,146,60,0.2)", marginTop: "4px",
               }}>
                 {loading ? "..." : "Změnit heslo"}
               </button>

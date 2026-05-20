@@ -76,8 +76,8 @@ export default function GenerateForm({ type, title, subtitle, fields, initialDat
       }
 
       setResult(data.document)
-    } catch (err: any) {
-      setError(err.message || 'Něco se pokazilo')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Něco se pokazilo')
     } finally {
       setLoading(false)
     }

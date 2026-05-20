@@ -209,14 +209,14 @@ function Navbar() {
             Plány
           </Link>
           <Link
-            href="/zdarma"
+            href="/login"
             className="text-sm text-white/70 hover:text-white transition-colors"
           >
             Přihlásit se
           </Link>
           <Link
-            href="/zdarma"
-            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+            href="/registrace"
+            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Registrace
           </Link>
@@ -285,15 +285,15 @@ function Navbar() {
               Plány
             </Link>
             <Link
-              href="/zdarma"
+              href="/login"
               className="px-2 py-2 text-sm text-white/70 hover:text-white"
               onClick={() => setMobileOpen(false)}
             >
               Přihlásit se
             </Link>
             <Link
-              href="/zdarma"
-              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
+              href="/registrace"
+              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
               Registrace
@@ -343,11 +343,11 @@ function AnimatedJobsFeed() {
           </div>
           <div className="flex items-center gap-2">
             {job.tag && (
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${job.tag === "Nové" ? "bg-[#39ff6e]/20 text-[#39ff6e]" : "bg-amber-500/20 text-amber-400"}`}>
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${job.tag === "Nové" ? "bg-[#fb923c]/20 text-[#fb923c]" : "bg-amber-500/20 text-amber-400"}`}>
                 {job.tag}
               </span>
             )}
-            <span className="text-[#39ff6e] text-[11px] font-bold whitespace-nowrap">{job.salary}</span>
+            <span className="text-[#fb923c] text-[11px] font-bold whitespace-nowrap">{job.salary}</span>
           </div>
         </motion.div>
       ))}
@@ -431,7 +431,7 @@ function BentoCard({
           {imagePlaceholder === "housing" && large && <AnimatedHousingFeed />}
           <div
             className={`absolute left-0 ${large ? "top-6 bottom-6" : "top-6 bottom-6"} w-[3px] rounded-full ${
-              accent === "green" ? "bg-[#39ff6e]" : "bg-cyan-400"
+              accent === "green" ? "bg-[#fb923c]" : "bg-cyan-400"
             }`}
           />
           <div className="pl-4">
@@ -445,7 +445,7 @@ function BentoCard({
             <p className="text-sm text-white/60 leading-relaxed mb-4">{text}</p>
             <span
               className={`text-sm font-medium ${
-                accent === "green" ? "text-[#39ff6e]" : "text-cyan-400"
+                accent === "green" ? "text-[#fb923c]" : "text-cyan-400"
               } group-hover:underline`}
             >
               {cta}
@@ -500,7 +500,7 @@ function ComparisonTable() {
         <thead>
           <tr className="border-b border-white/[0.08]">
             <th className="text-left py-3 px-4 text-white/40 font-medium" />
-            <th className="text-left py-3 px-4 text-[#39ff6e] font-bold">Woker</th>
+            <th className="text-left py-3 px-4 text-[#fb923c] font-bold">Woker</th>
             <th className="text-left py-3 px-4 text-white/40 font-medium">Agentura</th>
             <th className="text-left py-3 px-4 text-white/40 font-medium">Sám</th>
           </tr>
@@ -647,7 +647,7 @@ export default function MarketingPage() {
       {/* ── HERO ── */}
       <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 px-4 sm:px-6 overflow-hidden">
         {/* Ambient blobs */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-[#39ff6e]/[0.04] blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-[#fb923c]/[0.04] blur-[120px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-cyan-400/[0.03] blur-[120px] pointer-events-none" />
         {/* Dot grid */}
         <div
@@ -665,7 +665,7 @@ export default function MarketingPage() {
               4 600 ubytování.
               <br />
               1 007 agentur.{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-cyan-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fb923c] to-cyan-400">
                 Vše česky.
               </span>
             </h1>
@@ -686,13 +686,13 @@ export default function MarketingPage() {
           <FadeIn delay={0.2}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/zdarma"
-                className="px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
+                href="/pricing"
+                className="px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#fb923c]/20"
               >
                 Začít zdarma &rarr;
               </Link>
               <Link
-                href="/zdarma"
+                href="/pricing"
                 className="px-8 py-3.5 rounded-xl text-base font-medium border border-white/[0.15] text-white hover:bg-white/[0.05] hover:border-white/[0.25] transition-all"
               >
                 Prohlédnout nabídky
@@ -749,7 +749,7 @@ export default function MarketingPage() {
               headline="1 007 agentur. Telefon, email, adresa."
               text="Zeptej se přímo. Žádný prostředník, žádný poplatek za číslo. Filtruj podle kantonu, jazyka nebo oboru."
               cta="Hledat práci &rarr;"
-              href="/zdarma"
+              href="/pricing"
               accent="green"
               delay={0.05}
               imagePlaceholder="jobs"
@@ -759,7 +759,7 @@ export default function MarketingPage() {
               headline="4 600 ubytování. Od CHF 417/měsíc."
               text="Penziony, byty, ubytovny, WG — s cenou a přímým kontaktem. Nastěhuj se dřív než začneš pracovat."
               cta="Hledat bydlení &rarr;"
-              href="/zdarma"
+              href="/pricing"
               accent="cyan"
               delay={0.1}
               imagePlaceholder="housing"
@@ -770,7 +770,7 @@ export default function MarketingPage() {
               headline="Německý životopis za 90 sekund"
               text="Zadej česky, dostaneš německý Bewerbungsdossier. Hotovo dřív než dopíješ kafe."
               cta="Vyzkoušet &rarr;"
-              href="/zdarma"
+              href="/pricing"
               accent="green"
               delay={0.15}
             />
@@ -778,7 +778,7 @@ export default function MarketingPage() {
               headline="Volej přímo zaměstnavateli"
               text="Každá nabídka má telefon nebo email. Žádné formuláře, žádné čekání."
               cta="Zobrazit &rarr;"
-              href="/zdarma"
+              href="/pricing"
               accent="cyan"
               delay={0.2}
             />
@@ -786,7 +786,7 @@ export default function MarketingPage() {
               headline="Povolení, pojištění, daně — česky"
               text="Co je L-povolení? Kde se přihlásíš na Gemeinde? Krok za krokem, bez úřadničiny."
               cta="Číst &rarr;"
-              href="/zdarma"
+              href="/pricing"
               accent="green"
               delay={0.25}
             />
@@ -794,7 +794,7 @@ export default function MarketingPage() {
               headline="Komunita lidí co už tam žijou"
               text="Zeptej se něco v komunitě. Odpoví ti skladník z Zürichu, ne chatbot."
               cta="Vstoupit &rarr;"
-              href="/zdarma"
+              href="/pricing"
               accent="cyan"
               delay={0.3}
             />
@@ -830,7 +830,7 @@ export default function MarketingPage() {
             ].map((step, i) => (
               <FadeIn key={step.num} delay={i * 0.1}>
                 <div className="text-center sm:text-left">
-                  <span className="inline-block text-5xl font-extrabold text-[#39ff6e]/20 mb-3">
+                  <span className="inline-block text-5xl font-extrabold text-[#fb923c]/20 mb-3">
                     {step.num}
                   </span>
                   <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
@@ -842,8 +842,8 @@ export default function MarketingPage() {
           <FadeIn delay={0.3}>
             <div className="text-center mt-12">
               <Link
-                href="/zdarma"
-                className="inline-block px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
+                href="/pricing"
+                className="inline-block px-8 py-3.5 rounded-xl text-base font-bold bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#fb923c]/20"
               >
                 Zaregistrovat se zdarma &rarr;
               </Link>
@@ -930,96 +930,40 @@ export default function MarketingPage() {
               Cena jednoho oběda. Nebo 600 EUR zprostředkovateli.
             </h2>
           </FadeIn>
-          <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {/* Free */}
+          <div className="max-w-md mx-auto">
             <FadeIn delay={0.05}>
-              <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-6 sm:p-8 h-full flex flex-col">
-                <h3 className="text-lg font-bold text-white mb-1">Zdarma</h3>
-                <p className="text-3xl font-extrabold text-white mb-6">
-                  0 EUR
-                </p>
-                <ul className="space-y-3 mb-8 flex-1">
-                  {[
-                    "Hledání práce a základní filtry",
-                    "Základní nabídky bydlení",
-                    "Průvodce krok za krokem",
-                    "Přístup do komunity",
-                  ].map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-white/60">
-                      <svg
-                        className="w-4 h-4 text-white/30 mt-0.5 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/zdarma"
-                  className="block text-center px-6 py-3 rounded-xl text-sm font-semibold border border-white/[0.15] text-white hover:bg-white/[0.05] transition-all"
-                >
-                  Začít zdarma
-                </Link>
-              </div>
-            </FadeIn>
-
-            {/* Premium */}
-            <FadeIn delay={0.1}>
-              <div className="relative rounded-2xl bg-white/[0.03] border-2 border-[#39ff6e]/40 p-6 sm:p-8 h-full flex flex-col">
-                <span className="absolute -top-3 left-6 px-3 py-0.5 text-xs font-bold bg-[#39ff6e] text-[#0a0a12] rounded-full">
-                  Nejoblíbenější
+              <div className="relative rounded-2xl bg-white/[0.03] border-2 border-orange-400/40 p-6 sm:p-8 flex flex-col">
+                <span className="absolute -top-3 left-6 px-3 py-0.5 text-xs font-bold bg-orange-400 text-[#0a0a12] rounded-full">
+                  Woker Pro
                 </span>
-                <h3 className="text-lg font-bold text-white mb-1">Premium</h3>
-                <p className="text-3xl font-extrabold text-white mb-1">
-                  19,99 EUR
-                  <span className="text-base font-normal text-white/40">
-                    /měsíc
-                  </span>
+                <p className="text-4xl font-extrabold text-white mb-1 mt-2">
+                  CHF 9
+                  <span className="text-base font-normal text-white/40">/měsíc</span>
                 </p>
-                <p className="text-xs text-white/30 mb-6">
-                  = cena jednoho oběda. Zprostředkovatelé účtují ~600 EUR.
+                <p className="text-sm text-orange-400 font-semibold mb-6">
+                  Prvních 7 dní zdarma — pak CHF 9/měsíc
                 </p>
                 <ul className="space-y-3 mb-8 flex-1">
                   {[
-                    "Vše z Free +",
-                    "4 600 ubytování s telefonem a emailem",
-                    "1 007 agentur s přímým kontaktem",
-                    "Německý životopis a Bewerbung za 90s",
-                    "AI Smart Matching — práce podle tvých skillů",
-                    "Prioritní podpora",
+                    "1 007+ Temporärbüro s přímým kontaktem",
+                    "Smart Apply — auto-emaily zaměstnavatelům",
+                    "AI asistent — CV, dopisy, příprava na pohovor",
+                    "Smart Housing — bydlení s kontakty na majitele",
+                    "Denní nové nabídky a osobní podpora",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-white/80">
-                      <svg
-                        className="w-4 h-4 text-[#39ff6e] mt-0.5 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
+                      <svg className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                       {f}
                     </li>
                   ))}
                 </ul>
                 <Link
-                  href="/registrace?plan=premium"
-                  className="block text-center px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+                  href="/pricing"
+                  className="block text-center px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-orange-400 to-orange-500 text-[#0a0a12] hover:brightness-110 transition-all"
                 >
-                  Zkusit Premium
+                  Vyzkoušet 7 dní zdarma
                 </Link>
                 <p className="text-xs text-white/30 text-center mt-3">
                   Bez závazku. Zrušíš kdykoliv jedním klikem.
@@ -1032,7 +976,7 @@ export default function MarketingPage() {
 
       {/* ── FINAL CTA ── */}
       <section className="relative py-20 sm:py-28 px-4 sm:px-6 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#39ff6e]/[0.03] blur-[150px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#fb923c]/[0.03] blur-[150px] pointer-events-none" />
         <div className="relative max-w-3xl mx-auto text-center">
           <FadeIn>
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
@@ -1046,8 +990,8 @@ export default function MarketingPage() {
           </FadeIn>
           <FadeIn delay={0.15}>
             <Link
-              href="/zdarma"
-              className="inline-block px-10 py-4 rounded-xl text-lg font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
+              href="/pricing"
+              className="inline-block px-10 py-4 rounded-xl text-lg font-bold bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#fb923c]/20"
             >
               Začít zdarma &rarr;
             </Link>

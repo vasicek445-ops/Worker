@@ -140,7 +140,7 @@ function Navbar() {
           </Link>
           <Link
             href="/zdarma"
-            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Začít zdarma
           </Link>
@@ -189,7 +189,7 @@ function Navbar() {
             </Link>
             <Link
               href="/zdarma"
-              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
+              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
               Začít zdarma
@@ -255,7 +255,7 @@ function AnimatedJobFeed() {
                   <span
                     className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${
                       job.tag === "Nové"
-                        ? "bg-[#39ff6e]/20 text-[#39ff6e]"
+                        ? "bg-[#fb923c]/20 text-[#fb923c]"
                         : "bg-amber-500/20 text-amber-400"
                     }`}
                   >
@@ -267,7 +267,7 @@ function AnimatedJobFeed() {
                 {job.location} &middot; {job.company}
               </p>
             </div>
-            <span className="text-[#39ff6e] font-bold text-sm whitespace-nowrap ml-3">
+            <span className="text-[#fb923c] font-bold text-sm whitespace-nowrap ml-3">
               {job.salary}
             </span>
           </motion.div>
@@ -330,7 +330,7 @@ function ProgressRing({ progress }: { progress: number }) {
         cy="24"
         r={r}
         fill="none"
-        stroke="#39ff6e"
+        stroke="#fb923c"
         strokeWidth={4}
         strokeLinecap="round"
         strokeDasharray={circ}
@@ -379,7 +379,7 @@ function MockupDashboard() {
     { label: "Práce", value: "999", gradient: "from-orange-500 to-amber-500" },
     { label: "Bydlení", value: "4 600", gradient: "from-cyan-500 to-blue-500" },
     { label: "Agentur", value: "1 007", gradient: "from-purple-500 to-pink-500" },
-    { label: "Přihlášky", value: "3", gradient: "from-[#39ff6e] to-emerald-500" },
+    { label: "Přihlášky", value: "3", gradient: "from-[#fb923c] to-emerald-500" },
   ];
 
   const steps = ["Profil", "CV", "Matching", "Přihláška"];
@@ -420,7 +420,7 @@ function MockupDashboard() {
             <div key={i} className="flex-1 px-1">
               <div
                 className={`h-0.5 rounded-full transition-all duration-500 ${
-                  i < step ? "bg-[#39ff6e]" : "bg-white/[0.06]"
+                  i < step ? "bg-[#fb923c]" : "bg-white/[0.06]"
                 }`}
               />
             </div>
@@ -435,9 +435,9 @@ function MockupDashboard() {
                 <div
                   className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500 ${
                     done
-                      ? "bg-[#39ff6e] text-[#0a0a12]"
+                      ? "bg-[#fb923c] text-[#0a0a12]"
                       : active
-                      ? "bg-[#39ff6e]/20 text-[#39ff6e] ring-2 ring-[#39ff6e]/40 animate-pulse"
+                      ? "bg-[#fb923c]/20 text-[#fb923c] ring-2 ring-[#fb923c]/40 animate-pulse"
                       : "bg-white/[0.06] text-white/30"
                   }`}
                 >
@@ -497,8 +497,8 @@ function MockupMatching() {
   }, []);
 
   const results = [
-    { name: "Adecco Schweiz AG", loc: "Zürich", match: 92, color: "text-[#39ff6e] bg-[#39ff6e]/15", phone: "+41 44 123 45 67" },
-    { name: "Manpower AG", loc: "Bern", match: 87, color: "text-[#39ff6e] bg-[#39ff6e]/15", phone: "+41 31 987 65 43" },
+    { name: "Adecco Schweiz AG", loc: "Zürich", match: 92, color: "text-[#fb923c] bg-[#fb923c]/15", phone: "+41 44 123 45 67" },
+    { name: "Manpower AG", loc: "Bern", match: 87, color: "text-[#fb923c] bg-[#fb923c]/15", phone: "+41 31 987 65 43" },
     { name: "Kelly Services", loc: "Luzern", match: 78, color: "text-cyan-400 bg-cyan-400/15", phone: "+41 41 555 12 34" },
   ];
 
@@ -532,7 +532,7 @@ function MockupMatching() {
           animate={{ opacity: 1 }}
           className="flex justify-center pt-2"
         >
-          <div className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] font-bold text-sm cursor-default shadow-lg shadow-[#39ff6e]/20">
+          <div className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold text-sm cursor-default shadow-lg shadow-[#fb923c]/20">
             Spustit matching
           </div>
         </motion.div>
@@ -543,7 +543,7 @@ function MockupMatching() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-            className="w-8 h-8 rounded-full border-2 border-[#39ff6e]/30 border-t-[#39ff6e]"
+            className="w-8 h-8 rounded-full border-2 border-[#fb923c]/30 border-t-[#fb923c]"
           />
           <p className="text-white/50 text-xs">Hledám nejlepší agentury...</p>
         </div>
@@ -657,13 +657,13 @@ function MockupCV() {
             {formFields >= 1 && (
               <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
                 <p className="text-white/30 text-[10px] uppercase tracking-wider">Jméno</p>
-                <p className="text-white text-sm font-medium">{typedName}<span className="inline-block w-[2px] h-[14px] bg-[#39ff6e] ml-0.5 animate-pulse align-middle" /></p>
+                <p className="text-white text-sm font-medium">{typedName}<span className="inline-block w-[2px] h-[14px] bg-[#fb923c] ml-0.5 animate-pulse align-middle" /></p>
               </div>
             )}
             {formFields >= 2 && (
               <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
                 <p className="text-white/30 text-[10px] uppercase tracking-wider">Pozice</p>
-                <p className="text-white text-sm font-medium">{typedPos}{formFields === 2 && <span className="inline-block w-[2px] h-[14px] bg-[#39ff6e] ml-0.5 animate-pulse align-middle" />}</p>
+                <p className="text-white text-sm font-medium">{typedPos}{formFields === 2 && <span className="inline-block w-[2px] h-[14px] bg-[#fb923c] ml-0.5 animate-pulse align-middle" />}</p>
               </div>
             )}
             {formFields >= 3 && (
@@ -674,7 +674,7 @@ function MockupCV() {
                 </div>
                 <div className="rounded-lg bg-[#111120] border border-white/[0.06] px-3 py-2">
                   <p className="text-white/30 text-[10px] uppercase tracking-wider">Němčina</p>
-                  <p className="text-[#39ff6e] text-sm font-medium">A2 — základy</p>
+                  <p className="text-[#fb923c] text-sm font-medium">A2 — základy</p>
                 </div>
               </>
             )}
@@ -684,7 +684,7 @@ function MockupCV() {
             <div className="flex gap-2">
               {["Klassisch", "Modern", "Kreativ", "Elegant"].map((t, i) => (
                 <div key={t} className={`text-center text-[10px] px-3 py-1.5 rounded-md cursor-default ${
-                  i === 2 ? "bg-[#39ff6e]/15 text-[#39ff6e] font-bold border border-[#39ff6e]/30"
+                  i === 2 ? "bg-[#fb923c]/15 text-[#fb923c] font-bold border border-[#fb923c]/30"
                     : "bg-white/[0.04] text-white/30 border border-white/[0.06]"
                 }`}>{t}</div>
               ))}
@@ -693,7 +693,7 @@ function MockupCV() {
 
           {showBtn && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-center pt-1">
-              <div className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] font-bold text-sm cursor-default shadow-lg shadow-[#39ff6e]/20">
+              <div className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold text-sm cursor-default shadow-lg shadow-[#fb923c]/20">
                 Generovat CV →
               </div>
             </motion.div>
@@ -704,9 +704,9 @@ function MockupCV() {
       {/* Step 2: Generating */}
       {step === "generating" && (
         <div className="flex flex-col items-center gap-3 py-6">
-          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-8 h-8 rounded-full border-2 border-[#39ff6e]/30 border-t-[#39ff6e]" />
+          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-8 h-8 rounded-full border-2 border-[#fb923c]/30 border-t-[#fb923c]" />
           <div className="w-48 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#39ff6e] to-[#32e060] transition-all duration-200" style={{ width: `${progress}%` }} />
+            <div className="h-full rounded-full bg-gradient-to-r from-[#fb923c] to-[#f97316] transition-all duration-200" style={{ width: `${progress}%` }} />
           </div>
           <p className="text-white/50 text-xs">{statusText}</p>
         </div>
@@ -798,8 +798,8 @@ function MockupCV() {
 
           {/* Generated badge */}
           <div className="flex items-center justify-center gap-2 bg-[#0a0a12] py-3">
-            <svg className="w-4 h-4 text-[#39ff6e]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-            <span className="text-xs font-semibold text-[#39ff6e]">CV vygenerováno v němčině</span>
+            <svg className="w-4 h-4 text-[#fb923c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            <span className="text-xs font-semibold text-[#fb923c]">CV vygenerováno v němčině</span>
           </div>
         </motion.div>
       )}
@@ -823,7 +823,7 @@ function DashboardShowcase() {
         <FadeIn>
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">
             Podívej se jak to{" "}
-            <span className="text-[#39ff6e]">funguje</span>
+            <span className="text-[#fb923c]">funguje</span>
           </h2>
           <p className="text-white/40 text-center text-sm mb-8 max-w-lg mx-auto">
             Tohle všechno se děje automaticky. Ty jen klikneš.
@@ -841,7 +841,7 @@ function DashboardShowcase() {
                 onClick={() => setActiveTab(i)}
                 className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                   activeTab === i
-                    ? "bg-[#39ff6e]/15 text-[#39ff6e] border border-[#39ff6e]/30"
+                    ? "bg-[#fb923c]/15 text-[#fb923c] border border-[#fb923c]/30"
                     : "bg-white/[0.04] text-white/40 border border-white/[0.06] hover:text-white/60 hover:border-white/[0.12]"
                 }`}
               >
@@ -896,7 +896,7 @@ function DashboardShowcase() {
           <div className="mt-8 text-center">
             <Link
               href="/zdarma"
-              className="inline-block px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#39ff6e]/20"
+              className="inline-block px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#fb923c]/20"
             >
               Vyzkoušet zdarma →
             </Link>
@@ -919,7 +919,7 @@ export default function PracePage() {
           <FadeIn>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
               Najdi práci{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-[#32e060]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fb923c] to-[#f97316]">
                 ve Švýcarsku
               </span>
             </h1>
@@ -960,7 +960,7 @@ export default function PracePage() {
                   <p className="text-white font-semibold text-sm">{fake.t}</p>
                   <p className="text-white/40 text-xs mt-0.5">{fake.c}</p>
                 </div>
-                <span className="text-[#39ff6e] font-bold text-sm">{fake.s}</span>
+                <span className="text-[#fb923c] font-bold text-sm">{fake.s}</span>
               </div>
             ))}
           </div>
@@ -972,7 +972,7 @@ export default function PracePage() {
             </p>
             <Link
               href="/zdarma"
-              className="px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#39ff6e]/20"
+              className="px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#fb923c]/20"
             >
               Začít zdarma
             </Link>
@@ -988,7 +988,7 @@ export default function PracePage() {
         <FadeIn>
           <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 text-center">
             <div>
-              <p className="text-2xl sm:text-3xl font-extrabold text-[#39ff6e]">1 007</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-[#fb923c]">1 007</p>
               <p className="text-white/50 text-sm mt-1">ověřených agentur</p>
             </div>
             <div className="hidden sm:block w-px h-10 bg-white/10" />

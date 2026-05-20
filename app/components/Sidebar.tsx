@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
@@ -67,14 +68,14 @@ export default function Sidebar() {
           href="/dashboard"
           className="flex items-center gap-2.5 no-underline group"
         >
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black text-base shadow-[0_4px_12px_rgba(255,140,43,0.25)] group-hover:shadow-[0_4px_18px_rgba(255,140,43,0.4)] transition-all"
-            style={{
-              background: "linear-gradient(135deg, #ff8c2b 0%, #ff6a1f 100%)",
-            }}
-          >
-            W
-          </div>
+          <Image
+            src="/logo.svg"
+            alt="Woker"
+            width={40}
+            height={40}
+            className="group-hover:scale-105 transition-transform"
+            priority
+          />
           <span className="text-white font-extrabold text-xl tracking-tight">
             Woker
           </span>
@@ -111,7 +112,7 @@ export default function Sidebar() {
             href: "/profil/gmail",
             icon: Mail,
             label: "Smart Apply",
-            badge: { text: "BETA", className: "bg-[#39ff6e]/15 text-[#39ff6e]" },
+            badge: { text: "BETA", className: "bg-[#fb923c]/15 text-[#fb923c]" },
           },
         ].map((it) => {
           const active = isActivePath(it.href);

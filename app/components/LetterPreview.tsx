@@ -23,7 +23,7 @@ interface LetterPreviewProps {
   template: string
   accentColor: string
   photo?: string | null
-  onSave?: (html: string) => void
+  onSave?: (html: string, pdfBlob: Blob) => void
   saving?: boolean
   saved?: boolean
 }
@@ -3016,6 +3016,39 @@ const TEMPLATE_MAP: Record<string, React.FC<{ data: LetterData; c: string; photo
 export default function LetterPreview({ data, template, accentColor, photo, onSave, saving, saved }: LetterPreviewProps) {
   const letterRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
+  const [preparing, setPreparing] = useState(false)
+
+  // Vyrobí PDF blob dopisu (pro uložení jako příloha přihlášky).
+  const buildLetterPdfBlob = async (): Promise<Blob> => {
+    const html2pdf = (await import('html2pdf.js')).default
+    const el = letterRef.current!
+    const inner = el.firstElementChild as HTMLElement | null
+    const origMinH = inner?.style.minHeight || ''
+    if (inner) inner.style.minHeight = 'auto'
+    const blob = await html2pdf().set({
+      margin: 0,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 794 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any).from(el).outputPdf('blob')
+    if (inner) inner.style.minHeight = origMinH
+    return blob as Blob
+  }
+
+  const handleSaveClick = async () => {
+    if (!letterRef.current || !onSave) return
+    setPreparing(true)
+    try {
+      const blob = await buildLetterPdfBlob()
+      onSave(letterRef.current.innerHTML, blob)
+    } catch {
+      alert('Chyba při přípravě PDF dopisu.')
+    } finally {
+      setPreparing(false)
+    }
+  }
 
   const handleDownload = async () => {
     if (!letterRef.current) return
@@ -3050,12 +3083,12 @@ export default function LetterPreview({ data, template, accentColor, photo, onSa
         </button>
         {onSave && (
           saved ? (
-            <div className="flex-1 bg-[#39ff6e]/10 border border-[#39ff6e]/30 text-[#39ff6e] font-bold py-3 px-6 rounded-xl text-center">
+            <div className="flex-1 bg-[#fb923c]/10 border border-[#fb923c]/30 text-[#fb923c] font-bold py-3 px-6 rounded-xl text-center">
               Ulozeno
             </div>
           ) : (
-            <button onClick={() => { if (letterRef.current) onSave(letterRef.current.innerHTML) }} disabled={saving} className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
-              {saving ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />Ukladam...</span>) : 'Ulozit pro prihlasky'}
+            <button onClick={handleSaveClick} disabled={saving || preparing} className="flex-1 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+              {(saving || preparing) ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />Ukladam...</span>) : 'Ulozit pro prihlasky'}
             </button>
           )
         )}

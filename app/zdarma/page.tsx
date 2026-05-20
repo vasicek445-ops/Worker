@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ZdarmaPage() {
   const [name, setName] = useState('');
@@ -31,8 +32,8 @@ export default function ZdarmaPage() {
       if (!res.ok) throw new Error(data.error || 'Něco se pokazilo');
 
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || 'Něco se pokazilo. Zkuste to znovu.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Něco se pokazilo. Zkuste to znovu.');
     } finally {
       setLoading(false);
     }
@@ -44,8 +45,8 @@ export default function ZdarmaPage() {
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=General+Sans:wght@400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'General Sans', -apple-system, sans-serif; background: #0a0a12; color: #f0f0f5; min-height: 100vh; overflow-x: hidden; }
-        .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(57,255,110,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(57,255,110,0.03) 1px,transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
-        .bg-glow { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(circle,rgba(57,255,110,0.06) 0%,transparent 70%); pointer-events: none; z-index: 0; }
+        .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(251,146,60,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(251,146,60,0.03) 1px,transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
+        .bg-glow { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(circle,rgba(251,146,60,0.06) 0%,transparent 70%); pointer-events: none; z-index: 0; }
         .grain { position: fixed; inset: 0; opacity: 0.4; pointer-events: none; z-index: 1; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); }
         @keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -56,19 +57,19 @@ export default function ZdarmaPage() {
       <div className="grain" />
 
       <div style={{ position: 'relative', zIndex: 2, maxWidth: 580, margin: '0 auto', padding: '40px 20px', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <a href="/" style={{ position: 'absolute', top: 24, left: 20, color: '#8888aa', textDecoration: 'none', fontSize: 14 }}>
+        <Link href="/" style={{ position: 'absolute', top: 24, left: 20, color: '#8888aa', textDecoration: 'none', fontSize: 14 }}>
           ← Zpět na Woker
-        </a>
+        </Link>
 
         {!success ? (
           <div>
             {/* Badge */}
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(57,255,110,0.08)', border: '1px solid rgba(57,255,110,0.15)', color: '#39ff6e', fontSize: 12, fontWeight: 600, padding: '6px 14px', borderRadius: 20, letterSpacing: 0.5, textTransform: 'uppercase' as const, marginBottom: 24 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(251,146,60,0.08)', border: '1px solid rgba(251,146,60,0.15)', color: '#fb923c', fontSize: 12, fontWeight: 600, padding: '6px 14px', borderRadius: 20, letterSpacing: 0.5, textTransform: 'uppercase' as const, marginBottom: 24 }}>
               ✦ Zdarma ke stažení
             </div>
 
             <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 'clamp(36px, 8vw, 52px)', fontWeight: 400, lineHeight: 1.1, marginBottom: 8 }}>
-              5 kroků k práci ve <span style={{ color: '#39ff6e' }}>Švýcarsku</span>
+              5 kroků k práci ve <span style={{ color: '#fb923c' }}>Švýcarsku</span>
             </h1>
             <p style={{ fontSize: 17, color: '#8888aa', lineHeight: 1.5, marginBottom: 32 }}>
               Kompletní průvodce, jak si najít práci ve Švýcarsku bez agentury. 10 stran praktických tipů, kontaktů a akčního plánu.
@@ -85,7 +86,7 @@ export default function ZdarmaPage() {
                 ['🛡️', 'Ochrana před podvody', '— varovné signály a ověření firem'],
               ].map(([icon, title, desc], i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 12 }}>
-                  <div style={{ width: 28, height: 28, background: 'rgba(57,255,110,0.1)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>{icon}</div>
+                  <div style={{ width: 28, height: 28, background: 'rgba(251,146,60,0.1)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>{icon}</div>
                   <div style={{ fontSize: 15, color: '#ccccdd', lineHeight: 1.4 }}>
                     <strong style={{ color: '#f0f0f5', fontWeight: 600 }}>{title}</strong> {desc}
                   </div>
@@ -94,7 +95,7 @@ export default function ZdarmaPage() {
             </div>
 
             {/* Form */}
-            <div style={{ background: 'linear-gradient(135deg,rgba(57,255,110,0.06),rgba(57,255,110,0.02))', border: '1px solid rgba(57,255,110,0.12)', borderRadius: 16, padding: '28px 24px', marginBottom: 24 }}>
+            <div style={{ background: 'linear-gradient(135deg,rgba(251,146,60,0.06),rgba(251,146,60,0.02))', border: '1px solid rgba(251,146,60,0.12)', borderRadius: 16, padding: '28px 24px', marginBottom: 24 }}>
               <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, marginBottom: 6 }}>Stáhněte si průvodce zdarma</div>
               <div style={{ fontSize: 14, color: '#8888aa', marginBottom: 20 }}>Zadejte email a pošleme vám PDF rovnou do schránky.</div>
 
@@ -120,7 +121,7 @@ export default function ZdarmaPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{ width: '100%', padding: '16px 24px', background: '#39ff6e', color: '#0a0a12', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 700, fontFamily: 'inherit', cursor: loading ? 'wait' : 'pointer', opacity: loading ? 0.8 : 1, position: 'relative', overflow: 'hidden' }}
+                  style={{ width: '100%', padding: '16px 24px', background: '#fb923c', color: '#0a0a12', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 700, fontFamily: 'inherit', cursor: loading ? 'wait' : 'pointer', opacity: loading ? 0.8 : 1, position: 'relative', overflow: 'hidden' }}
                 >
                   {loading ? 'Odesílám...' : '📥 Stáhnout průvodce zdarma'}
                 </button>
@@ -138,7 +139,7 @@ export default function ZdarmaPage() {
                   ))}
                 </div>
                 <div style={{ fontSize: 13, color: '#8888aa' }}>
-                  Už <strong style={{ color: '#39ff6e', fontWeight: 600 }}>847+ lidí</strong> si průvodce stáhlo
+                  Už <strong style={{ color: '#fb923c', fontWeight: 600 }}>847+ lidí</strong> si průvodce stáhlo
                 </div>
               </div>
             </div>
@@ -147,7 +148,7 @@ export default function ZdarmaPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 24 }}>
               {[['10','stran průvodce'],['5','kroků k práci'],['30+','CHF/hod průměr']].map(([n,l],i) => (
                 <div key={i} style={{ textAlign: 'center', padding: '16px 8px', background: '#111122', borderRadius: 12, border: '1px solid rgba(255,255,255,0.04)' }}>
-                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: 28, color: '#39ff6e' }}>{n}</div>
+                  <div style={{ fontFamily: "'Instrument Serif', serif", fontSize: 28, color: '#fb923c' }}>{n}</div>
                   <div style={{ fontSize: 11, color: '#8888aa', marginTop: 2 }}>{l}</div>
                 </div>
               ))}
@@ -156,10 +157,10 @@ export default function ZdarmaPage() {
         ) : (
           /* SUCCESS STATE */
           <div style={{ textAlign: 'center', padding: '40px 20px', animation: 'fadeIn 0.5s ease' }}>
-            <div style={{ width: 80, height: 80, background: 'rgba(57,255,110,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 40 }}>✅</div>
+            <div style={{ width: 80, height: 80, background: 'rgba(251,146,60,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 40 }}>✅</div>
             <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 32, marginBottom: 12 }}>Průvodce je na cestě!</h2>
             <p style={{ color: '#8888aa', fontSize: 15, lineHeight: 1.6, marginBottom: 24 }}>
-              Zkontrolujte si email — průvodce <strong style={{ color: '#f0f0f5' }}>"5 kroků k práci ve Švýcarsku"</strong> je na cestě do vaší schránky.
+              Zkontrolujte si email — průvodce <strong style={{ color: '#f0f0f5' }}>&quot;5 kroků k práci ve Švýcarsku&quot;</strong> je na cestě do vaší schránky.
               <br /><br />
               Pokud ho nevidíte, zkontrolujte spam složku.
             </p>
@@ -173,18 +174,18 @@ export default function ZdarmaPage() {
               ✓ 24/7 AI asistent
             </p>
             <br />
-            <a href="/#cenik" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', background: '#39ff6e', color: '#0a0a12', textDecoration: 'none', borderRadius: 12, fontWeight: 700, fontSize: 15 }}>
+            <Link href="/#cenik" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 28px', background: '#fb923c', color: '#0a0a12', textDecoration: 'none', borderRadius: 12, fontWeight: 700, fontSize: 15 }}>
               Prozkoumat Woker Premium →
-            </a>
+            </Link>
           </div>
         )}
 
         {/* Footer */}
         <div style={{ textAlign: 'center', marginTop: 40, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ color: '#39ff6e', fontWeight: 700, fontSize: 16, letterSpacing: 2 }}>WOKER</div>
+          <div style={{ color: '#fb923c', fontWeight: 700, fontSize: 16, letterSpacing: 2 }}>WOKER</div>
           <p style={{ fontSize: 12, color: '#8888aa', marginTop: 8 }}>Tvůj průvodce za prací ve Švýcarsku</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginTop: 12 }}>
-            <a href="/" style={{ color: '#8888aa', textDecoration: 'none', fontSize: 12 }}>Hlavní stránka</a>
+            <Link href="/" style={{ color: '#8888aa', textDecoration: 'none', fontSize: 12 }}>Hlavní stránka</Link>
             <a href="https://tiktok.com/@vasicenko" target="_blank" style={{ color: '#8888aa', textDecoration: 'none', fontSize: 12 }}>TikTok</a>
             <a href="https://instagram.com/vasicenko" target="_blank" style={{ color: '#8888aa', textDecoration: 'none', fontSize: 12 }}>Instagram</a>
           </div>

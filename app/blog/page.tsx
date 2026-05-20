@@ -125,8 +125,8 @@ export default function BlogPage() {
                     style={{
                       fontSize: 12,
                       fontWeight: 600,
-                      color: "#39ff6e",
-                      background: "rgba(57,255,110,0.08)",
+                      color: "#fb923c",
+                      background: "rgba(251,146,60,0.08)",
                       padding: "4px 10px",
                       borderRadius: 6,
                     }}
@@ -193,7 +193,7 @@ export default function BlogPage() {
         <div
           style={{
             background: "linear-gradient(135deg, #111120 0%, #0a0a12 100%)",
-            border: "1px solid rgba(57,255,110,0.15)",
+            border: "1px solid rgba(251,146,60,0.15)",
             borderRadius: 20,
             padding: "48px 36px",
             textAlign: "center",
@@ -227,7 +227,7 @@ export default function BlogPage() {
             href="/#pricing"
             style={{
               display: "inline-block",
-              background: "#39ff6e",
+              background: "#fb923c",
               color: "#0a0a12",
               fontWeight: 700,
               fontSize: 16,

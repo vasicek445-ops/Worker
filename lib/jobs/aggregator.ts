@@ -1,6 +1,7 @@
 import { searchAdzuna } from './sources/adzuna'
 import { searchAgencies } from './sources/agencies'
 import { searchCompanies } from './sources/companies'
+import { searchJobsTable } from './sources/indeed'
 import { extractRecipientEmail } from '@/lib/matching/extract'
 import type { DiscoverConfig, DiscoverResult, EnrichedJob, NormalizedJob } from './types'
 
@@ -117,6 +118,20 @@ export async function discoverJobs(config: DiscoverConfig): Promise<DiscoverResu
   } catch (err) {
     errors.push({ source: 'companies', error: (err as Error).message })
     bySource.companies = 0
+  }
+
+  // Jobs table — Indeed/Apify postings that already carry a contact email
+  try {
+    const { jobs } = await searchJobsTable({
+      positions: config.positions,
+      locations: config.locations,
+      limit: Math.max(20, config.daily_limit * 5),
+    })
+    bySource.indeed = jobs.length
+    preEnriched.push(...jobs)
+  } catch (err) {
+    errors.push({ source: 'indeed', error: (err as Error).message })
+    bySource.indeed = 0
   }
 
   // Dedupe by URL (canonicalized)

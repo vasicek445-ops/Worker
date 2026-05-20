@@ -30,7 +30,7 @@ function FadeIn({
 
 const CHECK = (
   <svg
-    className="w-4 h-4 text-[#39ff6e] mt-0.5 shrink-0"
+    className="w-4 h-4 text-[#fb923c] mt-0.5 shrink-0"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -107,7 +107,7 @@ export default function CenikPage() {
           </Link>
           <Link
             href="/registrace"
-            className="px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+            className="px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Začít zdarma
           </Link>
@@ -160,8 +160,8 @@ export default function CenikPage() {
 
             {/* Premium */}
             <FadeIn delay={0.15}>
-              <div className="relative rounded-2xl bg-white/[0.03] border-2 border-[#39ff6e]/40 p-6 sm:p-8 h-full flex flex-col">
-                <span className="absolute -top-3 left-6 px-3 py-0.5 text-xs font-bold bg-[#39ff6e] text-[#0a0a12] rounded-full">
+              <div className="relative rounded-2xl bg-white/[0.03] border-2 border-[#fb923c]/40 p-6 sm:p-8 h-full flex flex-col">
+                <span className="absolute -top-3 left-6 px-3 py-0.5 text-xs font-bold bg-[#fb923c] text-[#0a0a12] rounded-full">
                   Nejoblíbenější
                 </span>
                 <h2 className="text-lg font-bold text-white mb-1">Premium</h2>
@@ -187,7 +187,7 @@ export default function CenikPage() {
                 </ul>
                 <Link
                   href="/registrace?plan=premium"
-                  className="block text-center px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+                  className="block text-center px-6 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all"
                 >
                   Zkusit Premium
                 </Link>

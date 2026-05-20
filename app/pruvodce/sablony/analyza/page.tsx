@@ -171,13 +171,13 @@ export default function AnalyzaInzeratu() {
   }
 
   const diffColor = (d: string) => {
-    if (d === 'easy') return { bg: 'bg-[#39ff6e]/10', text: 'text-[#39ff6e]', label: 'Snadné' }
+    if (d === 'easy') return { bg: 'bg-[#fb923c]/10', text: 'text-[#fb923c]', label: 'Snadné' }
     if (d === 'medium') return { bg: 'bg-yellow-500/10', text: 'text-yellow-400', label: 'Střední' }
     return { bg: 'bg-red-500/10', text: 'text-red-400', label: 'Náročné' }
   }
 
   const scoreColor = (score: number) => {
-    if (score >= 75) return { stroke: 'stroke-[#39ff6e]', text: 'text-[#39ff6e]', label: 'Výborná shoda', glow: 'shadow-[0_0_30px_rgba(57,255,110,0.2)]' }
+    if (score >= 75) return { stroke: 'stroke-[#fb923c]', text: 'text-[#fb923c]', label: 'Výborná shoda', glow: 'shadow-[0_0_30px_rgba(251,146,60,0.2)]' }
     if (score >= 50) return { stroke: 'stroke-yellow-400', text: 'text-yellow-400', label: 'Dobrá shoda', glow: 'shadow-[0_0_30px_rgba(234,179,8,0.2)]' }
     if (score >= 25) return { stroke: 'stroke-orange-400', text: 'text-orange-400', label: 'Částečná shoda', glow: 'shadow-[0_0_30px_rgba(251,146,60,0.2)]' }
     return { stroke: 'stroke-red-400', text: 'text-red-400', label: 'Nízká shoda', glow: 'shadow-[0_0_30px_rgba(248,113,113,0.2)]' }
@@ -186,7 +186,7 @@ export default function AnalyzaInzeratu() {
   // ─── Ambient background ───
   const ambientBg = (
     <>
-      <div className="fixed top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[rgba(57,255,110,0.12)] blur-[180px] pointer-events-none z-0" />
+      <div className="fixed top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[rgba(251,146,60,0.12)] blur-[180px] pointer-events-none z-0" />
       <div className="fixed bottom-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[rgba(100,60,255,0.10)] blur-[160px] pointer-events-none z-0" />
     </>
   )
@@ -225,7 +225,7 @@ export default function AnalyzaInzeratu() {
                 <div className="flex items-start justify-between mb-1">
                   <div>
                     <h1 className="text-white text-lg font-bold">{result.position}</h1>
-                    {result.company && <p className="text-[#39ff6e]/70 text-sm font-medium">{result.company}</p>}
+                    {result.company && <p className="text-[#fb923c]/70 text-sm font-medium">{result.company}</p>}
                   </div>
                   {result.contract_type && <span className="text-[10px] bg-white/[0.06] text-white/50 px-2.5 py-1 rounded-full flex-shrink-0 border border-white/[0.06]">{result.contract_type}</span>}
                 </div>
@@ -288,7 +288,7 @@ export default function AnalyzaInzeratu() {
               </div>
               <div className="flex gap-2 flex-wrap">
                 {result.languages.map((l, i) => (
-                  <div key={i} className={`px-3 py-2 rounded-xl text-sm backdrop-blur-sm ${l.importance === 'Povinné' ? 'bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20 text-[#39ff6e]/80' : 'bg-[#111120]/80 border border-white/[0.06] text-white/40'}`}>
+                  <div key={i} className={`px-3 py-2 rounded-xl text-sm backdrop-blur-sm ${l.importance === 'Povinné' ? 'bg-[#fb923c]/[0.06] border border-[#fb923c]/20 text-[#fb923c]/80' : 'bg-[#111120]/80 border border-white/[0.06] text-white/40'}`}>
                     <span className="font-semibold">{l.language}</span> · {l.level}
                     <span className="text-xs ml-1 opacity-60">({l.importance})</span>
                   </div>
@@ -306,8 +306,8 @@ export default function AnalyzaInzeratu() {
               </div>
               <div className="space-y-2">
                 {result.green_flags.map((f, i) => (
-                  <div key={i} className="bg-[#39ff6e]/[0.04] border border-[#39ff6e]/10 rounded-xl p-3 backdrop-blur-sm">
-                    <p className="text-[#39ff6e]/80 text-xs font-semibold">{f.flag}</p>
+                  <div key={i} className="bg-[#fb923c]/[0.04] border border-[#fb923c]/10 rounded-xl p-3 backdrop-blur-sm">
+                    <p className="text-[#fb923c]/80 text-xs font-semibold">{f.flag}</p>
                     <p className="text-white/25 text-[10px] mt-0.5">{f.explanation}</p>
                   </div>
                 ))}
@@ -338,7 +338,7 @@ export default function AnalyzaInzeratu() {
             <div className="bg-[#111120]/80 backdrop-blur-sm border border-white/[0.06] rounded-2xl p-4 space-y-2">
               {result.match_tips.map((t, i) => (
                 <div key={i} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-white/[0.02] transition">
-                  <span className="text-[#39ff6e]/60 text-xs mt-0.5 font-bold">{i + 1}.</span>
+                  <span className="text-[#fb923c]/60 text-xs mt-0.5 font-bold">{i + 1}.</span>
                   <p className="text-white/60 text-sm">{t}</p>
                 </div>
               ))}
@@ -354,7 +354,7 @@ export default function AnalyzaInzeratu() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {result.cover_letter_keywords.map((k, i) => (
-                  <span key={i} className="text-xs bg-[#39ff6e]/[0.06] text-[#39ff6e]/70 px-3 py-1.5 rounded-full font-medium border border-[#39ff6e]/15">{k}</span>
+                  <span key={i} className="text-xs bg-[#fb923c]/[0.06] text-[#fb923c]/70 px-3 py-1.5 rounded-full font-medium border border-[#fb923c]/15">{k}</span>
                 ))}
               </div>
             </div>
@@ -394,7 +394,7 @@ export default function AnalyzaInzeratu() {
           <div className="space-y-2.5 mt-8">
             <p className="text-white/20 text-xs text-center mb-2">Data z analýzy se automaticky předvyplní</p>
             <Link href={`/pruvodce/sablony/cv?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, skills: result.skills_needed?.join(', ') || '', keywords: result.cover_letter_keywords?.join(', ') || '', location: result.location || '' }))}`}
-              className="block w-full bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl text-center hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] transition-all">
+              className="block w-full bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl text-center hover:shadow-[0_4px_30px_rgba(251,146,60,0.35)] hover:scale-[1.02] transition-all">
               📄 Vytvořit CV na míru
             </Link>
             <Link href={`/pruvodce/sablony/motivacni-dopis?prefill=${encodeURIComponent(JSON.stringify({ position: result.position?.split('(')[0]?.split('/')[0]?.trim() || '', company: result.company, keywords: result.cover_letter_keywords || [], tips: result.match_tips || [], location: result.location || '' }))}`}
@@ -409,9 +409,9 @@ export default function AnalyzaInzeratu() {
               className="block w-full bg-white/[0.04] text-white/60 font-bold py-3.5 px-6 rounded-2xl text-center border border-white/[0.08] hover:bg-white/[0.08] transition-all">
               🎤 Připravit se na pohovor
             </Link>
-            <Link href="/pruvodce/matching"
-              className="block w-full bg-gradient-to-r from-[#643cff]/30 to-[#39ff6e]/20 text-white font-bold py-3.5 px-6 rounded-2xl text-center border border-white/[0.08] hover:border-[#39ff6e]/30 transition-all">
-              🚀 Přihlásit se přes Smart Matching
+            <Link href="/profil/gmail"
+              className="block w-full bg-gradient-to-r from-[#643cff]/30 to-[#fb923c]/20 text-white font-bold py-3.5 px-6 rounded-2xl text-center border border-white/[0.08] hover:border-[#fb923c]/30 transition-all">
+              🚀 Přihlásit se přes Smart Apply
             </Link>
           </div>
 
@@ -432,23 +432,23 @@ export default function AnalyzaInzeratu() {
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <div className="w-full max-w-sm">
               <div className="mb-8 text-center">
-                <div className="w-16 h-16 border-4 border-[#39ff6e]/20 border-t-[#39ff6e] rounded-full animate-spin mx-auto mb-4" />
+                <div className="w-16 h-16 border-4 border-[#fb923c]/20 border-t-[#fb923c] rounded-full animate-spin mx-auto mb-4" />
                 <h2 className="text-white text-lg font-bold">Analyzuji inzerát</h2>
                 <p className="text-white/30 text-sm mt-1">Tohle trvá 10-15 sekund</p>
               </div>
               <div className="space-y-3">
                 {PROGRESS_STEPS.map((step, i) => (
                   <div key={i} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-500 ${
-                    i < progressStep ? 'bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20' :
+                    i < progressStep ? 'bg-[#fb923c]/[0.06] border border-[#fb923c]/20' :
                     i === progressStep ? 'bg-white/[0.04] border border-white/[0.08]' :
                     'bg-white/[0.02] border border-white/[0.04] opacity-40'
                   }`}>
                     <span className="text-lg">{i < progressStep ? '✅' : step.icon}</span>
                     <span className={`text-sm font-medium ${
-                      i < progressStep ? 'text-[#39ff6e]/80' :
+                      i < progressStep ? 'text-[#fb923c]/80' :
                       i === progressStep ? 'text-white' : 'text-white/30'
                     }`}>{step.label}</span>
-                    {i === progressStep && <span className="ml-auto w-4 h-4 border-2 border-white/20 border-t-[#39ff6e] rounded-full animate-spin" />}
+                    {i === progressStep && <span className="ml-auto w-4 h-4 border-2 border-white/20 border-t-[#fb923c] rounded-full animate-spin" />}
                   </div>
                 ))}
               </div>
@@ -486,21 +486,21 @@ export default function AnalyzaInzeratu() {
             <span className="flex items-center gap-1">💡 Tipy</span>
             <span className="flex items-center gap-1">🔑 Klíčová slova</span>
             <span className="flex items-center gap-1">💰 Plat</span>
-            <span className="flex items-center gap-1 text-[#39ff6e]/60">📊 Match skóre</span>
+            <span className="flex items-center gap-1 text-[#fb923c]/60">📊 Match skóre</span>
           </div>
         </div>
 
         {/* Profile auto-loaded banner */}
         {profile && (profile.pozice || profile.dovednosti) && (
-          <div className="bg-[#39ff6e]/[0.04] border border-[#39ff6e]/15 rounded-xl p-3 mb-5 flex items-center gap-3">
+          <div className="bg-[#fb923c]/[0.04] border border-[#fb923c]/15 rounded-xl p-3 mb-5 flex items-center gap-3">
             <Image src="/images/3d/key.png" alt="" width={18} height={18} />
             <div className="flex-1 min-w-0">
-              <p className="text-[#39ff6e]/70 text-sm font-medium">Profil načten automaticky</p>
+              <p className="text-[#fb923c]/70 text-sm font-medium">Profil načten automaticky</p>
               <p className="text-white/30 text-xs truncate">
                 {[profile.pozice, profile.obor, profile.nemcina_uroven].filter(Boolean).join(' · ')}
               </p>
             </div>
-            <span className="text-[#39ff6e]/60 text-[10px] bg-[#39ff6e]/[0.06] px-2 py-1 rounded-full border border-[#39ff6e]/15">Match aktivní</span>
+            <span className="text-[#fb923c]/60 text-[10px] bg-[#fb923c]/[0.06] px-2 py-1 rounded-full border border-[#fb923c]/15">Match aktivní</span>
           </div>
         )}
 
@@ -509,10 +509,10 @@ export default function AnalyzaInzeratu() {
 
             {/* Input mode toggle */}
             <div className="flex gap-2">
-              <button onClick={() => setInputMode('text')} className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition ${inputMode === 'text' ? 'bg-[#39ff6e]/15 text-[#39ff6e] border border-[#39ff6e]/30' : 'bg-white/[0.04] text-white/40 border border-white/[0.08] hover:bg-white/[0.08]'}`}>
+              <button onClick={() => setInputMode('text')} className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition ${inputMode === 'text' ? 'bg-[#fb923c]/15 text-[#fb923c] border border-[#fb923c]/30' : 'bg-white/[0.04] text-white/40 border border-white/[0.08] hover:bg-white/[0.08]'}`}>
                 📝 Vložit text
               </button>
-              <button onClick={() => setInputMode('url')} className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition ${inputMode === 'url' ? 'bg-[#39ff6e]/15 text-[#39ff6e] border border-[#39ff6e]/30' : 'bg-white/[0.04] text-white/40 border border-white/[0.08] hover:bg-white/[0.08]'}`}>
+              <button onClick={() => setInputMode('url')} className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-medium transition ${inputMode === 'url' ? 'bg-[#fb923c]/15 text-[#fb923c] border border-[#fb923c]/30' : 'bg-white/[0.04] text-white/40 border border-white/[0.08] hover:bg-white/[0.08]'}`}>
                 🔗 Vložit URL
               </button>
             </div>
@@ -526,10 +526,10 @@ export default function AnalyzaInzeratu() {
                 </div>
                 <div className="flex gap-2">
                   <input type="url" value={jobUrl} onChange={(e) => setJobUrl(e.target.value)} placeholder="https://www.jobs.ch/en/vacancies/detail/..."
-                    className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition"
+                    className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#fb923c]/40 focus:outline-none focus:shadow-[0_0_20px_rgba(251,146,60,0.05)] transition"
                     onKeyDown={(e) => e.key === 'Enter' && handleExtractUrl()} />
                   <button onClick={handleExtractUrl} disabled={extractingUrl || !jobUrl.trim()}
-                    className="bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] px-5 py-3 rounded-xl text-sm font-bold hover:shadow-[0_4px_20px_rgba(57,255,110,0.3)] transition disabled:opacity-50 flex items-center gap-2 flex-shrink-0">
+                    className="bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] px-5 py-3 rounded-xl text-sm font-bold hover:shadow-[0_4px_20px_rgba(251,146,60,0.3)] transition disabled:opacity-50 flex items-center gap-2 flex-shrink-0">
                     {extractingUrl ? <span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" /> : '📥'}
                     {extractingUrl ? 'Načítám' : 'Načíst'}
                   </button>
@@ -548,8 +548,8 @@ export default function AnalyzaInzeratu() {
                   </span>
                 </div>
                 <textarea value={jobText} onChange={(e) => setJobText(e.target.value)} placeholder={'Zkopíruj celý text inzerátu z jobs.ch, Indeed, LinkedIn...\n\nNapříklad:\nMonteur (m/w) – Stahlbau\nWir suchen einen erfahrenen Monteur für...'} rows={10}
-                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition resize-none" />
-                <p className="text-white/20 text-xs mt-1.5">{jobText.length} znaků · {jobText.length < 30 ? 'vlož celý text inzerátu' : <span className="text-[#39ff6e]/60">✓ dostatečný text</span>}</p>
+                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#fb923c]/40 focus:outline-none focus:shadow-[0_0_20px_rgba(251,146,60,0.05)] transition resize-none" />
+                <p className="text-white/20 text-xs mt-1.5">{jobText.length} znaků · {jobText.length < 30 ? 'vlož celý text inzerátu' : <span className="text-[#fb923c]/60">✓ dostatečný text</span>}</p>
                 {urlWarning && (
                   <div className="bg-yellow-500/[0.06] border border-yellow-500/20 rounded-xl p-3 mt-3">
                     <p className="text-yellow-400 text-sm font-medium mb-1">⚠️ Neúplný text</p>
@@ -566,7 +566,7 @@ export default function AnalyzaInzeratu() {
             )}
 
             <button onClick={handleSubmit} disabled={generating || jobText.trim().length < 30}
-              className="w-full bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none">
+              className="w-full bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl hover:shadow-[0_4px_30px_rgba(251,146,60,0.35)] hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none">
               Analyzovat inzerát{profile?.pozice ? ' + porovnat s profilem' : ''}
             </button>
             <p className="text-white/20 text-xs text-center">
@@ -601,7 +601,7 @@ export default function AnalyzaInzeratu() {
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {item.match_score !== null && (
                           <span className={`text-xs font-bold px-2 py-1 rounded-full ${
-                            item.match_score >= 75 ? 'bg-[#39ff6e]/10 text-[#39ff6e]' :
+                            item.match_score >= 75 ? 'bg-[#fb923c]/10 text-[#fb923c]' :
                             item.match_score >= 50 ? 'bg-yellow-500/10 text-yellow-400' :
                             'bg-red-500/10 text-red-400'
                           }`}>{item.match_score}%</span>

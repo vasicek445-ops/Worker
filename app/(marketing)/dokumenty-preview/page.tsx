@@ -137,7 +137,7 @@ function Navbar() {
           </Link>
           <Link
             href="/zdarma"
-            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Začít zdarma
           </Link>
@@ -186,7 +186,7 @@ function Navbar() {
             </Link>
             <Link
               href="/zdarma"
-              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
+              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
               Začít zdarma
@@ -329,7 +329,7 @@ function TypingDemo() {
         className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-5 sm:p-8 font-mono text-sm leading-relaxed min-h-[360px]"
       >
         {displayedLines.map((line, i) => (
-          <div key={i} className={`${i === 0 ? "text-[#39ff6e] font-bold text-lg mb-3" : line.startsWith("-") ? "text-white/50 pl-4" : line === "" ? "h-3" : line.match(/^(Persönliche|Berufserfahrung|Ausbildung|Sprachkenntnisse)/) ? "text-white font-semibold mt-2 mb-1" : "text-white/70"}`}>
+          <div key={i} className={`${i === 0 ? "text-[#fb923c] font-bold text-lg mb-3" : line.startsWith("-") ? "text-white/50 pl-4" : line === "" ? "h-3" : line.match(/^(Persönliche|Berufserfahrung|Ausbildung|Sprachkenntnisse)/) ? "text-white font-semibold mt-2 mb-1" : "text-white/70"}`}>
             {line}
           </div>
         ))}
@@ -337,7 +337,7 @@ function TypingDemo() {
           <motion.span
             animate={{ opacity: [1, 0] }}
             transition={{ duration: 0.5, repeat: Infinity }}
-            className="inline-block w-2 h-4 bg-[#39ff6e] ml-0.5 -mb-0.5"
+            className="inline-block w-2 h-4 bg-[#fb923c] ml-0.5 -mb-0.5"
           />
         )}
       </motion.div>
@@ -371,7 +371,7 @@ export default function DokumentyPreviewPage() {
           <FadeIn>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
               Dokumenty v němčině{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-[#32e060]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fb923c] to-[#f97316]">
                 za minutu
               </span>
             </h1>
@@ -403,8 +403,8 @@ export default function DokumentyPreviewPage() {
                 { title: "Bewerbungsdossier", desc: "Kompletní balíček pro zaměstnavatele", icon: "BD" },
               ].map((doc) => (
                 <div key={doc.title} className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-5 text-center hover:border-white/[0.12] transition-all">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center">
-                    <span className="text-[#39ff6e] font-bold text-sm">{doc.icon}</span>
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-lg bg-[#fb923c]/10 flex items-center justify-center">
+                    <span className="text-[#fb923c] font-bold text-sm">{doc.icon}</span>
                   </div>
                   <h3 className="text-white font-semibold text-sm mb-1">{doc.title}</h3>
                   <p className="text-white/40 text-xs">{doc.desc}</p>
@@ -427,7 +427,7 @@ export default function DokumentyPreviewPage() {
             </p>
             <Link
               href="/zdarma"
-              className="inline-block px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#39ff6e]/20"
+              className="inline-block px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#fb923c]/20"
             >
               Vytvořit životopis
             </Link>

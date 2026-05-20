@@ -18,7 +18,7 @@ async function isPremiumUser(req: NextRequest): Promise<boolean> {
       .select('status')
       .eq('user_id', user.id)
       .single()
-    return sub?.status === 'active'
+    return (sub?.status === 'active' || sub?.status === 'trialing')
   } catch {
     return false
   }

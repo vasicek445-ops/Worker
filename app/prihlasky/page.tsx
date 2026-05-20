@@ -110,13 +110,13 @@ export default function Prihlasky() {
             <div className="text-5xl mb-4">✉️</div>
             <h3 className="text-white font-bold text-lg mb-2">Zatím žádné přihlášky</h3>
             <p className="text-gray-500 text-sm mb-6">
-              Použij Smart Matching pro automatické přihlášení k agenturám
+              Použij Smart Apply pro automatické přihlášení k práci i agenturám
             </p>
             <Link
-              href="/pruvodce/matching"
+              href="/profil/gmail"
               className="inline-block bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-bold text-sm no-underline"
             >
-              🎯 Spustit Smart Matching
+              🎯 Spustit Smart Apply
             </Link>
           </div>
         ) : (

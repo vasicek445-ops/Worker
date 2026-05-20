@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+// maxRetries — SDK samo opakuje přetížení (529) / rate-limit (429) s backoffem
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY!, maxRetries: 5 })
 
 export type CVData = {
   profil?: string
@@ -68,7 +69,8 @@ PRAVIDLA:
 6. NEPIŠ jako AI/bot. Žádné "Sehr geehrte Damen und Herren, ich bewerbe mich hiermit..." — buď přirozený, lehce neformální, ale profesionální.
 7. NEPŘIDÁVEJ podpis (uchazečovo jméno, telefon) — Gmail to dodá automaticky.
 8. NEPŘIDÁVEJ "P.S." ani emoji.
-9. strengths/gaps: maximálně 3 položky, každá max 12 slov, konkrétně — žádné "soft skills", "týmovost" apod.`
+9. strengths/gaps: maximálně 3 položky, každá max 12 slov, konkrétně — žádné "soft skills", "týmovost" apod.
+10. JAZYKOVÁ KVALITA — je to skutečná přihláška, kterou čte zaměstnavatel. draft_subject i draft_body musí být GRAMATICKY BEZCHYBNÉ, bez překlepů a bez zkomolených slov. Piš čistě jedním jazykem (jazyk inzerátu), NEMÍCHEJ slova z jiných jazyků. Po napsání si text po sobě přečti a oprav každou chybu — zvlášť hlídej správné tvary základních slov ("Ich bin", ne "ice bin").`
 
 /**
  * Generate match score + email draft for a job, given the candidate's CV.
@@ -98,19 +100,25 @@ ${job.description.slice(0, 3500)}
 
 Vygeneruj match analýzu a draft emailu podle pravidel ze system promptu. Vrať JEN JSON.`
 
-  const response = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 1500,
-    system: [
-      { type: 'text', text: SYSTEM_PROMPT },
-      {
-        type: 'text',
-        text: `## CV uchazeče\n\n${cvText}`,
-        cache_control: { type: 'ephemeral' },
-      },
-    ],
-    messages: [{ role: 'user', content: userPrompt }],
-  })
+  const response = await anthropic.messages
+    .create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1500,
+      temperature: 0.4,
+      system: [
+        { type: 'text', text: SYSTEM_PROMPT },
+        {
+          type: 'text',
+          text: `## CV uchazeče\n\n${cvText}`,
+          cache_control: { type: 'ephemeral' },
+        },
+      ],
+      messages: [{ role: 'user', content: userPrompt }],
+    })
+    .catch((err: unknown) => {
+      console.error('[generateDraft] Claude API error:', err)
+      throw new Error('AI je momentálně přetížená. Zkus návrh vygenerovat znovu za chvíli.')
+    })
 
   const block = response.content.find((b) => b.type === 'text')
   if (!block || block.type !== 'text') {

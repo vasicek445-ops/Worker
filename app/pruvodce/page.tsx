@@ -58,7 +58,7 @@ export default function Pruvodce() {
       title: 'Hledám práci',
       subtitle: 'AI nástroje pro úspěšné podání přihlášky',
       items: [
-        { Icon: Target, title: 'Smart Matching', desc: 'Najdi agentury a přihlas se jedním klikem', href: '/pruvodce/matching', ai: true },
+        { Icon: Target, title: 'Smart Apply', desc: 'Najdi práci i agentury, přihlas se jedním klikem', href: '/profil/gmail', ai: true },
         { Icon: BarChart3, title: 'Analýza inzerátu', desc: 'AI vyhodnotí, jestli pozice sedí na tvůj profil', href: '/pruvodce/sablony/analyza', ai: true },
         { Icon: FileText, title: 'Životopis (CV)', desc: '5 šablon + AI generátor obsahu v němčině', href: '/pruvodce/sablony/cv', ai: true },
         { Icon: PenLine, title: 'Motivační dopis', desc: 'Personalizovaný Bewerbungsschreiben pro každou firmu', href: '/pruvodce/sablony/motivacni-dopis', ai: true },

@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Project-specific ignores
+    "woker-deploy/**",          // Legacy duplicate deploy folder
+    "lib/fonts/**",             // Binary font data (base64 strings)
+    "src/**",                   // Legacy src/ duplicates
+    "content-engine/**",        // Python tooling
   ]),
 ]);
 

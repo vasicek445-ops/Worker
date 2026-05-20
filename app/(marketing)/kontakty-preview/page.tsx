@@ -137,7 +137,7 @@ function Navbar() {
           </Link>
           <Link
             href="/zdarma"
-            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all"
+            className="ml-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all"
           >
             Začít zdarma
           </Link>
@@ -186,7 +186,7 @@ function Navbar() {
             </Link>
             <Link
               href="/zdarma"
-              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12]"
+              className="mt-2 block text-center px-4 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12]"
               onClick={() => setMobileOpen(false)}
             >
               Začít zdarma
@@ -273,7 +273,7 @@ export default function KontaktyPreviewPage() {
         <div className="max-w-5xl mx-auto text-center">
           <FadeIn>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#39ff6e] to-[#32e060]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#fb923c] to-[#f97316]">
                 1 007
               </span>{" "}
               ověřených pracovních agentur
@@ -321,7 +321,7 @@ export default function KontaktyPreviewPage() {
             </p>
             <Link
               href="/zdarma"
-              className="px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#39ff6e]/20"
+              className="px-8 py-3 text-base font-semibold rounded-xl bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] hover:brightness-110 transition-all shadow-lg shadow-[#fb923c]/20"
             >
               Začít zdarma
             </Link>
@@ -334,7 +334,7 @@ export default function KontaktyPreviewPage() {
         <FadeIn>
           <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 text-center">
             <div>
-              <p className="text-2xl sm:text-3xl font-extrabold text-[#39ff6e]">1 007</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-[#fb923c]">1 007</p>
               <p className="text-white/50 text-sm mt-1">ověřených agentur</p>
             </div>
             <div className="hidden sm:block w-px h-10 bg-white/10" />

@@ -10,7 +10,7 @@ const pl: Translation = {
     guides_title: "Przewodnik po Szwajcarii", guides_all: "Wszystko",
     premium_title: "Woker Premium",
     premium_desc: "Odblokuj ponad 1000 kontaktów, przewodniki premium i asystenta AI do pracy w Szwajcarii.",
-    premium_cta: "Aktywuj za 9,99 €/mies.", premium_trial: "Bez zobowiązań",
+    premium_cta: "Wypróbuj 7 dni za darmo", premium_trial: "Bez zobowiązań",
     wooky_name: "Asystent Wooky", wooky_online: "Online 24/7",
     wooky_message: "Cześć! 👋 Jestem Wooky, Twój asystent do pracy w Szwajcarii. Pomogę z pozwoleniami, mieszkaniem i szukaniem pracy.",
     wooky_open: "Otwórz czat →",
@@ -26,7 +26,7 @@ const pl: Translation = {
   paywall: {
     title: "Odblokuj pełny dostęp",
     description: "Zdobądź kontakty do firm, przewodniki i asystenta AI",
-    cta: "Subskrybuj za 9,99 €/mies.",
+    cta: "Wypróbuj 7 dni za darmo",
     disclaimer: "Anulujesz kiedy chcesz • 7 dni za darmo",
   },
   home: {

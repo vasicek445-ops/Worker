@@ -50,9 +50,9 @@ export default function LeadMagnetOverlay() {
 
       // Auto-close after success
       setTimeout(() => setIsVisible(false), 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus("error");
-      setErrorMsg(err.message || "Něco se pokazilo, zkuste to znovu.");
+      setErrorMsg(err instanceof Error ? err.message : "Něco se pokazilo, zkuste to znovu.");
     }
   };
 

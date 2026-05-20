@@ -187,7 +187,7 @@ export default function Bydleni() {
 
   const isGasthaus = (listing: Listing) => listing.source === 'gasthaus-finder' || listing.source === 'kloster-finder'
 
-  const selectClass = "bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#39ff6e]/30 appearance-none flex-shrink-0 transition"
+  const selectClass = "bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-white text-xs focus:outline-none focus:border-[#fb923c]/30 appearance-none flex-shrink-0 transition"
 
   return (
     <main className="min-h-screen bg-[#0a0a12] pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
@@ -221,9 +221,9 @@ export default function Bydleni() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Hledej město, adresu..."
-              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#39ff6e]/30 placeholder-white/20 transition"
+              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#fb923c]/30 placeholder-white/20 transition"
             />
-            <button type="submit" className="bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] px-5 py-3 rounded-xl text-sm font-extrabold hover:shadow-[0_4px_20px_rgba(57,255,110,0.3)] hover:scale-[1.03] transition-all">
+            <button type="submit" className="bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] px-5 py-3 rounded-xl text-sm font-extrabold hover:shadow-[0_4px_20px_rgba(251,146,60,0.3)] hover:scale-[1.03] transition-all">
               Hledat
             </button>
           </form>
@@ -278,7 +278,7 @@ export default function Bydleni() {
               onClick={() => { setFurnished(!furnished); setPage(1) }}
               className={`px-3 py-2.5 rounded-xl text-xs font-semibold border flex-shrink-0 transition ${
                 furnished
-                  ? 'bg-[#39ff6e]/10 text-[#39ff6e] border-[#39ff6e]/30'
+                  ? 'bg-[#fb923c]/10 text-[#fb923c] border-[#fb923c]/30'
                   : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
               }`}
             >
@@ -289,7 +289,7 @@ export default function Bydleni() {
               onClick={() => { setHasPrice(!hasPrice); setPage(1) }}
               className={`px-3 py-2.5 rounded-xl text-xs font-semibold border flex-shrink-0 transition ${
                 hasPrice
-                  ? 'bg-[#39ff6e]/10 text-[#39ff6e] border-[#39ff6e]/30'
+                  ? 'bg-[#fb923c]/10 text-[#fb923c] border-[#fb923c]/30'
                   : 'bg-white/[0.04] text-white/40 border-white/[0.08] hover:text-white/60'
               }`}
             >
@@ -330,7 +330,7 @@ export default function Bydleni() {
             <h3 className="text-white font-bold text-lg mb-2">Žádné nabídky nenalezeny</h3>
             <p className="text-white/30 text-sm mb-4">Zkus změnit filtry nebo hledaný výraz</p>
             {hasFilters && (
-              <button onClick={clearFilters} className="text-[#39ff6e] text-sm font-bold hover:text-[#39ff6e]/80 transition">
+              <button onClick={clearFilters} className="text-[#fb923c] text-sm font-bold hover:text-[#fb923c]/80 transition">
                 Vymazat filtry
               </button>
             )}
@@ -357,7 +357,7 @@ export default function Bydleni() {
                       </span>
                     )}
                     {listing.is_furnished && (
-                      <span className="bg-[#39ff6e]/20 backdrop-blur-sm text-[#39ff6e] text-[10px] font-bold px-2 py-1 rounded-lg">
+                      <span className="bg-[#fb923c]/20 backdrop-blur-sm text-[#fb923c] text-[10px] font-bold px-2 py-1 rounded-lg">
                         Zařízeno
                       </span>
                     )}
@@ -372,7 +372,7 @@ export default function Bydleni() {
                     onClick={() => toggleSaved(listing.id)}
                     className={`absolute top-2 right-2 w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
                       saved.includes(listing.id)
-                        ? 'bg-[#39ff6e]/20 backdrop-blur-sm text-[#39ff6e]'
+                        ? 'bg-[#fb923c]/20 backdrop-blur-sm text-[#fb923c]'
                         : 'bg-black/40 backdrop-blur-sm text-white/50 hover:text-white opacity-0 group-hover:opacity-100'
                     }`}
                   >
@@ -393,7 +393,7 @@ export default function Bydleni() {
                       <h4 className="text-white font-extrabold text-lg m-0 tracking-tight">
                         {listing.price ? (
                           <>
-                            <span className="text-[#39ff6e]">CHF {listing.price.toLocaleString()}</span>
+                            <span className="text-[#fb923c]">CHF {listing.price.toLocaleString()}</span>
                             <span className="text-white/30 font-normal text-sm">/měsíc</span>
                           </>
                         ) : (
@@ -477,7 +477,7 @@ export default function Bydleni() {
                       <>
                         {listing.url && (
                           <a href={listing.url} target="_blank" rel="noopener noreferrer"
-                            className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(57,255,110,0.25)] hover:scale-[1.02] transition-all">
+                            className="flex-1 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(251,146,60,0.25)] hover:scale-[1.02] transition-all">
                             Zobrazit
                           </a>
                         )}
@@ -493,7 +493,7 @@ export default function Bydleni() {
                       <>
                         {listing.url && (
                           <a href={listing.url} target="_blank" rel="noopener noreferrer"
-                            className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(57,255,110,0.25)] hover:scale-[1.02] transition-all">
+                            className="flex-1 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] text-center py-2.5 rounded-xl text-sm font-extrabold no-underline hover:shadow-[0_4px_16px_rgba(251,146,60,0.25)] hover:scale-[1.02] transition-all">
                             Zobrazit
                           </a>
                         )}
@@ -531,11 +531,11 @@ export default function Bydleni() {
           <Link href="/pruvodce/sablony/bydleni" className="block no-underline group">
             <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
               <Image src="/images/3d/house.png" alt="" width={80} height={80} className="absolute -right-2 -top-2 opacity-[0.08] group-hover:opacity-[0.15] transition" />
-              <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%)" }} />
+              <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(251,146,60,0.15), transparent 60%)" }} />
               <div className="relative flex items-center gap-4">
                 <Image src="/images/3d/document.png" alt="" width={36} height={36} className="drop-shadow-lg" />
                 <div>
-                  <p className="text-white font-bold text-sm m-0 group-hover:text-[#39ff6e] transition">Potřebuješ napsat dopis pronajímateli?</p>
+                  <p className="text-white font-bold text-sm m-0 group-hover:text-[#fb923c] transition">Potřebuješ napsat dopis pronajímateli?</p>
                   <p className="text-white/30 text-xs m-0 mt-0.5">AI vygeneruje Bewerbungsdossier v němčině + checklist dokumentů</p>
                 </div>
               </div>

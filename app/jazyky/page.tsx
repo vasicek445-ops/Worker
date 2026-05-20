@@ -74,8 +74,8 @@ export default function Jazyky() {
       const data = await res.json()
       if (data.error) { setError(data.error); return }
       setAiResult(data)
-    } catch (err: any) {
-      setError("Chyba při generování")
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Chyba při generování")
     } finally {
       setGenerating(false)
     }
@@ -108,7 +108,7 @@ export default function Jazyky() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <h2 className="text-white text-lg font-bold">Základní fráze</h2>
-            <span className="bg-[#39ff6e]/10 text-[#39ff6e] text-[10px] font-bold px-2 py-0.5 rounded-full">Zdarma</span>
+            <span className="bg-[#fb923c]/10 text-[#fb923c] text-[10px] font-bold px-2 py-0.5 rounded-full">Zdarma</span>
           </div>
           <div className="space-y-2.5">
             {FREE_PHRASES.map((phrase) => (
@@ -209,8 +209,8 @@ export default function Jazyky() {
             {aiResult && (
               <div className="space-y-6">
                 {aiResult.tip && (
-                  <div className="bg-[#39ff6e]/[0.06] border border-[#39ff6e]/[0.12] rounded-2xl p-4">
-                    <p className="text-[#39ff6e] text-sm font-medium">💡 {aiResult.tip}</p>
+                  <div className="bg-[#fb923c]/[0.06] border border-[#fb923c]/[0.12] rounded-2xl p-4">
+                    <p className="text-[#fb923c] text-sm font-medium">💡 {aiResult.tip}</p>
                   </div>
                 )}
 

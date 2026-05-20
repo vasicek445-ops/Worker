@@ -10,8 +10,8 @@ export default function PaymentSuccess() {
     setTimeout(() => setShow(true), 100);
     // Track purchase conversion
     if (typeof window !== 'undefined') {
-      if ((window as any).fbq) (window as any).fbq('track', 'Purchase', { currency: 'EUR', value: 9.99 });
-      if ((window as any).gtag) (window as any).gtag('event', 'purchase', { currency: 'EUR', value: 9.99 });
+      if ((window as unknown as { fbq?: (...args: unknown[]) => void }).fbq) (window as unknown as { fbq: (...args: unknown[]) => void }).fbq('track', 'Purchase', { currency: 'EUR', value: 9.99 });
+      if ((window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', 'purchase', { currency: 'EUR', value: 9.99 });
     }
   }, []);
 
@@ -42,7 +42,7 @@ export default function PaymentSuccess() {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)",
+          background: "radial-gradient(circle, rgba(251,146,60,0.25), transparent 70%)",
         }}
       />
 
@@ -63,12 +63,12 @@ export default function PaymentSuccess() {
             width: "80px",
             height: "80px",
             borderRadius: "50%",
-            background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+            background: "linear-gradient(135deg, #fb923c, #f97316)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             margin: "0 auto 24px",
-            boxShadow: "0 0 60px rgba(57,255,110,0.3)",
+            boxShadow: "0 0 60px rgba(251,146,60,0.3)",
             fontSize: "36px",
           }}
         >
@@ -152,14 +152,14 @@ export default function PaymentSuccess() {
           href="/dashboard"
           style={{
             display: "inline-block",
-            background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+            background: "linear-gradient(135deg, #fb923c, #f97316)",
             color: "#0a0a12",
             padding: "16px 40px",
             borderRadius: "14px",
             fontSize: "16px",
             fontWeight: 800,
             textDecoration: "none",
-            boxShadow: "0 4px 24px rgba(57,255,110,0.25)",
+            boxShadow: "0 4px 24px rgba(251,146,60,0.25)",
             transition: "all 0.2s",
           }}
         >

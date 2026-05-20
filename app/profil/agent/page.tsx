@@ -14,6 +14,8 @@ type AgentConfig = {
   salary_min_chf: number | null;
   active: boolean;
   auto_send: boolean;
+  cv_pdf_path: string | null;
+  letter_pdf_path: string | null;
 };
 
 const DEFAULT: AgentConfig = {
@@ -24,6 +26,8 @@ const DEFAULT: AgentConfig = {
   salary_min_chf: null,
   active: true,
   auto_send: false,
+  cv_pdf_path: null,
+  letter_pdf_path: null,
 };
 
 const ALL_LANGUAGES = [
@@ -40,6 +44,11 @@ export default function AgentSettingsPage() {
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [config, setConfig] = useState<AgentConfig>(DEFAULT);
+  const [cvDocs, setCvDocs] = useState<{ id: string; title: string }[]>([]);
+  const [userId, setUserId] = useState("");
+  const [cvUploading, setCvUploading] = useState(false);
+  const [letterDocs, setLetterDocs] = useState<{ id: string; title: string }[]>([]);
+  const [letterUploading, setLetterUploading] = useState(false);
 
   const [newPosition, setNewPosition] = useState("");
   const [newLocation, setNewLocation] = useState("");
@@ -68,6 +77,31 @@ export default function AgentSettingsPage() {
       });
       const json = await res.json();
       if (json.config) setConfig({ ...DEFAULT, ...json.config });
+      setUserId(session.user.id);
+      const docsRes = await fetch("/api/documents?type=cv", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const docsJson = await docsRes.json();
+      if (Array.isArray(docsJson.documents)) {
+        setCvDocs(
+          docsJson.documents.map((d: { id: string; title: string }) => ({
+            id: d.id,
+            title: d.title || "CV",
+          })),
+        );
+      }
+      const letterRes = await fetch("/api/documents?type=letter", {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const letterJson = await letterRes.json();
+      if (Array.isArray(letterJson.documents)) {
+        setLetterDocs(
+          letterJson.documents.map((d: { id: string; title: string }) => ({
+            id: d.id,
+            title: d.title || "Motivační dopis",
+          })),
+        );
+      }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err?.message || "Načtení selhalo");
@@ -97,6 +131,50 @@ export default function AgentSettingsPage() {
       setError(err?.message || "Uložení selhalo");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function uploadCv(file: File) {
+    setCvUploading(true);
+    setError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const form = new FormData();
+      form.append("file", file, "cv.pdf");
+      const res = await fetch("/api/cv-pdf", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+        body: form,
+      });
+      const json = await res.json();
+      if (!res.ok || !json.path) throw new Error(json.error || "upload failed");
+      setConfig((c) => ({ ...c, cv_pdf_path: json.path }));
+    } catch {
+      setError("Nahrání CV se nepovedlo.");
+    } finally {
+      setCvUploading(false);
+    }
+  }
+
+  async function uploadLetter(file: File) {
+    setLetterUploading(true);
+    setError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const form = new FormData();
+      form.append("file", file, "letter.pdf");
+      const res = await fetch("/api/cv-pdf", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session!.access_token}` },
+        body: form,
+      });
+      const json = await res.json();
+      if (!res.ok || !json.path) throw new Error(json.error || "upload failed");
+      setConfig((c) => ({ ...c, letter_pdf_path: json.path }));
+    } catch {
+      setError("Nahrání dopisu se nepovedlo.");
+    } finally {
+      setLetterUploading(false);
     }
   }
 
@@ -185,10 +263,16 @@ export default function AgentSettingsPage() {
           <Settings size={28} className="text-[#ff8c2b]" />
           <h1 className="text-2xl font-extrabold tracking-tight m-0">Smart Apply nastavení</h1>
         </div>
-        <p className="text-white/50 text-sm mb-8">
+        <p className="text-white/50 text-sm mb-3">
           Řekni agentovi co hledáš. Každý den ráno na základě těchto preferencí najde
           relevantní pozice a vygeneruje drafty emailů, které pošleš ze svého Gmailu.
         </p>
+        <Link
+          href="/profil/gmail"
+          className="inline-flex items-center gap-2 text-[#ff8c2b] text-sm mb-8 no-underline hover:underline"
+        >
+          ✉️ Připojit Gmail pro odesílání →
+        </Link>
 
         {error && (
           <div className="mb-4 p-4 rounded-xl border border-red-500/30 bg-red-500/5 text-red-300 text-sm">
@@ -321,6 +405,84 @@ export default function AgentSettingsPage() {
           </div>
         </section>
 
+        {/* CV ATTACHMENT */}
+        <section className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 mb-4">
+          <h2 className="text-base font-bold mb-2 m-0">CV pro přihlášky</h2>
+          <p className="text-white/40 text-xs mb-3">
+            Tohle CV se přiloží ke každé odeslané přihlášce. Vyber uložené Woker CV nebo nahraj vlastní PDF.
+          </p>
+          <select
+            value={config.cv_pdf_path ?? ""}
+            onChange={(e) => setConfig((c) => ({ ...c, cv_pdf_path: e.target.value || null }))}
+            className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#ff8c2b] appearance-none mb-3"
+          >
+            <option value="" className="bg-[#1a1a1a]">Poslední uložené CV (automaticky)</option>
+            {cvDocs.map((d) => (
+              <option key={d.id} value={`${userId}/${d.id}.pdf`} className="bg-[#1a1a1a]">
+                {d.title}
+              </option>
+            ))}
+            {config.cv_pdf_path?.includes("/uploads/") && (
+              <option value={config.cv_pdf_path} className="bg-[#1a1a1a]">
+                Nahrané CV z PC
+              </option>
+            )}
+          </select>
+          <label className="inline-flex items-center gap-2 text-sm text-[#ff8c2b] cursor-pointer hover:underline">
+            {cvUploading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+            {cvUploading ? "Nahrávám…" : "Nahrát vlastní CV z PC (PDF)"}
+            <input
+              type="file"
+              accept="application/pdf"
+              className="hidden"
+              disabled={cvUploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void uploadCv(f);
+              }}
+            />
+          </label>
+        </section>
+
+        {/* LETTER ATTACHMENT */}
+        <section className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 mb-4">
+          <h2 className="text-base font-bold mb-2 m-0">Motivační dopis pro přihlášky</h2>
+          <p className="text-white/40 text-xs mb-3">
+            Volitelné. Vyber uložený Woker motivační dopis nebo nahraj vlastní PDF — přiloží se k přihláškám. Když nevybereš, použije se text e-mailu jako jednoduché PDF.
+          </p>
+          <select
+            value={config.letter_pdf_path ?? ""}
+            onChange={(e) => setConfig((c) => ({ ...c, letter_pdf_path: e.target.value || null }))}
+            className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-sm focus:outline-none focus:border-[#ff8c2b] appearance-none mb-3"
+          >
+            <option value="" className="bg-[#1a1a1a]">Automaticky (text e-mailu jako PDF)</option>
+            {letterDocs.map((d) => (
+              <option key={d.id} value={`${userId}/${d.id}.pdf`} className="bg-[#1a1a1a]">
+                {d.title}
+              </option>
+            ))}
+            {config.letter_pdf_path?.includes("/uploads/") && (
+              <option value={config.letter_pdf_path} className="bg-[#1a1a1a]">
+                Nahraný dopis z PC
+              </option>
+            )}
+          </select>
+          <label className="inline-flex items-center gap-2 text-sm text-[#ff8c2b] cursor-pointer hover:underline">
+            {letterUploading ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+            {letterUploading ? "Nahrávám…" : "Nahrát vlastní dopis z PC (PDF)"}
+            <input
+              type="file"
+              accept="application/pdf"
+              className="hidden"
+              disabled={letterUploading}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void uploadLetter(f);
+              }}
+            />
+          </label>
+        </section>
+
         {/* TOGGLES */}
         <section className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 mb-6 space-y-3">
           <ToggleRow
@@ -348,7 +510,7 @@ export default function AgentSettingsPage() {
             Uložit nastavení
           </button>
           {savedAt && (
-            <span className="text-[#39ff6e] text-sm">
+            <span className="text-[#fb923c] text-sm">
               ✅ Uloženo {savedAt.toLocaleTimeString("cs-CZ")}
             </span>
           )}
@@ -376,8 +538,8 @@ export default function AgentSettingsPage() {
             <p className="text-white/30 text-xs mt-2">Nejdřív přidej alespoň jednu pozici výše a ulož.</p>
           )}
           {discoveryResult?.kind === "ok" && (
-            <div className="mt-4 p-3 rounded-xl bg-[#39ff6e]/5 border border-[#39ff6e]/20 text-sm">
-              <div className="text-[#39ff6e] font-semibold">
+            <div className="mt-4 p-3 rounded-xl bg-[#fb923c]/5 border border-[#fb923c]/20 text-sm">
+              <div className="text-[#fb923c] font-semibold">
                 ✅ {discoveryResult.inserted} nových pozic ready k odeslání
               </div>
               <div className="text-white/50 text-xs mt-1.5 space-y-0.5">
@@ -390,7 +552,7 @@ export default function AgentSettingsPage() {
                 </div>
               </div>
               {discoveryResult.inserted > 0 && (
-                <Link href="/profil/matches" className="text-[#ff8c2b] text-xs mt-3 inline-block no-underline hover:underline">
+                <Link href="/profil/gmail" className="text-[#ff8c2b] text-xs mt-3 inline-block no-underline hover:underline">
                   → Otevřít fronta matchů
                 </Link>
               )}

@@ -99,7 +99,7 @@ export default function PaymentCancelled() {
           <Link
             href="/#pricing"
             style={{
-              background: "linear-gradient(135deg, #39ff6e, #2bcc58)",
+              background: "linear-gradient(135deg, #fb923c, #f97316)",
               color: "#0a0a12",
               padding: "14px 28px",
               borderRadius: "12px",

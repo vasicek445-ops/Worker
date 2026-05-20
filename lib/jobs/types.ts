@@ -3,7 +3,7 @@
  * Each source maps its own response into this format.
  */
 export type NormalizedJob = {
-  source: 'adzuna' | 'jooble' | 'agencies' | 'manual'
+  source: 'adzuna' | 'jooble' | 'agencies' | 'manual' | 'indeed'
   source_id: string // unique within source
   url: string
   title: string

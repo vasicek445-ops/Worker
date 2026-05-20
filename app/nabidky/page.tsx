@@ -305,10 +305,10 @@ export default function Nabidky() {
 
       {/* Smart Matching CTA */}
       <div className="px-5 mt-6">
-        <Link href="/pruvodce/matching" className="block no-underline">
+        <Link href="/profil/gmail" className="block no-underline">
           <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-2xl p-4 text-center">
             <p className="text-blue-400 text-sm font-bold m-0">🎯 Nechceš hledat ručně?</p>
-            <p className="text-gray-500 text-xs m-0 mt-1">Smart Matching ti najde nejlepší agentury a přihlásí tě jedním klikem</p>
+            <p className="text-gray-500 text-xs m-0 mt-1">Smart Apply ti najde práci i agentury a pošle přihlášku za tebe</p>
           </div>
         </Link>
       </div>

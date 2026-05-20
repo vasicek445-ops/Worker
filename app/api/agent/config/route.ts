@@ -52,6 +52,14 @@ export async function POST(req: NextRequest) {
       salary_min_chf: salaryMinChf,
       active,
       auto_send: autoSend,
+      cv_pdf_path:
+        typeof body.cv_pdf_path === 'string' && body.cv_pdf_path.startsWith(`${user.id}/`)
+          ? body.cv_pdf_path
+          : null,
+      letter_pdf_path:
+        typeof body.letter_pdf_path === 'string' && body.letter_pdf_path.startsWith(`${user.id}/`)
+          ? body.letter_pdf_path
+          : null,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'member_id' })
     .select()

@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<Props, State> {
                                 this.setState({ hasError: false, error: null })
                                 window.location.reload()
                             }}
-                            className="bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 px-8 rounded-xl hover:opacity-90 transition"
+                            className="bg-gradient-to-br from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold py-3 px-8 rounded-xl hover:opacity-90 transition"
                         >
                             Obnovit stránku
                         </button>

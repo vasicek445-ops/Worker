@@ -64,9 +64,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               whiteSpace: "nowrap",
               ...(t.type === "success"
                 ? {
-                    background: "rgba(57,255,110,0.15)",
-                    border: "1px solid rgba(57,255,110,0.3)",
-                    color: "#39ff6e",
+                    background: "rgba(251,146,60,0.15)",
+                    border: "1px solid rgba(251,146,60,0.3)",
+                    color: "#fb923c",
                   }
                 : t.type === "error"
                 ? {

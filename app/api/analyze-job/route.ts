@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
+    if ((sub?.status !== 'active' && sub?.status !== 'trialing')) return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
     const { jobText, userProfile } = await req.json()
     if (!jobText || typeof jobText !== 'string' || jobText.trim().length < 30) {

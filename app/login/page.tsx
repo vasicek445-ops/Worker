@@ -44,6 +44,7 @@ function LoginInner() {
   }
 
   async function handleGoogle() {
+    try { if (planParam) localStorage.setItem('woker_pending_plan', planParam) } catch {}
     const redirectUrl = planParam
       ? `https://www.gowoker.com/auth/callback?plan=${planParam}`
       : 'https://www.gowoker.com/auth/callback';
@@ -66,16 +67,27 @@ function LoginInner() {
         setLoading(false);
         return;
       }
+      try { if (planParam) localStorage.setItem('woker_pending_plan', planParam) } catch {}
       const { data: signUpData, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: { full_name: trimmedName },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: planParam
+            ? `${window.location.origin}/auth/callback?plan=${planParam}`
+            : `${window.location.origin}/auth/callback`,
         },
       });
-      if (error) setError(error.message);
-      else setMessage("Zkontroluj svůj email pro potvrzení registrace!");
+      if (error) {
+        setError(error.message);
+      } else if (signUpData?.session) {
+        // Potvrzování emailu vypnuté — uživatel je rovnou přihlášený
+        if (planParam) { await redirectToCheckout(planParam); return; }
+        window.location.href = "/dashboard";
+        return;
+      } else {
+        setMessage("Zkontroluj svůj email pro potvrzení registrace!");
+      }
     } else {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -109,7 +121,7 @@ function LoginInner() {
           position: 'fixed', width: '500px', height: '500px', borderRadius: '50%',
           filter: 'blur(120px)', pointerEvents: 'none', zIndex: 0, opacity: 0.35,
           top: '-150px', left: '-100px',
-          background: 'radial-gradient(circle, rgba(57,255,110,0.15), transparent 70%)',
+          background: 'radial-gradient(circle, rgba(251,146,60,0.15), transparent 70%)',
         }} />
         <div style={{
           position: 'fixed', width: '500px', height: '500px', borderRadius: '50%',
@@ -129,28 +141,8 @@ function LoginInner() {
         }} />
 
         <div style={{ width: '100%', maxWidth: '420px', position: 'relative', zIndex: 10 }}>
-          {/* Logo */}
+          {/* Subtitle */}
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: '10px',
-                marginBottom: '16px',
-              }}>
-                <div style={{
-                  width: '44px', height: '44px', borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #39ff6e, #2bcc58)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 800, fontSize: '20px', color: '#0a0a12',
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                }}>W</div>
-              </div>
-            </Link>
-            <h1 style={{
-              fontSize: '28px', fontWeight: 800, marginBottom: '8px',
-              background: 'linear-gradient(135deg, #39ff6e, #2bcc58)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>Woker</h1>
             <p style={{
               color: 'rgba(255,255,255,0.45)', fontSize: '14px',
             }}>AI průvodce prací a životem ve Švýcarsku</p>
@@ -241,7 +233,7 @@ function LoginInner() {
                   outline: 'none',
                   transition: 'border-color 0.2s',
                 }}
-                onFocus={(e) => e.target.style.borderColor = 'rgba(57,255,110,0.4)'}
+                onFocus={(e) => e.target.style.borderColor = 'rgba(251,146,60,0.4)'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
               />
               {!forgotMode && <input
@@ -263,7 +255,7 @@ function LoginInner() {
                   outline: 'none',
                   transition: 'border-color 0.2s',
                 }}
-                onFocus={(e) => e.target.style.borderColor = 'rgba(57,255,110,0.4)'}
+                onFocus={(e) => e.target.style.borderColor = 'rgba(251,146,60,0.4)'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
               />}
 
@@ -296,9 +288,9 @@ function LoginInner() {
               )}
               {message && (
                 <div style={{
-                  background: 'rgba(57,255,110,0.1)',
-                  border: '1px solid rgba(57,255,110,0.2)',
-                  color: '#39ff6e',
+                  background: 'rgba(251,146,60,0.1)',
+                  border: '1px solid rgba(251,146,60,0.2)',
+                  color: '#fb923c',
                   fontSize: '13px',
                   borderRadius: '12px',
                   padding: '12px 16px',
@@ -312,7 +304,7 @@ function LoginInner() {
                 disabled={loading}
                 style={{
                   width: '100%',
-                  background: 'linear-gradient(135deg, #39ff6e, #2bcc58)',
+                  background: 'linear-gradient(135deg, #fb923c, #f97316)',
                   color: '#0a0a12',
                   border: 'none',
                   padding: '14px',
@@ -323,7 +315,7 @@ function LoginInner() {
                   fontFamily: 'inherit',
                   opacity: loading ? 0.6 : 1,
                   transition: 'all 0.2s',
-                  boxShadow: '0 4px 20px rgba(57,255,110,0.2)',
+                  boxShadow: '0 4px 20px rgba(251,146,60,0.2)',
                   marginTop: '4px',
                 }}
               >
@@ -341,7 +333,7 @@ function LoginInner() {
                   cursor: 'pointer', fontFamily: 'inherit',
                   transition: 'color 0.2s',
                 }}
-                onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#39ff6e'}
+                onMouseEnter={(e) => (e.target as HTMLElement).style.color = '#fb923c'}
                 onMouseLeave={(e) => (e.target as HTMLElement).style.color = 'rgba(255,255,255,0.4)'}
               >
                 {forgotMode ? "← Zpět na přihlášení" : isRegister ? "Už máš účet? Přihlas se" : "Nemáš účet? Zaregistruj se"}
@@ -349,13 +341,6 @@ function LoginInner() {
             </div>
           </div>
 
-          {/* Footer */}
-          <p style={{
-            textAlign: 'center', marginTop: '24px',
-            color: 'rgba(255,255,255,0.2)', fontSize: '12px',
-          }}>
-            ✅ 1007 agentur &nbsp; ✅ 8 AI nástrojů &nbsp; ✅ Komunita &nbsp; ✅ Zdarma na start
-          </p>
         </div>
       </main>
     </>

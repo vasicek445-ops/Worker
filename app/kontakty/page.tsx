@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useTransition } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
 import Link from 'next/link'
@@ -44,11 +44,10 @@ export default function Kontakty() {
   const [search, setSearch] = useState('')
   const [region, setRegion] = useState('')
   const [canton, setCanton] = useState('')
-  const [loading, setLoading] = useState(true)
+  const [isPending, startTransition] = useTransition()
   const [searchInput, setSearchInput] = useState('')
 
   const fetchAgencies = useCallback(async () => {
-    setLoading(true)
     try {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
@@ -70,11 +69,12 @@ export default function Kontakty() {
     } catch (e) {
       console.error('Failed to fetch agencies', e)
     }
-    setLoading(false)
   }, [search, region, canton, page])
 
   useEffect(() => {
-    fetchAgencies()
+    startTransition(async () => {
+      await fetchAgencies()
+    })
   }, [fetchAgencies])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -224,12 +224,12 @@ export default function Kontakty() {
 
           {/* Results count */}
           <p className="text-gray-500 text-xs mb-3">
-            {loading ? 'Načítám...' : `${total} ${total === 1 ? 'agentura' : total < 5 ? 'agentury' : 'agentur'}`}
+            {isPending ? 'Načítám...' : `${total} ${total === 1 ? 'agentura' : total < 5 ? 'agentury' : 'agentur'}`}
           </p>
 
           {/* Agency list */}
           <div className="space-y-3">
-            {loading ? (
+            {isPending ? (
               <div className="space-y-3">
                 {[...Array(5)].map((_, i) => (
                   <div key={i} className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 animate-pulse">

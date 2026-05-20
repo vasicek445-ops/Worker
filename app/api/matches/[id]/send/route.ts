@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { sendGmailMessage } from '@/lib/gmail'
+import { buildMotivationPdf } from '@/lib/motivation-pdf'
+import { resolveCvPdfPath, resolveLetterPdfPath } from '@/lib/cv-pdf'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -79,6 +81,38 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const senderName = (cvDoc?.document_data as any)?.personalData?.name || oauth.email.split('@')[0]
 
+  // 4b. CV PDF — zvolené CV pro Smart Apply (povinná příloha)
+  const cvPath = await resolveCvPdfPath(supabaseAdmin, user.id)
+  if (!cvPath) {
+    return NextResponse.json({
+      error: 'no_cv_pdf',
+      hint: 'Otevři a ulož své CV v Moje dokumenty — bez životopisu nelze přihlášku odeslat.',
+    }, { status: 400 })
+  }
+  const { data: pdfBlob, error: pdfErr } = await supabaseAdmin.storage
+    .from('cv-pdfs')
+    .download(cvPath)
+  if (pdfErr || !pdfBlob) {
+    return NextResponse.json({
+      error: 'no_cv_pdf',
+      hint: 'Otevři své CV v sekci Moje dokumenty a ulož ho — bez životopisu nelze přihlášku odeslat.',
+    }, { status: 400 })
+  }
+  const cvPdfBase64 = Buffer.from(await pdfBlob.arrayBuffer()).toString('base64')
+  const cvFilename = `Lebenslauf_${senderName.replace(/\s+/g, '_')}.pdf`
+
+  // Motivační dopis — zvolený Woker dopis z nastavení, jinak AI text jako PDF
+  const motivationFilename = `Motivationsschreiben_${senderName.replace(/\s+/g, '_')}.pdf`
+  const letterPath = await resolveLetterPdfPath(supabaseAdmin, user.id)
+  let motivationPdfBase64: string | null = null
+  if (letterPath) {
+    const { data: letterBlob } = await supabaseAdmin.storage.from('cv-pdfs').download(letterPath)
+    if (letterBlob) motivationPdfBase64 = Buffer.from(await letterBlob.arrayBuffer()).toString('base64')
+  }
+  if (!motivationPdfBase64) {
+    motivationPdfBase64 = await buildMotivationPdf({ senderName, body: match.draft_body })
+  }
+
   // 5. Plain text body → minimal HTML (preserve paragraphs)
   const bodyHtml = match.draft_body
     .split(/\n{2,}/)
@@ -96,13 +130,26 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
       to: recipient,
       subject: match.draft_subject,
       bodyHtml,
+      attachments: [
+        { filename: cvFilename, mimeType: 'application/pdf', contentBase64: cvPdfBase64 },
+        { filename: motivationFilename, mimeType: 'application/pdf', contentBase64: motivationPdfBase64 },
+      ],
     })
   } catch (err) {
     console.error('[gmail-send] failed:', err)
-    return NextResponse.json({
-      error: 'send_failed',
-      message: (err as Error).message,
-    }, { status: 500 })
+    const msg = (err as Error)?.message || ''
+    if (msg.includes('invalid_grant')) {
+      await supabaseAdmin
+        .from('email_oauth_tokens')
+        .update({ revoked: true })
+        .eq('member_id', user.id)
+        .eq('provider', 'gmail')
+      return NextResponse.json({
+        error: 'gmail_expired',
+        hint: 'Spojení s Gmailem vypršelo — připoj Gmail prosím znovu na stránce Připojit Gmail.',
+      }, { status: 400 })
+    }
+    return NextResponse.json({ error: 'send_failed', message: msg }, { status: 500 })
   }
 
   // 7. Persist: mark match sent + log

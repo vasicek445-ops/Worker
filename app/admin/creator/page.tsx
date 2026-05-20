@@ -62,7 +62,7 @@ function Section({
           {title}
         </span>
         <span
-          className={`text-[#39ff6e] text-xl transition-transform duration-300 ${
+          className={`text-[#fb923c] text-xl transition-transform duration-300 ${
             open ? "rotate-180" : ""
           }`}
         >
@@ -368,14 +368,14 @@ export default function ContentCreatorPage() {
     <div className="min-h-screen bg-[#0a0a12] text-white">
       {/* Background glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#39ff6e]/5 rounded-full blur-[150px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-[#39ff6e]/3 rounded-full blur-[120px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#fb923c]/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-[#fb923c]/3 rounded-full blur-[120px]" />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#39ff6e]/10 border border-[#39ff6e]/20 text-[#39ff6e] text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#fb923c]/10 border border-[#fb923c]/20 text-[#fb923c] text-sm font-medium mb-4">
             <span>🎬</span> Admin Tool
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
@@ -396,9 +396,9 @@ export default function ContentCreatorPage() {
             onClick={() => fileInputRef.current?.click()}
             className={`relative border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-300 ${
               dragOver
-                ? "border-[#39ff6e] bg-[#39ff6e]/10 scale-[1.01]"
+                ? "border-[#fb923c] bg-[#fb923c]/10 scale-[1.01]"
                 : file
-                ? "border-[#39ff6e]/40 bg-[#39ff6e]/5"
+                ? "border-[#fb923c]/40 bg-[#fb923c]/5"
                 : "border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]"
             }`}
           >
@@ -440,7 +440,7 @@ export default function ContentCreatorPage() {
             className={`mt-4 w-full py-3 rounded-xl font-semibold text-lg transition-all duration-300 ${
               !file || transcribing
                 ? "bg-white/5 text-white/30 cursor-not-allowed"
-                : "bg-[#39ff6e] text-[#0a0a12] hover:bg-[#39ff6e]/90 hover:shadow-[0_0_30px_rgba(57,255,110,0.3)] active:scale-[0.98]"
+                : "bg-[#fb923c] text-[#0a0a12] hover:bg-[#fb923c]/90 hover:shadow-[0_0_30px_rgba(251,146,60,0.3)] active:scale-[0.98]"
             }`}
           >
             {transcribing ? (
@@ -456,7 +456,7 @@ export default function ContentCreatorPage() {
           {/* Transcription result */}
           {transcriptionResult && (
             <div className="mt-6 space-y-4 animate-fade-in">
-              <div className="flex items-center gap-2 text-[#39ff6e] font-medium">
+              <div className="flex items-center gap-2 text-[#fb923c] font-medium">
                 <span>✅</span> Přepis hotový
                 {transcriptionResult.duration > 0 && (
                   <span className="text-white/40 text-sm ml-2">
@@ -484,7 +484,7 @@ export default function ContentCreatorPage() {
                   <div className="bg-white/[0.03] border border-white/10 rounded-lg p-4 max-h-60 overflow-y-auto text-sm space-y-1">
                     {transcriptionResult.segments.map((seg, i) => (
                       <div key={i} className="flex gap-2">
-                        <span className="text-[#39ff6e]/60 font-mono shrink-0">
+                        <span className="text-[#fb923c]/60 font-mono shrink-0">
                           [{formatTime(seg.start)}]
                         </span>
                         <span className="text-white/70">{seg.text}</span>
@@ -507,7 +507,7 @@ export default function ContentCreatorPage() {
                       setMeta({ ...meta, title: e.target.value })
                     }
                     placeholder="Název videa"
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#39ff6e]/40 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fb923c]/40 transition-colors"
                   />
                 </div>
                 <div>
@@ -521,7 +521,7 @@ export default function ContentCreatorPage() {
                       setMeta({ ...meta, creator: e.target.value })
                     }
                     placeholder="@username"
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#39ff6e]/40 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fb923c]/40 transition-colors"
                   />
                 </div>
                 <div>
@@ -539,7 +539,7 @@ export default function ContentCreatorPage() {
                           | "YouTube",
                       })
                     }
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#39ff6e]/40 transition-colors appearance-none"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#fb923c]/40 transition-colors appearance-none"
                   >
                     <option value="TikTok" className="bg-[#0a0a12]">
                       TikTok
@@ -563,7 +563,7 @@ export default function ContentCreatorPage() {
                       setMeta({ ...meta, views: e.target.value })
                     }
                     placeholder="např. 1.2M"
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#39ff6e]/40 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fb923c]/40 transition-colors"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -577,7 +577,7 @@ export default function ContentCreatorPage() {
                       setMeta({ ...meta, tags: e.target.value })
                     }
                     placeholder="práce, švýcarsko, tip"
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#39ff6e]/40 transition-colors"
+                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fb923c]/40 transition-colors"
                   />
                 </div>
               </div>
@@ -585,7 +585,7 @@ export default function ContentCreatorPage() {
               {/* Save button */}
               <button
                 onClick={handleSave}
-                className="w-full py-3 rounded-xl font-semibold bg-[#39ff6e]/10 border border-[#39ff6e]/30 text-[#39ff6e] hover:bg-[#39ff6e]/20 transition-all duration-300 active:scale-[0.98]"
+                className="w-full py-3 rounded-xl font-semibold bg-[#fb923c]/10 border border-[#fb923c]/30 text-[#fb923c] hover:bg-[#fb923c]/20 transition-all duration-300 active:scale-[0.98]"
               >
                 💾 Uložit do knihovny
               </button>
@@ -671,7 +671,7 @@ export default function ContentCreatorPage() {
                           {item.tags.split(",").map((tag, i) => (
                             <span
                               key={i}
-                              className="px-2 py-0.5 rounded-full bg-[#39ff6e]/10 text-[#39ff6e] text-xs"
+                              className="px-2 py-0.5 rounded-full bg-[#fb923c]/10 text-[#fb923c] text-xs"
                             >
                               {tag.trim()}
                             </span>
@@ -687,7 +687,7 @@ export default function ContentCreatorPage() {
                         {item.segments.length > 0
                           ? item.segments.map((seg, i) => (
                               <div key={i} className="flex gap-2 mb-1">
-                                <span className="text-[#39ff6e]/50 font-mono text-xs shrink-0 mt-0.5">
+                                <span className="text-[#fb923c]/50 font-mono text-xs shrink-0 mt-0.5">
                                   [{formatTime(seg.start)}]
                                 </span>
                                 <span>{seg.text}</span>
@@ -716,7 +716,7 @@ export default function ContentCreatorPage() {
                 onChange={(e) => setIdea(e.target.value)}
                 rows={4}
                 placeholder="Např: Video o tom, jak najít práci ve Švýcarsku bez němčiny. Zaměřit na agentury a první kroky."
-                className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#39ff6e]/40 transition-colors resize-none leading-relaxed"
+                className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#fb923c]/40 transition-colors resize-none leading-relaxed"
               />
             </div>
 
@@ -733,7 +733,7 @@ export default function ContentCreatorPage() {
                       e.target.value as "TikTok" | "Instagram" | "YouTube"
                     )
                   }
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#39ff6e]/40 transition-colors appearance-none"
+                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#fb923c]/40 transition-colors appearance-none"
                 >
                   <option value="TikTok" className="bg-[#0a0a12]">
                     TikTok (15-60s)
@@ -753,7 +753,7 @@ export default function ContentCreatorPage() {
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#39ff6e]/40 transition-colors appearance-none"
+                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#fb923c]/40 transition-colors appearance-none"
                 >
                   <option value="Informativní" className="bg-[#0a0a12]">
                     Informativní
@@ -791,7 +791,7 @@ export default function ContentCreatorPage() {
               className={`w-full py-3.5 rounded-xl font-semibold text-lg transition-all duration-300 ${
                 !idea.trim() || generating
                   ? "bg-white/5 text-white/30 cursor-not-allowed"
-                  : "bg-[#39ff6e] text-[#0a0a12] hover:bg-[#39ff6e]/90 hover:shadow-[0_0_30px_rgba(57,255,110,0.3)] active:scale-[0.98]"
+                  : "bg-[#fb923c] text-[#0a0a12] hover:bg-[#fb923c]/90 hover:shadow-[0_0_30px_rgba(251,146,60,0.3)] active:scale-[0.98]"
               }`}
             >
               {generating ? (
@@ -807,7 +807,7 @@ export default function ContentCreatorPage() {
             {/* Generated script output */}
             {(script || rawScript) && (
               <div className="mt-6 space-y-4 animate-fade-in">
-                <div className="flex items-center gap-2 text-[#39ff6e] font-medium text-lg">
+                <div className="flex items-center gap-2 text-[#fb923c] font-medium text-lg">
                   <span>🎬</span> Vygenerovaný script
                 </div>
 
@@ -855,9 +855,9 @@ export default function ContentCreatorPage() {
 
                 {/* CTA */}
                 {script?.cta && (
-                  <div className="bg-[#39ff6e]/5 border border-[#39ff6e]/20 rounded-xl p-4">
+                  <div className="bg-[#fb923c]/5 border border-[#fb923c]/20 rounded-xl p-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="px-2 py-0.5 rounded-full bg-[#39ff6e]/20 text-[#39ff6e] text-xs font-bold uppercase tracking-wide">
+                      <span className="px-2 py-0.5 rounded-full bg-[#fb923c]/20 text-[#fb923c] text-xs font-bold uppercase tracking-wide">
                         CTA
                       </span>
                       <span className="text-white/30 text-xs">

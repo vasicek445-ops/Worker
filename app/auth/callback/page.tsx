@@ -38,6 +38,7 @@ async function handlePostAuth(user: any, plan: string | null, isRecovery: boolea
   }
 
   if (isRecovery) { window.location.replace("/reset-heslo"); return; }
+  try { localStorage.removeItem("woker_pending_plan"); } catch {}
   if (plan && (plan === "monthly" || plan === "quarterly")) {
     const res = await fetch('/api/stripe/checkout', {
       method: 'POST',
@@ -55,7 +56,8 @@ export default function AuthCallback() {
   useEffect(() => {
     const hash = window.location.hash;
     const params = new URLSearchParams(window.location.search);
-    const plan = params.get("plan");
+    let plan = params.get("plan");
+    try { if (!plan) plan = localStorage.getItem("woker_pending_plan"); } catch {}
 
     // Detect recovery type from hash
     const isRecovery = hash.includes("type=recovery");
@@ -105,9 +107,22 @@ export default function AuthCallback() {
     });
   }, []);
   return (
-    <main style={{ minHeight: "100vh", background: "#0a0a12", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "16px" }}>
-      <div style={{ fontSize: "32px", animation: "spin 1s linear infinite" }}>⚙️</div>
-      <p style={{ color: "white", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>{status}</p>
+    <main style={{ minHeight: "100vh", background: "#0a0a12", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "20px", fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+      {/* Branded loader — oranžový spinner ring + W uprostřed. Pro vlastní ikonku vyměň div s "W" za <img>. */}
+      <div style={{ position: "relative", width: "56px", height: "56px" }}>
+        <div style={{
+          position: "absolute", inset: 0, borderRadius: "50%",
+          border: "3px solid rgba(251,146,60,0.15)",
+          borderTopColor: "#fb923c",
+          animation: "spin 0.7s linear infinite",
+        }} />
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#fb923c", fontWeight: 800, fontSize: "22px",
+        }}>W</div>
+      </div>
+      <p style={{ color: "white", fontWeight: 700, fontSize: "15px" }}>{status}</p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </main>
   );

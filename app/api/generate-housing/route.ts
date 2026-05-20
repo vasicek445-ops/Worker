@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
+    if ((sub?.status !== 'active' && sub?.status !== 'trialing')) return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
     const { formData } = await req.json()
     if (!formData?.name?.trim() || !formData?.region?.trim()) {
@@ -108,8 +108,8 @@ DŮLEŽITÉ:
       messages: [{ role: 'user', content: userMessage }],
     })
 
-    const textBlock = response.content.find((block: any) => block.type === 'text')
-    let text = textBlock ? (textBlock as any).text : ''
+    const textBlock = response.content.find((block) => block.type === 'text')
+    let text = textBlock && textBlock.type === 'text' ? textBlock.text : ''
     if (!text) return NextResponse.json({ error: 'Generation failed' }, { status: 500 })
 
     text = text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim()
@@ -131,8 +131,8 @@ DŮLEŽITÉ:
     }
 
     return NextResponse.json({ housingData, usage: { input: response.usage.input_tokens, output: response.usage.output_tokens } })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Housing error:', error)
-    return NextResponse.json({ error: error.message || 'Generation error' }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Generation error' }, { status: 500 })
   }
 }

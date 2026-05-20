@@ -50,8 +50,8 @@ export async function GET(req: NextRequest) {
       page,
       totalPages: Math.ceil((count || 0) / limit),
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Jobs API error:', error)
-    return NextResponse.json({ error: error.message || 'Failed to fetch jobs' }, { status: 500 })
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Failed to fetch jobs' }, { status: 500 })
   }
 }

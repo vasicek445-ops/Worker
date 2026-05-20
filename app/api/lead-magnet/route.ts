@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Pošli welcome email s průvodcem
     const { data, error } = await resend.emails.send({
-      from: "Václav z Wokeru <vaclav@gowoker.com>",
+      from: "Václav z Wokeru <info@gowoker.com>",
       to: email,
       subject: "🇨🇭 Váš průvodce: 5 kroků k práci ve Švýcarsku",
       html: `

@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
 
     let customerId = sub?.stripe_customer_id
 
-    if (!customerId) {
+    // Reuse jen skutečné Stripe ID — placeholdery (free_friend, founder_free) přeskoč
+    if (!customerId || !customerId.startsWith('cus_')) {
       const customer = await stripe.customers.create({
         email,
         metadata: { supabase_user_id: userId },
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
         plan: planKey,
       },
       subscription_data: {
-        ...(planKey === 'quarterly' ? { trial_period_days: 3 } : {}),
+        trial_period_days: 7,
         metadata: {
           supabase_user_id: userId,
           plan: planKey,

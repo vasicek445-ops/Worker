@@ -254,24 +254,24 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
   if (!expanded) {
     return (
       <div ref={chatRef} id="wooky" onClick={() => setExpanded(true)} className="cursor-pointer group">
-        <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] overflow-hidden transition-all hover:border-[#39ff6e]/20 hover:shadow-[0_0_30px_rgba(57,255,110,0.08)]">
+        <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] overflow-hidden transition-all hover:border-[#fb923c]/20 hover:shadow-[0_0_30px_rgba(251,146,60,0.08)]">
           <div className="px-5 py-4 flex items-center justify-between border-b border-white/[0.04]">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center shadow-[0_0_20px_rgba(57,255,110,0.2)]">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#fb923c] to-[#f97316] flex items-center justify-center shadow-[0_0_20px_rgba(251,146,60,0.2)]">
                   <Image src="/images/3d/wooky-wave-sm.png" alt="Wooky" width={26} height={26} className="rounded-md" />
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#39ff6e] rounded-full border-2 border-[#0a0a12] shadow-[0_0_8px_rgba(57,255,110,0.5)]" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#fb923c] rounded-full border-2 border-[#0a0a12] shadow-[0_0_8px_rgba(251,146,60,0.5)]" />
               </div>
               <div>
                 <p className="text-white text-sm font-bold m-0">Wooky</p>
-                <p className="text-[#39ff6e] text-[11px] font-medium m-0">Online 24/7</p>
+                <p className="text-[#fb923c] text-[11px] font-medium m-0">Online 24/7</p>
               </div>
             </div>
             <span className="text-[11px] text-white/25 font-medium bg-white/[0.04] px-3 py-1.5 rounded-full border border-white/[0.06]">AI Team Leader</span>
           </div>
           <div className="p-4 flex flex-col gap-3">
-            <div className="bg-[#39ff6e]/[0.04] rounded-xl rounded-bl-sm px-3.5 py-2.5 max-w-[85%] border border-[#39ff6e]/10">
+            <div className="bg-[#fb923c]/[0.04] rounded-xl rounded-bl-sm px-3.5 py-2.5 max-w-[85%] border border-[#fb923c]/10">
               <p className="text-[13px] text-white/60 leading-relaxed m-0">
                 {profilePercent < 50
                   ? `Profil na ${profilePercent}% — dohodime to a pustim na to cely tym.`
@@ -286,8 +286,8 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
               ))}
             </div>
           </div>
-          <div className="px-4 py-3 bg-[#39ff6e]/[0.02] border-t border-[#39ff6e]/[0.06] flex items-center justify-center">
-            <span className="text-[13px] font-semibold text-[#39ff6e]/70 group-hover:text-[#39ff6e] transition">Otevrit chat →</span>
+          <div className="px-4 py-3 bg-[#fb923c]/[0.02] border-t border-[#fb923c]/[0.06] flex items-center justify-center">
+            <span className="text-[13px] font-semibold text-[#fb923c]/70 group-hover:text-[#fb923c] transition">Otevrit chat →</span>
           </div>
         </div>
       </div>
@@ -296,18 +296,18 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
 
   // ─── EXPANDED CHAT ───
   return (
-    <div ref={chatRef} id="wooky" className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] overflow-hidden shadow-[0_0_40px_rgba(57,255,110,0.05)]">
+    <div ref={chatRef} id="wooky" className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] overflow-hidden shadow-[0_0_40px_rgba(251,146,60,0.05)]">
       {/* Header */}
       <div className="px-5 py-3.5 border-b border-white/[0.04] flex items-center gap-3 bg-white/[0.02]">
         <div className="relative">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#39ff6e] to-[#2bcc58] flex items-center justify-center shadow-[0_0_20px_rgba(57,255,110,0.2)]">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#fb923c] to-[#f97316] flex items-center justify-center shadow-[0_0_20px_rgba(251,146,60,0.2)]">
             <Image src="/images/3d/wooky-wave-sm.png" alt="Wooky" width={26} height={26} className="rounded-md" />
           </div>
-          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#39ff6e] rounded-full border-2 border-[#0a0a12]" />
+          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#fb923c] rounded-full border-2 border-[#0a0a12]" />
         </div>
         <div className="flex-1">
           <p className="text-white text-sm font-bold m-0">Wooky</p>
-          <p className={`text-[11px] font-medium m-0 ${isStreaming ? "text-yellow-400" : "text-[#39ff6e]"}`}>
+          <p className={`text-[11px] font-medium m-0 ${isStreaming ? "text-yellow-400" : "text-[#fb923c]"}`}>
             {isStreaming ? "Pise..." : "Online"}
           </p>
         </div>
@@ -326,13 +326,13 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
             {msg.role === "assistant" && (
-              <div className="w-7 h-7 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-7 h-7 rounded-lg bg-[#fb923c]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <Image src="/images/3d/wooky-default-sm.png" alt="" width={18} height={18} className="rounded-sm" />
               </div>
             )}
             <div className={`rounded-xl px-3.5 py-2.5 max-w-[80%] ${
               msg.role === "user"
-                ? "bg-[#39ff6e]/15 text-white/90 border border-[#39ff6e]/20"
+                ? "bg-[#fb923c]/15 text-white/90 border border-[#fb923c]/20"
                 : "bg-white/[0.04] text-white/60 border border-white/[0.06]"
             }`}>
               <p className="text-[13px] whitespace-pre-wrap leading-relaxed m-0">{msg.content}</p>
@@ -343,13 +343,13 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
         {/* Streaming */}
         {isStreaming && streamingText && (
           <div className="flex gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-7 h-7 rounded-lg bg-[#fb923c]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
               <Image src="/images/3d/wooky-default-sm.png" alt="" width={18} height={18} className="rounded-sm" />
             </div>
             <div className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3.5 py-2.5 max-w-[80%]">
               <p className="text-[13px] whitespace-pre-wrap leading-relaxed text-white/60 m-0">
                 {streamingText}
-                <span className="inline-block w-0.5 h-3.5 bg-[#39ff6e] ml-0.5 animate-pulse align-text-bottom" />
+                <span className="inline-block w-0.5 h-3.5 bg-[#fb923c] ml-0.5 animate-pulse align-text-bottom" />
               </p>
             </div>
           </div>
@@ -358,14 +358,14 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
         {/* Typing indicator */}
         {isStreaming && !streamingText && (
           <div className="flex gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-7 h-7 rounded-lg bg-[#fb923c]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
               <Image src="/images/3d/wooky-default-sm.png" alt="" width={18} height={18} className="rounded-sm" />
             </div>
             <div className="bg-white/[0.04] border border-white/[0.06] rounded-xl px-3.5 py-2.5">
               <div className="flex gap-1.5">
-                <div className="w-2 h-2 bg-[#39ff6e]/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <div className="w-2 h-2 bg-[#39ff6e]/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <div className="w-2 h-2 bg-[#39ff6e]/40 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                <div className="w-2 h-2 bg-[#fb923c]/40 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                <div className="w-2 h-2 bg-[#fb923c]/40 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                <div className="w-2 h-2 bg-[#fb923c]/40 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           </div>
@@ -376,7 +376,7 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
           <div className="flex flex-wrap gap-1.5 ml-9">
             {contextQuestions.map((q) => (
               <button key={q} onClick={() => sendMessage(q)}
-                className="text-[11px] px-3 py-1.5 rounded-lg border border-white/[0.08] text-white/40 hover:border-[#39ff6e]/30 hover:text-[#39ff6e]/70 hover:bg-[#39ff6e]/[0.04] transition font-medium">
+                className="text-[11px] px-3 py-1.5 rounded-lg border border-white/[0.08] text-white/40 hover:border-[#fb923c]/30 hover:text-[#fb923c]/70 hover:bg-[#fb923c]/[0.04] transition font-medium">
                 {q}
               </button>
             ))}
@@ -388,7 +388,7 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
           <div className="flex flex-wrap gap-1.5 ml-9">
             {lastAssistantMsg!.chips!.map((chip) => (
               <button key={chip} onClick={() => sendMessage(chip)}
-                className="text-[11px] px-3 py-1.5 rounded-lg border border-white/[0.08] text-white/40 hover:border-[#39ff6e]/30 hover:text-[#39ff6e]/70 hover:bg-[#39ff6e]/[0.04] transition font-medium">
+                className="text-[11px] px-3 py-1.5 rounded-lg border border-white/[0.08] text-white/40 hover:border-[#fb923c]/30 hover:text-[#fb923c]/70 hover:bg-[#fb923c]/[0.04] transition font-medium">
                 {chip}
               </button>
             ))}
@@ -408,12 +408,12 @@ export default function WookyChat({ profilePercent = 0, profileData, appCount = 
             onChange={(e) => setInput(e.target.value)}
             placeholder="Zeptej se Wookyho..."
             disabled={isStreaming}
-            className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#39ff6e]/40 focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] disabled:opacity-50 transition"
+            className="flex-1 bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#fb923c]/40 focus:shadow-[0_0_20px_rgba(251,146,60,0.05)] disabled:opacity-50 transition"
           />
           <button
             type="submit"
             disabled={isStreaming || !input.trim()}
-            className="bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] w-10 h-10 rounded-xl hover:shadow-[0_4px_20px_rgba(57,255,110,0.3)] transition disabled:opacity-30 font-bold flex items-center justify-center flex-shrink-0"
+            className="bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] w-10 h-10 rounded-xl hover:shadow-[0_4px_20px_rgba(251,146,60,0.3)] transition disabled:opacity-30 font-bold flex items-center justify-center flex-shrink-0"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />

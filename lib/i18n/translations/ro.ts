@@ -10,7 +10,7 @@ const ro: Translation = {
     guides_title: "Ghidul Elveției", guides_all: "Tot",
     premium_title: "Woker Premium",
     premium_desc: "Deblochează peste 1.000 de contacte, ghiduri premium și asistent AI pentru lucrul în Elveția.",
-    premium_cta: "Activează la 9,99 €/lună", premium_trial: "Fără obligații",
+    premium_cta: "Încearcă 7 zile gratis", premium_trial: "Fără obligații",
     wooky_name: "Asistent Wooky", wooky_online: "Online 24/7",
     wooky_message: "Salut! 👋 Sunt Wooky, asistentul tău pentru lucrul în Elveția. Te ajut cu permise, locuință și căutarea unui job.",
     wooky_open: "Deschide chat →",
@@ -26,7 +26,7 @@ const ro: Translation = {
   paywall: {
     title: "Deblochează accesul complet",
     description: "Obține contacte la companii, ghiduri și asistent AI",
-    cta: "Abonează-te la 9,99 €/lună",
+    cta: "Încearcă 7 zile gratis",
     disclaimer: "Anulezi oricând • 7 zile gratuit",
   },
   home: {

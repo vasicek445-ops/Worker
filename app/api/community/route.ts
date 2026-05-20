@@ -141,7 +141,7 @@ export async function POST(req: NextRequest) {
     .eq('user_id', user.id)
     .single()
 
-  if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium required' }, { status: 403 })
+  if ((sub?.status !== 'active' && sub?.status !== 'trialing')) return NextResponse.json({ error: 'Premium required' }, { status: 403 })
 
   const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Anonym'
 

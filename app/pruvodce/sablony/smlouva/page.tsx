@@ -20,14 +20,14 @@ interface ContractData {
 }
 
 const RATING = {
-  good: { emoji: '✅', label: 'Dobrá smlouva', color: 'text-[#39ff6e]', bg: 'bg-[#39ff6e]/[0.06] border-[#39ff6e]/20', glow: 'shadow-[0_0_30px_rgba(57,255,110,0.15)]' },
+  good: { emoji: '✅', label: 'Dobrá smlouva', color: 'text-[#fb923c]', bg: 'bg-[#fb923c]/[0.06] border-[#fb923c]/20', glow: 'shadow-[0_0_30px_rgba(251,146,60,0.15)]' },
   acceptable: { emoji: '👍', label: 'Přijatelná', color: 'text-blue-400', bg: 'bg-blue-500/[0.06] border-blue-500/20', glow: 'shadow-[0_0_30px_rgba(59,130,246,0.15)]' },
   caution: { emoji: '⚠️', label: 'Pozor – jsou problémy', color: 'text-yellow-400', bg: 'bg-yellow-500/[0.06] border-yellow-500/20', glow: 'shadow-[0_0_30px_rgba(234,179,8,0.15)]' },
   bad: { emoji: '🚫', label: 'Nevýhodná smlouva', color: 'text-red-400', bg: 'bg-red-500/[0.06] border-red-500/20', glow: 'shadow-[0_0_30px_rgba(248,113,113,0.15)]' },
 }
 
 const STATUS_STYLE = {
-  ok: { icon: '✅', border: 'border-l-[#39ff6e]/40' },
+  ok: { icon: '✅', border: 'border-l-[#fb923c]/40' },
   warning: { icon: '⚠️', border: 'border-l-yellow-400/40' },
   danger: { icon: '🚫', border: 'border-l-red-400/40' },
 }
@@ -177,14 +177,14 @@ export default function SmlouvaPage() {
 
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Analýza smlouvy – ${result.overview.position}</title>
 <style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;color:#222;line-height:1.5}
-h1{color:#0a6e2a;font-size:22px;border-bottom:2px solid #39ff6e;padding-bottom:8px}
+h1{color:#0a6e2a;font-size:22px;border-bottom:2px solid #fb923c;padding-bottom:8px}
 h2{color:#333;font-size:16px;margin-top:24px;border-bottom:1px solid #ddd;padding-bottom:4px}
 .rating{padding:12px 16px;border-radius:8px;margin:16px 0;font-weight:bold;font-size:15px}
 .good{background:#e8f5e9;color:#2e7d32}.acceptable{background:#e3f2fd;color:#1565c0}
 .caution{background:#fff3e0;color:#e65100}.bad{background:#ffebee;color:#c62828}
 .overview{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f8f9fa;padding:12px;border-radius:8px;margin:12px 0}
 .overview span{font-size:11px;color:#888}.overview p{margin:0;font-size:13px}
-.term{border-left:3px solid #39ff6e;padding:8px 12px;margin:8px 0;background:#f8f9fa;border-radius:0 6px 6px 0}
+.term{border-left:3px solid #fb923c;padding:8px 12px;margin:8px 0;background:#f8f9fa;border-radius:0 6px 6px 0}
 .term.warning{border-left-color:#ffc107}.term.danger{border-left-color:#f44336}
 .flag{padding:8px 12px;margin:6px 0;border-radius:6px;font-size:13px}
 .red{background:#fff5f5;border:1px solid #fee}.green{background:#f0fff0;border:1px solid #e0ffe0}
@@ -236,7 +236,7 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
   // ─── Ambient background ───
   const ambientBg = (
     <>
-      <div className="fixed top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[rgba(57,255,110,0.10)] blur-[180px] pointer-events-none z-0" />
+      <div className="fixed top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[rgba(251,146,60,0.10)] blur-[180px] pointer-events-none z-0" />
       <div className="fixed bottom-[-15%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[rgba(100,60,255,0.08)] blur-[160px] pointer-events-none z-0" />
     </>
   )
@@ -287,7 +287,7 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition whitespace-nowrap ${
                     activeTab === tab.key
-                      ? 'bg-[#39ff6e]/15 text-[#39ff6e] border border-[#39ff6e]/30'
+                      ? 'bg-[#fb923c]/15 text-[#fb923c] border border-[#fb923c]/30'
                       : 'text-white/40 hover:text-white/60 hover:bg-white/[0.04]'
                   }`}>
                   <span>{tab.icon}</span>
@@ -317,7 +317,7 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
                   <div><span className="text-white/25 text-xs block">Úvazek</span><span className="text-white/80">{result.overview.workload}</span></div>
                   <div className="col-span-2">
                     <span className="text-white/25 text-xs block">Hrubá mzda</span>
-                    <span className="text-[#39ff6e] text-lg font-bold">{result.overview.salary_gross}</span>
+                    <span className="text-[#fb923c] text-lg font-bold">{result.overview.salary_gross}</span>
                   </div>
                   {result.overview.salary_info && (
                     <div className="col-span-2"><span className="text-white/25 text-xs block">Mzdové info</span><span className="text-white/50 text-sm">{result.overview.salary_info}</span></div>
@@ -327,8 +327,8 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
 
               {/* Quick stats */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-[#39ff6e]/[0.04] border border-[#39ff6e]/15 rounded-xl p-3 text-center">
-                  <span className="text-[#39ff6e] text-xl font-bold block">{result.green_flags.length}</span>
+                <div className="bg-[#fb923c]/[0.04] border border-[#fb923c]/15 rounded-xl p-3 text-center">
+                  <span className="text-[#fb923c] text-xl font-bold block">{result.green_flags.length}</span>
                   <span className="text-white/30 text-[10px] uppercase tracking-wider">Pozitivní</span>
                 </div>
                 <div className="bg-red-500/[0.04] border border-red-500/15 rounded-xl p-3 text-center">
@@ -361,14 +361,14 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
                     {t.term_de && (
                       <div className="flex items-center gap-2 mb-1">
                         <p className="text-white/20 text-xs italic flex-1">&bdquo;{t.term_de}&ldquo;</p>
-                        <button onClick={() => speakText(t.term_de)} className="text-white/20 hover:text-[#39ff6e] transition p-1 flex-shrink-0" title="Poslechnout výslovnost">
+                        <button onClick={() => speakText(t.term_de)} className="text-white/20 hover:text-[#fb923c] transition p-1 flex-shrink-0" title="Poslechnout výslovnost">
                           <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" /></svg>
                         </button>
                       </div>
                     )}
                     <p className="text-white/60 text-sm mb-1">{t.translation}</p>
                     <p className="text-white/30 text-xs leading-relaxed">{t.explanation}</p>
-                    <p className={`text-xs mt-1.5 ${t.status === 'ok' ? 'text-[#39ff6e]/60' : t.status === 'warning' ? 'text-yellow-400/60' : 'text-red-400/60'}`}>{t.status_reason}</p>
+                    <p className={`text-xs mt-1.5 ${t.status === 'ok' ? 'text-[#fb923c]/60' : t.status === 'warning' ? 'text-yellow-400/60' : 'text-red-400/60'}`}>{t.status_reason}</p>
                   </div>
                 )
               })}
@@ -426,9 +426,9 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
               )}
 
               {result.red_flags.length === 0 && result.missing_items.length === 0 && (
-                <div className="bg-[#39ff6e]/[0.04] border border-[#39ff6e]/15 rounded-2xl p-8 text-center">
+                <div className="bg-[#fb923c]/[0.04] border border-[#fb923c]/15 rounded-2xl p-8 text-center">
                   <span className="text-4xl block mb-3">🎉</span>
-                  <p className="text-[#39ff6e]/70 font-bold">Žádné problémy nenalezeny</p>
+                  <p className="text-[#fb923c]/70 font-bold">Žádné problémy nenalezeny</p>
                   <p className="text-white/25 text-sm mt-1">Smlouva vypadá v pořádku</p>
                 </div>
               )}
@@ -445,8 +445,8 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
               {result.green_flags.length > 0 ? (
                 <div className="space-y-2">
                   {result.green_flags.map((f, i) => (
-                    <div key={i} className="bg-[#39ff6e]/[0.04] border border-[#39ff6e]/10 rounded-xl p-3 backdrop-blur-sm">
-                      <h3 className="text-[#39ff6e]/80 text-sm font-semibold">{f.positive}</h3>
+                    <div key={i} className="bg-[#fb923c]/[0.04] border border-[#fb923c]/10 rounded-xl p-3 backdrop-blur-sm">
+                      <h3 className="text-[#fb923c]/80 text-sm font-semibold">{f.positive}</h3>
                       <p className="text-white/25 text-xs mt-0.5">{f.detail}</p>
                     </div>
                   ))}
@@ -512,7 +512,7 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
           <div className="space-y-2.5 mt-8">
             <p className="text-white/20 text-xs text-center mb-2">Pokračuj s daty ze smlouvy</p>
             <Link href={`/pruvodce/sablony/email?prefill=${encodeURIComponent(JSON.stringify({ position: result.overview.position || '', company: result.overview.employer || '' }))}`}
-              className="block w-full bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl text-center hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] transition-all">
+              className="block w-full bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl text-center hover:shadow-[0_4px_30px_rgba(251,146,60,0.35)] hover:scale-[1.02] transition-all">
               📧 Napsat email zaměstnavateli
             </Link>
             <Link href={`/pruvodce/sablony/pohovor?prefill=${encodeURIComponent(JSON.stringify({ position: result.overview.position || '', company: result.overview.employer || '' }))}`}
@@ -539,23 +539,23 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
           <div className="flex flex-col items-center justify-center min-h-[60vh]">
             <div className="w-full max-w-sm">
               <div className="mb-8 text-center">
-                <div className="w-16 h-16 border-4 border-[#39ff6e]/20 border-t-[#39ff6e] rounded-full animate-spin mx-auto mb-4" />
+                <div className="w-16 h-16 border-4 border-[#fb923c]/20 border-t-[#fb923c] rounded-full animate-spin mx-auto mb-4" />
                 <h2 className="text-white text-lg font-bold">Analyzuji smlouvu</h2>
                 <p className="text-white/30 text-sm mt-1">Tohle trvá 15-20 sekund</p>
               </div>
               <div className="space-y-3">
                 {PROGRESS_STEPS.map((step, i) => (
                   <div key={i} className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-500 ${
-                    i < progressStep ? 'bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20' :
+                    i < progressStep ? 'bg-[#fb923c]/[0.06] border border-[#fb923c]/20' :
                     i === progressStep ? 'bg-white/[0.04] border border-white/[0.08]' :
                     'bg-white/[0.02] border border-white/[0.04] opacity-40'
                   }`}>
                     <span className="text-lg">{i < progressStep ? '✅' : step.icon}</span>
                     <span className={`text-sm font-medium ${
-                      i < progressStep ? 'text-[#39ff6e]/80' :
+                      i < progressStep ? 'text-[#fb923c]/80' :
                       i === progressStep ? 'text-white' : 'text-white/30'
                     }`}>{step.label}</span>
-                    {i === progressStep && <span className="ml-auto w-4 h-4 border-2 border-white/20 border-t-[#39ff6e] rounded-full animate-spin" />}
+                    {i === progressStep && <span className="ml-auto w-4 h-4 border-2 border-white/20 border-t-[#fb923c] rounded-full animate-spin" />}
                   </div>
                 ))}
               </div>
@@ -593,7 +593,7 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
             <span className="flex items-center gap-1">🇨🇭 Standard</span>
             <span className="flex items-center gap-1">🤝 Vyjednání</span>
             <span className="flex items-center gap-1">✅ Hodnocení</span>
-            <span className="flex items-center gap-1 text-[#39ff6e]/60">🔊 Výslovnost</span>
+            <span className="flex items-center gap-1 text-[#fb923c]/60">🔊 Výslovnost</span>
           </div>
         </div>
 
@@ -612,7 +612,7 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
                 onDrop={handleDrop}
                 className={`w-full flex flex-col items-center justify-center py-6 rounded-2xl cursor-pointer transition-all ${
                   dragOver
-                    ? 'bg-[#39ff6e]/[0.08] border-2 border-dashed border-[#39ff6e]/40 shadow-[0_0_30px_rgba(57,255,110,0.1)]'
+                    ? 'bg-[#fb923c]/[0.08] border-2 border-dashed border-[#fb923c]/40 shadow-[0_0_30px_rgba(251,146,60,0.1)]'
                     : 'bg-[#111120]/80 backdrop-blur-sm border-2 border-dashed border-white/[0.08] hover:border-white/[0.15]'
                 }`}>
                 <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
@@ -651,17 +651,17 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
               <textarea value={contractText} onChange={(e) => setContractText(e.target.value)}
                 placeholder={'Zkopíruj text smlouvy v němčině...\n\nArbeitsvertrag\nzwischen [Firma] als Arbeitgeber\nund [Jméno] als Arbeitnehmer\n\n1. Beginn und Dauer\nDas Arbeitsverhältnis beginnt am...'}
                 rows={10}
-                className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition resize-none" />
+                className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#fb923c]/40 focus:outline-none focus:shadow-[0_0_20px_rgba(251,146,60,0.05)] transition resize-none" />
               <p className="text-white/20 text-xs mt-1.5">
                 {contractText.length} znaků
                 {images.length > 0 ? ` · ${images.length} fotk${images.length === 1 ? 'a' : images.length < 5 ? 'y' : 'ek'}` : ''}
                 {contractText.length < 50 && images.length === 0 ? ' · vlož text nebo nahraj fotku' : ''}
-                {(contractText.length >= 50 || images.length > 0) && <span className="text-[#39ff6e]/60"> · ✓ připraveno k analýze</span>}
+                {(contractText.length >= 50 || images.length > 0) && <span className="text-[#fb923c]/60"> · ✓ připraveno k analýze</span>}
               </p>
             </div>
 
-            <div className="bg-[#39ff6e]/[0.04] border border-[#39ff6e]/15 rounded-xl p-3">
-              <p className="text-[#39ff6e]/60 text-xs">💡 Tip: Smlouvu můžeš vyfotit telefonem, udělat screenshot nebo zkopírovat text z PDF/emailu. Při fotce nahraj všechny stránky.</p>
+            <div className="bg-[#fb923c]/[0.04] border border-[#fb923c]/15 rounded-xl p-3">
+              <p className="text-[#fb923c]/60 text-xs">💡 Tip: Smlouvu můžeš vyfotit telefonem, udělat screenshot nebo zkopírovat text z PDF/emailu. Při fotce nahraj všechny stránky.</p>
             </div>
 
             {error && (
@@ -671,7 +671,7 @@ ${result.negotiate_tips.length > 0 ? `<h2>Co si vyjednat</h2>${result.negotiate_
             )}
 
             <button onClick={handleSubmit} disabled={generating || (contractText.trim().length < 50 && images.length === 0)}
-              className="w-full bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none">
+              className="w-full bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl hover:shadow-[0_4px_30px_rgba(251,146,60,0.35)] hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none">
               Analyzovat smlouvu
             </button>
             <p className="text-white/20 text-xs text-center">AI přečte text z fotky nebo vloženého textu, přeloží a porovná se švýcarským standardem</p>

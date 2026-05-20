@@ -72,6 +72,26 @@ ANTWORTE NUR MIT VALIDEM JSON (kein anderer Text!):
   "certifications": ["Zertifikate, Kurse, Berechtigungen – branchenrelevant, sonst leeres Array"]
 }`
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function normalizeCV(cv: any) {
+  return {
+    profil: typeof cv?.profil === 'string' ? cv.profil : '',
+    personalData: cv?.personalData && typeof cv.personalData === 'object' ? cv.personalData : {},
+    experience: (Array.isArray(cv?.experience) ? cv.experience : []).map((e: any) => ({
+      ...e,
+      tasks: Array.isArray(e?.tasks) ? e.tasks : [],
+    })),
+    education: Array.isArray(cv?.education) ? cv.education : [],
+    languages: Array.isArray(cv?.languages) ? cv.languages : [],
+    skills: {
+      technical: Array.isArray(cv?.skills?.technical) ? cv.skills.technical : [],
+      soft: Array.isArray(cv?.skills?.soft) ? cv.skills.soft : [],
+    },
+    certifications: Array.isArray(cv?.certifications) ? cv.certifications : [],
+  }
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get('authorization')
@@ -87,7 +107,7 @@ export async function POST(req: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (sub?.status !== 'active') return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
+    if ((sub?.status !== 'active' && sub?.status !== 'trialing')) return NextResponse.json({ error: 'Premium subscription required' }, { status: 403 })
 
     const { formData } = await req.json()
     if (!formData || typeof formData !== 'object') return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
@@ -123,7 +143,7 @@ WICHTIG: Erweitere jede Position auf 3-5 konkrete Tätigkeiten mit Aktionsverben
     const generateCV = async (): Promise<string> => {
       const response = await anthropic.messages.create({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 4096,
+        max_tokens: 8192,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: userMessage }],
       })
@@ -145,12 +165,16 @@ WICHTIG: Erweitere jede Position auf 3-5 konkrete Tätigkeiten mit Aktionsverben
         if (jsonStart !== -1 && jsonEnd !== -1) {
           text = text.substring(jsonStart, jsonEnd + 1)
         }
-        cvData = JSON.parse(text)
+        cvData = normalizeCV(JSON.parse(text))
+        if (!cvData.personalData?.name || cvData.experience.length === 0) {
+          throw new Error('incomplete CV')
+        }
         break
       } catch {
+        cvData = undefined
         if (attempt === 2) {
-          console.error('JSON parse error after retries')
-          return NextResponse.json({ error: 'AI generated invalid data. Try again.' }, { status: 500 })
+          console.error('CV generation failed after retries')
+          return NextResponse.json({ error: 'AI vygenerovala neúplná data. Zkus to prosím znovu.' }, { status: 500 })
         }
       }
     }

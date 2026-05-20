@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
 import { supabase } from '../../../supabase'
+import { useProfile } from '../../../../lib/profile/hooks'
 import Link from 'next/link'
 
 const FIELDS = ['Stavebnictví', 'Gastronomie / Hotelnictví', 'Logistika / Sklad', 'Zdravotnictví', 'Úklid / Údržba', 'Strojírenství / Technik', 'IT / Software', 'Elektro / Instalatér', 'Řidič / Doprava', 'Jiný obor']
@@ -26,7 +27,9 @@ interface InterviewData {
 
 export default function PohovorPage() {
   const { isActive, loading } = useSubscription()
+  const { profile } = useProfile()
   const [formData, setFormData] = useState<Record<string, string>>({})
+  const [prefilledFromProfile, setPrefilledFromProfile] = useState<Set<string>>(new Set())
   const [result, setResult] = useState<InterviewData | null>(null)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -60,24 +63,45 @@ export default function PohovorPage() {
     }
   }, [result, formData])
 
-  // Auto-prefill from profile + analysis
+  // Auto-prefill from user profile (jen prázdná pole, profile = SSOT)
+  useEffect(() => {
+    if (!profile) return
+    const fromProfile = new Set<string>()
+    setFormData((f) => {
+      const next = { ...f }
+      const apply = (key: string, val: string | null | undefined) => {
+        if (!val) return
+        if (next[key]?.trim()) return
+        next[key] = val
+        fromProfile.add(key)
+      }
+      apply('position', profile.pozice)
+      apply('field', profile.obor)
+      apply('german', profile.nemcina_uroven)
+      // experience: kombinace zkusenosti + dovednosti (raw text — pro pohovor je užitečné)
+      if (!next.experience?.trim()) {
+        const parts: string[] = []
+        if (profile.zkusenosti) parts.push(profile.zkusenosti)
+        if (profile.dovednosti) parts.push('Dovednosti: ' + profile.dovednosti)
+        if (parts.length > 0) {
+          next.experience = parts.join('\n')
+          fromProfile.add('experience')
+        }
+      }
+      return next
+    })
+    setPrefilledFromProfile((prev) => {
+      const merged = new Set(prev)
+      fromProfile.forEach((k) => merged.add(k))
+      return merged
+    })
+  }, [profile])
+
+  // Job analysis prefill
   useEffect(() => {
     if (prefilled) return
-    const loadProfile = async () => {
+    const loadAnalysis = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-        if (profile) {
-          const p: Record<string, string> = {}
-          if (profile.pozice) p.position = profile.pozice
-          if (profile.obor) p.field = profile.obor
-          if (profile.nemcina_uroven) p.german = profile.nemcina_uroven
-          if (profile.zkusenosti) p.experience = profile.zkusenosti
-          if (profile.dovednosti) p.experience = (p.experience || '') + (p.experience ? '\n' : '') + 'Dovednosti: ' + profile.dovednosti
-          setFormData(prev => ({ ...prev, ...p }))
-        }
-
         // Analysis prefill
         const params = new URLSearchParams(window.location.search)
         const pr = params.get('prefill')
@@ -110,10 +134,18 @@ export default function PohovorPage() {
       } catch {}
       setPrefilled(true)
     }
-    loadProfile()
+    loadAnalysis()
   }, [prefilled])
 
-  const handleChange = (name: string, value: string) => setFormData(prev => ({ ...prev, [name]: value }))
+  const handleChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }))
+    setPrefilledFromProfile(prev => {
+      if (!prev.has(name)) return prev
+      const next = new Set(prev)
+      next.delete(name)
+      return next
+    })
+  }
 
   const handleSubmit = async () => {
     if (!formData.position?.trim() || !formData.field || !formData.german) {
@@ -180,15 +212,15 @@ export default function PohovorPage() {
     } catch { window.print() }
   }
 
-  const inputClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition-all"
-  const selectClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:border-[#39ff6e]/40 focus:outline-none transition-all appearance-none"
+  const inputClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#fb923c]/40 focus:outline-none focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(251,146,60,0.05)] transition-all"
+  const selectClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:border-[#fb923c]/40 focus:outline-none transition-all appearance-none"
 
   // ─── PRACTICE MODE ───
   if (practiceMode && result) {
     const q = result.questions[practiceIndex]
     return (
       <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
-        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(251,146,60,0.25), transparent 70%)" }} />
         <div className="max-w-2xl mx-auto relative z-10">
           <div className="flex items-center justify-between mb-6">
             <button onClick={() => { setPracticeMode(false); setPracticeIndex(0); setPracticeRevealed(false) }} className="text-white/30 hover:text-white text-sm transition">← Zpět na přehled</button>
@@ -198,16 +230,16 @@ export default function PohovorPage() {
           {/* Progress bar */}
           <div className="flex gap-1 mb-8">
             {result.questions.map((_, i) => (
-              <div key={i} className={`flex-1 h-1 rounded-full transition-all ${i <= practiceIndex ? 'bg-[#39ff6e]/60' : 'bg-white/[0.06]'}`} />
+              <div key={i} className={`flex-1 h-1 rounded-full transition-all ${i <= practiceIndex ? 'bg-[#fb923c]/60' : 'bg-white/[0.06]'}`} />
             ))}
           </div>
 
           {/* Question card */}
           <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6 mb-4">
             <div className="flex items-center gap-2 mb-4">
-              <span className="w-8 h-8 bg-[#39ff6e]/10 rounded-xl flex items-center justify-center text-sm text-[#39ff6e] font-bold">{practiceIndex + 1}</span>
+              <span className="w-8 h-8 bg-[#fb923c]/10 rounded-xl flex items-center justify-center text-sm text-[#fb923c] font-bold">{practiceIndex + 1}</span>
               <span className="text-white/30 text-xs uppercase tracking-wider font-bold">Otázka</span>
-              <button onClick={() => speakText(q.question_de)} className="ml-auto text-white/20 hover:text-[#39ff6e] text-xs px-2 py-1 rounded-lg transition hover:bg-white/[0.04]" title="Přečíst německy">
+              <button onClick={() => speakText(q.question_de)} className="ml-auto text-white/20 hover:text-[#fb923c] text-xs px-2 py-1 rounded-lg transition hover:bg-white/[0.04]" title="Přečíst německy">
                 🔊
               </button>
             </div>
@@ -220,15 +252,15 @@ export default function PohovorPage() {
             <div className="text-center py-8">
               <p className="text-white/30 text-sm mb-4">Zkus si odpovědět nahlas v němčině, pak odkryj vzorovou odpověď</p>
               <button onClick={() => setPracticeRevealed(true)}
-                className="bg-[#39ff6e]/10 border border-[#39ff6e]/20 text-[#39ff6e] font-bold py-3.5 px-8 rounded-2xl transition hover:bg-[#39ff6e]/20 text-sm">
+                className="bg-[#fb923c]/10 border border-[#fb923c]/20 text-[#fb923c] font-bold py-3.5 px-8 rounded-2xl transition hover:bg-[#fb923c]/20 text-sm">
                 Odkrýt odpověď
               </button>
             </div>
           ) : (
-            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-[#39ff6e]/10 p-6 mb-4">
+            <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-[#fb923c]/10 p-6 mb-4">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#39ff6e] text-xs font-bold uppercase tracking-wider">Vzorová odpověď</span>
-                <button onClick={() => speakText(q.answer_de)} className="ml-auto text-white/20 hover:text-[#39ff6e] text-xs px-2 py-1 rounded-lg transition hover:bg-white/[0.04]">
+                <span className="text-[#fb923c] text-xs font-bold uppercase tracking-wider">Vzorová odpověď</span>
+                <button onClick={() => speakText(q.answer_de)} className="ml-auto text-white/20 hover:text-[#fb923c] text-xs px-2 py-1 rounded-lg transition hover:bg-white/[0.04]">
                   🔊
                 </button>
               </div>
@@ -251,12 +283,12 @@ export default function PohovorPage() {
             </button>
             {practiceIndex < result.questions.length - 1 ? (
               <button onClick={() => { setPracticeIndex(practiceIndex + 1); setPracticeRevealed(false) }}
-                className="flex-[2] bg-[#39ff6e]/10 border border-[#39ff6e]/20 text-[#39ff6e] font-bold py-3.5 rounded-2xl transition hover:bg-[#39ff6e]/20 text-sm">
+                className="flex-[2] bg-[#fb923c]/10 border border-[#fb923c]/20 text-[#fb923c] font-bold py-3.5 rounded-2xl transition hover:bg-[#fb923c]/20 text-sm">
                 Další otázka →
               </button>
             ) : (
               <button onClick={() => { setPracticeMode(false); setPracticeIndex(0); setPracticeRevealed(false) }}
-                className="flex-[2] bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3.5 rounded-2xl transition text-sm">
+                className="flex-[2] bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold py-3.5 rounded-2xl transition text-sm">
                 ✓ Hotovo!
               </button>
             )}
@@ -270,7 +302,7 @@ export default function PohovorPage() {
   if (result) {
     return (
       <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
-        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(251,146,60,0.25), transparent 70%)" }} />
         <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-10 bottom-[200px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
 
         <div className="max-w-2xl mx-auto relative z-10">
@@ -278,11 +310,11 @@ export default function PohovorPage() {
             <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white text-sm no-underline transition">← Zpět</Link>
             <div className="flex items-center gap-2">
               <button onClick={() => setShowCz(!showCz)}
-                className={`text-xs px-3 py-2 rounded-xl transition border ${showCz ? 'border-[#39ff6e]/30 text-[#39ff6e] bg-[#39ff6e]/[0.06]' : 'border-white/[0.08] text-white/30 bg-white/[0.04]'}`}>
+                className={`text-xs px-3 py-2 rounded-xl transition border ${showCz ? 'border-[#fb923c]/30 text-[#fb923c] bg-[#fb923c]/[0.06]' : 'border-white/[0.08] text-white/30 bg-white/[0.04]'}`}>
                 🇨🇿 {showCz ? 'CZ' : 'CZ'}
               </button>
               <button onClick={saveDocument} disabled={savingDoc}
-                className={`text-xs px-3 py-2 rounded-xl transition border ${savedDoc ? 'bg-[#39ff6e]/10 border-[#39ff6e]/30 text-[#39ff6e]' : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white'}`}>
+                className={`text-xs px-3 py-2 rounded-xl transition border ${savedDoc ? 'bg-[#fb923c]/10 border-[#fb923c]/30 text-[#fb923c]' : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white'}`}>
                 {savingDoc ? '...' : savedDoc ? '✓ Uloženo' : '💾 Uložit'}
               </button>
               <button onClick={() => setResult(null)} className="text-white/40 hover:text-white text-xs px-3 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Nový</button>
@@ -291,9 +323,9 @@ export default function PohovorPage() {
 
           {/* Header */}
           <div className="rounded-2xl p-5 mb-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
-            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%)" }} />
+            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(251,146,60,0.15), transparent 60%)" }} />
             <div className="relative flex items-center gap-4">
-              <Image src="/images/3d/speech.png" alt="" width={48} height={48} className="drop-shadow-[0_4px_20px_rgba(57,255,110,0.3)]" />
+              <Image src="/images/3d/speech.png" alt="" width={48} height={48} className="drop-shadow-[0_4px_20px_rgba(251,146,60,0.3)]" />
               <div>
                 <h1 className="text-white text-lg font-extrabold m-0">Pohovor: {formData.position}</h1>
                 <p className="text-white/30 text-xs m-0 mt-0.5">{formData.field} · {formData.company || 'obecný pohovor'}</p>
@@ -304,7 +336,7 @@ export default function PohovorPage() {
 
           {/* Practice mode CTA */}
           <button onClick={() => { setPracticeMode(true); setPracticeIndex(0); setPracticeRevealed(false) }}
-            className="w-full bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-3.5 rounded-2xl mb-5 transition hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] active:scale-[0.98] text-sm flex items-center justify-center gap-2.5">
+            className="w-full bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold py-3.5 rounded-2xl mb-5 transition hover:shadow-[0_4px_30px_rgba(251,146,60,0.35)] hover:scale-[1.02] active:scale-[0.98] text-sm flex items-center justify-center gap-2.5">
             <Image src="/images/3d/speech.png" alt="" width={22} height={22} />
             Procvičit otázky (flashcards)
           </button>
@@ -318,7 +350,7 @@ export default function PohovorPage() {
               { id: 'salary' as const, label: 'Plat', icon: '💰' },
             ]).map(tab => (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all border ${activeTab === tab.id ? 'bg-[#39ff6e]/[0.08] border-[#39ff6e]/20 text-[#39ff6e]' : 'bg-white/[0.02] border-white/[0.06] text-white/30 hover:text-white/50'}`}>
+                className={`flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all border ${activeTab === tab.id ? 'bg-[#fb923c]/[0.08] border-[#fb923c]/20 text-[#fb923c]' : 'bg-white/[0.02] border-white/[0.06] text-white/30 hover:text-white/50'}`}>
                 {tab.icon} {tab.label} {tab.count ? `(${tab.count})` : ''}
               </button>
             ))}
@@ -331,22 +363,22 @@ export default function PohovorPage() {
                 {result.questions.map((q, i) => (
                   <div key={i} className="bg-[#111120]/80 backdrop-blur-sm border border-white/[0.06] rounded-2xl overflow-hidden">
                     <button onClick={() => setExpandedQ(expandedQ === i ? null : i)} className="w-full px-4 py-3.5 flex items-start gap-3 text-left">
-                      <span className="w-7 h-7 bg-[#39ff6e]/10 rounded-lg flex items-center justify-center text-xs text-[#39ff6e] font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
+                      <span className="w-7 h-7 bg-[#fb923c]/10 rounded-lg flex items-center justify-center text-xs text-[#fb923c] font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
                       <div className="flex-1 min-w-0">
                         <p className="text-white text-sm font-medium">{q.question_de}</p>
                         {showCz && <p className="text-white/25 text-xs mt-0.5">{q.question_cz}</p>}
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={(e) => { e.stopPropagation(); speakText(q.question_de) }} className="text-white/15 hover:text-[#39ff6e] text-xs p-1 rounded transition">🔊</button>
+                        <button onClick={(e) => { e.stopPropagation(); speakText(q.question_de) }} className="text-white/15 hover:text-[#fb923c] text-xs p-1 rounded transition">🔊</button>
                         <span className={`text-white/20 text-xs transition-transform ${expandedQ === i ? 'rotate-180' : ''}`}>▼</span>
                       </div>
                     </button>
                     {expandedQ === i && (
                       <div className="px-4 pb-4 border-t border-white/[0.06]">
-                        <div className="mt-3 bg-[#39ff6e]/[0.03] border border-[#39ff6e]/[0.08] rounded-xl p-3">
+                        <div className="mt-3 bg-[#fb923c]/[0.03] border border-[#fb923c]/[0.08] rounded-xl p-3">
                           <div className="flex items-center justify-between mb-1">
-                            <p className="text-xs text-[#39ff6e]/70 font-semibold">Vzorová odpověď</p>
-                            <button onClick={() => speakText(q.answer_de)} className="text-white/20 hover:text-[#39ff6e] text-xs p-1 rounded transition">🔊</button>
+                            <p className="text-xs text-[#fb923c]/70 font-semibold">Vzorová odpověď</p>
+                            <button onClick={() => speakText(q.answer_de)} className="text-white/20 hover:text-[#fb923c] text-xs p-1 rounded transition">🔊</button>
                           </div>
                           <p className="text-white/80 text-sm leading-relaxed">{q.answer_de}</p>
                           {showCz && <p className="text-white/30 text-xs mt-2 italic">{q.answer_cz}</p>}
@@ -388,7 +420,7 @@ export default function PohovorPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="text-white text-sm font-medium">{p.de}</p>
-                        <button onClick={() => speakText(p.de)} className="text-white/15 hover:text-[#39ff6e] text-xs p-0.5 rounded transition flex-shrink-0">🔊</button>
+                        <button onClick={() => speakText(p.de)} className="text-white/15 hover:text-[#fb923c] text-xs p-0.5 rounded transition flex-shrink-0">🔊</button>
                       </div>
                       {showCz && <p className="text-white/30 text-xs">{p.cz}</p>}
                       <p className="text-white/15 text-[10px] mt-0.5 italic">{p.context}</p>
@@ -400,8 +432,8 @@ export default function PohovorPage() {
 
             {/* Salary tab */}
             {activeTab === 'salary' && result.salary_tip && (
-              <div className="bg-[#111120]/80 backdrop-blur-sm border border-[#39ff6e]/10 rounded-2xl p-5 mb-6">
-                <h2 className="text-[#39ff6e]/70 font-bold text-sm mb-3 flex items-center gap-2">
+              <div className="bg-[#111120]/80 backdrop-blur-sm border border-[#fb923c]/10 rounded-2xl p-5 mb-6">
+                <h2 className="text-[#fb923c]/70 font-bold text-sm mb-3 flex items-center gap-2">
                   <Image src="/images/3d/gem.png" alt="" width={18} height={18} />
                   Platové očekávání (Lohnvorstellung)
                 </h2>
@@ -443,7 +475,7 @@ export default function PohovorPage() {
   // ─── FORM VIEW ───
   return (
     <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
-      <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] right-[10%]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+      <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] right-[10%]" style={{ background: "radial-gradient(circle, rgba(251,146,60,0.25), transparent 70%)" }} />
       <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-8 bottom-[100px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
 
       <div className="max-w-2xl mx-auto relative z-10">
@@ -452,7 +484,7 @@ export default function PohovorPage() {
         {/* Hero header */}
         <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
           <Image src="/images/3d/speech.png" alt="" width={120} height={120} className="absolute -right-4 -bottom-4 opacity-[0.08]" />
-          <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(100,60,255,0.1), transparent 60%)" }} />
+          <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(251,146,60,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(100,60,255,0.1), transparent 60%)" }} />
           <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
             <pattern id="interviewGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
               <circle cx="1" cy="1" r="0.8" fill="white"/>
@@ -460,7 +492,7 @@ export default function PohovorPage() {
             <rect width="100%" height="100%" fill="url(#interviewGrid)"/>
           </svg>
           <div className="relative flex items-center gap-4">
-            <Image src="/images/3d/speech.png" alt="" width={56} height={56} className="drop-shadow-[0_4px_20px_rgba(57,255,110,0.3)]" />
+            <Image src="/images/3d/speech.png" alt="" width={56} height={56} className="drop-shadow-[0_4px_20px_rgba(251,146,60,0.3)]" />
             <div>
               <h1 className="text-white text-2xl font-extrabold m-0 tracking-tight">AI příprava na pohovor</h1>
               <p className="text-white/35 text-sm m-0 mt-1">10 otázek · odpovědi · fráze · procvičování · výslovnost</p>
@@ -471,13 +503,13 @@ export default function PohovorPage() {
         {/* Feature badges */}
         <div className="bg-[#111120]/80 backdrop-blur-sm rounded-xl border border-white/[0.06] p-3 mb-6">
           <div className="flex items-center gap-3 text-xs text-white/30 justify-center flex-wrap">
-            <span className="flex items-center gap-1"><span className="text-[#39ff6e]">❓</span> 10 otázek</span>
-            <span className="flex items-center gap-1"><span className="text-[#39ff6e]">✅</span> Odpovědi</span>
+            <span className="flex items-center gap-1"><span className="text-[#fb923c]">❓</span> 10 otázek</span>
+            <span className="flex items-center gap-1"><span className="text-[#fb923c]">✅</span> Odpovědi</span>
             <span className="flex items-center gap-1"><span className="text-orange-400">⚠️</span> Tipy</span>
             <span className="flex items-center gap-1"><span className="text-blue-400">💬</span> Fráze</span>
             <span className="flex items-center gap-1"><span className="text-yellow-400">💰</span> Plat</span>
             <span className="flex items-center gap-1"><span className="text-purple-400">🔊</span> Výslovnost</span>
-            <span className="flex items-center gap-1"><span className="text-[#39ff6e]">🃏</span> Flashcards</span>
+            <span className="flex items-center gap-1"><span className="text-[#fb923c]">🃏</span> Flashcards</span>
           </div>
         </div>
 
@@ -485,9 +517,9 @@ export default function PohovorPage() {
           <div className="space-y-5">
 
             {prefilled && Object.keys(formData).length > 2 && (
-              <div className="bg-[#39ff6e]/[0.06] border border-[#39ff6e]/20 rounded-xl p-3 flex items-center gap-2">
+              <div className="bg-[#fb923c]/[0.06] border border-[#fb923c]/20 rounded-xl p-3 flex items-center gap-2">
                 <Image src="/images/3d/key.png" alt="" width={18} height={18} />
-                <span className="text-[#39ff6e]/80 text-sm">Údaje vyplněny z profilu. Uprav co potřebuješ.</span>
+                <span className="text-[#fb923c]/80 text-sm">Údaje vyplněny z profilu. Uprav co potřebuješ.</span>
               </div>
             )}
 
@@ -497,16 +529,31 @@ export default function PohovorPage() {
                 <Image src="/images/3d/target.png" alt="" width={18} height={18} />
                 <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Pozice a obor</span>
               </div>
-              <input type="text" value={formData.position || ''} onChange={(e) => handleChange('position', e.target.value)} placeholder="Cílová pozice *" className={inputClass} />
+              <div className="relative">
+                <input type="text" value={formData.position || ''} onChange={(e) => handleChange('position', e.target.value)} placeholder="Cílová pozice *" className={inputClass} />
+                {prefilledFromProfile.has('position') && (
+                  <span className="absolute top-1 right-2 text-[9px] text-[#fb923c]/70 bg-[#fb923c]/[0.08] border border-[#fb923c]/20 rounded-md px-1.5 py-0.5">z profilu</span>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-3">
-                <select value={formData.field || ''} onChange={(e) => handleChange('field', e.target.value)} className={selectClass}>
-                  <option value="">Obor *</option>
-                  {FIELDS.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
-                <select value={formData.german || ''} onChange={(e) => handleChange('german', e.target.value)} className={selectClass}>
-                  <option value="">Úroveň němčiny *</option>
-                  {GERMAN.map(o => <option key={o} value={o}>{o}</option>)}
-                </select>
+                <div className="relative">
+                  <select value={formData.field || ''} onChange={(e) => handleChange('field', e.target.value)} className={selectClass}>
+                    <option value="">Obor *</option>
+                    {FIELDS.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                  {prefilledFromProfile.has('field') && (
+                    <span className="absolute top-1 right-8 text-[9px] text-[#fb923c]/70 bg-[#fb923c]/[0.08] border border-[#fb923c]/20 rounded-md px-1.5 py-0.5">z profilu</span>
+                  )}
+                </div>
+                <div className="relative">
+                  <select value={formData.german || ''} onChange={(e) => handleChange('german', e.target.value)} className={selectClass}>
+                    <option value="">Úroveň němčiny *</option>
+                    {GERMAN.map(o => <option key={o} value={o}>{o}</option>)}
+                  </select>
+                  {prefilledFromProfile.has('german') && (
+                    <span className="absolute top-1 right-8 text-[9px] text-[#fb923c]/70 bg-[#fb923c]/[0.08] border border-[#fb923c]/20 rounded-md px-1.5 py-0.5">z profilu</span>
+                  )}
+                </div>
               </div>
               <input type="text" value={formData.company || ''} onChange={(e) => handleChange('company', e.target.value)} placeholder="Firma / agentura (volitelné — AI přizpůsobí otázky)" className={inputClass} />
             </div>
@@ -516,6 +563,9 @@ export default function PohovorPage() {
               <div className="flex items-center gap-2 mb-1">
                 <Image src="/images/3d/briefcase.png" alt="" width={18} height={18} />
                 <span className="text-white/50 text-xs font-bold uppercase tracking-wider">Tvé zkušenosti (volitelné)</span>
+                {prefilledFromProfile.has('experience') && (
+                  <span className="text-[10px] text-[#fb923c]/70 bg-[#fb923c]/[0.08] border border-[#fb923c]/20 rounded-md px-1.5 py-0.5 ml-1">z profilu</span>
+                )}
               </div>
               <textarea value={formData.experience || ''} onChange={(e) => handleChange('experience', e.target.value)} placeholder="Krátce popiš co umíš — AI přizpůsobí odpovědi tvému profilu" rows={3} className={`${inputClass} resize-none`} />
             </div>
@@ -527,7 +577,7 @@ export default function PohovorPage() {
             )}
 
             <button onClick={handleSubmit} disabled={generating}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] active:scale-[0.98]">
+              className="w-full relative overflow-hidden bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_4px_30px_rgba(251,146,60,0.35)] hover:scale-[1.02] active:scale-[0.98]">
               {generating ? (
                 <span className="flex items-center justify-center gap-2.5">
                   <span className="w-5 h-5 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />

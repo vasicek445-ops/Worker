@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
+import TrustpilotWidget from "./components/TrustpilotWidget";
 
 /* ─── Handle auth redirects (recovery, email confirm) ─── */
 function useAuthRedirect() {
@@ -72,15 +73,14 @@ function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
 
 /* ─── Navbar links ─── */
 const NAV_LINKS = [
-  { label: "Práce", href: "/prace" },
-  { label: "Bydlení", href: "/bydleni-preview" },
-  { label: "Dokumenty", href: "/dokumenty-preview" },
-  { label: "Plány", href: "/cenik" },
+  { label: "Funkce", href: "/#funkce" },
+  { label: "O nás", href: "/o-nas" },
+  { label: "Ceník", href: "/pricing" },
   { label: "Blog", href: "/blog" },
 ];
 
 /* ─── Navbar — Flixy style: white bg, logo left, links center, auth right ─── */
-function Navbar() {
+export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -100,8 +100,10 @@ function Navbar() {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center">
         {/* Logo — left */}
-        <Link href="/" className="text-xl font-extrabold tracking-tight text-white">
-          WOKER
+        <Link href="/" className="flex items-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="Woker" className="h-8 w-auto" />
+          <span className="text-xl font-extrabold tracking-tight text-white">WOKER</span>
         </Link>
 
         {/* Desktop nav — center, pushed right */}
@@ -226,11 +228,11 @@ function AnimatedJobsFeed() {
           </div>
           <div className="flex items-center gap-2">
             {job.tag && (
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${job.tag === "Nové" ? "bg-[#39ff6e]/20 text-[#39ff6e]" : "bg-amber-500/20 text-amber-400"}`}>
+              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${job.tag === "Nové" ? "bg-[#fb923c]/20 text-[#fb923c]" : "bg-amber-500/20 text-amber-400"}`}>
                 {job.tag}
               </span>
             )}
-            <span className="text-[#39ff6e] text-[11px] font-bold whitespace-nowrap">{job.salary}</span>
+            <span className="text-[#fb923c] text-[11px] font-bold whitespace-nowrap">{job.salary}</span>
           </div>
         </motion.div>
       ))}
@@ -314,7 +316,7 @@ function BentoCard({
           {imagePlaceholder === "housing" && large && <AnimatedHousingFeed />}
           <div
             className={`absolute left-0 ${large ? "top-6 bottom-6" : "top-6 bottom-6"} w-[3px] rounded-full ${
-              accent === "green" ? "bg-[#39ff6e]" : "bg-cyan-400"
+              accent === "green" ? "bg-[#fb923c]" : "bg-cyan-400"
             }`}
           />
           <div className="pl-4">
@@ -328,7 +330,7 @@ function BentoCard({
             <p className="text-sm text-white/60 leading-relaxed mb-4">{text}</p>
             <span
               className={`text-sm font-medium ${
-                accent === "green" ? "text-[#39ff6e]" : "text-cyan-400"
+                accent === "green" ? "text-[#fb923c]" : "text-cyan-400"
               } group-hover:underline`}
             >
               {cta}
@@ -383,7 +385,7 @@ function ComparisonTable() {
         <thead>
           <tr className="border-b border-white/[0.08]">
             <th className="text-left py-3 px-4 text-white/40 font-medium" />
-            <th className="text-left py-3 px-4 text-[#39ff6e] font-bold">Woker</th>
+            <th className="text-left py-3 px-4 text-[#fb923c] font-bold">Woker</th>
             <th className="text-left py-3 px-4 text-white/40 font-medium">Agentura</th>
             <th className="text-left py-3 px-4 text-white/40 font-medium">Sám</th>
           </tr>
@@ -406,74 +408,140 @@ function ComparisonTable() {
   );
 }
 
-/* ─── Footer ─── */
-function Footer() {
-  const cols = [
-    {
-      title: "Práce",
-      links: [
-        { label: "Nabídky práce", href: "/dashboard/nabidky-prace" },
-        { label: "Smart Matching", href: "/dashboard/smart-matching" },
-        { label: "Kontakty", href: "/dashboard/kontakty" },
-      ],
-    },
-    {
-      title: "Bydlení",
-      links: [
-        { label: "Byty & WG", href: "/dashboard/bydleni" },
-        { label: "Penziony", href: "/dashboard/bydleni?typ=penziony" },
-        { label: "Pro pracující", href: "/dashboard/bydleni?typ=pracujici" },
-        { label: "Hostely", href: "/dashboard/bydleni?typ=hostely" },
-      ],
-    },
-    {
-      title: "Dokumenty",
-      links: [
-        { label: "Životopis", href: "/dokumenty" },
-        { label: "Motivační dopis", href: "/dokumenty" },
-        { label: "Bewerbung", href: "/dokumenty" },
-      ],
-    },
-    {
-      title: "O nás",
-      links: [
-        { label: "Podmínky", href: "/podminky" },
-        { label: "Ochrana dat", href: "/ochrana-udaju" },
-        { label: "Kontakt", href: "/kontakty" },
-      ],
-    },
+/* ─── VS Card ─── */
+function VSCard() {
+  const items = [
+    { label: "Najde nabídku práce ve Švýcarsku", left: true, right: true },
+    { label: "Mluví česky / slovensky", left: true, right: true },
+    { label: "Bewerbung v němčině šitý na pozici", left: false, right: true },
+    { label: "Byt s přímým kontaktem na majitele", left: false, right: true },
+    { label: "Příprava na pohovor + Lohnvorstellung", left: false, right: true },
+    { label: "Nezávislá kontrola smlouvy", left: false, right: true },
+    { label: "Dostupné 24/7 a návod na povolení / AHV", left: false, right: true },
   ];
 
   return (
-    <footer className="border-t border-white/[0.06] bg-[#0a0a12]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
-          {cols.map((col) => (
-            <div key={col.title}>
-              <h4 className="text-sm font-semibold text-white mb-3">{col.title}</h4>
-              <ul className="space-y-2">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-white/40 hover:text-white/70 transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+    <div className="relative rounded-3xl overflow-hidden border border-white/[0.08]">
+      <div className="grid grid-cols-2">
+        {/* LEFT — Zprostředkovatel */}
+        <div className="bg-white/[0.04] p-5 sm:p-7 pr-7 sm:pr-10 flex flex-col">
+          <h3 className="font-extrabold text-white/70 text-[10px] sm:text-xs uppercase tracking-wider mb-6 sm:mb-8 text-center leading-tight pt-4">
+            Zprostředkovatel<br />
+            <span className="text-white/40">(ČR / SK)</span>
+          </h3>
+          <ul className="space-y-3.5 sm:space-y-4">
+            {items.map((item, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span
+                  className={`flex-shrink-0 mt-0.5 text-sm sm:text-base font-bold ${
+                    item.left ? "text-[#fb923c]" : "text-red-400"
+                  }`}
+                >
+                  {item.left ? "✓" : "✕"}
+                </span>
+                <span className="text-white/60 text-xs sm:text-sm font-medium leading-snug">
+                  {item.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-auto pt-4 border-t border-white/[0.08] flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/illustrations/cost/worried.png" alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain flex-shrink-0" />
+            <span className="text-white/70 text-xs sm:text-sm font-bold">~600 EUR</span>
+          </div>
         </div>
-        <div className="border-t border-white/[0.06] pt-8">
-          <p className="text-xl font-extrabold tracking-tight text-white mb-3">WOKER</p>
-          <p className="text-xs text-white/30">
-            &copy; 2026 Woker &middot; Práce a bydlení ve Švýcarsku
-          </p>
-          <p className="text-xs text-white/20 mt-1">
-            Žádné skryté poplatky. Tvá data nikdy neprodáváme.
-          </p>
+
+        {/* RIGHT — Woker */}
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-5 sm:p-7 pl-7 sm:pl-10 text-white flex flex-col">
+          <h3 className="font-extrabold text-white text-[10px] sm:text-xs uppercase tracking-wider mb-6 sm:mb-8 text-center leading-tight pt-4">
+            Woker
+          </h3>
+          <ul className="space-y-3.5 sm:space-y-4">
+            {items.map((item, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="flex-shrink-0 mt-0.5 text-sm sm:text-base font-bold text-white">✓</span>
+                <span className="text-white text-xs sm:text-sm font-medium leading-snug">
+                  {item.label}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-auto pt-4 border-t border-white/30 flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/illustrations/cost/happy.png" alt="" className="w-7 h-7 sm:w-9 sm:h-9 object-contain flex-shrink-0" />
+            <span className="text-white text-xs sm:text-sm font-extrabold">9 CHF / měs.</span>
+          </div>
+        </div>
+      </div>
+
+      {/* VS badge */}
+      <div className="absolute top-2 sm:top-3 left-1/2 -translate-x-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#0a0a12] border-2 border-white/15 flex items-center justify-center shadow-lg">
+        <span className="text-white font-extrabold text-[11px] sm:text-xs tracking-wider">VS</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Footer ─── */
+export function Footer() {
+  return (
+    <footer className="border-t border-white/[0.06] bg-[#0a0a12]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <Link href="/" className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="Woker" className="h-7 w-auto" />
+            <span className="text-xl font-extrabold tracking-tight text-white">WOKER</span>
+          </Link>
+          <nav className="flex flex-wrap items-center gap-x-7 gap-y-2">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-white/50 hover:text-white transition-colors font-medium"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="border-t border-white/[0.06] mt-8 pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+          <div>
+            <p className="text-xs text-white/30">
+              Woker &copy; Copyright 2026, Všechna práva vyhrazena
+            </p>
+            <p className="text-xs text-white/20 mt-1">
+              Žádné skryté poplatky. Tvá data nikdy neprodáváme.
+            </p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2.5">
+              <Link href="/podminky" className="text-xs text-white/35 hover:text-white/70 transition-colors">
+                Obchodní podmínky
+              </Link>
+              <Link href="/ochrana-udaju" className="text-xs text-white/35 hover:text-white/70 transition-colors">
+                Ochrana osobních údajů
+              </Link>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <a href="https://instagram.com/vasicenko" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-white/35 hover:text-[#fb923c] transition-colors">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+              </svg>
+            </a>
+            <a href="https://tiktok.com/@vasicenko" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="text-white/35 hover:text-[#fb923c] transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+              </svg>
+            </a>
+            <a href="https://www.facebook.com/vasicenko" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-white/35 hover:text-[#fb923c] transition-colors">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </footer>
@@ -540,29 +608,29 @@ export default function MarketingPage() {
             </FadeIn>
             <FadeIn delay={0.05}>
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white">
-                Začni vydělávat ve Švýcarsku už do 30 dní.
+                Začni <span className="text-[#fb923c]">vydělávat</span> ve Švýcarsku už <span className="text-[#fb923c]">do 30 dní</span>.
               </h1>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <p className="text-base sm:text-lg text-white/50 mb-8 leading-relaxed">
-                <strong className="text-white">#1 AI powered platforma</strong> co za tebe vyřeší celý proces během 10 minut.
+              <p className="text-base sm:text-lg text-white font-semibold mb-8 leading-relaxed">
+                <strong className="text-[#fb923c]">#1 AI powered platforma</strong> co za tebe vyřeší celý proces během <strong className="text-[#fb923c]">10 minut</strong>.
               </p>
             </FadeIn>
             <FadeIn delay={0.15}>
               <ul className="space-y-3 mb-8">
                 {[
-                  "1 007 agentur s přímými kontakty — nejrychlejší start ve Švýcarsku",
-                  "4 000+ ubytování s přímými kontakty — byty, WG, Gasthaus — od 400 CHF/měsíc podle kantonu",
-                  "AI nástroje co za tebe napíšou životopis, motivační dopis, zkontrolují smlouvy a mnohem víc — na pár kliknutí",
-                  "Smart Matching — vyplníš profil, AI najde agentury co hledají přesně tebe a odešle přihlášku jedním kliknutím",
-                  "Kompletní průvodce pojištěním, daněmi a pracovním povolením ve Švýcarsku",
-                  "Spoj se s lidmi co už ve Švýcarsku jsou nebo se tam chystají — tak jako právě ty",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-white/70">
-                    <svg className="w-5 h-5 text-[#39ff6e] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <><span className="text-[#fb923c]">1 007 Temporärbüro</span> s přímými kontakty — <span className="text-[#fb923c]">nejrychlejší start</span> ve Švýcarsku</>,
+                  <><span className="text-[#fb923c]">4 000+ ubytování</span> s přímými kontakty — byty, WG, Gasthaus — <span className="text-[#fb923c]">od 400 CHF/měsíc</span> podle kantonu</>,
+                  <><span className="text-[#fb923c]">AI nástroje</span> co za tebe napíšou životopis, motivační dopis, zkontrolují smlouvy a mnohem víc — <span className="text-[#fb923c]">na pár kliknutí</span></>,
+                  <><span className="text-[#fb923c]">Smart Matching</span> — vyplníš profil, AI najde Temporärbüro co hledají přesně tebe a odešle přihlášku <span className="text-[#fb923c]">jedním kliknutím</span></>,
+                  <><span className="text-[#fb923c]">Kompletní průvodce</span> pojištěním, daněmi a pracovním povolením ve Švýcarsku</>,
+                  <><span className="text-[#fb923c]">Spoj se s lidmi</span> co už ve Švýcarsku jsou nebo se tam chystají — <span className="text-[#fb923c]">tak jako právě ty</span></>,
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-sm text-white font-semibold">
+                    <svg className="w-5 h-5 text-[#fb923c] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    {item}
+                    <span>{item}</span>
                   </li>
                 ))}
               </ul>
@@ -576,7 +644,7 @@ export default function MarketingPage() {
                   Zaregistruj se a prozkoumej Woker &rarr;
                 </Link>
                 <Link
-                  href="/prace"
+                  href="/#funkce"
                   className="flex items-center gap-2 px-4 py-3.5 text-base font-medium text-white/70 hover:text-white transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -655,19 +723,19 @@ export default function MarketingPage() {
                 {
                   num: "1",
                   title: "Vyplň profil",
-                  desc: "Řekni nám co umíš, kde chceš pracovat a jakou máš němčinu.",
+                  desc: <>Řekni nám <span className="text-[#fb923c]">co umíš</span>, kde chceš pracovat a <span className="text-[#fb923c]">jakou máš němčinu</span>.</>,
                   icon: "/illustrations/steps/01-profile.png?v=3",
                 },
                 {
                   num: "2",
                   title: "AI vyřeší zbytek",
-                  desc: "Woker ti najde agentury, napíše životopis v němčině a odešle přihlášky.",
+                  desc: <>Woker ti <span className="text-[#fb923c]">najde Temporärbüro</span>, napíše životopis v němčině a <span className="text-[#fb923c]">odešle přihlášky</span>.</>,
                   icon: "/illustrations/steps/02-ai.png?v=3",
                 },
                 {
                   num: "3",
                   title: "Začni vydělávat",
-                  desc: "Nastoupíš do práce ve Švýcarsku. Průměrně do 30 dní.",
+                  desc: <>Nastoupíš do práce <span className="text-[#fb923c]">ve Švýcarsku</span>. Průměrně <span className="text-[#fb923c]">do 30 dní</span>.</>,
                   icon: "/illustrations/steps/03-earning.png?v=3",
                 },
               ].map((step, i) => (
@@ -679,7 +747,7 @@ export default function MarketingPage() {
                     </div>
                     <div>
                       <h3 className="text-white font-bold text-xl mb-2">{step.title}</h3>
-                      <p className="text-white/50 text-base leading-relaxed">{step.desc}</p>
+                      <p className="text-white text-base leading-relaxed">{step.desc}</p>
                     </div>
                   </div>
                 </FadeIn>
@@ -718,7 +786,7 @@ export default function MarketingPage() {
           <FadeIn>
             <div className="flex justify-center">
               <div className="relative">
-                <div className="w-[280px] h-[560px] rounded-[40px] border-[6px] border-white/10 bg-[#111128] overflow-hidden shadow-2xl shadow-[#39ff6e]/5">
+                <div className="w-[280px] h-[560px] rounded-[40px] border-[6px] border-white/10 bg-[#111128] overflow-hidden shadow-2xl shadow-[#fb923c]/5">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[28px] bg-[#0a0a12] rounded-b-2xl" />
                   <img
                     src="/images/macbook-mockup.png"
@@ -726,7 +794,7 @@ export default function MarketingPage() {
                     className="w-full h-full object-cover opacity-80"
                   />
                 </div>
-                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full bg-[#39ff6e]/5 blur-3xl" />
+                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] rounded-full bg-[#fb923c]/5 blur-3xl" />
               </div>
             </div>
           </FadeIn>
@@ -736,14 +804,14 @@ export default function MarketingPage() {
             <FadeIn delay={0.1}>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight mb-6">
                 Celá tvá cesta za prací ve Švýcarsku v{" "}
-                <span className="text-[#39ff6e]">1 AI nástroji</span>
+                <span className="text-[#fb923c]">1 AI nástroji</span>
               </h2>
             </FadeIn>
 
             <FadeIn delay={0.2}>
               <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-6 mb-6">
                 <p className="text-white/60 text-base leading-relaxed italic">
-                  &ldquo;Měsíc jsem googlil agentury, psal emaily německy přes Google Translate a nikdo neodpovídal. Přes Woker jsem za večer měl hotový životopis v němčině, seznam agentur v mém kantonu a tři přihlášky odeslané. Za 3 týdny jsem nastoupil.&rdquo;
+                  &ldquo;Měsíc jsem googlil Temporärbüro, psal emaily německy přes Google Translate a nikdo neodpovídal. Přes Woker jsem za večer měl hotový životopis v němčině, seznam Temporärbüro v mém kantonu a tři přihlášky odeslané. Za 3 týdny jsem nastoupil.&rdquo;
                 </p>
                 <div className="flex items-center gap-3 mt-4">
                   <img src="/images/testimonial-martin.png" alt="Martin K." className="w-10 h-10 rounded-full object-cover" />
@@ -753,7 +821,7 @@ export default function MarketingPage() {
                   </div>
                   <div className="ml-auto flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <span key={i} className="text-[#39ff6e] text-lg">★</span>
+                      <span key={i} className="text-[#fb923c] text-lg">★</span>
                     ))}
                   </div>
                 </div>
@@ -762,8 +830,8 @@ export default function MarketingPage() {
 
             <FadeIn delay={0.3}>
               <div className="flex items-center gap-2 text-white/50 text-sm">
-                <span className="text-[#39ff6e]">↗</span>
-                <span>AI asistent, životopis, agentury — vše na jednom místě</span>
+                <span className="text-[#fb923c]">↗</span>
+                <span>AI asistent, životopis, Temporärbüro — vše na jednom místě</span>
               </div>
             </FadeIn>
           </div>
@@ -777,7 +845,7 @@ export default function MarketingPage() {
             <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
               Připoj Gmail a Woker za tebe osloví{" "}
               <span className="text-orange-400">
-                švýcarské firmy, 1007 pracovních agentur a majitele bytů
+                švýcarské firmy, 1007 Temporärbüro a majitele bytů
               </span>{" "}
               na míru tvé situaci:
             </h2>
@@ -786,7 +854,7 @@ export default function MarketingPage() {
       </section>
 
       {/* ── FEATURE CARDS (Flixy-style) ── */}
-      <section className="py-10 sm:py-16 px-4 sm:px-6">
+      <section id="funkce" className="scroll-mt-20 py-10 sm:py-16 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
             {[
@@ -794,13 +862,13 @@ export default function MarketingPage() {
                 image: "/illustrations/cards/01-outreach.png?v=3",
                 tag: "Smart Apply",
                 title: "Chytrá žádost o práci i bydlení",
-                desc: "Připoj Gmail a Woker za tebe napíše profesionální německé zprávy zaměstnavatelům, agenturám i na bydlení — dle švýcarských standardů. Ty klikneš send a emaily vypadají, jako bys je napsal sám — nejsou generické a odcházejí z tvé schránky. Odpovědi chodí přímo tobě.",
+                desc: "Připoj Gmail a Woker za tebe napíše profesionální německé zprávy zaměstnavatelům, Temporärbüro i na bydlení — dle švýcarských standardů. Ty klikneš send a emaily vypadají, jako bys je napsal sám — nejsou generické a odcházejí z tvé schránky. Odpovědi chodí přímo tobě.",
               },
               {
                 image: "/illustrations/cards/02-prace.png?v=3",
                 tag: "Smart Jobs",
-                title: "1007 pracovních agentur a stovky švýcarských firem",
-                desc: "Volej rovnou tomu, kdo rozhoduje — manuálně nebo přes Smart Apply. Filtruj podle kantonu, jazyka i oboru; u každé najdeš telefon, e-mail i adresu. Agentury jsou nejrychlejší cesta do práce — nástup během několika dní. Firmy jsou pro ty, co přes agenturu pracují delší dobu a chtějí se posunout.",
+                title: "1007 Temporärbüro a stovky švýcarských firem",
+                desc: "Volej rovnou tomu, kdo rozhoduje — manuálně nebo přes Smart Apply. Filtruj podle kantonu, jazyka i oboru; u každé najdeš telefon, e-mail i adresu. Temporärbüro jsou nejrychlejší cesta do práce — nástup během několika dní. Firmy jsou pro ty, co přes Temporärbüro pracují delší dobu a chtějí se posunout.",
               },
               {
                 image: "/illustrations/cards/03-bydleni.png?v=3",
@@ -852,46 +920,220 @@ export default function MarketingPage() {
         </div>
       </section>
 
-      {/* ── COMPARISON TABLE ── */}
+      {/* ── SET & FORGET ── */}
       <section className="py-16 sm:py-24 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto">
-          <FadeIn>
-            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12">
-              Woker vs. agentura vs. na vlastní pěst
-            </h2>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden">
-              <ComparisonTable />
-            </div>
-          </FadeIn>
+        <div className="max-w-6xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-12 sm:gap-16 items-center">
+            <FadeIn>
+              <h2 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-6">
+                <span className="text-orange-400">Jednou</span> si vyplníš profil a zbytek procesu jede <span className="text-orange-400">automatizovaně</span>.
+              </h2>
+              <p className="text-white/60 text-base sm:text-lg leading-relaxed">
+                Myslím si, že Woker je navržený <span className="text-orange-400 font-semibold">blbuvzdorně</span>
+                {" "}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/illustrations/blbuvzdorne.png" alt="" className="inline-block w-7 h-7 sm:w-8 sm:h-8 align-middle object-contain" />
+                {" "}
+                — stačí si doslova <span className="text-orange-400 font-semibold">jednou vyplnit profil</span> a algoritmus z něj vezme údaje a automaticky ti předvyplní všechno ostatní. Nemusíš nic dalšího vyplňovat a <span className="text-orange-400 font-semibold">šetříš si drahocenný čas</span>.
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.15}>
+              <div className="relative aspect-[4/5] rounded-3xl bg-gradient-to-br from-orange-500/[0.08] to-white/[0.02] border border-white/[0.06] flex items-center justify-center overflow-hidden">
+                <p className="text-white/30 text-sm">Obrázek/mockup sem</p>
+              </div>
+            </FadeIn>
+          </div>
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
-      <section className="relative py-20 sm:py-28 px-4 sm:px-6 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#39ff6e]/[0.03] blur-[150px] pointer-events-none" />
-        <div className="relative max-w-3xl mx-auto text-center">
+      {/* ── COST REPLACEMENT ── */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <FadeIn>
+            <div className="rounded-3xl bg-white/[0.03] border border-white/[0.06] p-6 sm:p-10">
+              <ul className="space-y-5 sm:space-y-6">
+                {[
+                  { icon: "/illustrations/cost/apply.png", title: "Smart Apply — auto-žádost o práci i bydlení", replaces: ["Sonara", "LoopCV"], price: 29 },
+                  { icon: "/illustrations/cost/cv.png", title: "Smart CV & Bewerbungsdossier", replaces: ["Canva Pro", "Rezi"], price: 34 },
+                  { icon: "/illustrations/cost/letter.png?v=2", title: "AI motivační dopisy a komunikace", replaces: ["ChatGPT Plus"], price: 16 },
+                  { icon: "/illustrations/cost/interview.png", title: "Smart Interview — AI příprava na pohovor", replaces: ["Yoodli Pro"], price: 6 },
+                  { icon: "/illustrations/cost/housing.png", title: "Smart Housing — hledání bytu", replaces: ["Homegate"], price: 30 },
+                  { icon: "/illustrations/cost/translation.png", title: "Překlady DE/EN ↔ CZ", replaces: ["DeepL Pro"], price: 8 },
+                  { icon: "/illustrations/cost/outreach.png?v=2", title: "Smart Outreach — kontakt na firmy", replaces: ["Lemlist"], price: 62 },
+                  { icon: "/illustrations/cost/tracking.png?v=2", title: "Sledování přihlášek", replaces: ["Huntr"], price: 31 },
+                ].map((row) => (
+                  <li key={row.title} className="flex items-start gap-4 sm:gap-5">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={row.icon} alt="" className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 object-contain" />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-white font-semibold text-base sm:text-lg leading-tight">{row.title}</h3>
+                      <p className="text-white/40 text-xs sm:text-sm mt-1">
+                        Nahrazuje:{" "}
+                        <span className="text-white/60 font-medium">{row.replaces.join(", ")}</span>
+                      </p>
+                    </div>
+                    <div className="text-white font-semibold text-base sm:text-lg whitespace-nowrap">
+                      CHF {row.price}
+                    </div>
+                  </li>
+                ))}
+
+                <li className="flex items-start gap-4 sm:gap-5 pt-4 mt-2 border-t border-white/[0.05] opacity-80">
+                  <span className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 flex items-center justify-center text-2xl sm:text-3xl" aria-hidden="true">🔗</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white/85 font-medium text-sm sm:text-base leading-tight">
+                      Čestná zmínka: Herohero / Patreon influenceři
+                    </h3>
+                    <p className="text-white/40 text-xs sm:text-sm mt-1">
+                      Co dostaneš:{" "}
+                      <span className="text-white/60 font-medium">jen sdílené odkazy</span>
+                    </p>
+                  </div>
+                  <div className="text-white/70 font-medium text-sm sm:text-base whitespace-nowrap">
+                    CHF 6–15+
+                  </div>
+                </li>
+              </ul>
+
+              <div className="border-t border-white/[0.08] mt-8 pt-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 text-white/60">
+                    <span className="text-red-400 text-lg leading-none">✕</span>
+                    <span className="text-sm sm:text-base">Co bys normálně zaplatil</span>
+                  </div>
+                  <div className="text-red-400/80 line-through font-semibold text-base sm:text-lg">
+                    CHF 216 / měs.
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/illustrations/penize.png" alt="" className="w-7 h-7 sm:w-8 sm:h-8 object-contain" />
+                    <span className="text-white font-bold text-base sm:text-lg">S Wokerem</span>
+                  </div>
+                  <div className="text-orange-400 font-extrabold text-xl sm:text-2xl whitespace-nowrap">
+                    CHF 9 / měs.
+                  </div>
+                </div>
+              </div>
+            </div>
+            </FadeIn>
+
+            <FadeIn delay={0.15}>
+              <h2 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-6">
+                Ušetři <span className="text-orange-400">stovky CHF měsíčně</span>{" "}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/illustrations/penize.png" alt="" className="inline-block w-10 h-10 sm:w-14 sm:h-14 align-middle object-contain" />
+                {" "}za jiné aplikace
+              </h2>
+              <p className="text-white/60 text-base sm:text-lg leading-relaxed">
+                Woker nahradí <span className="text-orange-400 font-semibold">auto-apply nástroje, AI CV buildery a 7+ dalších aplikací</span>. Jednodušší, levnější a nakonfigurováno pro švýcarský pracovní trh — místo <span className="text-orange-400 font-semibold">216 CHF měsíčně</span> za 8 různých předplatných máš všechno v jedné appce.
+              </p>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ── COMPARISON TABLE ── */}
+      <section className="py-16 sm:py-24 px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <FadeIn>
+              <h2 className="text-3xl sm:text-5xl font-extrabold leading-tight mb-6 text-white">
+                Tvoje získání práce ve Švýcarsku <span className="text-orange-400">na automat</span>{" "}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/illustrations/text/automat.png" alt="" className="inline-block w-9 h-9 sm:w-12 sm:h-12 align-middle object-contain" />
+                {" "}a <span className="text-orange-400">bez práce</span>.
+              </h2>
+              <p className="text-white/60 text-base sm:text-lg leading-relaxed mb-4">
+                Zachoval jsem <span className="text-orange-400 font-semibold">jasný krok po kroku</span>, aby ses neztratil v celém procesu. A zároveň jsem přidal <span className="text-orange-400 font-semibold">AI, která tě tím procesem provede</span> — tak, aby ses na ničem nezasekl.
+              </p>
+              <p className="text-white/60 text-base sm:text-lg leading-relaxed mb-8">
+                Celý systém je navržený tak, <span className="text-orange-400 font-semibold">abys tím prošel během pár desítek minut</span>{" "}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/illustrations/text/watch.png" alt="" className="inline-block w-7 h-7 sm:w-9 sm:h-9 align-middle object-contain" />
+                . Jediné, co nedokážu plně automatizovat, je odezva firmy nebo Temporärbüro.
+              </p>
+              <Link
+                href="/login?tab=register"
+                className="inline-block px-7 py-3.5 rounded-xl text-base font-bold bg-[#fb923c] text-[#0a0a12] hover:bg-[#f97316] transition-all shadow-lg shadow-[#fb923c]/20"
+              >
+                Zaregistruj se a prozkoumej Woker &rarr;
+              </Link>
+            </FadeIn>
+
+            <FadeIn delay={0.15}>
+              <VSCard />
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ── RECENZE ── */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto">
           <FadeIn>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
-              Zítra v tuhle dobu můžeš mít práci v Zürichu.
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4 text-white leading-tight">
+              Co říkají <span className="text-[#fb923c]">lidé</span>
             </h2>
-          </FadeIn>
-          <FadeIn delay={0.1}>
-            <p className="text-white/50 mb-8">
-              Martin to zvládl za 3 týdny. Katarína za 10 minut našla co zprostředkovatel za 600 EUR.
+            <p className="text-white/50 text-center mb-14 max-w-2xl mx-auto text-base sm:text-lg">
+              Reálná zpětná vazba od lidí, kterým Woker pomohl.
             </p>
           </FadeIn>
+
+          <div className="grid sm:grid-cols-2 gap-5 items-start mb-5">
+            <FadeIn>
+              <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/reviews/recenze-1.jpg" alt="Recenze od člena Wokeru" className="w-full rounded-xl block" />
+              </div>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/reviews/recenze-2.jpg" alt="Recenze od člena Wokeru" className="w-full rounded-xl block" />
+              </div>
+            </FadeIn>
+          </div>
+
           <FadeIn delay={0.15}>
-            <Link
-              href="/zdarma"
-              className="inline-block px-10 py-4 rounded-xl text-lg font-bold bg-gradient-to-r from-[#39ff6e] to-[#32e060] text-[#0a0a12] hover:brightness-110 hover:scale-[1.02] transition-all shadow-lg shadow-[#39ff6e]/20"
-            >
-              Začít zdarma &rarr;
-            </Link>
-            <p className="text-xs text-white/30 mt-4">
-              2 minuty. Žádná kreditka. Žádný závazek.
-            </p>
+            <div className="rounded-2xl border border-[#fb923c]/20 bg-gradient-to-br from-[#fb923c]/[0.08] to-transparent p-8 sm:p-10 text-center">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-2">
+                Máš zkušenost s Wokerem?
+              </h3>
+              <p className="text-white/55 text-sm sm:text-base mb-6 max-w-lg mx-auto leading-relaxed">
+                Ohodnoť nás na Trustpilotu — tvoje zpětná vazba nám pomáhá zlepšovat poskytované služby.
+              </p>
+              <div className="max-w-md mx-auto">
+                <TrustpilotWidget />
+              </div>
+              <p className="text-white/40 text-xs sm:text-sm mt-7">
+                Nebo mi svoji recenzi pošli osobně na:
+              </p>
+              <div className="flex flex-wrap items-center justify-center gap-2.5 mt-3">
+                <a href="https://instagram.com/vasicenko" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/70 font-medium text-xs hover:text-white hover:bg-white/[0.09] transition-all">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="2" width="20" height="20" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                  </svg>
+                  Instagram
+                </a>
+                <a href="https://www.facebook.com/vasicenko" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/70 font-medium text-xs hover:text-white hover:bg-white/[0.09] transition-all">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
+                  Facebook
+                </a>
+                <a href="https://tiktok.com/@vasicenko" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/70 font-medium text-xs hover:text-white hover:bg-white/[0.09] transition-all">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                  </svg>
+                  TikTok
+                </a>
+              </div>
+            </div>
           </FadeIn>
         </div>
       </section>

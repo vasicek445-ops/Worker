@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function SharedHeader({ backHref, backLabel }: { backHref?: string; backLabel?: string }) {
   return (
@@ -19,10 +18,6 @@ export default function SharedHeader({ backHref, backLabel }: { backHref?: strin
               <span className="text-red-500 font-bold text-lg tracking-tight">Woker</span>
             </Link>
           )}
-        </div>
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
-          <Link href="/profil" className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-red-500/30">W</Link>
         </div>
       </div>
     </div>

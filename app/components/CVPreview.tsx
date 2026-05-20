@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 
-interface CVData {
+export interface CVData {
   profil?: string
   personalData: {
     name: string
@@ -25,7 +25,7 @@ interface CVPreviewProps {
   photo: string | null
   template: string
   accentColor: string
-  onSave?: (html: string) => void
+  onSave?: (html: string, pdfBlob: Blob) => void
   saving?: boolean
   saved?: boolean
 }
@@ -395,29 +395,53 @@ function isColorDark(hex: string): boolean {
 export default function CVPreview({ data, photo, template, accentColor, onSave, saving, saved }: CVPreviewProps) {
   const cvRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
+  const [preparing, setPreparing] = useState(false)
+
+  // Vyrenderuje CV do jednostránkového A4 PDF — sdílí stahování i ukládání.
+  const buildPdfDoc = async () => {
+    const html2canvas = (await import('html2canvas')).default
+    const { jsPDF } = await import('jspdf')
+    const el = cvRef.current!
+    // minHeight pryč — obsah se zmenší na přirozenou výšku, žádná prázdná 2. strana
+    const inner = el.firstElementChild as HTMLElement | null
+    const origMinH = inner?.style.minHeight || ''
+    if (inner) inner.style.minHeight = 'auto'
+    const canvas = await html2canvas(el, {
+      scale: 2, useCORS: true, scrollY: 0, windowWidth: 794,
+    })
+    if (inner) inner.style.minHeight = origMinH
+    // celé CV jako jeden obrázek na jednu A4 stránku, zachovaný poměr stran
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
+    const pageW = 210, pageH = 297
+    const ratio = canvas.width / canvas.height
+    let w = pageW, h = pageW / ratio
+    if (h > pageH) { h = pageH; w = pageH * ratio }
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', (pageW - w) / 2, 0, w, h)
+    return pdf
+  }
 
   const handleDownload = async () => {
     if (!cvRef.current) return
     setDownloading(true)
     try {
-      const html2pdf = (await import('html2pdf.js')).default
-      const el = cvRef.current
-      // Temporarily remove minHeight so content fits naturally without creating blank page 2
-      const inner = el.firstElementChild as HTMLElement | null
-      const origMinH = inner?.style.minHeight || ''
-      if (inner) inner.style.minHeight = 'auto'
-      await html2pdf().set({
-        margin: 0,
-        filename: `Lebenslauf_${data.personalData.name.replace(/\s+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollY: 0, windowWidth: 794 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any).from(el).save()
-      if (inner) inner.style.minHeight = origMinH
+      const pdf = await buildPdfDoc()
+      pdf.save(`Lebenslauf_${data.personalData.name.replace(/\s+/g, '_')}.pdf`)
     } catch { alert('Chyba při generování PDF.') }
     finally { setDownloading(false) }
+  }
+
+  // Uložení: vyrobí PDF blob a předá ho rodiči spolu s HTML (kvůli příloze k přihlášce).
+  const handleSaveClick = async () => {
+    if (!cvRef.current || !onSave) return
+    setPreparing(true)
+    try {
+      const pdf = await buildPdfDoc()
+      onSave(cvRef.current.innerHTML, pdf.output('blob'))
+    } catch {
+      alert('Chyba při přípravě PDF životopisu.')
+    } finally {
+      setPreparing(false)
+    }
   }
 
   const handcrafted: Record<string, React.FC<{data: CVData; photo: string | null; c: string}>> = { klassisch: KlassischT, modern: ModernT, kreativ: KreativT, elegant: ElegantT, minimal: MinimalT, executive: ExecutiveT, swiss: SwissT, timeline: TimelineT, corporate: CorporateT, bold: BoldT, compact: CompactT, dark: DarkT, infographic: InfographicT, zweispaltig: ZweispaltigT, nordic: NordicT }
@@ -432,12 +456,12 @@ export default function CVPreview({ data, photo, template, accentColor, onSave, 
         </button>
         {onSave && (
           saved ? (
-            <div className="flex-1 bg-[#39ff6e]/10 border border-[#39ff6e]/30 text-[#39ff6e] font-bold py-3 px-6 rounded-xl text-center">
-              ✓ Uloženo pro přihlášky
+            <div className="flex-1 bg-[#fb923c]/10 border border-[#fb923c]/30 text-[#fb923c] font-bold py-3 px-6 rounded-xl text-center">
+              ✓ Uloženo
             </div>
           ) : (
-            <button onClick={() => { if (cvRef.current) onSave(cvRef.current.innerHTML) }} disabled={saving} className="flex-1 bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
-              {saving ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />Ukládám...</span>) : '💾 Uložit pro přihlášky'}
+            <button onClick={handleSaveClick} disabled={saving || preparing} className="flex-1 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+              {(saving || preparing) ? (<span className="flex items-center justify-center gap-2"><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />Ukládám...</span>) : '💾 Uložit životopis'}
             </button>
           )
         )}

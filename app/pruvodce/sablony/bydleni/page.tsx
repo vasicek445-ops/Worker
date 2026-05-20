@@ -5,7 +5,26 @@ import Image from 'next/image'
 import { useSubscription } from '../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../components/PaywallOverlay'
 import { supabase } from '../../../supabase'
+import { useProfile } from '../../../../lib/profile/hooks'
 import Link from 'next/link'
+
+// Spočítá věk z 'DD.MM.YYYY' nebo ISO date stringu
+function calculateAge(birthdate: string): number | null {
+  if (!birthdate) return null
+  const eu = birthdate.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/)
+  let birth: Date
+  if (eu) {
+    birth = new Date(+eu[3], +eu[2] - 1, +eu[1])
+  } else {
+    birth = new Date(birthdate)
+    if (isNaN(birth.getTime())) return null
+  }
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const m = today.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--
+  return (age > 0 && age < 120) ? age : null
+}
 
 const REGIONS = ['Zürich', 'Bern', 'Basel', 'Luzern', 'St. Gallen', 'Aargau', 'Solothurn', 'Thurgau', 'Zug', 'Schaffhausen', 'Graubünden', 'Wallis / Valais', 'Waadt / Vaud', 'Genf / Genève', 'Ticino', 'Jiný']
 const APT_TYPES = ['Studio / 1 pokoj', '1.5 - 2 pokoje', '2.5 - 3 pokoje', '3.5 - 4 pokoje', '4.5+ pokojů', 'WG (spolubydlení)']
@@ -33,7 +52,9 @@ const TABS = [
 
 export default function BydleniPage() {
   const { isActive, loading } = useSubscription()
+  const { profile } = useProfile()
   const [formData, setFormData] = useState<Record<string, string>>({})
+  const [prefilledFromProfile, setPrefilledFromProfile] = useState<Set<string>>(new Set())
   const [result, setResult] = useState<HousingData | null>(null)
   const [generating, setGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -41,50 +62,56 @@ export default function BydleniPage() {
   const [copied, setCopied] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('letter')
 
-  // Auto-fill from user profile
+  // Auto-prefill from user profile (jen prázdná pole, profile = SSOT)
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session?.user?.id) return
-        const { data: profile } = await supabase.from('profiles').select('full_name, pozice, preferovany_kanton, datum_narozeni, obor').eq('id', session.user.id).single()
-        if (!profile) return
-
-        const cantonToRegion: Record<string, string> = {
-          'ZH': 'Zürich', 'BE': 'Bern', 'BS': 'Basel', 'BL': 'Basel', 'LU': 'Luzern',
-          'SG': 'St. Gallen', 'AG': 'Aargau', 'SO': 'Solothurn', 'TG': 'Thurgau',
-          'ZG': 'Zug', 'SH': 'Schaffhausen', 'GR': 'Graubünden',
-          'VS': 'Wallis / Valais', 'VD': 'Waadt / Vaud', 'GE': 'Genf / Genève', 'TI': 'Ticino',
-        }
-
-        const prefill: Record<string, string> = {}
-        if (profile.full_name) prefill.name = profile.full_name
-        if (profile.pozice) prefill.position = profile.pozice
-        if (profile.preferovany_kanton) {
-          const region = cantonToRegion[profile.preferovany_kanton]
-          if (region) prefill.region = region
-        }
-        if (profile.datum_narozeni) {
-          const birth = new Date(profile.datum_narozeni)
-          const today = new Date()
-          let age = today.getFullYear() - birth.getFullYear()
-          if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--
-          if (age > 0 && age < 120) prefill.age = String(age)
-        }
-
-        if (Object.keys(prefill).length > 0) {
-          setFormData(prev => {
-            const merged = { ...prefill }
-            for (const [k, v] of Object.entries(prev)) { if (v) merged[k] = v }
-            return merged
-          })
-        }
-      } catch {}
+    if (!profile) return
+    const cantonToRegion: Record<string, string> = {
+      'ZH': 'Zürich', 'BE': 'Bern', 'BS': 'Basel', 'BL': 'Basel', 'LU': 'Luzern',
+      'SG': 'St. Gallen', 'AG': 'Aargau', 'SO': 'Solothurn', 'TG': 'Thurgau',
+      'ZG': 'Zug', 'SH': 'Schaffhausen', 'GR': 'Graubünden',
+      'VS': 'Wallis / Valais', 'VD': 'Waadt / Vaud', 'GE': 'Genf / Genève', 'TI': 'Ticino',
     }
-    loadProfile()
-  }, [])
+    const fromProfile = new Set<string>()
+    setFormData((f) => {
+      const next = { ...f }
+      const apply = (key: string, val: string | null | undefined) => {
+        if (!val) return
+        if (next[key]?.trim()) return
+        next[key] = val
+        fromProfile.add(key)
+      }
+      apply('name', profile.full_name)
+      apply('position', profile.pozice)
+      apply('employer', profile.employer_current)
+      if (profile.income_expected != null) {
+        apply('income', `CHF ${profile.income_expected.toLocaleString('de-CH')}`)
+      }
+      if (profile.preferovany_kanton) {
+        const region = cantonToRegion[profile.preferovany_kanton]
+        if (region) apply('region', region)
+      }
+      if (profile.datum_narozeni) {
+        const age = calculateAge(profile.datum_narozeni)
+        if (age != null) apply('age', String(age))
+      }
+      return next
+    })
+    setPrefilledFromProfile((prev) => {
+      const merged = new Set(prev)
+      fromProfile.forEach((k) => merged.add(k))
+      return merged
+    })
+  }, [profile])
 
-  const handleChange = (name: string, value: string) => setFormData(prev => ({ ...prev, [name]: value }))
+  const handleChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }))
+    setPrefilledFromProfile(prev => {
+      if (!prev.has(name)) return prev
+      const next = new Set(prev)
+      next.delete(name)
+      return next
+    })
+  }
 
   const handleSubmit = async () => {
     if (!formData.name?.trim() || !formData.region) { setError('Vyplň jméno a region'); return }
@@ -110,16 +137,16 @@ export default function BydleniPage() {
     setCopied(id); setTimeout(() => setCopied(null), 2000)
   }
 
-  const inputClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#39ff6e]/40 focus:outline-none focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(57,255,110,0.05)] transition-all"
+  const inputClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 focus:border-[#fb923c]/40 focus:outline-none focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(251,146,60,0.05)] transition-all"
   const labelClass = "text-white/60 text-sm font-medium mb-1.5 block"
-  const selectClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:border-[#39ff6e]/40 focus:outline-none transition-all appearance-none"
+  const selectClass = "w-full bg-white/[0.03] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm focus:border-[#fb923c]/40 focus:outline-none transition-all appearance-none"
 
   // ─── RESULTS ───
   if (result) {
     return (
       <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
         {/* Ambient effects */}
-        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+        <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] -right-[100px]" style={{ background: "radial-gradient(circle, rgba(251,146,60,0.25), transparent 70%)" }} />
         <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-10 bottom-[200px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
 
         <div className="max-w-2xl mx-auto relative z-10">
@@ -131,7 +158,7 @@ export default function BydleniPage() {
           {/* Header */}
           <div className="rounded-2xl p-5 mb-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
             <Image src="/images/3d/house.png" alt="" width={100} height={100} className="absolute -right-2 -top-2 opacity-[0.1]" />
-            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(57,255,110,0.15), transparent 60%)" }} />
+            <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(251,146,60,0.15), transparent 60%)" }} />
             <div className="relative flex items-center gap-4">
               <Image src="/images/3d/house.png" alt="" width={48} height={48} className="drop-shadow-lg" />
               <div>
@@ -139,7 +166,7 @@ export default function BydleniPage() {
                 <p className="text-white/40 text-sm m-0 mt-0.5">Kompletní žádost o byt — připraveno ke kopírování</p>
               </div>
             </div>
-            {result.region_tips && <p className="text-[#39ff6e]/70 text-xs mt-3 leading-relaxed relative">📍 {result.region_tips}</p>}
+            {result.region_tips && <p className="text-[#fb923c]/70 text-xs mt-3 leading-relaxed relative">📍 {result.region_tips}</p>}
           </div>
 
           {/* Tab navigation */}
@@ -148,7 +175,7 @@ export default function BydleniPage() {
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                   activeTab === tab.id
-                    ? 'bg-[#39ff6e]/10 border border-[#39ff6e]/30 text-[#39ff6e] shadow-[0_0_15px_rgba(57,255,110,0.1)]'
+                    ? 'bg-[#fb923c]/10 border border-[#fb923c]/30 text-[#fb923c] shadow-[0_0_15px_rgba(251,146,60,0.1)]'
                     : 'bg-white/[0.03] border border-white/[0.06] text-white/40 hover:text-white/60 hover:bg-white/[0.06]'
                 }`}>
                 <Image src={tab.img} alt="" width={16} height={16} className={activeTab === tab.id ? '' : 'opacity-50 grayscale'} />
@@ -166,10 +193,10 @@ export default function BydleniPage() {
                   Motivační dopis pro pronajímatele
                 </h2>
                 <div className="flex gap-2">
-                  <button onClick={() => setShowCz(!showCz)} className={`text-[10px] px-3 py-1.5 rounded-lg border transition ${showCz ? 'border-[#39ff6e]/30 text-[#39ff6e] bg-[#39ff6e]/5' : 'border-white/10 text-white/40 hover:text-white/60'}`}>
+                  <button onClick={() => setShowCz(!showCz)} className={`text-[10px] px-3 py-1.5 rounded-lg border transition ${showCz ? 'border-[#fb923c]/30 text-[#fb923c] bg-[#fb923c]/5' : 'border-white/10 text-white/40 hover:text-white/60'}`}>
                     {showCz ? '🇨🇿 CZ' : '🇩🇪 DE'}
                   </button>
-                  <button onClick={() => handleCopy(result.bewerbungsschreiben, 'letter')} className="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 text-white/40 hover:text-white hover:border-[#39ff6e]/30 transition">
+                  <button onClick={() => handleCopy(result.bewerbungsschreiben, 'letter')} className="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 text-white/40 hover:text-white hover:border-[#fb923c]/30 transition">
                     {copied === 'letter' ? '✅ Zkopírováno' : '📋 Kopírovat'}
                   </button>
                 </div>
@@ -189,7 +216,7 @@ export default function BydleniPage() {
                   <Image src="/images/3d/key.png" alt="" width={24} height={24} className="drop-shadow-lg" />
                   Osobní profil
                 </h2>
-                <button onClick={() => handleCopy(result.personal_profile_de, 'profile')} className="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 text-white/40 hover:text-white hover:border-[#39ff6e]/30 transition">
+                <button onClick={() => handleCopy(result.personal_profile_de, 'profile')} className="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 text-white/40 hover:text-white hover:border-[#fb923c]/30 transition">
                   {copied === 'profile' ? '✅ Zkopírováno' : '📋 Kopírovat'}
                 </button>
               </div>
@@ -218,7 +245,7 @@ export default function BydleniPage() {
                     <p className="text-white text-sm font-semibold m-0">{c.document}</p>
                     <p className="text-white/20 text-xs italic m-0 mt-0.5">{c.document_de}</p>
                     <p className="text-white/40 text-xs m-0 mt-1.5">{c.description}</p>
-                    <p className="text-[#39ff6e]/60 text-xs m-0 mt-1.5">→ {c.how_to_get}</p>
+                    <p className="text-[#fb923c]/60 text-xs m-0 mt-1.5">→ {c.how_to_get}</p>
                   </div>
                 </div>
               ))}
@@ -248,7 +275,7 @@ export default function BydleniPage() {
                 <div key={i} className={`bg-white/[0.03] border rounded-2xl p-4 hover:bg-white/[0.05] transition ${p.warning ? 'border-amber-500/20' : 'border-white/[0.06]'}`}>
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-white text-sm font-semibold">{p.name}</span>
-                    <span className={`text-[10px] px-2.5 py-1 rounded-lg font-bold ${p.cost === 'Zdarma' || p.cost.toLowerCase().includes('zdarma') ? 'bg-[#39ff6e]/10 text-[#39ff6e] border border-[#39ff6e]/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>{p.cost}</span>
+                    <span className={`text-[10px] px-2.5 py-1 rounded-lg font-bold ${p.cost === 'Zdarma' || p.cost.toLowerCase().includes('zdarma') ? 'bg-[#fb923c]/10 text-[#fb923c] border border-[#fb923c]/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>{p.cost}</span>
                   </div>
                   <p className="text-white/40 text-xs m-0">{p.description}</p>
                   {p.warning && <p className="text-amber-400 text-xs m-0 mt-1.5">⚠️ {p.warning}</p>}
@@ -288,7 +315,7 @@ export default function BydleniPage() {
                   </h2>
                   {result.tips.map((tip, i) => (
                     <div key={i} className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4 flex items-start gap-3">
-                      <span className="text-[#39ff6e] text-xs font-bold mt-0.5 flex-shrink-0 w-5 h-5 rounded-lg bg-[#39ff6e]/10 flex items-center justify-center">{i + 1}</span>
+                      <span className="text-[#fb923c] text-xs font-bold mt-0.5 flex-shrink-0 w-5 h-5 rounded-lg bg-[#fb923c]/10 flex items-center justify-center">{i + 1}</span>
                       <p className="text-white/60 text-sm m-0">{tip}</p>
                     </div>
                   ))}
@@ -309,7 +336,7 @@ export default function BydleniPage() {
   return (
     <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
       {/* Ambient effects */}
-      <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] right-[10%]" style={{ background: "radial-gradient(circle, rgba(57,255,110,0.25), transparent 70%)" }} />
+      <div className="fixed w-[600px] h-[600px] rounded-full blur-[180px] pointer-events-none z-0 opacity-10 -top-[200px] right-[10%]" style={{ background: "radial-gradient(circle, rgba(251,146,60,0.25), transparent 70%)" }} />
       <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-8 bottom-[100px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%)" }} />
 
       <div className="max-w-2xl mx-auto relative z-10">
@@ -318,7 +345,7 @@ export default function BydleniPage() {
         {/* Hero header */}
         <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
           <Image src="/images/3d/house.png" alt="" width={120} height={120} className="absolute -right-4 -bottom-4 opacity-[0.08]" />
-          <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(57,255,110,0.1), transparent 60%)" }} />
+          <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(251,146,60,0.1), transparent 60%)" }} />
           {/* Dot pattern */}
           <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
             <pattern id="formGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -348,6 +375,13 @@ export default function BydleniPage() {
         <PaywallOverlay isLocked={!isActive && !loading} title="AI bydlení je součástí Premium" description="Bewerbungsdossier, portály, varování před podvody">
           <div className="space-y-5">
 
+            {prefilledFromProfile.size > 0 && (
+              <div className="bg-[#fb923c]/[0.06] border border-[#fb923c]/20 rounded-xl p-3 flex items-center gap-2">
+                <Image src="/images/3d/key.png" alt="" width={18} height={18} />
+                <span className="text-[#fb923c]/80 text-sm">Údaje vyplněny z profilu. Uprav co potřebuješ.</span>
+              </div>
+            )}
+
             {/* Form card */}
             <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 space-y-4">
               <div className="flex items-center gap-2 mb-1">
@@ -357,33 +391,51 @@ export default function BydleniPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelClass}>Celé jméno *</label>
+                  <label className={labelClass}>
+                    Celé jméno *
+                    {prefilledFromProfile.has('name') && <span className="text-[10px] text-[#fb923c]/70 ml-1.5">z profilu</span>}
+                  </label>
                   <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} placeholder="Jan Novák" className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Věk</label>
+                  <label className={labelClass}>
+                    Věk
+                    {prefilledFromProfile.has('age') && <span className="text-[10px] text-[#fb923c]/70 ml-1.5">z profilu</span>}
+                  </label>
                   <input type="text" value={formData.age || ''} onChange={(e) => handleChange('age', e.target.value)} placeholder="30" className={inputClass} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelClass}>Zaměstnavatel</label>
+                  <label className={labelClass}>
+                    Zaměstnavatel
+                    {prefilledFromProfile.has('employer') && <span className="text-[10px] text-[#fb923c]/70 ml-1.5">z profilu</span>}
+                  </label>
                   <input type="text" value={formData.employer || ''} onChange={(e) => handleChange('employer', e.target.value)} placeholder="Firma / agentura" className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Pozice</label>
+                  <label className={labelClass}>
+                    Pozice
+                    {prefilledFromProfile.has('position') && <span className="text-[10px] text-[#fb923c]/70 ml-1.5">z profilu</span>}
+                  </label>
                   <input type="text" value={formData.position || ''} onChange={(e) => handleChange('position', e.target.value)} placeholder="Monteur, Koch..." className={inputClass} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelClass}>Hrubý měsíční příjem</label>
+                  <label className={labelClass}>
+                    Hrubý měsíční příjem
+                    {prefilledFromProfile.has('income') && <span className="text-[10px] text-[#fb923c]/70 ml-1.5">z profilu</span>}
+                  </label>
                   <input type="text" value={formData.income || ''} onChange={(e) => handleChange('income', e.target.value)} placeholder="CHF 5 000" className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Region *</label>
+                  <label className={labelClass}>
+                    Region *
+                    {prefilledFromProfile.has('region') && <span className="text-[10px] text-[#fb923c]/70 ml-1.5">z profilu</span>}
+                  </label>
                   <select value={formData.region || ''} onChange={(e) => handleChange('region', e.target.value)} className={selectClass}>
                     <option value="">Vyber kanton / region</option>
                     {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
@@ -438,7 +490,7 @@ export default function BydleniPage() {
 
             {/* Submit button */}
             <button onClick={handleSubmit} disabled={generating || !formData.name?.trim() || !formData.region}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-[#39ff6e] to-[#2bcc58] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_4px_30px_rgba(57,255,110,0.35)] hover:scale-[1.02] active:scale-[0.98]">
+              className="w-full relative overflow-hidden bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-extrabold py-4 px-6 rounded-2xl transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:shadow-[0_4px_30px_rgba(251,146,60,0.35)] hover:scale-[1.02] active:scale-[0.98]">
               {generating ? (
                 <span className="flex items-center justify-center gap-2.5">
                   <span className="w-5 h-5 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin" />

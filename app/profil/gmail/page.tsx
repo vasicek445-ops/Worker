@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../../supabase";
 import { Mail, CheckCircle2, AlertCircle, ArrowLeft, Send, Loader2, Settings } from "lucide-react";
+import MatchesView from "../matches/MatchesView";
 
 type ConnectionStatus =
   | { state: "loading" }
@@ -86,11 +87,11 @@ function GmailConnectContent() {
     if (!confirm("Opravdu odpojit Gmail? Smart Apply pak nebude posílat emaily.")) return;
     setBusy(true);
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
-    await supabase
-      .from("email_oauth_tokens")
-      .update({ revoked: true })
-      .eq("provider", "gmail");
+    if (!session) { setBusy(false); return; }
+    await fetch("/api/auth/gmail/disconnect", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
     setBusy(false);
     void loadStatus();
   }
@@ -122,7 +123,7 @@ function GmailConnectContent() {
 
   return (
     <main className="min-h-screen bg-[#0a0a12] text-white px-4 py-6 pb-24">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <Link
           href="/profil"
           className="inline-flex items-center gap-2 text-white/40 hover:text-white text-sm mb-6 no-underline"
@@ -148,7 +149,7 @@ function GmailConnectContent() {
           </div>
         )}
         {callbackConnected && (
-          <div className="mb-4 p-4 rounded-xl border border-[#39ff6e]/30 bg-[#39ff6e]/5 text-[#39ff6e] text-sm flex gap-3">
+          <div className="mb-4 p-4 rounded-xl border border-[#fb923c]/30 bg-[#fb923c]/5 text-[#fb923c] text-sm flex gap-3">
             <CheckCircle2 size={20} className="flex-shrink-0" />
             <div>
               Gmail propojen{callbackEmail ? `: ${callbackEmail}` : ""}.
@@ -172,6 +173,16 @@ function GmailConnectContent() {
                 <code className="bg-white/10 px-1.5 py-0.5 rounded text-[12px]">gmail.send</code>{" "}
                 (posílání emailů z tvé adresy). NIKDY nemáme přístup ke čtení tvých emailů.
               </p>
+              <div className="rounded-xl border border-[#ff8c2b]/25 bg-[#ff8c2b]/[0.06] p-4 mb-5 text-[13px] leading-relaxed text-white/65">
+                <strong className="text-white/85">Co tě čeká:</strong> Google ti při přihlášení
+                ukáže obrazovku „Tato aplikace není ověřená Googlem&quot;.{" "}
+                <strong className="text-white/85">Je to v pořádku</strong> — Woker je nová aplikace
+                a ověření u Googlu právě dokončuje. Klikni na{" "}
+                <strong className="text-white/85">„Pokročilé&quot;</strong> a pak{" "}
+                <strong className="text-white/85">„Přejít na gowoker.com&quot;</strong>. Je to bezpečné:
+                Woker může e-maily z tvé adresy jen <strong className="text-white/85">posílat</strong>,
+                číst je nikdy.
+              </div>
               <button
                 disabled={busy}
                 onClick={handleConnect}
@@ -185,7 +196,7 @@ function GmailConnectContent() {
           {status.state === "connected" && (
             <>
               <div className="flex items-center gap-2 mb-1">
-                <CheckCircle2 size={18} className="text-[#39ff6e]" />
+                <CheckCircle2 size={18} className="text-[#fb923c]" />
                 <h2 className="text-lg font-bold m-0">Gmail připojen</h2>
               </div>
               <p className="text-white/50 text-sm mb-1">
@@ -203,12 +214,22 @@ function GmailConnectContent() {
                 </Link>
                 <button
                   disabled={busy}
+                  onClick={handleConnect}
+                  className="text-[#ff8c2b] hover:text-[#ff6a1f] disabled:opacity-50 text-sm underline"
+                >
+                  Připojit znovu
+                </button>
+                <button
+                  disabled={busy}
                   onClick={handleDisconnect}
                   className="text-red-400 hover:text-red-300 disabled:opacity-50 text-sm underline"
                 >
                   Odpojit Gmail
                 </button>
               </div>
+              <p className="text-white/30 text-xs mt-3 m-0">
+                Když odesílání hlásí „spojení vypršelo&quot;, klikni na „Připojit znovu&quot; — Gmail se přepojí s čerstvým tokenem.
+              </p>
             </>
           )}
 
@@ -245,7 +266,7 @@ function GmailConnectContent() {
             </div>
             {testResult && (
               <div className={`mt-4 p-3 rounded-xl text-sm ${
-                testResult.startsWith("✅") ? "bg-[#39ff6e]/5 border border-[#39ff6e]/20 text-[#39ff6e]"
+                testResult.startsWith("✅") ? "bg-[#fb923c]/5 border border-[#fb923c]/20 text-[#fb923c]"
                 : "bg-red-500/5 border border-red-500/20 text-red-300"
               }`}>
                 {testResult}
@@ -253,6 +274,7 @@ function GmailConnectContent() {
             )}
           </div>
         )}
+        <MatchesView />
       </div>
     </main>
   );

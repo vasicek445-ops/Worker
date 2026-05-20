@@ -10,7 +10,7 @@ const it: Translation = {
     guides_title: "Guida alla Svizzera", guides_all: "Tutto",
     premium_title: "Woker Premium",
     premium_desc: "Sblocca oltre 1.000 contatti, guide premium e assistente AI per lavorare in Svizzera.",
-    premium_cta: "Attiva a 9,99 €/mese", premium_trial: "Senza impegno",
+    premium_cta: "Prova 7 giorni gratis", premium_trial: "Senza impegno",
     wooky_name: "Assistente Wooky", wooky_online: "Online 24/7",
     wooky_message: "Ciao! 👋 Sono Wooky, il tuo assistente per lavorare in Svizzera. Ti aiuto con permessi, alloggio e ricerca lavoro.",
     wooky_open: "Apri chat →",
@@ -26,7 +26,7 @@ const it: Translation = {
   paywall: {
     title: "Sblocca l'accesso completo",
     description: "Ottieni contatti aziendali, guide e assistente AI",
-    cta: "Abbonati a 9,99 €/mese",
+    cta: "Prova 7 giorni gratis",
     disclaimer: "Cancelli quando vuoi • 7 giorni gratis",
   },
   home: {
