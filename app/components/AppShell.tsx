@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 const NO_SIDEBAR = ["/login", "/registrace", "/auth/callback", "/pricing", "/reset-heslo", "/podminky", "/ochrana-udaju", "/blog", "/pro", "/cenik", "/zdarma", "/prace", "/bydleni-preview", "/dokumenty-preview", "/kontakty-preview", "/o-nas", "/dev", "/cv/"];
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideSidebar = NO_SIDEBAR.some(p => pathname?.startsWith(p)) || pathname === "/";
+  const hideSidebar = NO_SIDEBAR.some(p => pathname === p || pathname?.startsWith(p + "/")) || pathname === "/";
   return (
     <div className="flex min-h-screen">
       {!hideSidebar && <Sidebar />}

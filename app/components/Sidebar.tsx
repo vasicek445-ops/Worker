@@ -16,6 +16,7 @@ import {
   Sparkles,
   LogOut,
   Mail,
+  User,
   X,
   Menu,
 } from "lucide-react";
@@ -47,6 +48,8 @@ export default function Sidebar() {
   }, [mobileOpen]);
 
   const isActivePath = (href: string) => pathname === href;
+  const isProfileActive =
+    pathname === "/profil" || pathname?.startsWith("/profil/");
   const isToolsActive =
     pathname?.startsWith("/pruvodce") || pathname?.startsWith("/jazyky");
 
@@ -114,8 +117,9 @@ export default function Sidebar() {
             label: "Smart Apply",
             badge: { text: "BETA", className: "bg-[#fb923c]/15 text-[#fb923c]" },
           },
+          { href: "/profil/osobni-udaje", icon: User, label: "Profil", activeWhen: isProfileActive },
         ].map((it) => {
-          const active = isActivePath(it.href);
+          const active = it.activeWhen ?? isActivePath(it.href);
           const Icon = it.icon;
           return (
             <Link key={it.href} href={it.href} className={linkClass(active)}>
