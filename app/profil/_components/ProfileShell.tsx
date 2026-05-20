@@ -8,6 +8,7 @@ import { useProfile, type UseProfileResult } from '../../../lib/profile/hooks'
 import ProfileNav from './ProfileNav'
 import ReadinessSidebar from './ReadinessSidebar'
 import AutoSaveIndicator from './AutoSaveIndicator'
+import WookyFAB from './WookyFAB'
 
 // Single source of truth: useProfile() is called ONCE here in the shell and exposed
 // to all profile pages via context. Pages call useProfileShell() (NOT useProfile())
@@ -112,6 +113,9 @@ export default function ProfileShell({ children, showReadiness = true }: Profile
             )}
           </div>
         </div>
+
+        {/* Wooky AI floating asistent — jen v /profil/* */}
+        <WookyFAB />
       </div>
     </ProfileShellContext.Provider>
   )
