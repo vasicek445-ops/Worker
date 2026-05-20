@@ -1,7 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
 import SharedHeader from "../components/SharedHeader";
-import WokerSidebar from "./_components/WokerSidebar";
 import ProfileShell from "./_components/ProfileShell";
 
 // Paths under /profil that should NOT be wrapped in the ProfileShell.
@@ -23,12 +22,7 @@ export default function ProfilLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  return (
-    <div className="flex min-h-screen" style={{ background: "#0a0a12" }}>
-      <WokerSidebar />
-      <div className="flex-1 min-w-0">
-        <ProfileShell>{children}</ProfileShell>
-      </div>
-    </div>
-  );
+  // AppShell (in root layout) already renders the global <Sidebar />, including for /profil.
+  // We only need ProfileShell which provides the tabs nav + content + readiness sidebar.
+  return <ProfileShell>{children}</ProfileShell>;
 }
