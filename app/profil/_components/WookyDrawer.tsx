@@ -4,7 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../supabase'
 import { useProfileShell } from './ProfileShell'
 import { WOOKY_FIELDS_BY_SECTION, wookyField } from '../../../lib/wooky/fields'
-import type { WookyFieldMeta } from '../../../lib/wooky/types'
+import type { WookyFieldMeta, LanguageEntry } from '../../../lib/wooky/types'
+import { parseLanguages, stringifyLanguages } from '../../../lib/wooky/types'
+
+void wookyField // re-exported helper, keep import
 
 interface WookyDrawerProps {
   open: boolean
@@ -208,7 +211,25 @@ export default function WookyDrawer({ open, onClose }: WookyDrawerProps) {
           {step === 'picker' && (
             <PickerView profile={profile} onPick={openField} />
           )}
-          {step === 'editing' && activeField && (
+          {step === 'editing' && activeField && activeField.kind === 'choice' && (
+            <ChoiceView
+              field={activeField}
+              currentValue={profile?.[activeField.key]}
+              loading={loading}
+              error={error}
+              onSave={(val) => handleSave(val)}
+            />
+          )}
+          {step === 'editing' && activeField && activeField.kind === 'languages' && (
+            <LanguagesView
+              field={activeField}
+              currentValue={profile?.[activeField.key]}
+              loading={loading}
+              error={error}
+              onSave={(val) => handleSave(val)}
+            />
+          )}
+          {step === 'editing' && activeField && (activeField.kind === 'simple' || activeField.kind === 'expand') && (
             <EditingView
               field={activeField}
               draft={draft}
@@ -533,6 +554,325 @@ function PreviewView({
           ↺ Zkusit znovu jinak
         </button>
       </div>
+    </div>
+  )
+}
+
+// ===== ChoiceView: chips s pevnymi moznostmi (single nebo multi) =====
+function ChoiceView({
+  field,
+  currentValue,
+  loading,
+  error,
+  onSave,
+}: {
+  field: WookyFieldMeta
+  currentValue: unknown
+  loading: boolean
+  error: string | null
+  onSave: (value: string) => void
+}) {
+  const isMulti = !!field.multi
+  const customAllowed = !!field.customAllowed
+  const currentStr =
+    typeof currentValue === 'string' || typeof currentValue === 'number'
+      ? String(currentValue)
+      : ''
+
+  // pro multi rozsekej "A, B, C" -> Set<string>
+  const initialSelected = new Set<string>(
+    isMulti
+      ? currentStr.split(',').map((s) => s.trim()).filter(Boolean)
+      : currentStr ? [currentStr] : [],
+  )
+  const [selected, setSelected] = useState<Set<string>>(initialSelected)
+  const [custom, setCustom] = useState<string>(() => {
+    if (!customAllowed) return ''
+    // detect ze current je custom (neni mezi options)
+    const opts = field.options || []
+    if (!isMulti && currentStr && !opts.some((o) => o.value === currentStr)) {
+      return currentStr
+    }
+    return ''
+  })
+
+  function toggle(value: string) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (isMulti) {
+        next.has(value) ? next.delete(value) : next.add(value)
+      } else {
+        next.clear()
+        next.add(value)
+        // single-select clear custom
+        setCustom('')
+      }
+      return next
+    })
+  }
+
+  function handleSubmit() {
+    if (isMulti) {
+      const arr = Array.from(selected)
+      if (arr.length === 0 && !custom.trim()) return
+      const value = customAllowed && custom.trim()
+        ? [...arr, custom.trim()].join(', ')
+        : arr.join(', ')
+      onSave(value)
+    } else {
+      const picked = Array.from(selected)[0] || ''
+      const value = picked || custom.trim()
+      if (!value) return
+      onSave(value)
+    }
+  }
+
+  const canSubmit = isMulti
+    ? selected.size > 0 || custom.trim().length > 0
+    : selected.size > 0 || custom.trim().length > 0
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xl">{field.icon}</span>
+          <h2 className="text-white text-lg font-semibold">{field.label}</h2>
+        </div>
+        <p className="text-white/60 text-sm leading-relaxed">{field.prompt}</p>
+        {isMulti && (
+          <p className="text-white/40 text-xs mt-1">Můžeš vybrat víc.</p>
+        )}
+      </div>
+
+      {/* Chips grid */}
+      <div className="flex flex-wrap gap-2">
+        {(field.options || []).map((opt) => {
+          const active = selected.has(opt.value)
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => toggle(opt.value)}
+              className="px-3 py-2 rounded-xl text-sm transition-all"
+              style={{
+                background: active ? 'rgba(251,146,60,0.15)' : 'rgba(255,255,255,0.04)',
+                border: active ? '1px solid rgba(251,146,60,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                color: active ? '#fb923c' : '#e5e5ea',
+                fontWeight: active ? 600 : 500,
+              }}
+            >
+              {opt.label}
+              {opt.hint && (
+                <span className="ml-1.5 text-[10px] opacity-60">{opt.hint}</span>
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Custom input */}
+      {customAllowed && (
+        <div>
+          <div className="text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}>
+            Nebo zadej vlastní
+          </div>
+          <input
+            type="text"
+            value={custom}
+            onChange={(e) => setCustom(e.target.value)}
+            placeholder="Vlastní hodnota…"
+            className="w-full rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+            }}
+            onFocus={(e) => (e.currentTarget.style.borderColor = 'rgba(251,146,60,0.4)')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)')}
+          />
+        </div>
+      )}
+
+      {/* Value pitch */}
+      <div
+        className="rounded-xl p-3 text-xs leading-relaxed"
+        style={{
+          background: 'rgba(251,146,60,0.06)',
+          border: '1px solid rgba(251,146,60,0.15)',
+          color: 'rgba(255,255,255,0.7)',
+        }}
+      >
+        💡 <span className="text-white/80 font-medium">{field.valuePitch}</span>
+      </div>
+
+      {error && (
+        <div className="text-sm" style={{ color: '#ef4444' }}>
+          {error}
+        </div>
+      )}
+
+      <button
+        onClick={handleSubmit}
+        disabled={loading || !canSubmit}
+        className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{ background: 'linear-gradient(135deg, #fb923c, #f97316)', color: 'white' }}
+      >
+        {loading ? 'Ukládám…' : 'Uložit do profilu'}
+      </button>
+    </div>
+  )
+}
+
+// ===== LanguagesView: list radek (jazyk + uroven), Add button =====
+function LanguagesView({
+  field,
+  currentValue,
+  loading,
+  error,
+  onSave,
+}: {
+  field: WookyFieldMeta
+  currentValue: unknown
+  loading: boolean
+  error: string | null
+  onSave: (value: string) => void
+}) {
+  const currentStr = typeof currentValue === 'string' ? currentValue : ''
+  const [entries, setEntries] = useState<LanguageEntry[]>(() => {
+    const parsed = parseLanguages(currentStr)
+    return parsed.length > 0 ? parsed : [{ lang: '', level: '' }]
+  })
+
+  function updateRow(idx: number, patch: Partial<LanguageEntry>) {
+    setEntries((rows) => rows.map((r, i) => (i === idx ? { ...r, ...patch } : r)))
+  }
+
+  function addRow() {
+    setEntries((rows) => [...rows, { lang: '', level: '' }])
+  }
+
+  function removeRow(idx: number) {
+    setEntries((rows) => rows.filter((_, i) => i !== idx))
+  }
+
+  function handleSubmit() {
+    const cleaned = entries.filter((e) => e.lang.trim().length > 0)
+    onSave(stringifyLanguages(cleaned))
+  }
+
+  const canSubmit = entries.some((e) => e.lang.trim().length > 0)
+  const usedLangs = new Set(entries.map((e) => e.lang))
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xl">{field.icon}</span>
+          <h2 className="text-white text-lg font-semibold">{field.label}</h2>
+        </div>
+        <p className="text-white/60 text-sm leading-relaxed">{field.prompt}</p>
+      </div>
+
+      <div className="space-y-2.5">
+        {entries.map((row, idx) => (
+          <div key={idx} className="flex items-center gap-2">
+            <select
+              value={row.lang}
+              onChange={(e) => updateRow(idx, { lang: e.target.value })}
+              className="flex-1 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none appearance-none cursor-pointer"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <option value="" disabled className="bg-[#111120]">— vyber jazyk —</option>
+              {(field.languageOptions || []).map((l) => {
+                const disabled = usedLangs.has(l) && l !== row.lang
+                return (
+                  <option key={l} value={l} disabled={disabled} className="bg-[#111120]">
+                    {l}{disabled ? ' (už máš)' : ''}
+                  </option>
+                )
+              })}
+            </select>
+            <select
+              value={row.level}
+              onChange={(e) => updateRow(idx, { level: e.target.value })}
+              className="w-28 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none appearance-none cursor-pointer"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}
+            >
+              <option value="" className="bg-[#111120]">úroveň</option>
+              {(field.levelOptions || []).map((lv) => (
+                <option key={lv.value} value={lv.value} className="bg-[#111120]">
+                  {lv.label}
+                </option>
+              ))}
+            </select>
+            {entries.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeRow(idx)}
+                aria-label="Odstranit jazyk"
+                className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center text-white/40 hover:text-red-400 transition"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={addRow}
+          className="w-full py-2 rounded-xl text-sm font-medium transition-colors"
+          style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px dashed rgba(255,255,255,0.15)',
+            color: 'rgba(255,255,255,0.6)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(251,146,60,0.05)'
+            e.currentTarget.style.borderColor = 'rgba(251,146,60,0.3)'
+            e.currentTarget.style.color = '#fb923c'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+            e.currentTarget.style.color = 'rgba(255,255,255,0.6)'
+          }}
+        >
+          + Přidat další jazyk
+        </button>
+      </div>
+
+      <div
+        className="rounded-xl p-3 text-xs leading-relaxed"
+        style={{
+          background: 'rgba(251,146,60,0.06)',
+          border: '1px solid rgba(251,146,60,0.15)',
+          color: 'rgba(255,255,255,0.7)',
+        }}
+      >
+        💡 <span className="text-white/80 font-medium">{field.valuePitch}</span>
+      </div>
+
+      {error && (
+        <div className="text-sm" style={{ color: '#ef4444' }}>
+          {error}
+        </div>
+      )}
+
+      <button
+        onClick={handleSubmit}
+        disabled={loading || !canSubmit}
+        className="w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        style={{ background: 'linear-gradient(135deg, #fb923c, #f97316)', color: 'white' }}
+      >
+        {loading ? 'Ukládám…' : 'Uložit do profilu'}
+      </button>
     </div>
   )
 }
