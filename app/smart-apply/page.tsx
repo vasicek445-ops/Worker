@@ -253,14 +253,11 @@ function SmartApplyContent() {
           </div>
         )}
 
-        {/* Gmail setup card */}
+        {/* Gmail setup — full card (back to original UX). Důležitý onboarding step,
+            user musí jasně vidět co se s Google OAuth bude dít. */}
         <div
           id="gmail-setup"
-          className="rounded-2xl border p-5 mb-6"
-          style={{
-            background: gmailConnected ? 'rgba(34,197,94,0.04)' : 'rgba(251,146,60,0.04)',
-            borderColor: gmailConnected ? 'rgba(34,197,94,0.2)' : 'rgba(251,146,60,0.25)',
-          }}
+          className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 mb-6"
         >
           {gmailStatus.state === 'loading' && (
             <div className="flex items-center gap-3 text-white/40 text-sm">
@@ -268,42 +265,65 @@ function SmartApplyContent() {
             </div>
           )}
           {gmailStatus.state === 'not_connected' && (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Mail size={20} className="text-[#fb923c]" strokeWidth={1.75} />
-                  <h2 className="text-white text-base font-semibold m-0">Připoj Gmail a začni</h2>
-                </div>
-                <p className="text-white/55 text-sm m-0">
-                  Worker bude posílat z tvé adresy — vyšší reply rate, odpovědi chodí přímo k tobě.
-                  Jen <code className="bg-white/10 px-1 py-0.5 rounded text-xs">gmail.send</code> oprávnění, čtení nikdy.
-                </p>
+            <>
+              <div className="flex items-center gap-2.5 mb-2">
+                <Mail size={22} className="text-[#fb923c]" strokeWidth={1.75} />
+                <h2 className="text-white text-lg font-bold m-0">Připoj Gmail a začni</h2>
+              </div>
+              <p className="text-white/55 text-sm mb-5 leading-relaxed">
+                Worker bude posílat tvé pracovní přihlášky z tvého vlastního Gmail účtu — vyšší reply rate než cold email,
+                a všechny odpovědi ti chodí přímo do tvého Inboxu. Worker dostane pouze oprávnění{' '}
+                <code className="bg-white/10 px-1.5 py-0.5 rounded text-[12px]">gmail.send</code> (posílání emailů z tvé adresy).
+                NIKDY nemáme přístup ke čtení tvých emailů.
+              </p>
+              <div className="rounded-xl border border-[#ff8c2b]/25 bg-[#ff8c2b]/[0.06] p-4 mb-5 text-[13px] leading-relaxed text-white/65">
+                <strong className="text-white/85">Co tě čeká:</strong> Google ti při přihlášení ukáže obrazovku „Tato aplikace není ověřená Googlem&quot;.{' '}
+                <strong className="text-white/85">Je to v pořádku</strong> — Woker je nová aplikace a ověření u Googlu právě dokončuje.
+                Klikni na <strong className="text-white/85">„Pokročilé&quot;</strong> a pak{' '}
+                <strong className="text-white/85">„Přejít na gowoker.com&quot;</strong>. Je to bezpečné: Worker může e-maily z tvé adresy jen{' '}
+                <strong className="text-white/85">posílat</strong>, číst je nikdy.
               </div>
               <button
                 disabled={gmailBusy}
                 onClick={handleConnect}
-                className="bg-[#fb923c] hover:bg-[#f97316] disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2 transition shrink-0"
+                className="bg-[#ff8c2b] hover:bg-[#ff6a1f] disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl flex items-center gap-2 transition"
               >
-                <Mail size={16} /> {gmailBusy ? 'Otevírám…' : 'Připojit Gmail'}
+                <Mail size={18} /> {gmailBusy ? 'Otevírám Google…' : 'Připojit Gmail'}
               </button>
-            </div>
+            </>
           )}
           {gmailStatus.state === 'connected' && (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <CheckCircle2 size={20} className="text-[#22c55e] shrink-0" strokeWidth={1.75} />
-                <div className="min-w-0">
-                  <div className="text-white text-sm font-semibold leading-tight">Gmail připojen</div>
-                  <div className="text-white/40 text-xs truncate">{gmailStatus.email}</div>
-                </div>
+            <>
+              <div className="flex items-center gap-2 mb-1">
+                <CheckCircle2 size={20} className="text-[#22c55e]" strokeWidth={1.75} />
+                <h2 className="text-lg font-bold text-white m-0">Gmail připojen</h2>
               </div>
-              <Link
-                href="/profil/agent"
-                className="text-[#fb923c] hover:text-[#f97316] text-xs font-medium no-underline"
-              >
-                Nastavit agenta →
-              </Link>
-            </div>
+              <p className="text-white/55 text-sm mb-1">
+                Účet: <span className="text-white font-medium">{gmailStatus.email}</span>
+              </p>
+              <p className="text-white/30 text-xs mb-5">
+                Připojeno {new Date(gmailStatus.connectedAt).toLocaleString('cs-CZ')}
+              </p>
+              <div className="flex flex-wrap items-center gap-4">
+                <Link
+                  href="/profil/agent"
+                  className="bg-[#ff8c2b]/10 hover:bg-[#ff8c2b]/20 border border-[#ff8c2b]/30 text-[#ff8c2b] text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-2 no-underline"
+                >
+                  Nastavit agenta →
+                </Link>
+                <button
+                  type="button"
+                  disabled={gmailBusy}
+                  onClick={handleConnect}
+                  className="text-[#ff8c2b] hover:text-[#ff6a1f] disabled:opacity-50 text-sm underline"
+                >
+                  Připojit znovu
+                </button>
+              </div>
+              <p className="text-white/30 text-xs mt-3 m-0">
+                Když odesílání hlásí „spojení vypršelo&quot;, klikni na „Připojit znovu&quot; — Gmail se přepojí s čerstvým tokenem.
+              </p>
+            </>
           )}
           {gmailStatus.state === 'error' && (
             <div className="text-red-400 text-sm flex gap-2">
@@ -506,37 +526,67 @@ function JobCard({
         )}
       </div>
 
-      <div className="flex gap-2 flex-wrap">
+      {/* Footer: jemne pill akce dle Refero patternu (Teal/Handshake/Parallel) —
+          zadne full-width gradient CTA. CTA "Posli za me" je oranzova pill,
+          "Originál" je secondary outline pill. */}
+      <div className="flex items-center justify-between gap-2 pt-1">
+        <div className="flex items-center gap-2 min-w-0">
+          {job.url && (
+            <a
+              href={job.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium no-underline transition"
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(255,255,255,0.55)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+                e.currentTarget.style.color = 'rgba(255,255,255,0.85)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                e.currentTarget.style.color = 'rgba(255,255,255,0.55)'
+              }}
+            >
+              <ExternalLink size={12} strokeWidth={1.75} /> Originál
+            </a>
+          )}
+        </div>
         <button
           type="button"
           onClick={onApply}
-          className="flex-1 min-w-[140px] text-white text-center py-2.5 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2"
+          className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold transition"
           style={{
-            background: gmailConnected ? 'linear-gradient(135deg, #fb923c, #f97316)' : 'rgba(251,146,60,0.15)',
-            color: gmailConnected ? 'white' : '#fb923c',
-            border: gmailConnected ? 'none' : '1px solid rgba(251,146,60,0.3)',
+            background: gmailConnected ? 'rgba(251,146,60,0.12)' : 'transparent',
+            border: gmailConnected ? '1px solid rgba(251,146,60,0.35)' : '1px solid rgba(255,255,255,0.08)',
+            color: gmailConnected ? '#fb923c' : 'rgba(255,255,255,0.45)',
+          }}
+          onMouseEnter={(e) => {
+            if (gmailConnected) {
+              e.currentTarget.style.background = 'rgba(251,146,60,0.2)'
+              e.currentTarget.style.borderColor = 'rgba(251,146,60,0.5)'
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (gmailConnected) {
+              e.currentTarget.style.background = 'rgba(251,146,60,0.12)'
+              e.currentTarget.style.borderColor = 'rgba(251,146,60,0.35)'
+            }
           }}
         >
           {gmailConnected ? (
             <>
-              <Send size={14} strokeWidth={1.75} /> Pošli za mě
+              <Send size={12} strokeWidth={1.75} /> Pošli za mě
             </>
           ) : (
             <>
-              <Mail size={14} strokeWidth={1.75} /> Připoj Gmail pro odeslání
+              <Mail size={12} strokeWidth={1.75} /> Připoj Gmail
             </>
           )}
         </button>
-        {job.url && (
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#0a0a12] border border-white/[0.08] text-white/60 py-2.5 px-4 rounded-xl text-sm font-medium no-underline hover:border-white/20 transition flex items-center gap-1.5"
-          >
-            <ExternalLink size={12} strokeWidth={1.75} /> Originál
-          </a>
-        )}
       </div>
     </div>
   )
