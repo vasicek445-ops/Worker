@@ -38,7 +38,7 @@ function getCurrentSection(pathname: string | null) {
 
 export default function ProfileShell({ children, showReadiness = true }: ProfileShellProps) {
   const profileData = useProfile()
-  const { profile, saving, savedAt, loading, userId } = profileData
+  const { profile, saving, savedAt, loading, userId, saveError } = profileData
   const pathname = usePathname()
   const current = getCurrentSection(pathname)
 
@@ -89,7 +89,7 @@ export default function ProfileShell({ children, showReadiness = true }: Profile
               </h1>
             </div>
             <div className="shrink-0 pb-1">
-              <AutoSaveIndicator saving={saving} savedAt={savedAt} />
+              <AutoSaveIndicator saving={saving} savedAt={savedAt} saveError={saveError} />
             </div>
           </div>
 

@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react'
 export interface AutoSaveIndicatorProps {
   saving: boolean
   savedAt: number | null
+  saveError?: string | null
 }
 
-export default function AutoSaveIndicator({ saving, savedAt }: AutoSaveIndicatorProps) {
+export default function AutoSaveIndicator({ saving, savedAt, saveError }: AutoSaveIndicatorProps) {
   const [now, setNow] = useState<number>(() => Date.now())
 
   // Tick once a second only when we have a recent save to render
@@ -16,6 +17,27 @@ export default function AutoSaveIndicator({ saving, savedAt }: AutoSaveIndicator
     const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
   }, [savedAt])
+
+  if (saveError) {
+    return (
+      <div
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs"
+        style={{
+          background: 'rgba(239, 68, 68, 0.1)',
+          color: '#ef4444',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+        }}
+        title={saveError}
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span>Uložení selhalo</span>
+      </div>
+    )
+  }
 
   if (saving) {
     return (
