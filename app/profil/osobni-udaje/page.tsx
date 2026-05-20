@@ -138,6 +138,7 @@ export default function OsobniUdajePage() {
               className={inputClass}
               placeholder="Jan Novák"
             />
+            <p className={hintClass}>Objeví se na CV, v motivačním dopise a v podpisu Smart Apply e-mailů.</p>
           </div>
 
           <div>
@@ -148,7 +149,7 @@ export default function OsobniUdajePage() {
               locale="cs"
               outputFormat="eu"
             />
-            <p className={hintClass}>Den, měsíc, rok.</p>
+            <p className={hintClass}>Den, měsíc, rok. Použijeme pro výpočet věku v dopisech a žádostech o bydlení.</p>
           </div>
 
           <div>
@@ -160,6 +161,7 @@ export default function OsobniUdajePage() {
               className={inputClass}
               placeholder="+41 79 123 45 67"
             />
+            <p className={hintClass}>Kontakt na CV. Použije se i v žádostech o bydlení a v Smart Apply e-mailech.</p>
           </div>
 
           <div>
@@ -186,6 +188,7 @@ export default function OsobniUdajePage() {
                 <option key={n} value={n} className="bg-[#111120]">{n}</option>
               ))}
             </select>
+            <p className={hintClass}>Důležité pro povolení k práci ve Švýcarsku. Objeví se i v motivačních dopisech.</p>
           </div>
 
           <div>
@@ -197,7 +200,7 @@ export default function OsobniUdajePage() {
               className={inputClass}
               placeholder="Ulice 123, 8000 Curych"
             />
-            <p className={hintClass}>Aktuální adresa (CH nebo domov).</p>
+            <p className={hintClass}>Aktuální adresa (CH nebo domov). Použije se na CV a v žádostech o bydlení.</p>
           </div>
 
           <div>
@@ -209,7 +212,7 @@ export default function OsobniUdajePage() {
               className={inputClass}
               placeholder="B, C, vlastní auto"
             />
-            <p className={hintClass}>Skupiny + zda máš vlastní auto.</p>
+            <p className={hintClass}>Skupiny + zda máš vlastní auto. Velké plus pro logistiku a stavbu — objeví se v CV i motivačních dopisech.</p>
           </div>
         </div>
 
