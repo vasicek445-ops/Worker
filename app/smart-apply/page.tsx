@@ -540,12 +540,14 @@ function JobDetailPanel({
       setDraft(null)
       setGenerating(false)
       setDraftError(null)
-      setRecipient('')
+      // Auto-extract email z job description (regex + recruitment heuristic)
+      const extracted = extractRecruitmentEmail(job.description)
+      setRecipient(extracted || '')
       setSending(false)
       setSendError(null)
       setSent(null)
     }
-  }, [job.id])
+  }, [job.id, job.description])
 
   async function generateDraft() {
     if (generating) return
@@ -770,15 +772,29 @@ function JobDetailPanel({
             <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
               Komu (e-mail firmy)
             </label>
-            <input
-              type="email"
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-              placeholder="hr@firma.ch"
-              className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40 mb-2"
-            />
+            <div className="relative mb-2">
+              <input
+                type="email"
+                value={recipient}
+                onChange={(e) => setRecipient(e.target.value)}
+                placeholder="hr@firma.ch"
+                className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40"
+              />
+              {recipient && extractRecruitmentEmail(job.description) === recipient && (
+                <span
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded font-semibold"
+                  style={{ background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}
+                  title="Automaticky vyplněno z inzerátu"
+                >
+                  z inzerátu
+                </span>
+              )}
+            </div>
             <p className="text-white/40 text-xs m-0">
-              Najdeš v {job.url ? <a href={job.url} target="_blank" rel="noopener noreferrer" className="text-[#fb923c] no-underline hover:underline">inzerátu</a> : 'inzerátu'}.
+              {recipient
+                ? 'Auto-vyplněno z inzerátu. Můžeš změnit pokud chceš jiný kontakt.'
+                : <>Nenašli jsme kontakt v inzerátu. Otevři {job.url ? <a href={job.url} target="_blank" rel="noopener noreferrer" className="text-[#fb923c] no-underline hover:underline">originál</a> : 'inzerát'} a zkopíruj email firmy.</>
+              }{' '}
               CV přílohy připojíme v další verzi —{' '}
               <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">tvé CV</Link>.
             </p>
@@ -860,6 +876,34 @@ function JobDetailPanel({
       </div>
     </div>
   )
+}
+
+// ============================================================================
+// Email extraction z job description.
+// Heuristika: preferuj recruitment-typical prefixy (bewerbung@, hr@, jobs@,
+// karriere@, recruiting@, application@, talent@). Jinak vrat prvni email.
+// Eliminuje noreply/no-reply/donotreply adresy (CH HR system spammy).
+const RECRUITMENT_PREFIXES = [
+  'bewerbung', 'bewerbungen', 'hr', 'jobs', 'job', 'karriere', 'recruiting',
+  'recruitment', 'recruit', 'application', 'applications', 'apply', 'talent',
+  'personal', 'careers', 'career', 'people',
+]
+
+function extractRecruitmentEmail(text: string | null | undefined): string | null {
+  if (!text) return null
+  const matches = text.match(/\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/gi)
+  if (!matches || matches.length === 0) return null
+  const cleaned = matches
+    .map((e) => e.toLowerCase())
+    .filter((e) => !/^(noreply|no-reply|donotreply|do-not-reply|webmaster)@/.test(e))
+    .filter((e, i, arr) => arr.indexOf(e) === i) // unique
+  if (cleaned.length === 0) return null
+  // Preferuj recruitment prefixy
+  for (const prefix of RECRUITMENT_PREFIXES) {
+    const found = cleaned.find((e) => e.startsWith(prefix + '@') || e.startsWith(prefix + '.'))
+    if (found) return found
+  }
+  return cleaned[0]
 }
 
 function EmptyDetailState() {
