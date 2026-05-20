@@ -1,22 +1,19 @@
 'use client'
 
-import { createContext, useContext, useState, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import type { ProfileRow } from '../../../lib/profile/types'
 import { PROFILE_SECTIONS } from '../../../lib/profile/sections'
+import { useProfile, type UseProfileResult } from '../../../lib/profile/hooks'
 import ProfileNav from './ProfileNav'
 import ReadinessSidebar from './ReadinessSidebar'
 import AutoSaveIndicator from './AutoSaveIndicator'
 
-interface ProfileShellContextValue {
-  profile: ProfileRow | null
-  setProfile: (p: ProfileRow | null) => void
-  saving: boolean
-  setSaving: (v: boolean) => void
-  savedAt: number | null
-  setSavedAt: (t: number | null) => void
-}
+// Single source of truth: useProfile() is called ONCE here in the shell and exposed
+// to all profile pages via context. Pages call useProfileShell() (NOT useProfile())
+// to read/update — that way `profile` data is shared with ReadinessSidebar +
+// ProfileNav completion badges.
+type ProfileShellContextValue = UseProfileResult
 
 const ProfileShellContext = createContext<ProfileShellContextValue | null>(null)
 
@@ -39,15 +36,15 @@ function getCurrentSection(pathname: string | null) {
 }
 
 export default function ProfileShell({ children, showReadiness = true }: ProfileShellProps) {
-  const [profile, setProfile] = useState<ProfileRow | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [savedAt, setSavedAt] = useState<number | null>(null)
+  const profileData = useProfile()
+  const { profile, saving, savedAt, loading, userId } = profileData
   const pathname = usePathname()
   const current = getCurrentSection(pathname)
 
   const value = useMemo<ProfileShellContextValue>(
-    () => ({ profile, setProfile, saving, setSaving, savedAt, setSavedAt }),
-    [profile, saving, savedAt],
+    () => profileData,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [profile, saving, savedAt, loading, userId],
   )
 
   return (
@@ -100,13 +97,19 @@ export default function ProfileShell({ children, showReadiness = true }: Profile
             <ProfileNav />
           </div>
 
-          {/* 2-col content: main + optional readiness sidebar */}
-          <div className="flex gap-6 lg:gap-10">
+          {/* 2-col content: main + sticky readiness sidebar */}
+          <div className="flex gap-6 lg:gap-8">
             <main className="flex-1 min-w-0">
               {children}
             </main>
 
-            {showReadiness && <ReadinessSidebar profile={profile} />}
+            {showReadiness && (
+              <div className="hidden lg:block w-[240px] shrink-0">
+                <div className="sticky top-6">
+                  <ReadinessSidebar profile={profile} />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

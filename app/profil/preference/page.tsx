@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../supabase'
-import { useProfile } from '../../../lib/profile/hooks'
+import { useProfileShell } from '../_components/ProfileShell'
 import { useLanguage } from '../../../lib/i18n/LanguageContext'
 
 type Locale = 'cs' | 'sk' | 'en' | 'pl' | 'uk' | 'ro' | 'hu' | 'it' | 'pt' | 'es' | 'el'
@@ -25,7 +25,7 @@ const LANGUAGES: { code: Locale; flag: string; name: string }[] = [
 
 export default function PreferencePage() {
   const router = useRouter()
-  const { profile, loading, update, saving, savedAt } = useProfile()
+  const { profile, loading, update, saving, savedAt } = useProfileShell()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { locale, setLocale } = useLanguage() as any
   const [authChecked, setAuthChecked] = useState(false)

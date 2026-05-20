@@ -23,7 +23,7 @@ export default function ReadinessSidebar({ profile }: ReadinessSidebarProps) {
   return (
     <aside
       aria-label="Připravenost profilu"
-      className="hidden lg:flex flex-col gap-4 w-[220px] shrink-0"
+      className="flex flex-col gap-4 w-full"
       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
     >
       {/* Progress card */}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useProfile } from '../../../lib/profile/hooks'
+import { useProfileShell } from '../_components/ProfileShell'
 import { supabase } from '../../supabase'
 import WheelDatePicker from '../../components/cv/WheelDatePicker'
 
@@ -19,7 +19,7 @@ const labelClass = 'block text-white/60 text-xs font-medium mb-1.5'
 const hintClass = 'text-white/30 text-xs mt-1'
 
 export default function OsobniUdajePage() {
-  const { profile, userId, loading, update, saving, savedAt } = useProfile()
+  const { profile, userId, loading, update, saving, savedAt } = useProfileShell()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [uploading, setUploading] = useState(false)
   const [toast, setToast] = useState<string | null>(null)

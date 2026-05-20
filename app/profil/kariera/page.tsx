@@ -1,6 +1,6 @@
 'use client'
 
-import { useProfile } from '../../../lib/profile/hooks'
+import { useProfileShell } from '../_components/ProfileShell'
 
 const FIELDS = [
   'Gastronomie',
@@ -23,7 +23,7 @@ const labelClass = 'block text-white/60 text-xs font-medium mb-1.5'
 const hintClass = 'text-white/30 text-xs mt-1'
 
 export default function KarieraPage() {
-  const { profile, loading, update, saving, savedAt } = useProfile()
+  const { profile, loading, update, saving, savedAt } = useProfileShell()
 
   const saveStatus = saving ? 'Ukládám…' : savedAt ? 'Uloženo' : ''
 
