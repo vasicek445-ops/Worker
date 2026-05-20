@@ -9,9 +9,9 @@ import { useProfileShell } from './ProfileShell'
 const TRACKED_SECTIONS = new Set<string>(['osobni-udaje', 'kariera', 'cil'])
 
 // Horizontal tab groups (Tidal/Flixy/Resend pattern). Visual dividers between groups.
+// Profil = ja jako uzivatel (Osobni/Kariera/Cil), Ucet = aplikacni nastaveni (Preference/Nastaveni).
 const TAB_GROUPS: Array<{ ids: string[] }> = [
   { ids: ['osobni-udaje', 'kariera', 'cil'] },
-  { ids: ['dokumenty', 'smart-apply'] },
   { ids: ['preference', 'nastaveni'] },
 ]
 
