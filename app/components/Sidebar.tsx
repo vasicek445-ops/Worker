@@ -101,7 +101,11 @@ export default function Sidebar() {
 
         {[
           { href: "/dashboard", icon: Home, label: "Domů" },
-          { href: "/nabidky", icon: Briefcase, label: "Nabídky práce" },
+          {
+            href: "/smart-apply",
+            icon: Briefcase,
+            label: "Smart Apply",
+          },
           { href: "/bydleni", icon: Building2, label: "Bydlení" },
           {
             href: "/kontakty",
@@ -111,12 +115,6 @@ export default function Sidebar() {
           },
           { href: "/prihlasky", icon: MailOpen, label: "Moje přihlášky" },
           { href: "/dokumenty", icon: FileText, label: "Moje dokumenty" },
-          {
-            href: "/profil/gmail",
-            icon: Mail,
-            label: "Smart Apply",
-            badge: { text: "BETA", className: "bg-[#fb923c]/15 text-[#fb923c]" },
-          },
           { href: "/profil/osobni-udaje", icon: User, label: "Profil", activeWhen: isProfileActive },
         ].map((it) => {
           const active = it.activeWhen ?? isActivePath(it.href);
