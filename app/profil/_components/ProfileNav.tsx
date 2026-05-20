@@ -66,7 +66,11 @@ export default function ProfileNav() {
                     if (!active) e.currentTarget.style.color = 'rgba(255,255,255,0.65)'
                   }}
                 >
-                  <span className="text-sm leading-none">{section.icon}</span>
+                  <section.Icon
+                    size={16}
+                    strokeWidth={1.75}
+                    color={active ? '#fb923c' : 'rgba(255,140,43,0.7)'}
+                  />
                   <span>{section.label}</span>
                   {pct !== null && <CompletionBadge percent={pct} active={active} />}
                   {active && (

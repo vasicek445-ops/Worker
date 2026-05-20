@@ -1,4 +1,5 @@
 // Sdílené typy pro profil. Jediný zdroj pravdy o tom co je v `profiles` tabulce.
+import type React from 'react'
 
 export interface ProfileRow {
   id: string
@@ -47,10 +48,15 @@ export type ProfileSectionId =
   | 'preference'
   | 'nastaveni'
 
+// Lucide icon component type (lazy reference to avoid circular import).
+// V sections.ts importujeme konkretni komponenty z 'lucide-react'.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type LucideIconComponent = React.ComponentType<any>
+
 export interface ProfileSectionMeta {
   id: ProfileSectionId
   label: string
-  icon: string                      // emoji
+  Icon: LucideIconComponent         // Lucide ikona (sjednoceno s globalnim Sidebar)
   href: string                      // /profil/osobni-udaje, ...
   description?: string
 }
