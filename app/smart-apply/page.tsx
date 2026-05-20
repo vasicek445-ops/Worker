@@ -313,8 +313,8 @@ function SmartApplyContent() {
           )}
         </div>
 
-        {/* Split-view: list + detail (Teal/Handshake pattern) */}
-        <div className="grid lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] gap-5">
+        {/* Split-view: list + detail (Teal/Handshake pattern) — 50/50 split na desktopu */}
+        <div className="grid lg:grid-cols-2 gap-5">
           {/* LEFT — list (mobile hidden when detail selected) */}
           <div className={selectedJob ? 'hidden lg:flex' : 'flex'}>
             <div className="w-full flex flex-col">
