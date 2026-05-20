@@ -1,7 +1,7 @@
 // Wooky Edit Helper — typy. Wooky je on-demand AI asistent v profilu, ktery
 // uzivateli pomaha pridat/upravit pole + (u volnych textu) rozsirit kratky
 // vstup do bohatsiho profesionalniho textu.
-import type { ProfileRow } from '../profile/types'
+import type { ProfileRow, LucideIconComponent } from '../profile/types'
 
 export type WookyFieldKind =
   | 'simple'      // free text input → direct save
@@ -19,7 +19,7 @@ export interface WookyFieldMeta {
   // Klic v ProfileRow (single source of truth pro autofill napric apkou).
   key: keyof ProfileRow
   label: string
-  icon: string
+  Icon: LucideIconComponent          // Lucide ikona (sjednoceno s brandem)
   section: 'osobni-udaje' | 'kariera' | 'cil'
   kind: WookyFieldKind
   // Co rikat uzivateli, kdyz vybere toto pole.

@@ -1,4 +1,9 @@
 import type { WookyFieldMeta, WookyChoiceOption } from './types'
+import {
+  User, Phone, Mail, Globe, Home, Car,
+  Factory, Crosshair, History, GraduationCap, Zap, Languages, MessagesSquare,
+  MapPin, Wallet, IdCard, Building2,
+} from 'lucide-react'
 
 // ===== Reusable option sets =====
 
@@ -133,7 +138,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'full_name',
     label: 'Jméno a příjmení',
-    icon: '👤',
+    Icon: User,
     section: 'osobni-udaje',
     kind: 'simple',
     prompt: 'Začneme jménem — jak ti říkat?',
@@ -143,7 +148,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'telefon',
     label: 'Telefon',
-    icon: '📞',
+    Icon: Phone,
     section: 'osobni-udaje',
     kind: 'simple',
     prompt: 'Telefonní číslo, na kterém tě může zaměstnavatel zastihnout.',
@@ -153,7 +158,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'email',
     label: 'Kontaktní e-mail',
-    icon: '✉️',
+    Icon: Mail,
     section: 'osobni-udaje',
     kind: 'simple',
     prompt: 'E-mail, který uvedeš na CV (může se lišit od přihlašovacího).',
@@ -163,7 +168,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'nationality',
     label: 'Národnost',
-    icon: '🌍',
+    Icon: Globe,
     section: 'osobni-udaje',
     kind: 'choice',
     options: NATIONALITIES,
@@ -175,7 +180,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'adresa',
     label: 'Adresa',
-    icon: '🏠',
+    Icon: Home,
     section: 'osobni-udaje',
     kind: 'simple',
     prompt: 'Aktuální adresa — kde teď bydlíš (CH nebo domov).',
@@ -185,7 +190,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'ridicky_prukaz',
     label: 'Řidičský průkaz',
-    icon: '🚗',
+    Icon: Car,
     section: 'osobni-udaje',
     kind: 'choice',
     options: DRIVING_LICENSES,
@@ -199,7 +204,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'obor',
     label: 'Obor',
-    icon: '🏭',
+    Icon: Factory,
     section: 'kariera',
     kind: 'choice',
     options: INDUSTRIES,
@@ -211,7 +216,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'pozice',
     label: 'Cílová pozice',
-    icon: '🎯',
+    Icon: Crosshair,
     section: 'kariera',
     kind: 'simple',
     prompt: 'Na jakou pozici se hlásíš nebo jaká tě baví?',
@@ -221,7 +226,7 @@ export const WOOKY_FIELDS: WookyFieldMeta[] = [
   {
     key: 'zkusenosti',
     label: 'Pracovní zkušenosti',
-    icon: '💼',
+    Icon: History,
     section: 'kariera',
     kind: 'expand',
     prompt: 'Stačí mi to říct rámcově — kde, kdy, co. Já to pak rozšířím do profesionálního jazyka.',
@@ -235,7 +240,7 @@ Jen profesionálně přeformuluj + doplň běžné kontextové detaily (lokace, 
   {
     key: 'vzdelani',
     label: 'Vzdělání',
-    icon: '🎓',
+    Icon: GraduationCap,
     section: 'kariera',
     kind: 'expand',
     prompt: 'Nejvyšší dosažené vzdělání + obor. Stačí stručně, doplním.',
@@ -247,7 +252,7 @@ Nikdy nedoplňuj jméno školy ani specifický rok pokud uživatel neuvedl. Jen 
   {
     key: 'dovednosti',
     label: 'Dovednosti',
-    icon: '⚡',
+    Icon: Zap,
     section: 'kariera',
     kind: 'expand',
     prompt: 'Co umíš? Stroje, nástroje, jazyky programů, soft skills...',
@@ -262,7 +267,7 @@ Vrať jako seznam oddělený čárkami.`,
   {
     key: 'nemcina_uroven',
     label: 'Úroveň němčiny',
-    icon: '🇨🇭',
+    Icon: Languages,
     section: 'kariera',
     kind: 'choice',
     options: CEFR_LEVELS,
@@ -274,7 +279,7 @@ Vrať jako seznam oddělený čárkami.`,
   {
     key: 'dalsi_jazyky',
     label: 'Další jazyky',
-    icon: '🗣️',
+    Icon: MessagesSquare,
     section: 'kariera',
     kind: 'languages',
     languageOptions: LANGUAGE_OPTIONS,
@@ -287,7 +292,7 @@ Vrať jako seznam oddělený čárkami.`,
   {
     key: 'preferovany_kanton',
     label: 'Preferovaný kanton',
-    icon: '📍',
+    Icon: MapPin,
     section: 'cil',
     kind: 'choice',
     options: SWISS_CANTONS,
@@ -299,7 +304,7 @@ Vrať jako seznam oddělený čárkami.`,
   {
     key: 'income_expected',
     label: 'Očekávaný plat',
-    icon: '💰',
+    Icon: Wallet,
     section: 'cil',
     kind: 'simple',
     prompt: 'Kolik CHF si chceš vydělat měsíčně (brutto)?',
@@ -309,7 +314,7 @@ Vrať jako seznam oddělený čárkami.`,
   {
     key: 'work_permit_status',
     label: 'Pracovní povolení',
-    icon: '🪪',
+    Icon: IdCard,
     section: 'cil',
     kind: 'choice',
     options: SWISS_PERMITS,
@@ -321,7 +326,7 @@ Vrať jako seznam oddělený čárkami.`,
   {
     key: 'employer_current',
     label: 'Současný zaměstnavatel',
-    icon: '🏢',
+    Icon: Building2,
     section: 'cil',
     kind: 'simple',
     prompt: 'Kde teď pracuješ (pokud někde)?',

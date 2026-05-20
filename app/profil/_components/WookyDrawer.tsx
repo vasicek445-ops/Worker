@@ -319,7 +319,12 @@ function PickerView({
                     e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
                   }}
                 >
-                  <span className="text-base shrink-0">{f.icon}</span>
+                  <f.Icon
+                    size={16}
+                    strokeWidth={1.75}
+                    color={filled ? 'rgba(255,140,43,0.7)' : 'rgba(255,140,43,0.55)'}
+                    className="shrink-0"
+                  />
                   <span className="flex-1 truncate">{f.label}</span>
                   {filled && (
                     <span className="text-[10px]" style={{ color: '#22c55e' }} aria-label="vyplněno">
@@ -367,7 +372,7 @@ function EditingView({
     <div className="space-y-5">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">{field.icon}</span>
+          <field.Icon size={22} strokeWidth={1.75} color="#fb923c" />
           <h2 className="text-white text-lg font-semibold">{field.label}</h2>
         </div>
         <p className="text-white/60 text-sm leading-relaxed">{field.prompt}</p>
@@ -501,7 +506,7 @@ function PreviewView({
     <div className="space-y-5">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">{field.icon}</span>
+          <field.Icon size={22} strokeWidth={1.75} color="#fb923c" />
           <h2 className="text-white text-lg font-semibold">Takhle by to vypadalo</h2>
         </div>
         <p className="text-white/60 text-sm leading-relaxed">
@@ -635,7 +640,7 @@ function ChoiceView({
     <div className="space-y-5">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">{field.icon}</span>
+          <field.Icon size={22} strokeWidth={1.75} color="#fb923c" />
           <h2 className="text-white text-lg font-semibold">{field.label}</h2>
         </div>
         <p className="text-white/60 text-sm leading-relaxed">{field.prompt}</p>
@@ -766,7 +771,7 @@ function LanguagesView({
     <div className="space-y-5">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-xl">{field.icon}</span>
+          <field.Icon size={22} strokeWidth={1.75} color="#fb923c" />
           <h2 className="text-white text-lg font-semibold">{field.label}</h2>
         </div>
         <p className="text-white/60 text-sm leading-relaxed">{field.prompt}</p>
