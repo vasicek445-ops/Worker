@@ -160,11 +160,21 @@ function SmartApplyContent() {
       params.set('page', page.toString())
       const res = await fetch(`/api/jobs?${params}`)
       const data = await res.json()
-      setJobs(data.jobs || [])
+      // Smart Apply ma smysl jen pro nabidky kde dokazeme extrahovat kontakt.
+      // Inzeraty bez emailu (jen apply URL na externi ATS) zde nepatri — user
+      // by je neumel poslat pres Smart Apply. Otevri originál a aplikuj rucne.
+      const allJobs: Job[] = data.jobs || []
+      const applyable = allJobs.filter((j) => extractRecruitmentEmail(j.description) !== null)
+      setJobs(applyable)
+      // Total zobrazuje skutecny pocet apply-able (vlevo "X nabidek"), ale
+      // pagination kotvi na backend total — pro v1 zobrazujeme oboje
       setTotal(data.total || 0)
       setTotalPages(data.totalPages || 0)
-      if (!selectedJob && data.jobs && data.jobs.length > 0) {
-        setSelectedJob(data.jobs[0])
+      if (!selectedJob && applyable.length > 0) {
+        setSelectedJob(applyable[0])
+      } else if (selectedJob && !applyable.find((j) => j.id === selectedJob.id)) {
+        // Aktualne vybrana nabidka filtrem vypadla — pretty selectni prvni
+        setSelectedJob(applyable[0] || null)
       }
     } catch {
       setJobs([])
@@ -366,13 +376,22 @@ function SmartApplyContent() {
                 </button>
               </div>
 
-              <div className="text-white/40 text-xs mb-3">
-                {total > 0 && `${total} nabídek`}
+              <div className="text-white/40 text-xs mb-3 flex items-center gap-2 flex-wrap">
+                <span>
+                  {jobs.length > 0 && (
+                    <>
+                      <span className="text-white/70 font-semibold">{jobs.length}</span> nabídek s kontaktem
+                      {total > jobs.length && (
+                        <span className="text-white/30"> (z {total} celkem)</span>
+                      )}
+                    </>
+                  )}
+                </span>
                 {hasFilters && (
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="ml-3 text-white/40 hover:text-white transition"
+                    className="text-white/40 hover:text-white transition"
                   >
                     ✕ Vymazat filtry
                   </button>
