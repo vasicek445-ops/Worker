@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useState, useCallback } from 'react'
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '../supabase'
@@ -21,6 +21,7 @@ import {
   Calendar,
   ChevronLeft,
   Wand2,
+  RotateCw,
 } from 'lucide-react'
 
 // ============================================================================
@@ -522,12 +523,92 @@ function JobDetailPanel({
   timeAgo: (dateStr: string | null) => string
   sourceLabel: (source: string) => string
 }) {
-  function handleApply() {
-    if (!gmailConnected) {
-      document.getElementById('gmail-setup')?.scrollIntoView({ behavior: 'smooth' })
+  // Draft + send state. Resetuje se pri zmene jobu.
+  const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null)
+  const [generating, setGenerating] = useState(false)
+  const [draftError, setDraftError] = useState<string | null>(null)
+
+  const [recipient, setRecipient] = useState('')
+  const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
+  const [sent, setSent] = useState<{ messageId: string } | null>(null)
+
+  const lastJobIdRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (lastJobIdRef.current !== job.id) {
+      lastJobIdRef.current = job.id
+      setDraft(null)
+      setGenerating(false)
+      setDraftError(null)
+      setRecipient('')
+      setSending(false)
+      setSendError(null)
+      setSent(null)
+    }
+  }, [job.id])
+
+  async function generateDraft() {
+    if (generating) return
+    setGenerating(true)
+    setDraftError(null)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Musíš být přihlášený')
+      const res = await fetch('/api/smart-apply/draft', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ jobId: job.id }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`)
+      setDraft({ subject: body.subject, body: body.body })
+    } catch (e) {
+      setDraftError(e instanceof Error ? e.message : 'Generování selhalo')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  async function handleSend() {
+    if (!draft || !gmailConnected) {
+      if (!gmailConnected) {
+        document.getElementById('gmail-setup')?.scrollIntoView({ behavior: 'smooth' })
+      }
       return
     }
-    alert(`Draft generation pro "${job.title}" — coming soon (Fáze 2 AI draft + Gmail send).`)
+    if (!recipient.trim()) {
+      setSendError('Zadej e-mail příjemce (kontakt na firmu).')
+      return
+    }
+    setSending(true)
+    setSendError(null)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Musíš být přihlášený')
+      const res = await fetch('/api/smart-apply/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          jobId: job.id,
+          to: recipient.trim(),
+          subject: draft.subject,
+          body: draft.body,
+        }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`)
+      setSent({ messageId: body.message_id })
+    } catch (e) {
+      setSendError(e instanceof Error ? e.message : 'Odeslání selhalo')
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -606,36 +687,115 @@ function JobDetailPanel({
           </div>
         )}
 
+        {/* ===== AI motivacni email ===== */}
         <div className="rounded-xl border border-[#fb923c]/20 bg-[#fb923c]/[0.04] p-4 mb-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Wand2 size={16} className="text-[#fb923c]" strokeWidth={1.75} />
-            <h3 className="text-white text-sm font-semibold m-0">AI motivační dopis</h3>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <Wand2 size={16} className="text-[#fb923c]" strokeWidth={1.75} />
+              <h3 className="text-white text-sm font-semibold m-0">AI motivační dopis</h3>
+            </div>
+            {draft && !generating && (
+              <button
+                type="button"
+                onClick={generateDraft}
+                className="inline-flex items-center gap-1 text-white/50 hover:text-white text-xs transition"
+                title="Vygenerovat znovu"
+              >
+                <RotateCw size={11} strokeWidth={1.75} /> Znovu
+              </button>
+            )}
           </div>
-          <p className="text-white/55 text-xs leading-relaxed mb-3">
-            Wooky vygeneruje motivační dopis přesně pro tuto pozici z tvého profilu — pracovní zkušenosti,
-            jazyky, kvalifikace. Vidíš preview, můžeš upravit, pak pošleš.
-          </p>
-          <button
-            type="button"
-            disabled
-            className="text-[#fb923c] text-xs font-medium opacity-60 cursor-not-allowed"
-          >
-            ✨ Vygenerovat draft — coming soon
-          </button>
+
+          {!draft && !generating && (
+            <>
+              <p className="text-white/55 text-xs leading-relaxed mb-3">
+                Wooky vygeneruje motivační email z tvého profilu (zkušenosti, jazyky, povolení) přesně pro tuto pozici.
+                Můžeš upravit před odesláním. Žádné vymýšlení faktů — jen to co máš v profilu.
+              </p>
+              <button
+                type="button"
+                onClick={generateDraft}
+                className="inline-flex items-center gap-1.5 bg-[#fb923c] hover:bg-[#f97316] text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+              >
+                <Sparkles size={14} strokeWidth={1.75} /> Vygenerovat draft
+              </button>
+            </>
+          )}
+
+          {generating && (
+            <div className="flex items-center gap-2.5 text-white/70 text-sm py-2">
+              <Loader2 size={16} className="animate-spin text-[#fb923c]" />
+              <span>Generuji motivační dopis… (může to trvat 5–10 s)</span>
+            </div>
+          )}
+
+          {draftError && (
+            <div className="text-red-400 text-xs mt-2 flex items-start gap-1.5">
+              <AlertCircle size={13} className="shrink-0 mt-0.5" />
+              <span>{draftError}</span>
+            </div>
+          )}
+
+          {draft && (
+            <div className="space-y-3 mt-2">
+              <div>
+                <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
+                  Předmět
+                </label>
+                <input
+                  type="text"
+                  value={draft.subject}
+                  onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
+                  className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
+                  Tělo emailu
+                </label>
+                <textarea
+                  value={draft.body}
+                  onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+                  rows={12}
+                  className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm leading-relaxed focus:outline-none focus:border-[#fb923c]/40 resize-y font-[inherit]"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 mb-5">
-          <div className="flex items-center gap-2 mb-1">
-            <FileText size={16} className="text-white/60" strokeWidth={1.75} />
-            <h3 className="text-white text-sm font-semibold m-0">CV příloha</h3>
+        {/* ===== Recipient email + CV info ===== */}
+        {draft && (
+          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 mb-5">
+            <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
+              Komu (e-mail firmy)
+            </label>
+            <input
+              type="email"
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+              placeholder="hr@firma.ch"
+              className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40 mb-2"
+            />
+            <p className="text-white/40 text-xs m-0">
+              Najdeš v {job.url ? <a href={job.url} target="_blank" rel="noopener noreferrer" className="text-[#fb923c] no-underline hover:underline">inzerátu</a> : 'inzerátu'}.
+              CV přílohy připojíme v další verzi —{' '}
+              <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">tvé CV</Link>.
+            </p>
           </div>
-          <p className="text-white/50 text-xs leading-relaxed m-0">
-            K přihlášce automaticky přiložíme tvé poslední CV.{' '}
-            <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">
-              Spravovat CV →
-            </Link>
-          </p>
-        </div>
+        )}
+
+        {sent && (
+          <div className="rounded-xl border border-green-500/30 bg-green-500/[0.04] p-4 mb-5 flex items-start gap-2.5">
+            <CheckCircle2 size={18} className="text-[#22c55e] shrink-0 mt-0.5" strokeWidth={1.75} />
+            <div className="text-sm">
+              <div className="text-white font-semibold mb-0.5">Email odeslán!</div>
+              <div className="text-white/55 text-xs">
+                Doručeno z tvého Gmailu. Odpověď přijde přímo do tvého Inboxu.
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="border-t border-white/[0.06] p-4 flex items-center gap-2">
@@ -644,7 +804,7 @@ function JobDetailPanel({
             href={job.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition"
+            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition shrink-0"
             style={{
               background: 'transparent',
               border: '1px solid rgba(255,255,255,0.08)',
@@ -654,26 +814,49 @@ function JobDetailPanel({
             <ExternalLink size={13} strokeWidth={1.75} /> Originál
           </a>
         )}
-        <button
-          type="button"
-          onClick={handleApply}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition"
-          style={{
-            background: gmailConnected ? 'linear-gradient(135deg, #fb923c, #f97316)' : 'rgba(251,146,60,0.12)',
-            color: gmailConnected ? 'white' : '#fb923c',
-            border: gmailConnected ? 'none' : '1px solid rgba(251,146,60,0.35)',
-          }}
-        >
-          {gmailConnected ? (
-            <>
-              <Send size={15} strokeWidth={1.75} /> Pošli za mě
-            </>
-          ) : (
-            <>
-              <Mail size={15} strokeWidth={1.75} /> Připoj Gmail
-            </>
+        <div className="flex-1 min-w-0">
+          {sendError && (
+            <div className="text-red-400 text-xs mb-1.5 flex items-center gap-1">
+              <AlertCircle size={11} /> {sendError}
+            </div>
           )}
-        </button>
+          <button
+            type="button"
+            onClick={handleSend}
+            disabled={sending || sent !== null}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition disabled:cursor-not-allowed"
+            style={{
+              background: !gmailConnected
+                ? 'rgba(251,146,60,0.12)'
+                : sent
+                  ? 'rgba(34,197,94,0.15)'
+                  : draft
+                    ? 'linear-gradient(135deg, #fb923c, #f97316)'
+                    : 'rgba(255,255,255,0.04)',
+              color: !gmailConnected ? '#fb923c' : sent ? '#22c55e' : draft ? 'white' : 'rgba(255,255,255,0.4)',
+              border: !gmailConnected
+                ? '1px solid rgba(251,146,60,0.35)'
+                : sent
+                  ? '1px solid rgba(34,197,94,0.4)'
+                  : draft
+                    ? 'none'
+                    : '1px solid rgba(255,255,255,0.06)',
+              opacity: sending ? 0.6 : 1,
+            }}
+          >
+            {!gmailConnected ? (
+              <><Mail size={15} strokeWidth={1.75} /> Připoj Gmail</>
+            ) : sent ? (
+              <><CheckCircle2 size={15} strokeWidth={1.75} /> Odesláno</>
+            ) : sending ? (
+              <><Loader2 size={15} className="animate-spin" /> Posílám…</>
+            ) : draft ? (
+              <><Send size={15} strokeWidth={1.75} /> Pošli za mě</>
+            ) : (
+              <><Wand2 size={15} strokeWidth={1.75} /> Nejdřív vygeneruj draft</>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )
