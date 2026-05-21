@@ -44,10 +44,11 @@ export async function POST(req: NextRequest) {
     }
     const isAgencyMode = !!body.agencyId
 
-    // Load profile
+    // Load profile (bez email/profile_locale — ty nejsou v profiles tabulce vsude,
+    // email vezmeme z auth.user.email jako fallback)
     const { data: profile, error: profileErr } = await supabaseAdmin
       .from('profiles')
-      .select('full_name, nationality, zkusenosti, vzdelani, dovednosti, nemcina_uroven, dalsi_jazyky, pozice, obor, adresa, telefon, email, ridicky_prukaz, work_permit_status, profile_locale')
+      .select('full_name, nationality, zkusenosti, vzdelani, dovednosti, nemcina_uroven, dalsi_jazyky, pozice, obor, adresa, telefon, ridicky_prukaz, work_permit_status')
       .eq('id', user.id)
       .maybeSingle()
 
