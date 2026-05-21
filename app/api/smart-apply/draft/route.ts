@@ -59,6 +59,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Profile not found — vyplň profil před generací draftu' }, { status: 400 })
     }
 
+    // Load published CV URL (Smart Apply Stage 1: link v email body misto PDF
+    // attachment — Stage 2 implementuje multipart MIME).
+    let publishedCvUrl: string | null = null
+    try {
+      const { data: cvRow } = await supabaseAdmin
+        .from('saved_documents')
+        .select('published_slug')
+        .eq('member_id', user.id)
+        .eq('type', 'cv')
+        .not('published_slug', 'is', null)
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle()
+      if (cvRow?.published_slug) {
+        publishedCvUrl = `https://www.gowoker.com/cv/${cvRow.published_slug}`
+      }
+    } catch { /* saved_documents nemusi existovat ve vsech setupech */ }
+
     // Vyber jazyk emailu: nemcina prioritne pokud user umi alespon B1, jinak cestina.
     const germanLevel = profile.nemcina_uroven || ''
     const canWriteGerman = ['B1', 'B2', 'C1', 'C2', 'Mateřský'].includes(germanLevel)
@@ -80,6 +98,7 @@ export async function POST(req: NextRequest) {
       profile.ridicky_prukaz ? `Řidičský průkaz: ${profile.ridicky_prukaz}` : null,
       profile.adresa ? `Adresa: ${profile.adresa}` : null,
       profile.telefon ? `Telefon: ${profile.telefon}` : null,
+      publishedCvUrl ? `Veřejné CV (odkaz pro emailem): ${publishedCvUrl}` : null,
     ].filter(Boolean).join('\n')
 
     // ========================================================================
@@ -110,6 +129,10 @@ export async function POST(req: NextRequest) {
       prompt = `Jsi expert na psaní motivačních emailů pro švýcarský pracovní trh. Pomáháš blue-collar pracovníkům z CZ/SK najít práci ve Švýcarsku.
 
 ÚKOL: Napiš krátký, profesionální OPEN APPLICATION (Initiativbewerbung) email — uchazeč se hlásí do personální agentury s otevřenou žádostí, NE na konkrétní inzerát. Jazyk: ${lang}.
+
+📎 PŘÍLOHA: ${publishedCvUrl
+  ? `Uchazeč má veřejný online CV. V závěru emailu PŘED podpisem přidej odkaz: "Můj kompletní profesionální životopis je k dispozici online: ${publishedCvUrl}" (nebo německý ekvivalent "Mein vollständiger Lebenslauf ist online verfügbar:")`
+  : 'Uchazeč zatím nemá publikovaný online CV. Email napíš BEZ odkazu na CV — v závěru jen "Rád zašlu Lebenslauf na vyžádání" / "Gerne sende ich Ihnen meinen Lebenslauf auf Anfrage."'}
 
 🚫 KRITICKÉ:
 - Nikdy nepřidávej fakta, která uchazeč neuvedl v profilu.
@@ -159,6 +182,10 @@ Příklad: {"subject":"...","body":"..."}`
       prompt = `Jsi expert na psaní motivačních emailů pro švýcarský pracovní trh. Pomáháš blue-collar pracovníkům z CZ/SK najít práci ve Švýcarsku.
 
 ÚKOL: Napiš krátký, profesionální motivační email pro tuto pozici. Jazyk: ${lang}.
+
+📎 PŘÍLOHA: ${publishedCvUrl
+  ? `Uchazeč má veřejný online CV. V závěru PŘED podpisem přidej: "Můj profesionální životopis je online: ${publishedCvUrl}"`
+  : 'Uchazeč nemá online CV. Email BEZ odkazu na CV — "Gerne sende ich Lebenslauf auf Anfrage."'}
 
 🚫 KRITICKÉ:
 - Nikdy nepřidávej fakta, která uchazeč neuvedl v profilu.
@@ -215,6 +242,8 @@ Příklad: {"subject":"...","body":"..."}`
       subject: parsed.subject.trim(),
       body: parsed.body.trim(),
       language: langCode,
+      cv_url: publishedCvUrl,
+      has_cv: !!publishedCvUrl,
     })
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Internal error'

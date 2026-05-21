@@ -477,6 +477,8 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
   onBack: () => void
 }) {
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null)
+  const [hasCv, setHasCv] = useState<boolean | null>(null)
+  const [cvUrl, setCvUrl] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
   const [draftError, setDraftError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
@@ -511,6 +513,8 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
       const body = await res.json()
       if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`)
       setDraft({ subject: body.subject, body: body.body })
+      setHasCv(body.has_cv ?? false)
+      setCvUrl(body.cv_url ?? null)
     } catch (e) {
       setDraftError(e instanceof Error ? e.message : 'Generování selhalo')
     } finally {
@@ -656,6 +660,42 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
             </div>
           )}
         </div>
+
+        {/* CV info banner — viditelne po vygenerovani draftu */}
+        {draft !== null && (
+          <div className="rounded-xl border p-4 mb-5" style={{
+            background: hasCv ? 'rgba(34,197,94,0.04)' : 'rgba(251,146,60,0.04)',
+            borderColor: hasCv ? 'rgba(34,197,94,0.2)' : 'rgba(251,146,60,0.2)',
+          }}>
+            <div className="flex items-start gap-2.5">
+              {hasCv ? (
+                <CheckCircle2 size={16} className="text-[#22c55e] shrink-0 mt-0.5" strokeWidth={1.75} />
+              ) : (
+                <AlertCircle size={16} className="text-[#fb923c] shrink-0 mt-0.5" strokeWidth={1.75} />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold mb-1" style={{ color: hasCv ? '#22c55e' : '#fb923c' }}>
+                  {hasCv ? 'CV připojeno v emailu' : 'CV chybí — doporučujeme přidat'}
+                </div>
+                <div className="text-white/60 text-xs leading-relaxed">
+                  {hasCv ? (
+                    <>
+                      Tvůj veřejný CV je v textu emailu jako odkaz:{' '}
+                      {cvUrl && <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="text-[#fb923c] no-underline hover:underline break-all">{cvUrl}</a>}.
+                      CH HR ho otevře přímo v prohlížeči. PDF příloha přijde v další verzi.
+                    </>
+                  ) : (
+                    <>
+                      Email odejde bez CV příloh. Pro CH HR je CV standard — doporučujeme nejdřív v{' '}
+                      <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">Moje dokumenty</Link>{' '}
+                      vytvořit + publikovat CV. Pak ho Smart Apply automaticky vloží jako veřejný odkaz.
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {sent && (
           <div className="rounded-xl border border-green-500/30 bg-green-500/[0.04] p-4 mb-5 flex items-start gap-2.5">
