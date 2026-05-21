@@ -4,27 +4,28 @@ import { Plus, Trash2 } from 'lucide-react'
 import { useProfileShell } from '../_components/ProfileShell'
 import type { ProfileExperience, ProfileEducation, ProfileLanguage } from '@/lib/profile/types'
 
-// Top languages relevantni pro CH labor market + CZ/SK speakers
-const LANGUAGES = [
-  'Angličtina',
-  'Italština',
-  'Francouzština',
-  'Polština',
-  'Maďarština',
-  'Rumunština',
-  'Ukrajinština',
-  'Ruština',
-  'Španělština',
-  'Portugalština',
-  'Chorvatština',
-  'Srbština',
-  'Bulharština',
-  'Albánština',
-  'Turečtina',
-  'Slovenština',
-  'Čeština',
-  'Jiný',
-] as const
+// Top languages relevantni pro CH labor market + CZ/SK speakers.
+// Flag se zobrazuje ve dropdownu, ulozena hodnota je jen nazev jazyka (bez emoji).
+const LANGUAGES: Array<{ name: string; flag: string }> = [
+  { name: 'Angličtina', flag: '🇬🇧' },
+  { name: 'Italština', flag: '🇮🇹' },
+  { name: 'Francouzština', flag: '🇫🇷' },
+  { name: 'Polština', flag: '🇵🇱' },
+  { name: 'Maďarština', flag: '🇭🇺' },
+  { name: 'Rumunština', flag: '🇷🇴' },
+  { name: 'Ukrajinština', flag: '🇺🇦' },
+  { name: 'Ruština', flag: '🇷🇺' },
+  { name: 'Španělština', flag: '🇪🇸' },
+  { name: 'Portugalština', flag: '🇵🇹' },
+  { name: 'Chorvatština', flag: '🇭🇷' },
+  { name: 'Srbština', flag: '🇷🇸' },
+  { name: 'Bulharština', flag: '🇧🇬' },
+  { name: 'Albánština', flag: '🇦🇱' },
+  { name: 'Turečtina', flag: '🇹🇷' },
+  { name: 'Slovenština', flag: '🇸🇰' },
+  { name: 'Čeština', flag: '🇨🇿' },
+  { name: 'Jiný', flag: '🌍' },
+]
 
 const LANG_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Mateřský'] as const
 
@@ -385,8 +386,8 @@ function LanguageList({
               className={inputClass + ' appearance-none cursor-pointer flex-1'}
             >
               <option value="" disabled className="bg-[#111120]">Vyber jazyk</option>
-              {LANGUAGES.filter((l) => l === lang.language || !usedLanguages.has(l)).map((l) => (
-                <option key={l} value={l} className="bg-[#111120]">{l}</option>
+              {LANGUAGES.filter((l) => l.name === lang.language || !usedLanguages.has(l.name)).map((l) => (
+                <option key={l.name} value={l.name} className="bg-[#111120]">{l.flag} {l.name}</option>
               ))}
             </select>
             <select
