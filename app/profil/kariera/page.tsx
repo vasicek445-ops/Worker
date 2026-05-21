@@ -29,6 +29,72 @@ const LANGUAGES: Array<{ name: string; flag: string }> = [
 
 const LANG_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Mateřský'] as const
 
+// Rozsah let pro Obdobi dropdowny (1980 - currentYear, descending — nejnovejsi nahore)
+const CURRENT_YEAR = new Date().getFullYear()
+const YEARS = Array.from({ length: CURRENT_YEAR - 1979 }, (_, i) => CURRENT_YEAR - i)
+
+// Parse "2020 – 2024" or "2020 – současné" into {from, to}.
+// Akceptuje pomlcku - nebo en-dash – a slovo "soucasne"/"present"/"now"/"aktuell".
+function parsePeriod(period: string): { from: string; to: string } {
+  if (!period) return { from: '', to: '' }
+  const m = period.match(/^(\d{4})\s*[-–—]\s*(.+)$/)
+  if (m) {
+    const toRaw = m[2].trim().toLowerCase()
+    const to = /sou[cč]as|present|now|aktuell|aktual/.test(toRaw)
+      ? 'Současné'
+      : (toRaw.match(/^\d{4}$/) ? toRaw : '')
+    return { from: m[1], to }
+  }
+  const single = period.match(/^(\d{4})$/)
+  if (single) return { from: single[1], to: '' }
+  return { from: '', to: '' }
+}
+
+function formatPeriod(from: string, to: string): string {
+  if (!from && !to) return ''
+  if (from && !to) return from
+  return `${from} – ${to}`
+}
+
+// Year range picker: 2 selects (od / do). To podporuje "Současné" option.
+function YearRangePicker({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (next: string) => void
+}) {
+  const parsed = parsePeriod(value)
+  const setFrom = (from: string) => onChange(formatPeriod(from, parsed.to))
+  const setTo = (to: string) => onChange(formatPeriod(parsed.from, to))
+  return (
+    <div className="flex items-center gap-2">
+      <select
+        value={parsed.from}
+        onChange={(e) => setFrom(e.target.value)}
+        className={inputClass + ' appearance-none cursor-pointer flex-1'}
+      >
+        <option value="" className="bg-[#111120]">Od…</option>
+        {YEARS.map((y) => (
+          <option key={y} value={String(y)} className="bg-[#111120]">{y}</option>
+        ))}
+      </select>
+      <span className="text-white/30 text-sm">–</span>
+      <select
+        value={parsed.to}
+        onChange={(e) => setTo(e.target.value)}
+        className={inputClass + ' appearance-none cursor-pointer flex-1'}
+      >
+        <option value="" className="bg-[#111120]">Do…</option>
+        <option value="Současné" className="bg-[#111120]">Současné</option>
+        {YEARS.filter((y) => !parsed.from || y >= Number(parsed.from)).map((y) => (
+          <option key={y} value={String(y)} className="bg-[#111120]">{y}</option>
+        ))}
+      </select>
+    </div>
+  )
+}
+
 const FIELDS = [
   'Gastronomie',
   'Stavebnictví',
@@ -197,22 +263,19 @@ function ExperienceList({
               <Trash2 size={14} />
             </button>
 
-            <div className="grid grid-cols-2 gap-2.5 pr-8">
-              <input
-                type="text"
+            <div className="pr-8">
+              <YearRangePicker
                 value={exp.period || ''}
-                onChange={(e) => updateRow(i, { period: e.target.value })}
-                className={inputClass}
-                placeholder="2020 – 2024"
-              />
-              <input
-                type="text"
-                value={exp.title || ''}
-                onChange={(e) => updateRow(i, { title: e.target.value })}
-                className={inputClass}
-                placeholder="Pozice (Kuchař)"
+                onChange={(period) => updateRow(i, { period })}
               />
             </div>
+            <input
+              type="text"
+              value={exp.title || ''}
+              onChange={(e) => updateRow(i, { title: e.target.value })}
+              className={inputClass + ' pr-8'}
+              placeholder="Pozice (Kuchař)"
+            />
             <div className="grid grid-cols-2 gap-2.5">
               <input
                 type="text"
@@ -298,22 +361,19 @@ function EducationList({
               <Trash2 size={14} />
             </button>
 
-            <div className="grid grid-cols-2 gap-2.5 pr-8">
-              <input
-                type="text"
+            <div className="pr-8">
+              <YearRangePicker
                 value={edu.period || ''}
-                onChange={(e) => updateRow(i, { period: e.target.value })}
-                className={inputClass}
-                placeholder="2014 – 2017"
-              />
-              <input
-                type="text"
-                value={edu.school || ''}
-                onChange={(e) => updateRow(i, { school: e.target.value })}
-                className={inputClass}
-                placeholder="Škola (SOU gastro)"
+                onChange={(period) => updateRow(i, { period })}
               />
             </div>
+            <input
+              type="text"
+              value={edu.school || ''}
+              onChange={(e) => updateRow(i, { school: e.target.value })}
+              className={inputClass + ' pr-8'}
+              placeholder="Škola (SOU gastro)"
+            />
             <div className="grid grid-cols-2 gap-2.5">
               <input
                 type="text"
