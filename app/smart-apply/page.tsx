@@ -384,7 +384,7 @@ function SmartApplyContent() {
                 <span>
                   {total > 0 && (
                     <>
-                      <span className="text-white/70 font-semibold">{total}</span> nabídek s kontaktem
+                      <span className="text-white/70 font-semibold">{total}</span> nabídek s přímým kontaktem
                     </>
                   )}
                 </span>
@@ -397,6 +397,19 @@ function SmartApplyContent() {
                     ✕ Vymazat filtry
                   </button>
                 )}
+              </div>
+              {/* Honest disclaimer — zatim mame primy email jen u zlomku zdroju.
+                  Faze 2 (detail page fetch) + Faze 3 (Apify niche boardy) zvysi pomer. */}
+              <div
+                className="rounded-lg border text-[11px] leading-relaxed mb-3 px-3 py-2"
+                style={{
+                  background: 'rgba(251,146,60,0.05)',
+                  borderColor: 'rgba(251,146,60,0.15)',
+                  color: 'rgba(255,255,255,0.55)',
+                }}
+              >
+                Smart Apply ukazuje jen nabídky s ověřeným kontaktním e-mailem.
+                Rozšiřujeme zdroje — víc nabídek se sem postupně přidá.
               </div>
 
               <div className="flex flex-col gap-2">
