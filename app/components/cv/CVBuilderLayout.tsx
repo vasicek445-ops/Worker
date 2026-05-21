@@ -72,7 +72,7 @@ export default function CVBuilderLayout({
       <header className="flex-shrink-0 z-40 bg-[#0a0a12]/95 backdrop-blur border-b border-white/[0.05]">
         <div className="flex items-center justify-between px-4 lg:px-6 py-3 gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <Link href="/pruvodce/sablony" className="text-white/40 hover:text-white text-sm no-underline transition flex-shrink-0">←</Link>
+            <Link href="/pruvodce" className="text-white/40 hover:text-white text-sm no-underline transition flex-shrink-0">←</Link>
             <span className="text-white/70 text-sm font-medium truncate">Můj životopis</span>
           </div>
 

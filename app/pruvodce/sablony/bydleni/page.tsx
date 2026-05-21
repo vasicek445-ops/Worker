@@ -151,7 +151,7 @@ export default function BydleniPage() {
 
         <div className="max-w-2xl mx-auto relative z-10">
           <div className="flex items-center justify-between mb-5">
-            <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white text-sm no-underline transition">← Zpět</Link>
+            <Link href="/pruvodce" className="text-white/30 hover:text-white text-sm no-underline transition">← Zpět</Link>
             <button onClick={() => setResult(null)} className="text-white/40 hover:text-white text-xs px-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Nový dossier</button>
           </div>
 
@@ -340,7 +340,7 @@ export default function BydleniPage() {
       <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-8 bottom-[100px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(6,182,212,0.2), transparent 70%)" }} />
 
       <div className="max-w-2xl mx-auto relative z-10">
-        <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white mb-6 inline-block text-sm no-underline transition">← Zpět na šablony</Link>
+        <Link href="/pruvodce" className="text-white/30 hover:text-white mb-6 inline-block text-sm no-underline transition">← Zpět na nástroje</Link>
 
         {/* Hero header */}
         <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>

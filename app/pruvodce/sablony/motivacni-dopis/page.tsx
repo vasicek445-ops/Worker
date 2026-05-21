@@ -360,7 +360,7 @@ export default function MotivacniDopis() {
 
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="flex items-center justify-between mb-5">
-            <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white text-sm no-underline transition">← Zpět</Link>
+            <Link href="/pruvodce" className="text-white/30 hover:text-white text-sm no-underline transition">← Zpět</Link>
             <div className="flex items-center gap-2">
               <button onClick={saveDocument} disabled={savingDoc}
                 className={`text-xs px-4 py-2 rounded-xl transition border ${savedDoc ? 'bg-[#fb923c]/10 border-[#fb923c]/30 text-[#fb923c]' : 'bg-white/[0.04] border-white/[0.08] text-white/40 hover:text-white hover:bg-white/[0.08]'}`}>
@@ -432,7 +432,7 @@ export default function MotivacniDopis() {
       <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-8 bottom-[100px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
 
       <div className="max-w-2xl mx-auto relative z-10">
-        <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white mb-6 inline-block text-sm no-underline transition">← Zpět na šablony</Link>
+        <Link href="/pruvodce" className="text-white/30 hover:text-white mb-6 inline-block text-sm no-underline transition">← Zpět na nástroje</Link>
 
         {/* Hero header */}
         <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>

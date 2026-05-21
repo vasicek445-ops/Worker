@@ -91,7 +91,7 @@ export default function VyberSablonuPage() {
         {/* Top bar: back + skip */}
         <div className="flex items-center justify-between mb-10">
           <Link
-            href="/pruvodce/sablony"
+            href="/pruvodce"
             className="text-white/40 hover:text-white text-sm no-underline transition flex items-center gap-2"
           >
             <span aria-hidden="true">←</span>

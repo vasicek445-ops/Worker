@@ -201,7 +201,7 @@ export default function AnalyzaInzeratu() {
         {ambientBg}
         <div className="max-w-2xl mx-auto relative z-10">
           <div className="flex items-center justify-between mb-5">
-            <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white text-sm transition">← Zpět</Link>
+            <Link href="/pruvodce" className="text-white/30 hover:text-white text-sm transition">← Zpět</Link>
             <button onClick={() => { setResult(null); sessionStorage.removeItem('woker-last-analysis') }} className="text-white/40 hover:text-white text-xs px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-xl transition hover:bg-white/[0.08]">Nový inzerát</button>
           </div>
 
@@ -464,7 +464,7 @@ export default function AnalyzaInzeratu() {
     <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24 relative overflow-hidden">
       {ambientBg}
       <div className="max-w-2xl mx-auto relative z-10">
-        <Link href="/pruvodce/sablony" className="text-white/30 hover:text-white mb-6 inline-block text-sm transition">← Zpět na šablony</Link>
+        <Link href="/pruvodce" className="text-white/30 hover:text-white mb-6 inline-block text-sm transition">← Zpět na nástroje</Link>
 
         {/* Hero header */}
         <div className="relative rounded-2xl p-5 mb-6 overflow-hidden" style={{ background: 'linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)' }}>
