@@ -56,14 +56,26 @@ function CVEditorInner() {
       setAccessToken(session.access_token)
       setAuthChecked(true)
 
+      // Vzdy nactime profil paralelne — slouzi jako fallback pro pole co nemusi
+      // byt v saved CV (hlavne avatar_url -> foto).
+      const profilePromise = supabase
+        .from('profiles')
+        .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, avatar_url')
+        .eq('id', session.user.id)
+        .maybeSingle()
+
       // Auto-load: pokud existuje saved CV, načti ho
       if (documentId) {
         try {
-          const res = await fetch(`/api/documents?id=${documentId}`, {
-            headers: { Authorization: `Bearer ${session.access_token}` },
-          })
-          if (res.ok) {
-            const doc = await res.json()
+          const [docRes, profileRes] = await Promise.all([
+            fetch(`/api/documents?id=${documentId}`, {
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            }),
+            profilePromise,
+          ])
+          const profile = profileRes.data
+          if (docRes.ok) {
+            const doc = await docRes.json()
             if (doc?.document_data && !cancelled) {
               const cv: CVData = doc.document_data
               setCvData(cv)
@@ -103,7 +115,12 @@ function CVEditorInner() {
               }))
               if (doc.template) setTemplate(doc.template)
               if (doc.accent_color) setAccentColor(doc.accent_color)
-              if (doc.photo) setPhoto(doc.photo)
+              // Foto: doc.photo > profile.avatar_url > null
+              if (doc.photo) {
+                setPhoto(doc.photo)
+              } else if (profile?.avatar_url) {
+                setPhoto(profile.avatar_url)
+              }
             }
           }
         } catch { /* ignore */ }
@@ -112,11 +129,7 @@ function CVEditorInner() {
         // (full_name, telefon, datum_narozeni, adresa, ...). Mapujeme vsechny dostupne
         // CV-relevantni pole vcetne zkusenosti, vzdelani, jazyku a dovednosti.
         try {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, avatar_url')
-            .eq('id', session.user.id)
-            .maybeSingle()
+          const { data: profile } = await profilePromise
           if (profile && !cancelled) {
             // Auth email jako fallback pro contact email
             const contactEmail = profile.email || session.user.email || ''
