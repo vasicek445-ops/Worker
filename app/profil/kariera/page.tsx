@@ -2,7 +2,31 @@
 
 import { Plus, Trash2 } from 'lucide-react'
 import { useProfileShell } from '../_components/ProfileShell'
-import type { ProfileExperience, ProfileEducation } from '@/lib/profile/types'
+import type { ProfileExperience, ProfileEducation, ProfileLanguage } from '@/lib/profile/types'
+
+// Top languages relevantni pro CH labor market + CZ/SK speakers
+const LANGUAGES = [
+  'Angličtina',
+  'Italština',
+  'Francouzština',
+  'Polština',
+  'Maďarština',
+  'Rumunština',
+  'Ukrajinština',
+  'Ruština',
+  'Španělština',
+  'Portugalština',
+  'Chorvatština',
+  'Srbština',
+  'Bulharština',
+  'Albánština',
+  'Turečtina',
+  'Slovenština',
+  'Čeština',
+  'Jiný',
+] as const
+
+const LANG_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Mateřský'] as const
 
 const FIELDS = [
   'Gastronomie',
@@ -92,16 +116,11 @@ export default function KarieraPage() {
             <p className={hintClass}>A1 = začátečník, C2 = rodilý mluvčí.</p>
           </div>
 
-          <div>
-            <label className={labelClass}>Další jazyky</label>
-            <input
-              type="text"
-              value={profile?.dalsi_jazyky || ''}
-              onChange={(e) => update({ dalsi_jazyky: e.target.value })}
-              className={inputClass}
-              placeholder="Angličtina B2, italština A2…"
-            />
-          </div>
+          <LanguageList
+            languages={profile?.dalsi_jazyky_struct || []}
+            legacyText={profile?.dalsi_jazyky || ''}
+            onChange={(dalsi_jazyky_struct) => update({ dalsi_jazyky_struct })}
+          />
 
           <ExperienceList
             experiences={profile?.experiences || []}
@@ -321,6 +340,83 @@ function EducationList({
         <Plus size={16} />
         {educations.length === 0 ? 'Přidat školu/kurz' : 'Přidat další'}
       </button>
+    </div>
+  )
+}
+
+// ─── Multi-row dalsi jazyky (mimo nemciny) ──────────────────────────────────
+function LanguageList({
+  languages,
+  legacyText,
+  onChange,
+}: {
+  languages: ProfileLanguage[]
+  legacyText: string
+  onChange: (next: ProfileLanguage[]) => void
+}) {
+  const updateRow = (i: number, patch: Partial<ProfileLanguage>) => {
+    onChange(languages.map((l, idx) => (idx === i ? { ...l, ...patch } : l)))
+  }
+  const removeRow = (i: number) => onChange(languages.filter((_, idx) => idx !== i))
+  const addRow = () => onChange([...languages, { language: '', level: 'B1' }])
+
+  // Jazyky uz pridane v predchozich radcich vyfiltrujeme z dropdownu aby
+  // nevytvarel duplicate (kromé sve vlastni hodnoty pro tento radek).
+  const usedLanguages = new Set(languages.map((l) => l.language).filter(Boolean))
+
+  return (
+    <div>
+      <label className={labelClass}>Další jazyky</label>
+
+      {languages.length === 0 && legacyText && (
+        <div className="mb-3 rounded-xl bg-[#fb923c]/5 border border-[#fb923c]/15 p-3 text-xs text-white/60">
+          <p className="m-0 mb-1.5 font-medium text-[#fb923c]/80">Máš stará data v textovém formátu:</p>
+          <p className="m-0 whitespace-pre-line text-white/40">{legacyText}</p>
+          <p className="m-0 mt-2 text-white/30">Přidej jazyky níže pro nový formát — staré se použije jako fallback.</p>
+        </div>
+      )}
+
+      <div className="space-y-2.5">
+        {languages.map((lang, i) => (
+          <div key={i} className="flex items-center gap-2.5">
+            <select
+              value={lang.language || ''}
+              onChange={(e) => updateRow(i, { language: e.target.value })}
+              className={inputClass + ' appearance-none cursor-pointer flex-1'}
+            >
+              <option value="" disabled className="bg-[#111120]">Vyber jazyk</option>
+              {LANGUAGES.filter((l) => l === lang.language || !usedLanguages.has(l)).map((l) => (
+                <option key={l} value={l} className="bg-[#111120]">{l}</option>
+              ))}
+            </select>
+            <select
+              value={lang.level || 'B1'}
+              onChange={(e) => updateRow(i, { level: e.target.value })}
+              className={inputClass + ' appearance-none cursor-pointer w-32 flex-shrink-0'}
+            >
+              {LANG_LEVELS.map((l) => (
+                <option key={l} value={l} className="bg-[#111120]">{l}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => removeRow(i)}
+              aria-label="Odstranit jazyk"
+              className="text-white/30 hover:text-red-400 transition p-2 rounded-lg hover:bg-red-500/10 flex-shrink-0"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={addRow}
+        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
+      >
+        <Plus size={16} />
+        {languages.length === 0 ? 'Přidat jazyk' : 'Přidat další jazyk'}
+      </button>
+      <p className={hintClass}>Vyber jazyk + úroveň. Němčina se vyplňuje výše zvlášť.</p>
     </div>
   )
 }

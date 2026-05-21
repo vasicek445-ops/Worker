@@ -60,7 +60,7 @@ function CVEditorInner() {
       // byt v saved CV (hlavne avatar_url -> foto).
       const profilePromise = supabase
         .from('profiles')
-        .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, avatar_url')
+        .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, dalsi_jazyky_struct, avatar_url')
         .eq('id', session.user.id)
         .maybeSingle()
 
@@ -170,7 +170,9 @@ function CVEditorInner() {
               experience_detail: structExperiences.length === 0 ? (profile.zkusenosti || f.experience_detail) : f.experience_detail,
               education: structEducations.length === 0 ? (profile.vzdelani || f.education) : f.education,
               german: profile.nemcina_uroven || f.german,
-              other_languages: profile.dalsi_jazyky || f.other_languages,
+              other_languages: (Array.isArray(profile.dalsi_jazyky_struct) && profile.dalsi_jazyky_struct.length > 0)
+                ? profile.dalsi_jazyky_struct.map((l) => l.level ? `${l.language}-${l.level}` : l.language).join(', ')
+                : (profile.dalsi_jazyky || f.other_languages),
               skills: profile.dovednosti || f.skills,
             }))
             // Avatar jako foto na CV (pokud user nezvolil jine)

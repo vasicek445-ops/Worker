@@ -18,6 +18,11 @@ export interface ProfileEducation {
   location?: string
 }
 
+export interface ProfileLanguage {
+  language: string  // CZ nazev: 'Angličtina', 'Italština', ...
+  level: string     // 'A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Mateřský'
+}
+
 export interface ProfileRow {
   id: string
 
@@ -40,7 +45,8 @@ export interface ProfileRow {
   educations?: ProfileEducation[] | null
   dovednosti?: string | null
   nemcina_uroven?: string | null    // 'A1', 'B1', ...
-  dalsi_jazyky?: string | null
+  dalsi_jazyky?: string | null              // legacy text — fallback kdyz dalsi_jazyky_struct prazdne
+  dalsi_jazyky_struct?: ProfileLanguage[] | null
 
   // Cíl
   preferovany_kanton?: string | null
