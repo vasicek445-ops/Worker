@@ -21,7 +21,15 @@ import {
   Briefcase,
   Flame,
   ExternalLink,
+  FileText,
 } from 'lucide-react'
+
+interface SavedDoc {
+  id: string
+  type: 'cv' | 'letter'
+  title: string
+  updated_at: string
+}
 
 // ============================================================================
 // Smart Apply — agency-first (po pivotu 2026-05-21). DB-first architektura:
@@ -481,6 +489,28 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
   const [cvUrl, setCvUrl] = useState<string | null>(null)
   const [generating, setGenerating] = useState(false)
   const [draftError, setDraftError] = useState<string | null>(null)
+
+  // Saved documents (CV + letter) — user vybere z listu, jinak default (nejnovejsi CV + AI letter)
+  const [savedDocs, setSavedDocs] = useState<SavedDoc[]>([])
+  const [cvDocId, setCvDocId] = useState<string>('')        // '' = nejnovejsi (default)
+  const [letterDocId, setLetterDocId] = useState<string>('') // '' = AI vygenerovany
+
+  // Nacti user-ovy uloznene dokumenty pri mountu
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      const { data } = await supabase
+        .from('saved_documents')
+        .select('id, type, title, updated_at')
+        .eq('user_id', session.user.id)
+        .in('type', ['cv', 'letter'])
+        .order('updated_at', { ascending: false })
+      if (!cancelled && data) setSavedDocs(data as SavedDoc[])
+    })()
+    return () => { cancelled = true }
+  }, [])
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
   const [sendErrorHint, setSendErrorHint] = useState<string | null>(null)
@@ -537,7 +567,14 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
       const res = await fetch('/api/smart-apply/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ agencyId: agency.id, to: agency.email, subject: draft.subject, body: draft.body }),
+        body: JSON.stringify({
+          agencyId: agency.id,
+          to: agency.email,
+          subject: draft.subject,
+          body: draft.body,
+          cv_doc_id: cvDocId || null,
+          letter_doc_id: letterDocId || null,
+        }),
       })
       const body = await res.json()
       if (!res.ok) {
@@ -667,41 +704,82 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
           )}
         </div>
 
-        {/* CV info banner — viditelne po vygenerovani draftu */}
-        {draft !== null && (
-          <div className="rounded-xl border p-4 mb-5" style={{
-            background: hasCv ? 'rgba(34,197,94,0.04)' : 'rgba(251,146,60,0.04)',
-            borderColor: hasCv ? 'rgba(34,197,94,0.2)' : 'rgba(251,146,60,0.2)',
-          }}>
-            <div className="flex items-start gap-2.5">
-              {hasCv ? (
-                <CheckCircle2 size={16} className="text-[#22c55e] shrink-0 mt-0.5" strokeWidth={1.75} />
-              ) : (
-                <AlertCircle size={16} className="text-[#fb923c] shrink-0 mt-0.5" strokeWidth={1.75} />
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold mb-1" style={{ color: hasCv ? '#22c55e' : '#fb923c' }}>
-                  {hasCv ? 'CV připojeno v emailu' : 'CV chybí — doporučujeme přidat'}
-                </div>
-                <div className="text-white/60 text-xs leading-relaxed">
-                  {hasCv ? (
-                    <>
-                      Tvůj veřejný CV je v textu emailu jako odkaz:{' '}
-                      {cvUrl && <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="text-[#fb923c] no-underline hover:underline break-all">{cvUrl}</a>}.
-                      CH HR ho otevře přímo v prohlížeči. PDF příloha přijde v další verzi.
-                    </>
-                  ) : (
-                    <>
-                      Email odejde bez CV příloh. Pro CH HR je CV standard — doporučujeme nejdřív v{' '}
-                      <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">Moje dokumenty</Link>{' '}
-                      vytvořit + publikovat CV. Pak ho Smart Apply automaticky vloží jako veřejný odkaz.
-                    </>
-                  )}
-                </div>
+        {/* Selector PDF priloh: user vybere konkretni CV + motivacni dopis z /dokumenty.
+            Pokud nic nevybere, send pouzije nejnovejsi CV + AI generovany dopis. */}
+        {draft !== null && (() => {
+          const cvDocs = savedDocs.filter((d) => d.type === 'cv')
+          const letterDocs = savedDocs.filter((d) => d.type === 'letter')
+          const hasAnyCv = cvDocs.length > 0
+          return (
+            <div className="rounded-xl border p-4 mb-5" style={{
+              background: hasAnyCv ? 'rgba(34,197,94,0.04)' : 'rgba(251,146,60,0.04)',
+              borderColor: hasAnyCv ? 'rgba(34,197,94,0.2)' : 'rgba(251,146,60,0.2)',
+            }}>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText size={16} className={hasAnyCv ? 'text-[#22c55e]' : 'text-[#fb923c]'} strokeWidth={1.75} />
+                <h3 className="text-white text-sm font-semibold m-0">PDF přílohy k emailu</h3>
               </div>
+
+              {!hasAnyCv ? (
+                <div className="text-white/60 text-xs leading-relaxed">
+                  Nemáš zatím v <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">Moje dokumenty</Link> uložené žádné CV. Pro CH HR je životopis standard — Email bez něj nelze odeslat.
+                  <div className="mt-2">
+                    <Link href="/pruvodce/sablony/cv" className="inline-flex items-center gap-1 bg-[#fb923c] hover:bg-[#f97316] text-white text-xs font-semibold px-3 py-1.5 rounded-lg no-underline transition">
+                      Vytvořit CV →
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  <div>
+                    <label className="block text-[10px] uppercase font-semibold mb-1" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
+                      📄 Životopis (CV)
+                    </label>
+                    <select
+                      value={cvDocId}
+                      onChange={(e) => setCvDocId(e.target.value)}
+                      className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40 appearance-none cursor-pointer"
+                    >
+                      <option value="" className="bg-[#0a0a12]">— nejnovější uložené CV —</option>
+                      {cvDocs.map((d) => (
+                        <option key={d.id} value={d.id} className="bg-[#0a0a12]">
+                          {d.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase font-semibold mb-1" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
+                      ✉️ Motivační dopis
+                    </label>
+                    <select
+                      value={letterDocId}
+                      onChange={(e) => setLetterDocId(e.target.value)}
+                      className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40 appearance-none cursor-pointer"
+                    >
+                      <option value="" className="bg-[#0a0a12]">— AI vygenerovaný z draftu nahoře —</option>
+                      {letterDocs.map((d) => (
+                        <option key={d.id} value={d.id} className="bg-[#0a0a12]">
+                          {d.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <p className="text-white/40 text-[11px] m-0 mt-2">
+                    Spravuj uložené PDF v{' '}
+                    <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">Moje dokumenty</Link>.
+                    Email odejde s 2 PDF přílohami.
+                  </p>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )
+        })()}
+
+        {/* Skryta legacy fields aby TS nevolal o nepouzitych state vars */}
+        {false && hasCv !== null && cvUrl && <span>{cvUrl}</span>}
 
         {sent && (
           <div className="rounded-xl border border-green-500/30 bg-green-500/[0.04] p-4 mb-5 flex items-start gap-2.5">

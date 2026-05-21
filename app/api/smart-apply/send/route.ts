@@ -15,6 +15,10 @@ interface SendRequest {
   to: string
   subject: string
   body: string
+  // User vybral konkretni CV a/nebo motivacni dopis z /dokumenty. Pokud null,
+  // pouzije se default: resolveCvPdfPath (nejnovejsi CV) + AI generated letter.
+  cv_doc_id?: string | null
+  letter_doc_id?: string | null
 }
 
 export async function POST(req: NextRequest) {
@@ -67,7 +71,21 @@ export async function POST(req: NextRequest) {
     //   2. Motivacni dopis PDF — bud zvoleny letter_pdf_path z member_agent_config,
     //      jinak generujeme on-fly z draft body pres buildMotivationPdf().
     // ============================================================================
-    const cvPath = await resolveCvPdfPath(supabaseAdmin, user.id)
+    // CV PDF: user-selected nebo default (resolveCvPdfPath)
+    let cvPath: string | null = null
+    if (body.cv_doc_id) {
+      // User vybral konkretni CV — over ze patri jemu + sestav storage path
+      const { data: doc } = await supabaseAdmin
+        .from('saved_documents')
+        .select('id, type, user_id')
+        .eq('id', body.cv_doc_id)
+        .eq('user_id', user.id)
+        .eq('type', 'cv')
+        .maybeSingle()
+      if (doc) cvPath = `${user.id}/${doc.id}.pdf`
+    } else {
+      cvPath = await resolveCvPdfPath(supabaseAdmin, user.id)
+    }
     if (!cvPath) {
       return NextResponse.json({
         error: 'no_cv_pdf',
@@ -80,20 +98,33 @@ export async function POST(req: NextRequest) {
     if (cvErr || !cvBlob) {
       return NextResponse.json({
         error: 'no_cv_pdf',
-        hint: 'Otevři své CV v Moje dokumenty a ulož ho — bez životopisu nelze přihlášku poslat.',
+        hint: 'Vybrané CV neni v Storage. Otevři Moje dokumenty a ulož ho znovu.',
       }, { status: 400 })
     }
     const cvPdfBase64 = Buffer.from(await cvBlob.arrayBuffer()).toString('base64')
     const cvFilename = `Lebenslauf_${safeName || 'Bewerber'}.pdf`
 
-    const letterPath = await resolveLetterPdfPath(supabaseAdmin, user.id)
+    // Motivacni dopis PDF: user-selected NEBO default (member_agent_config.letter_pdf_path)
+    // NEBO fallback AI-generated z draft body
+    let letterPath: string | null = null
+    if (body.letter_doc_id) {
+      const { data: doc } = await supabaseAdmin
+        .from('saved_documents')
+        .select('id, user_id')
+        .eq('id', body.letter_doc_id)
+        .eq('user_id', user.id)
+        .eq('type', 'letter')
+        .maybeSingle()
+      if (doc) letterPath = `${user.id}/${doc.id}.pdf`
+    } else {
+      letterPath = await resolveLetterPdfPath(supabaseAdmin, user.id)
+    }
     let motivationPdfBase64: string | null = null
     if (letterPath) {
       const { data: letterBlob } = await supabaseAdmin.storage.from('cv-pdfs').download(letterPath)
       if (letterBlob) motivationPdfBase64 = Buffer.from(await letterBlob.arrayBuffer()).toString('base64')
     }
     if (!motivationPdfBase64) {
-      // Generate motivacni dopis PDF on-fly z AI draft body
       motivationPdfBase64 = await buildMotivationPdf({ senderName: fromName, body: body.body })
     }
     const motivationFilename = `Motivationsschreiben_${safeName || 'Bewerber'}.pdf`
