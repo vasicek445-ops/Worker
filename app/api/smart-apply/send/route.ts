@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { sendGmailMessage } from '@/lib/gmail'
+import { resolveCvPdfPath, resolveLetterPdfPath } from '@/lib/cv-pdf'
+import { buildMotivationPdf } from '@/lib/motivation-pdf'
 
 // POST /api/smart-apply/send
 // Body: { jobId: string, to: string, subject: string, body: string }
@@ -56,11 +58,51 @@ export async function POST(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle()
     const fromName = profile?.full_name || (user.email?.split('@')[0] ?? 'Worker user')
+    const safeName = fromName.replace(/\s+/g, '_').replace(/[^A-Za-z0-9_-]/g, '')
 
-    // Plain text body → HTML s line breaks (CH HR ocení plain readability)
-    const bodyHtml = `<div style="font-family: -apple-system, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.55; color: #111;">${
-      escapeHtml(body.body).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')
-    }</div>`.replace('>${', '><p>${').replace(/^<div([^>]*)>([^<])/, '<div$1><p>$2').replace(/([^>])<\/div>$/, '$1</p></div>')
+    // ============================================================================
+    // PDF prilohy (existing infrastructure z /api/matches/[id]/send)
+    //   1. CV PDF — povinne. Pokud user nema CV ulozene, vrat error s hintem
+    //      "vytvor CV v Moje dokumenty".
+    //   2. Motivacni dopis PDF — bud zvoleny letter_pdf_path z member_agent_config,
+    //      jinak generujeme on-fly z draft body pres buildMotivationPdf().
+    // ============================================================================
+    const cvPath = await resolveCvPdfPath(supabaseAdmin, user.id)
+    if (!cvPath) {
+      return NextResponse.json({
+        error: 'no_cv_pdf',
+        hint: 'Otevři Moje dokumenty → vytvoř a ulož CV. Bez životopisu nelze přihlášku poslat.',
+      }, { status: 400 })
+    }
+    const { data: cvBlob, error: cvErr } = await supabaseAdmin.storage
+      .from('cv-pdfs')
+      .download(cvPath)
+    if (cvErr || !cvBlob) {
+      return NextResponse.json({
+        error: 'no_cv_pdf',
+        hint: 'Otevři své CV v Moje dokumenty a ulož ho — bez životopisu nelze přihlášku poslat.',
+      }, { status: 400 })
+    }
+    const cvPdfBase64 = Buffer.from(await cvBlob.arrayBuffer()).toString('base64')
+    const cvFilename = `Lebenslauf_${safeName || 'Bewerber'}.pdf`
+
+    const letterPath = await resolveLetterPdfPath(supabaseAdmin, user.id)
+    let motivationPdfBase64: string | null = null
+    if (letterPath) {
+      const { data: letterBlob } = await supabaseAdmin.storage.from('cv-pdfs').download(letterPath)
+      if (letterBlob) motivationPdfBase64 = Buffer.from(await letterBlob.arrayBuffer()).toString('base64')
+    }
+    if (!motivationPdfBase64) {
+      // Generate motivacni dopis PDF on-fly z AI draft body
+      motivationPdfBase64 = await buildMotivationPdf({ senderName: fromName, body: body.body })
+    }
+    const motivationFilename = `Motivationsschreiben_${safeName || 'Bewerber'}.pdf`
+
+    // Email body HTML (plain → paragraphs)
+    const bodyHtml = body.body
+      .split(/\n{2,}/)
+      .map((p) => `<p style="margin:0 0 12px 0; line-height:1.55; font-family: -apple-system, Helvetica, Arial, sans-serif; font-size:14px; color:#111;">${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
+      .join('')
 
     try {
       const result = await sendGmailMessage({
@@ -71,6 +113,10 @@ export async function POST(req: NextRequest) {
         to: body.to,
         subject: body.subject,
         bodyHtml,
+        attachments: [
+          { filename: cvFilename, mimeType: 'application/pdf', contentBase64: cvPdfBase64 },
+          { filename: motivationFilename, mimeType: 'application/pdf', contentBase64: motivationPdfBase64 },
+        ],
       })
 
       // Update last_used_at na tokenu
@@ -101,6 +147,7 @@ export async function POST(req: NextRequest) {
         success: true,
         message_id: result.id,
         thread_id: result.threadId,
+        attachments: [cvFilename, motivationFilename],
       })
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'send_failed'

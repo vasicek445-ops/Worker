@@ -483,7 +483,8 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
   const [draftError, setDraftError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
-  const [sent, setSent] = useState<{ messageId: string } | null>(null)
+  const [sendErrorHint, setSendErrorHint] = useState<string | null>(null)
+  const [sent, setSent] = useState<{ messageId: string; attachments: string[] } | null>(null)
 
   const lastAgencyIdRef = useRef<number | null>(null)
   useEffect(() => {
@@ -529,6 +530,7 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
     }
     setSending(true)
     setSendError(null)
+    setSendErrorHint(null)
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Musíš být přihlášený')
@@ -538,8 +540,12 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
         body: JSON.stringify({ agencyId: agency.id, to: agency.email, subject: draft.subject, body: draft.body }),
       })
       const body = await res.json()
-      if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`)
-      setSent({ messageId: body.message_id })
+      if (!res.ok) {
+        setSendError(body?.error || `HTTP ${res.status}`)
+        if (body?.hint) setSendErrorHint(body.hint)
+        return
+      }
+      setSent({ messageId: body.message_id, attachments: body.attachments || [] })
     } catch (e) {
       setSendError(e instanceof Error ? e.message : 'Odeslání selhalo')
     } finally {
@@ -700,9 +706,34 @@ function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
         {sent && (
           <div className="rounded-xl border border-green-500/30 bg-green-500/[0.04] p-4 mb-5 flex items-start gap-2.5">
             <CheckCircle2 size={18} className="text-[#22c55e] shrink-0 mt-0.5" strokeWidth={1.75} />
-            <div className="text-sm">
-              <div className="text-white font-semibold mb-0.5">Email odeslán!</div>
-              <div className="text-white/55 text-xs">Doručeno na {agency.email}. Odpověď přijde do tvého Inboxu.</div>
+            <div className="text-sm flex-1 min-w-0">
+              <div className="text-white font-semibold mb-0.5">Email odeslán s přílohami</div>
+              <div className="text-white/60 text-xs mb-1.5">Doručeno na {agency.email}. Odpověď přijde do tvého Inboxu.</div>
+              {sent.attachments.length > 0 && (
+                <div className="text-white/50 text-xs flex flex-wrap gap-1.5 items-center">
+                  <span className="font-medium">Přílohy:</span>
+                  {sent.attachments.map((a) => (
+                    <span key={a} className="inline-flex items-center gap-1 rounded px-1.5 py-0.5" style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)' }}>
+                      📎 {a}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {sendError && sendErrorHint && (
+          <div className="rounded-xl border border-[#fb923c]/30 bg-[#fb923c]/[0.05] p-4 mb-5 flex items-start gap-2.5">
+            <AlertCircle size={18} className="text-[#fb923c] shrink-0 mt-0.5" strokeWidth={1.75} />
+            <div className="text-sm flex-1 min-w-0">
+              <div className="text-white font-semibold mb-0.5">{sendError === 'no_cv_pdf' ? 'Chybí životopis' : 'Nepodařilo se odeslat'}</div>
+              <div className="text-white/60 text-xs mb-2">{sendErrorHint}</div>
+              {sendError === 'no_cv_pdf' && (
+                <Link href="/dokumenty" className="inline-flex items-center gap-1 text-[#fb923c] text-xs font-medium no-underline hover:underline">
+                  Otevřít Moje dokumenty →
+                </Link>
+              )}
             </div>
           </div>
         )}
