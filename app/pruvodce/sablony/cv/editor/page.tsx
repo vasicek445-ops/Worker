@@ -155,7 +155,9 @@ function CVEditorInner() {
   }
 
   // ─── Uložit CV ───
-  const handleSave = async () => {
+  // CVPreview vola handleSave(html, pdfBlob). html zustava pro pripadny resave,
+  // pdfBlob nahrajeme do cv-pdfs/{user}/{docId}.pdf pro Smart Apply attachments.
+  const handleSave = async (_html?: string, pdfBlob?: Blob) => {
     if (!userId || !accessToken) return
     if (!cvData) {
       setError('Před uložením klikni na "Vygenerovat AI CV" pro plné zpracování.')
@@ -181,7 +183,23 @@ function CVEditorInner() {
       })
       if (!res.ok) throw new Error('Uložení selhalo')
       const data = await res.json()
-      if (data.id) setActiveDocId(data.id)
+      if (data.id) {
+        setActiveDocId(data.id)
+        // Upload PDF do Supabase storage (cv-pdfs bucket), aby Smart Apply send
+        // ho mohl pripojit. Bez tohoto saved_documents existuje ale PDF v storage neni.
+        if (pdfBlob) {
+          try {
+            const pdfForm = new FormData()
+            pdfForm.append('file', pdfBlob, 'cv.pdf')
+            pdfForm.append('documentId', String(data.id))
+            await fetch('/api/cv-pdf', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${accessToken}` },
+              body: pdfForm,
+            })
+          } catch { /* upload selhal ale save je OK; user upozornen v Smart Apply */ }
+        }
+      }
       setToast('CV uloženo. Bude se přikládat k přihláškám přes Smart Apply.')
       setTimeout(() => setToast(null), 3500)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
