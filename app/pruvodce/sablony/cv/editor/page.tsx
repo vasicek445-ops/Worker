@@ -65,7 +65,40 @@ function CVEditorInner() {
           if (res.ok) {
             const doc = await res.json()
             if (doc?.document_data && !cancelled) {
-              setCvData(doc.document_data)
+              const cv: CVData = doc.document_data
+              setCvData(cv)
+              // Mapuj CVData -> CVFormData aby form fieldy nalevo byly take prefilled,
+              // jinak user vidi pravy preview se svym CV ale na leve strane prazdne placeholdery.
+              setFormData((f) => ({
+                ...f,
+                name: cv.personalData?.name || f.name,
+                birthdate: cv.personalData?.birthdate || f.birthdate,
+                phone: cv.personalData?.phone || f.phone,
+                email: cv.personalData?.email || f.email,
+                nationality: cv.personalData?.nationality || f.nationality,
+                address: cv.personalData?.address || f.address,
+                driving: cv.personalData?.drivingLicense || f.driving,
+                position: cv.profil || f.position,
+                experiences: (cv.experience || []).map((e) => ({
+                  period: e.period || '',
+                  title: e.title || '',
+                  company: e.company || '',
+                  location: e.location || '',
+                  description: (e.tasks || []).join('\n'),
+                })),
+                educations: (cv.education || []).map((e) => ({
+                  period: e.period || '',
+                  school: e.school || '',
+                  degree: e.degree || '',
+                  location: e.location || '',
+                })),
+                german: cv.languages?.find((l) => /n[ěe]m|deutsch|german/i.test(l.language))?.level || f.german,
+                other_languages: (cv.languages || [])
+                  .filter((l) => !/n[ěe]m|deutsch|german/i.test(l.language))
+                  .map((l) => l.level ? `${l.language}-${l.level}` : l.language)
+                  .join(', ') || f.other_languages,
+                skills: (cv.skills?.technical || []).join(', ') || f.skills,
+              }))
               if (doc.template) setTemplate(doc.template)
               if (doc.accent_color) setAccentColor(doc.accent_color)
               if (doc.photo) setPhoto(doc.photo)
