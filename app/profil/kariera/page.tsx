@@ -1,7 +1,9 @@
 'use client'
 
-import { Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Plus, Trash2, Sparkles, X } from 'lucide-react'
 import { useProfileShell } from '../_components/ProfileShell'
+import { supabase } from '@/app/supabase'
 import type { ProfileExperience, ProfileEducation, ProfileLanguage } from '@/lib/profile/types'
 
 // Top languages relevantni pro CH labor market + CZ/SK speakers.
@@ -303,13 +305,22 @@ function ExperienceList({
         ))}
       </div>
 
-      <button
-        onClick={addRow}
-        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
-      >
-        <Plus size={16} />
-        {experiences.length === 0 ? 'Přidat první zkušenost' : 'Přidat další zkušenost'}
-      </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          onClick={addRow}
+          className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
+        >
+          <Plus size={16} />
+          {experiences.length === 0 ? 'Přidat první' : 'Přidat další'}
+        </button>
+        <WookyRowButton
+          kind="experiences"
+          label="Wooky pomůže"
+          placeholder="Napiš stručně kde jsi pracoval a co jsi dělal…"
+          example="3 roky jsem dělal skladníka v DHL Curych, řídil VZV. Pak 2 roky v Coopu jako pokladní."
+          onRows={(newRows) => onChange([...experiences, ...(newRows as ProfileExperience[])])}
+        />
+      </div>
       <p className={hintClass}>Většina lidí má 2 firmy. Roky, pozici a firmu uveď, popis je nepovinný — AI to rozšíří.</p>
     </div>
   )
@@ -394,13 +405,22 @@ function EducationList({
         ))}
       </div>
 
-      <button
-        onClick={addRow}
-        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
-      >
-        <Plus size={16} />
-        {educations.length === 0 ? 'Přidat školu/kurz' : 'Přidat další'}
-      </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          onClick={addRow}
+          className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
+        >
+          <Plus size={16} />
+          {educations.length === 0 ? 'Přidat školu/kurz' : 'Přidat další'}
+        </button>
+        <WookyRowButton
+          kind="educations"
+          label="Wooky pomůže"
+          placeholder="Napiš svoje vzdělání a kurzy…"
+          example="Vyučil jsem se kuchařem 2014-2017 na SOU gastro Praha, pak certifikát HACCP 2019."
+          onRows={(newRows) => onChange([...educations, ...(newRows as ProfileEducation[])])}
+        />
+      </div>
     </div>
   )
 }
@@ -478,14 +498,124 @@ function LanguageList({
         })}
       </div>
 
-      <button
-        onClick={addRow}
-        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
-      >
-        <Plus size={16} />
-        {languages.length === 0 ? 'Přidat jazyk' : 'Přidat další jazyk'}
-      </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          onClick={addRow}
+          className="flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
+        >
+          <Plus size={16} />
+          {languages.length === 0 ? 'Přidat jazyk' : 'Přidat další'}
+        </button>
+        <WookyRowButton
+          kind="languages"
+          label="Wooky pomůže"
+          placeholder="Napiš jazyky, které umíš…"
+          example="Anglicky B2, italsky A2, polsky mateřský"
+          onRows={(newRows) => onChange([...languages, ...(newRows as ProfileLanguage[])])}
+        />
+      </div>
       <p className={hintClass}>Vyber jazyk + úroveň. Němčina se vyplňuje výše zvlášť.</p>
+    </div>
+  )
+}
+
+// ─── Wooky AI helper: free text -> structured rows -> append ─────────────
+function WookyRowButton({
+  kind,
+  label,
+  placeholder,
+  example,
+  onRows,
+}: {
+  kind: 'experiences' | 'educations' | 'languages'
+  label: string
+  placeholder: string
+  example: string
+  onRows: (rows: unknown[]) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [raw, setRaw] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const submit = async () => {
+    if (raw.trim().length < 3) {
+      setError('Napiš víc detailů, ať to umím parsovat.')
+      return
+    }
+    setLoading(true)
+    setError(null)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) throw new Error('Nejsi přihlášený')
+      const res = await fetch('/api/wooky/parse-rows', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ kind, raw }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'AI volání selhalo')
+      if (!Array.isArray(data.rows) || data.rows.length === 0) {
+        setError('AI nevrátila žádné řádky. Zkus přesnější popis.')
+        return
+      }
+      onRows(data.rows)
+      setRaw('')
+      setOpen(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Něco se pokazilo')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center justify-center gap-2 rounded-xl border border-[#fb923c]/30 bg-[#fb923c]/[0.06] hover:bg-[#fb923c]/[0.12] hover:border-[#fb923c]/50 text-[#fb923c] text-sm font-medium py-2.5 transition"
+      >
+        <Sparkles size={15} />
+        {label}
+      </button>
+    )
+  }
+
+  return (
+    <div className="col-span-2 rounded-xl border border-[#fb923c]/30 bg-[#fb923c]/[0.03] p-3 relative">
+      <button
+        onClick={() => { setOpen(false); setRaw(''); setError(null) }}
+        className="absolute top-2 right-2 text-white/30 hover:text-white/60 p-1 rounded-lg transition"
+        aria-label="Zavřít"
+      >
+        <X size={14} />
+      </button>
+      <div className="flex items-center gap-2 text-[#fb923c] text-xs font-semibold mb-2">
+        <Sparkles size={14} />
+        <span>Wooky pomáhá</span>
+      </div>
+      <textarea
+        rows={3}
+        value={raw}
+        onChange={(e) => setRaw(e.target.value)}
+        placeholder={placeholder}
+        className={inputClass + ' resize-none'}
+        autoFocus
+      />
+      <p className="text-white/30 text-[11px] mt-1.5">Příklad: {example}</p>
+      {error && (
+        <p className="text-red-400/80 text-xs mt-2">⚠️ {error}</p>
+      )}
+      <button
+        onClick={submit}
+        disabled={loading || raw.trim().length < 3}
+        className="mt-2.5 w-full bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold text-sm py-2.5 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition hover:shadow-[0_4px_20px_rgba(251,146,60,0.3)]"
+      >
+        {loading ? 'Zpracovávám…' : '✨ Rozšířit a přidat'}
+      </button>
     </div>
   )
 }
