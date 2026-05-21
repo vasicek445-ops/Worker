@@ -94,8 +94,8 @@ export default function LivePreview({ formData, photo, template, accentColor, cv
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-2xl overflow-hidden live-preview-cv"
-      style={{ width: '100%', height: innerHeight ? `${innerHeight}px` : 'auto' }}
+      className="bg-white rounded-2xl shadow-2xl overflow-hidden live-preview-cv mx-auto"
+      style={{ width: `${210 * SCALE}mm`, maxWidth: '100%', height: innerHeight ? `${innerHeight}px` : 'auto' }}
     >
       <style dangerouslySetInnerHTML={{ __html: `
         .live-preview-cv .flex.gap-3.mb-6 { display: none !important; }
