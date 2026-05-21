@@ -147,7 +147,7 @@ export default function Dokumenty() {
                   {/* Actions */}
                   <div className="flex items-center gap-1.5">
                     <Link
-                      href={doc.type === 'cv' ? `/pruvodce/sablony/cv?load=${doc.id}` : `/pruvodce/sablony/motivacni-dopis?load=${doc.id}`}
+                      href={doc.type === 'cv' ? `/pruvodce/sablony/cv/editor?documentId=${doc.id}` : `/pruvodce/sablony/motivacni-dopis?load=${doc.id}`}
                       className="text-[#fb923c]/70 hover:text-[#fb923c] text-xs font-medium px-3 py-1.5 rounded-lg bg-[#fb923c]/[0.06] hover:bg-[#fb923c]/[0.12] transition no-underline">
                       Otevřít
                     </Link>
