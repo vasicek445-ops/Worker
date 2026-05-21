@@ -106,23 +106,39 @@ function CVEditorInner() {
           }
         } catch { /* ignore */ }
       } else {
-        // Prefill z profilu
+        // Prefill z profilu — pouzivame skutecne nazvy sloupcu z profiles tabulky
+        // (full_name, telefon, datum_narozeni, adresa, ...). Mapujeme vsechny dostupne
+        // CV-relevantni pole vcetne zkusenosti, vzdelani, jazyku a dovednosti.
         try {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('first_name, last_name, email, phone, birthdate, address, nationality')
+            .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, dovednosti, nemcina_uroven, dalsi_jazyky, avatar_url')
             .eq('id', session.user.id)
             .maybeSingle()
           if (profile && !cancelled) {
+            // Auth email jako fallback pro contact email
+            const contactEmail = profile.email || session.user.email || ''
             setFormData((f) => ({
               ...f,
-              name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || f.name,
-              email: profile.email || f.email,
-              phone: profile.phone || f.phone,
-              birthdate: profile.birthdate || f.birthdate,
-              address: profile.address || f.address,
+              name: profile.full_name || f.name,
+              email: contactEmail || f.email,
+              phone: profile.telefon || f.phone,
+              birthdate: profile.datum_narozeni || f.birthdate,
+              address: profile.adresa || f.address,
               nationality: profile.nationality || f.nationality,
+              driving: profile.ridicky_prukaz || f.driving,
+              position: profile.pozice || f.position,
+              field: profile.obor || f.field,
+              experience_detail: profile.zkusenosti || f.experience_detail,
+              education: profile.vzdelani || f.education,
+              german: profile.nemcina_uroven || f.german,
+              other_languages: profile.dalsi_jazyky || f.other_languages,
+              skills: profile.dovednosti || f.skills,
             }))
+            // Avatar jako foto na CV (pokud user nezvolil jine)
+            if (profile.avatar_url && !cancelled) {
+              setPhoto((p) => p || profile.avatar_url || null)
+            }
           }
         } catch { /* ignore */ }
       }
