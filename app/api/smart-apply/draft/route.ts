@@ -11,8 +11,12 @@ import { callOpenAI } from '@/lib/openai'
 // neuvedl v profile. Nemcina prioritne pro CH trh, fallback na cestinu pokud
 // uziv. profile ma cs locale a neumi DE.
 
+// Body podporuje 2 modes:
+//   - { jobId } — original mode (motivacni email pro konkretni inzerat)
+//   - { agencyId } — agency-first mode (general motivacni email pro agenturu)
 interface DraftRequest {
-  jobId: string
+  jobId?: string
+  agencyId?: number
 }
 
 interface DraftResponse {
@@ -33,11 +37,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Validate body
+    // Validate body — accept jobId OR agencyId
     const body = (await req.json()) as DraftRequest
-    if (!body || typeof body.jobId !== 'string') {
-      return NextResponse.json({ error: 'Invalid body — missing jobId' }, { status: 400 })
+    if (!body || (!body.jobId && !body.agencyId)) {
+      return NextResponse.json({ error: 'Invalid body — missing jobId or agencyId' }, { status: 400 })
     }
+    const isAgencyMode = !!body.agencyId
 
     // Load profile
     const { data: profile, error: profileErr } = await supabaseAdmin
@@ -51,20 +56,6 @@ export async function POST(req: NextRequest) {
     }
     if (!profile) {
       return NextResponse.json({ error: 'Profile not found — vyplň profil před generací draftu' }, { status: 400 })
-    }
-
-    // Load job
-    const { data: job, error: jobErr } = await supabaseAdmin
-      .from('jobs')
-      .select('title, company, location, canton, category, description, salary_text, url, remote, job_type')
-      .eq('id', body.jobId)
-      .maybeSingle()
-
-    if (jobErr) {
-      return NextResponse.json({ error: jobErr.message }, { status: 500 })
-    }
-    if (!job) {
-      return NextResponse.json({ error: 'Job not found' }, { status: 404 })
     }
 
     // Vyber jazyk emailu: nemcina prioritne pokud user umi alespon B1, jinak cestina.
@@ -87,34 +78,99 @@ export async function POST(req: NextRequest) {
       profile.work_permit_status ? `Pracovní povolení: ${profile.work_permit_status}` : null,
       profile.ridicky_prukaz ? `Řidičský průkaz: ${profile.ridicky_prukaz}` : null,
       profile.adresa ? `Adresa: ${profile.adresa}` : null,
+      profile.telefon ? `Telefon: ${profile.telefon}` : null,
     ].filter(Boolean).join('\n')
 
-    const jobSummary = [
-      `Pozice: ${job.title}`,
-      `Firma: ${job.company}`,
-      `Lokace: ${job.location}${job.canton ? ` (${job.canton})` : ''}`,
-      job.category ? `Kategorie: ${job.category}` : null,
-      job.remote ? 'Remote: Ano' : null,
-      job.job_type ? `Typ: ${job.job_type}` : null,
-      job.description ? `Popis pozice:\n${(job.description as string).slice(0, 2000)}` : null,
-    ].filter(Boolean).join('\n')
+    // ========================================================================
+    // Mode A: AGENCY (general application — Faze A pivot)
+    // ========================================================================
+    let prompt = ''
+    if (isAgencyMode) {
+      const { data: agency, error: agencyErr } = await supabaseAdmin
+        .from('agencies')
+        .select('company, city, canton, region, email, website, industry, current_positions, has_open_positions')
+        .eq('id', body.agencyId!)
+        .maybeSingle()
+      if (agencyErr) return NextResponse.json({ error: agencyErr.message }, { status: 500 })
+      if (!agency) return NextResponse.json({ error: 'Agency not found' }, { status: 404 })
 
-    const prompt = `Jsi expert na psaní motivačních emailů pro švýcarský pracovní trh. Pomáháš blue-collar pracovníkům z CZ/SK najít práci ve Švýcarsku.
+      const agencySummary = [
+        `Firma: ${agency.company}`,
+        agency.city ? `Lokace: ${agency.city}${agency.canton ? ` (${agency.canton})` : ''}` : null,
+        agency.region ? `Region: ${agency.region}` : null,
+        agency.industry && Array.isArray(agency.industry) && agency.industry.length > 0
+          ? `Obory: ${(agency.industry as string[]).join(', ')}`
+          : null,
+        agency.current_positions && Array.isArray(agency.current_positions) && agency.current_positions.length > 0
+          ? `Aktuálně otevřené pozice: ${(agency.current_positions as string[]).slice(0, 5).join(', ')}`
+          : null,
+      ].filter(Boolean).join('\n')
+
+      prompt = `Jsi expert na psaní motivačních emailů pro švýcarský pracovní trh. Pomáháš blue-collar pracovníkům z CZ/SK najít práci ve Švýcarsku.
+
+ÚKOL: Napiš krátký, profesionální OPEN APPLICATION (Initiativbewerbung) email — uchazeč se hlásí do personální agentury s otevřenou žádostí, NE na konkrétní inzerát. Jazyk: ${lang}.
+
+🚫 KRITICKÉ:
+- Nikdy nepřidávej fakta, která uchazeč neuvedl v profilu.
+- Žádné marketingové superlativy. Buď věcný.
+- Email je VŠEOBECNÁ ŽÁDOST do agentury, ne reakce na konkrétní inzerát. NEzminujte specifické pozice pokud agency nemá current_positions.
+
+✅ STRUKTURA EMAILU:
+- Předmět: "Initiativbewerbung — [Jméno], [Cílová pozice nebo Obor]" nebo "Otevřená žádost o práci — [Jméno]". Max 60 znaků.
+- Tělo: 3-4 odstavce plain text:
+  1. Pozdrav: "Sehr geehrte Damen und Herren," / "Vážená paní, vážený pane,"
+  2. Krátké představení a důvod kontaktu: hledám práci ve Švýcarsku, viděl jsem že vaše agentura působí v ${agency.region || 'CH'} ${agency.industry ? `v oboru ${(agency.industry as string[]).join('/')}` : ''} — chci se nabídnout jako uchazeč.
+  3. Tvoje kvalifikace přesně z profilu.
+  4. Závěr: pošlu CV, ochota pohovoru, díky, podpis (Jméno + telefon).
+
+PROFIL UCHAZEČE:
+${profileSummary || '(profil je převážně prázdný — zminuj jen to co je vyplneno)'}
+
+AGENTURA:
+${agencySummary}
+
+VRAŤ POUZE platný JSON s klíči "subject" a "body". Žádný úvod, žádný komentář, žádné code-fence.
+Příklad: {"subject":"...","body":"..."}`
+    }
+    // ========================================================================
+    // Mode B: JOB (original — konkrétní inzerát)
+    // ========================================================================
+    else {
+      const { data: job, error: jobErr } = await supabaseAdmin
+        .from('jobs')
+        .select('title, company, location, canton, category, description, salary_text, url, remote, job_type')
+        .eq('id', body.jobId!)
+        .maybeSingle()
+
+      if (jobErr) return NextResponse.json({ error: jobErr.message }, { status: 500 })
+      if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 })
+
+      const jobSummary = [
+        `Pozice: ${job.title}`,
+        `Firma: ${job.company}`,
+        `Lokace: ${job.location}${job.canton ? ` (${job.canton})` : ''}`,
+        job.category ? `Kategorie: ${job.category}` : null,
+        job.remote ? 'Remote: Ano' : null,
+        job.job_type ? `Typ: ${job.job_type}` : null,
+        job.description ? `Popis pozice:\n${(job.description as string).slice(0, 2000)}` : null,
+      ].filter(Boolean).join('\n')
+
+      prompt = `Jsi expert na psaní motivačních emailů pro švýcarský pracovní trh. Pomáháš blue-collar pracovníkům z CZ/SK najít práci ve Švýcarsku.
 
 ÚKOL: Napiš krátký, profesionální motivační email pro tuto pozici. Jazyk: ${lang}.
 
-🚫 KRITICKÉ — co NESMÍŠ:
-- Nikdy nepřidávej fakta, která uchazeč neuvedl v profilu (jména firem, čísla certifikátů, konkrétní roky, úrovně jazyků jiné než uvedené).
-- Žádné marketingové superlativy ("excelentní zkušenosti", "vynikající kandidát"). Buď věcný.
-- Žádné dlouhé úvody. CH HR ocení krátký, jasný email.
+🚫 KRITICKÉ:
+- Nikdy nepřidávej fakta, která uchazeč neuvedl v profilu.
+- Žádné marketingové superlativy. Buď věcný.
+- Žádné dlouhé úvody.
 
 ✅ STRUKTURA EMAILU:
-- Předmět (subject): krátký, konkrétní, max 60 znaků. Forma: "Bewerbung als [Pozice] — [Jméno]" nebo "Žádost o pozici [Pozice] — [Jméno]".
-- Tělo (body): 3-4 odstavce, plain text (žádný HTML, žádný markdown):
-  1. Pozdrav: "Sehr geehrte Damen und Herren," nebo "Vážená paní, vážený pane,"
-  2. Krátké představení (kdo jsi, jakou pozici hledáš, proč právě tato firma — využij info z job description)
-  3. Tvoje kvalifikace přesně z profilu (zkušenosti, jazyky, povolení, řidičák — jen co user uvedl)
-  4. Závěr: ochota přijít na pohovor, díky za zvážení, podpis (Jméno + telefon)
+- Předmět: "Bewerbung als [Pozice] — [Jméno]" nebo "Žádost o pozici [Pozice] — [Jméno]". Max 60 znaků.
+- Tělo: 3-4 odstavce plain text:
+  1. Pozdrav: "Sehr geehrte Damen und Herren," / "Vážená paní, vážený pane,"
+  2. Krátké představení (kdo jsi, jakou pozici hledáš, proč právě tato firma).
+  3. Tvoje kvalifikace přesně z profilu.
+  4. Závěr: ochota pohovoru, díky, podpis (Jméno + telefon).
 
 PROFIL UCHAZEČE:
 ${profileSummary || '(profil je převážně prázdný — zminuj jen to co je vyplneno)'}
@@ -123,7 +179,8 @@ NABÍDKA:
 ${jobSummary}
 
 VRAŤ POUZE platný JSON s klíči "subject" a "body". Žádný úvod, žádný komentář, žádné code-fence.
-Příklad formátu: {"subject":"...","body":"..."}`
+Příklad: {"subject":"...","body":"..."}`
+    }
 
     let aiText = ''
     try {

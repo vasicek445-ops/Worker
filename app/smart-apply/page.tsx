@@ -4,12 +4,6 @@ import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '../supabase'
-// Smart Apply email extraction — sdileny helper, scraper to pouziva pri insertu
-// do jobs.contact_emails[] sloupce. Frontend fallback pokud sloupec prazdny.
-import {
-  extractRecruitmentEmail,
-  preferredEmail as preferredFromArray,
-} from '../../lib/jobs/extract-email'
 import {
   Mail,
   CheckCircle2,
@@ -19,40 +13,35 @@ import {
   Sparkles,
   Search,
   MapPin,
-  Home,
-  Briefcase,
-  ExternalLink,
-  FileText,
   Building2,
-  Calendar,
   ChevronLeft,
   Wand2,
   RotateCw,
+  Globe,
+  Briefcase,
+  Flame,
+  ExternalLink,
 } from 'lucide-react'
 
 // ============================================================================
-// Smart Apply — sjednoceny center s split-view layoutem (Teal/Handshake pattern).
-// Vlevo: kompaktni job list. Vpravo: detail vybrane nabidky + AI motivacni draft
-// + priložene CV + Posli za me CTA. Mobile: stack — list zmizne kdyz je vybrana
-// nabidka, zpet sipkou.
+// Smart Apply — agency-first (po pivotu 2026-05-21). DB-first architektura:
+// 946 CH agentur s overenymi HR emaily misto scraping job boardu.
+// Listing /api/agencies, AI draft per agency (general motivacni email),
+// send pres Gmail OAuth.
 // ============================================================================
 
-type Job = {
-  id: string
-  title: string
+type AgencyEntry = {
+  id: number
   company: string
-  location: string
+  city: string | null
   canton: string | null
-  salary_text: string | null
-  job_type: string
-  category: string | null
-  description: string | null
-  url: string | null
-  remote: boolean
-  posted_at: string | null
-  tags: string[] | null
-  source: string
-  contact_emails: string[] | null
+  region: 'german' | 'french' | 'italian' | string | null
+  email: string
+  website: string | null
+  has_open_positions: boolean | null
+  current_positions: string[] | null
+  industry: string[] | null
+  last_hiring_check_at: string | null
 }
 
 type GmailStatus =
@@ -61,6 +50,18 @@ type GmailStatus =
   | { state: 'connected'; email: string; connectedAt: string }
   | { state: 'error'; message: string }
 
+const REGIONS: Array<{ id: string; label: string; flag: string }> = [
+  { id: '', label: 'Všechny regiony', flag: '🇨🇭' },
+  { id: 'german', label: 'Německá CH', flag: '🇩🇪' },
+  { id: 'french', label: 'Francouzská CH', flag: '🇫🇷' },
+  { id: 'italian', label: 'Italská CH', flag: '🇮🇹' },
+]
+
+const INDUSTRIES = [
+  'Logistika', 'Stavba', 'Gastronomie', 'Péče', 'Úklid', 'Doprava',
+  'Výroba', 'Zemědělství', 'Maloobchod', 'Bezpečnost', 'Administrativa',
+]
+
 const CANTONS: Record<string, string> = {
   ZH: 'Zürich', BE: 'Bern', LU: 'Luzern', UR: 'Uri', SZ: 'Schwyz',
   OW: 'Obwalden', NW: 'Nidwalden', GL: 'Glarus', ZG: 'Zug', FR: 'Fribourg',
@@ -68,23 +69,6 @@ const CANTONS: Record<string, string> = {
   AR: 'Appenzell AR', AI: 'Appenzell AI', SG: 'St. Gallen', GR: 'Graubünden',
   AG: 'Aargau', TG: 'Thurgau', TI: 'Ticino', VD: 'Vaud', VS: 'Valais',
   NE: 'Neuchâtel', GE: 'Genève', JU: 'Jura',
-}
-
-const CATEGORIES = [
-  'IT / Software', 'Stavebnictví', 'Gastronomie', 'Zdravotnictví',
-  'Logistika', 'Elektro / Technik', 'Úklid / Údržba', 'Finance',
-  'Marketing / Sales', 'HR / Admin',
-]
-
-const categoryColors: Record<string, string> = {
-  'IT / Software': 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-  'Stavebnictví': 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-  'Gastronomie': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-  'Zdravotnictví': 'bg-green-500/10 text-green-400 border-green-500/30',
-  'Logistika': 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-  'Elektro / Technik': 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
-  'Finance': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-  'Marketing / Sales': 'bg-pink-500/10 text-pink-400 border-pink-500/30',
 }
 
 export default function SmartApplyPage() {
@@ -104,17 +88,18 @@ function SmartApplyContent() {
   const [gmailStatus, setGmailStatus] = useState<GmailStatus>({ state: 'loading' })
   const [gmailBusy, setGmailBusy] = useState(false)
 
-  const [jobs, setJobs] = useState<Job[]>([])
+  const [agencies, setAgencies] = useState<AgencyEntry[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [region, setRegion] = useState('german') // default = german (Worker target)
   const [canton, setCanton] = useState('')
-  const [category, setCategory] = useState('')
-  const [jobType, setJobType] = useState('')
+  const [industry, setIndustry] = useState('')
+  const [hiringOnly, setHiringOnly] = useState(false)
   const [searchInput, setSearchInput] = useState('')
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null)
+  const [selectedAgency, setSelectedAgency] = useState<AgencyEntry | null>(null)
 
   const loadGmailStatus = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -127,7 +112,6 @@ function SmartApplyContent() {
       .select('email, connected_at, revoked')
       .eq('provider', 'gmail')
       .maybeSingle()
-
     if (error && error.code !== 'PGRST116') {
       setGmailStatus({ state: 'error', message: error.message })
       return
@@ -156,40 +140,37 @@ function SmartApplyContent() {
     }
   }
 
-  const fetchJobs = useCallback(async () => {
+  const fetchAgencies = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams()
       if (search) params.set('search', search)
+      if (region) params.set('region', region)
       if (canton) params.set('canton', canton)
-      if (category) params.set('category', category)
-      if (jobType) params.set('type', jobType)
-      // Smart Apply mode: jen nabidky s pre-extracted kontaktnim emailem v DB.
-      // Backfill viz migrace 20260521_jobs_contact_emails_backfill.sql.
-      // Scraper extrahuje contact_emails pri insertu (lib/jobs/extract-email.ts).
-      params.set('has_contact', '1')
+      if (industry) params.set('industry', industry)
+      if (hiringOnly) params.set('hiring_only', '1')
       params.set('page', page.toString())
-      const res = await fetch(`/api/jobs?${params}`)
+      const res = await fetch(`/api/agencies?${params}`)
       const data = await res.json()
-      const applyable: Job[] = data.jobs || []
-      setJobs(applyable)
+      const list: AgencyEntry[] = data.agencies || []
+      setAgencies(list)
       setTotal(data.total || 0)
       setTotalPages(data.totalPages || 0)
-      if (!selectedJob && applyable.length > 0) {
-        setSelectedJob(applyable[0])
-      } else if (selectedJob && !applyable.find((j) => j.id === selectedJob.id)) {
-        setSelectedJob(applyable[0] || null)
+      if (!selectedAgency && list.length > 0) {
+        setSelectedAgency(list[0])
+      } else if (selectedAgency && !list.find((a) => a.id === selectedAgency.id)) {
+        setSelectedAgency(list[0] || null)
       }
     } catch {
-      setJobs([])
+      setAgencies([])
     } finally {
       setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, canton, category, jobType, page])
+  }, [search, region, canton, industry, hiringOnly, page])
 
   useEffect(() => { void loadGmailStatus() }, [loadGmailStatus])
-  useEffect(() => { void fetchJobs() }, [fetchJobs])
+  useEffect(() => { void fetchAgencies() }, [fetchAgencies])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -200,33 +181,15 @@ function SmartApplyContent() {
   function clearFilters() {
     setSearch('')
     setSearchInput('')
+    setRegion('german')
     setCanton('')
-    setCategory('')
-    setJobType('')
+    setIndustry('')
+    setHiringOnly(false)
     setPage(1)
   }
 
-  const hasFilters = !!(search || canton || category || jobType)
+  const hasFilters = !!(search || canton || industry || hiringOnly || region !== 'german')
   const gmailConnected = gmailStatus.state === 'connected'
-
-  function timeAgo(dateStr: string | null): string {
-    if (!dateStr) return ''
-    const diff = Date.now() - new Date(dateStr).getTime()
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    if (days === 0) return 'Dnes'
-    if (days === 1) return 'Včera'
-    if (days < 7) return `Před ${days} dny`
-    if (days < 30) return `Před ${Math.floor(days / 7)} týdny`
-    return `Před ${Math.floor(days / 30)} měsíci`
-  }
-
-  function sourceLabel(source: string): string {
-    const labels: Record<string, string> = {
-      michaelpage: 'Michael Page', roberthalf: 'Robert Half',
-      jobsch: 'jobs.ch', jooble: 'Jooble', arbeitnow: 'arbeitnow',
-    }
-    return labels[source] || source
-  }
 
   return (
     <main
@@ -240,8 +203,7 @@ function SmartApplyContent() {
             <h1 className="text-white text-2xl font-bold tracking-tight m-0">Smart Apply</h1>
           </div>
           <p className="text-white/50 text-sm m-0">
-            Najdeme ti nabídky, vygenerujeme motivační dopis a pošleme přihlášku z tvého Gmailu.
-            Jedna aplikace = jedna minuta.
+            946 ověřených CH personálních agentur s HR e-maily. Pošli motivační dopis přímo zaměstnavateli — z tvého Gmailu, AI ho personalizuje za tebe.
           </p>
         </div>
 
@@ -258,10 +220,8 @@ function SmartApplyContent() {
           </div>
         )}
 
-        <div
-          id="gmail-setup"
-          className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 mb-6"
-        >
+        {/* Gmail card */}
+        <div id="gmail-setup" className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 mb-6">
           {gmailStatus.state === 'loading' && (
             <div className="flex items-center gap-3 text-white/40 text-sm">
               <Loader2 size={18} className="animate-spin" /> Načítám stav Gmailu…
@@ -274,16 +234,12 @@ function SmartApplyContent() {
                 <h2 className="text-white text-lg font-bold m-0">Připoj Gmail a začni</h2>
               </div>
               <p className="text-white/55 text-sm mb-5 leading-relaxed">
-                Worker bude posílat tvé pracovní přihlášky z tvého vlastního Gmail účtu — vyšší reply rate než cold email,
-                a všechny odpovědi ti chodí přímo do tvého Inboxu. Worker dostane pouze oprávnění{' '}
-                <code className="bg-white/10 px-1.5 py-0.5 rounded text-[12px]">gmail.send</code> (posílání emailů z tvé adresy).
-                NIKDY nemáme přístup ke čtení tvých emailů.
+                Worker bude posílat tvé pracovní přihlášky z tvého vlastního Gmail účtu — vyšší reply rate, odpovědi chodí přímo k tobě. Jen{' '}
+                <code className="bg-white/10 px-1.5 py-0.5 rounded text-[12px]">gmail.send</code> oprávnění, čtení nikdy.
               </p>
               <div className="rounded-xl border border-[#ff8c2b]/25 bg-[#ff8c2b]/[0.06] p-4 mb-5 text-[13px] leading-relaxed text-white/65">
                 <strong className="text-white/85">Co tě čeká:</strong> Google ti při přihlášení ukáže obrazovku „Tato aplikace není ověřená Googlem&quot;.{' '}
-                <strong className="text-white/85">Je to v pořádku</strong> — Worker je nová aplikace a ověření u Googlu právě dokončuje.
-                Klikni na <strong className="text-white/85">„Pokročilé&quot;</strong> a pak{' '}
-                <strong className="text-white/85">„Přejít na gowoker.com&quot;</strong>.
+                <strong className="text-white/85">Je to v pořádku</strong> — klikni <strong className="text-white/85">„Pokročilé&quot;</strong> → <strong className="text-white/85">„Přejít na gowoker.com&quot;</strong>.
               </div>
               <button
                 disabled={gmailBusy}
@@ -303,22 +259,14 @@ function SmartApplyContent() {
                   <div className="text-white/50 text-sm">{gmailStatus.email}</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/profil/agent"
-                  className="text-[#ff8c2b] hover:text-[#ff6a1f] text-sm font-medium no-underline"
-                >
-                  Nastavit agenta →
-                </Link>
-                <button
-                  type="button"
-                  disabled={gmailBusy}
-                  onClick={handleConnect}
-                  className="text-white/40 hover:text-white text-xs underline"
-                >
-                  Připojit znovu
-                </button>
-              </div>
+              <button
+                type="button"
+                disabled={gmailBusy}
+                onClick={handleConnect}
+                className="text-white/40 hover:text-white text-xs underline"
+              >
+                Připojit znovu
+              </button>
             </div>
           )}
           {gmailStatus.state === 'error' && (
@@ -328,10 +276,10 @@ function SmartApplyContent() {
           )}
         </div>
 
-        {/* Split-view: list + detail (Teal/Handshake pattern) — 50/50 split na desktopu */}
+        {/* Split view */}
         <div className="grid lg:grid-cols-2 gap-5">
-          {/* LEFT — list (mobile hidden when detail selected) */}
-          <div className={selectedJob ? 'hidden lg:flex' : 'flex'}>
+          {/* LEFT: agency list */}
+          <div className={selectedAgency ? 'hidden lg:flex' : 'flex'}>
             <div className="w-full flex flex-col">
               <form onSubmit={handleSearch} className="flex gap-2 mb-3">
                 <div className="flex-1 relative">
@@ -340,11 +288,34 @@ function SmartApplyContent() {
                     type="text"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    placeholder="Hledej pozici nebo firmu..."
+                    placeholder="Hledej firmu nebo město..."
                     className="w-full bg-[#111120] border border-white/[0.08] rounded-xl pl-9 pr-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#fb923c]/40 placeholder-white/30"
                   />
                 </div>
               </form>
+
+              {/* Region chips */}
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {REGIONS.map((r) => {
+                  const active = region === r.id
+                  return (
+                    <button
+                      key={r.id || 'all'}
+                      type="button"
+                      onClick={() => { setRegion(r.id); setPage(1) }}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition"
+                      style={{
+                        background: active ? 'rgba(251,146,60,0.12)' : '#111120',
+                        borderColor: active ? 'rgba(251,146,60,0.4)' : 'rgba(255,255,255,0.08)',
+                        color: active ? '#fb923c' : 'rgba(255,255,255,0.6)',
+                      }}
+                    >
+                      <span>{r.flag}</span> {r.label}
+                    </button>
+                  )
+                })}
+              </div>
+
               <div className="flex flex-wrap gap-1.5 mb-3">
                 <select
                   value={canton}
@@ -357,26 +328,26 @@ function SmartApplyContent() {
                   ))}
                 </select>
                 <select
-                  value={category}
-                  onChange={(e) => { setCategory(e.target.value); setPage(1) }}
+                  value={industry}
+                  onChange={(e) => { setIndustry(e.target.value); setPage(1) }}
                   className="bg-[#111120] border border-white/[0.08] rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none cursor-pointer flex-1 min-w-0"
                 >
                   <option value="" className="bg-[#111120]">Všechny obory</option>
-                  {CATEGORIES.map((c) => (
+                  {INDUSTRIES.map((c) => (
                     <option key={c} value={c} className="bg-[#111120]">{c}</option>
                   ))}
                 </select>
                 <button
                   type="button"
-                  onClick={() => { setJobType(jobType === 'remote' ? '' : 'remote'); setPage(1) }}
+                  onClick={() => { setHiringOnly((v) => !v); setPage(1) }}
                   className="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition flex items-center gap-1 shrink-0"
                   style={{
-                    background: jobType === 'remote' ? 'rgba(251,146,60,0.1)' : '#111120',
-                    borderColor: jobType === 'remote' ? 'rgba(251,146,60,0.3)' : 'rgba(255,255,255,0.08)',
-                    color: jobType === 'remote' ? '#fb923c' : 'rgba(255,255,255,0.6)',
+                    background: hiringOnly ? 'rgba(251,146,60,0.1)' : '#111120',
+                    borderColor: hiringOnly ? 'rgba(251,146,60,0.3)' : 'rgba(255,255,255,0.08)',
+                    color: hiringOnly ? '#fb923c' : 'rgba(255,255,255,0.6)',
                   }}
                 >
-                  <Home size={11} strokeWidth={1.75} /> Remote
+                  <Flame size={11} strokeWidth={1.75} /> Hire teď
                 </button>
               </div>
 
@@ -384,32 +355,15 @@ function SmartApplyContent() {
                 <span>
                   {total > 0 && (
                     <>
-                      <span className="text-white/70 font-semibold">{total}</span> nabídek s přímým kontaktem
+                      <span className="text-white/70 font-semibold">{total}</span> agentur s e-mailem
                     </>
                   )}
                 </span>
                 {hasFilters && (
-                  <button
-                    type="button"
-                    onClick={clearFilters}
-                    className="text-white/40 hover:text-white transition"
-                  >
+                  <button type="button" onClick={clearFilters} className="text-white/40 hover:text-white transition">
                     ✕ Vymazat filtry
                   </button>
                 )}
-              </div>
-              {/* Honest disclaimer — zatim mame primy email jen u zlomku zdroju.
-                  Faze 2 (detail page fetch) + Faze 3 (Apify niche boardy) zvysi pomer. */}
-              <div
-                className="rounded-lg border text-[11px] leading-relaxed mb-3 px-3 py-2"
-                style={{
-                  background: 'rgba(251,146,60,0.05)',
-                  borderColor: 'rgba(251,146,60,0.15)',
-                  color: 'rgba(255,255,255,0.55)',
-                }}
-              >
-                Smart Apply ukazuje jen nabídky s ověřeným kontaktním e-mailem.
-                Rozšiřujeme zdroje — víc nabídek se sem postupně přidá.
               </div>
 
               <div className="flex flex-col gap-2">
@@ -421,20 +375,19 @@ function SmartApplyContent() {
                       <div className="h-2.5 bg-white/[0.06] rounded w-1/3" />
                     </div>
                   ))
-                ) : jobs.length === 0 ? (
+                ) : agencies.length === 0 ? (
                   <div className="text-center py-12">
-                    <Briefcase size={36} className="mx-auto text-white/20 mb-3" strokeWidth={1.5} />
-                    <h3 className="text-white font-semibold text-sm mb-1">Žádné nabídky</h3>
+                    <Building2 size={36} className="mx-auto text-white/20 mb-3" strokeWidth={1.5} />
+                    <h3 className="text-white font-semibold text-sm mb-1">Žádné agentury</h3>
                     <p className="text-white/50 text-xs">Zkus změnit filtry</p>
                   </div>
                 ) : (
-                  jobs.map((job) => (
-                    <JobCardCompact
-                      key={job.id}
-                      job={job}
-                      isSelected={selectedJob?.id === job.id}
-                      onClick={() => setSelectedJob(job)}
-                      timeAgo={timeAgo}
+                  agencies.map((a) => (
+                    <AgencyCardCompact
+                      key={a.id}
+                      agency={a}
+                      isSelected={selectedAgency?.id === a.id}
+                      onClick={() => setSelectedAgency(a)}
                     />
                   ))
                 )}
@@ -442,35 +395,21 @@ function SmartApplyContent() {
 
               {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-4">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="bg-[#111120] border border-white/[0.08] text-white px-3 py-1.5 rounded-lg text-xs disabled:opacity-30 hover:border-white/20 transition"
-                  >
-                    ←
-                  </button>
+                  <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="bg-[#111120] border border-white/[0.08] text-white px-3 py-1.5 rounded-lg text-xs disabled:opacity-30 hover:border-white/20 transition">←</button>
                   <span className="text-white/50 text-xs">{page} / {totalPages}</span>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="bg-[#111120] border border-white/[0.08] text-white px-3 py-1.5 rounded-lg text-xs disabled:opacity-30 hover:border-white/20 transition"
-                  >
-                    →
-                  </button>
+                  <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="bg-[#111120] border border-white/[0.08] text-white px-3 py-1.5 rounded-lg text-xs disabled:opacity-30 hover:border-white/20 transition">→</button>
                 </div>
               )}
             </div>
           </div>
 
-          {/* RIGHT — detail */}
-          <div className={selectedJob ? 'block' : 'hidden lg:block'}>
-            {selectedJob ? (
-              <JobDetailPanel
-                job={selectedJob}
+          {/* RIGHT: detail */}
+          <div className={selectedAgency ? 'block' : 'hidden lg:block'}>
+            {selectedAgency ? (
+              <AgencyDetailPanel
+                agency={selectedAgency}
                 gmailConnected={gmailConnected}
-                onBack={() => setSelectedJob(null)}
-                timeAgo={timeAgo}
-                sourceLabel={sourceLabel}
+                onBack={() => setSelectedAgency(null)}
               />
             ) : (
               <EmptyDetailState />
@@ -483,16 +422,10 @@ function SmartApplyContent() {
 }
 
 // ============================================================================
-function JobCardCompact({
-  job,
-  isSelected,
-  onClick,
-  timeAgo,
-}: {
-  job: Job
+function AgencyCardCompact({ agency, isSelected, onClick }: {
+  agency: AgencyEntry
   isSelected: boolean
   onClick: () => void
-  timeAgo: (dateStr: string | null) => string
 }) {
   return (
     <button
@@ -503,39 +436,34 @@ function JobCardCompact({
         background: isSelected ? 'rgba(251,146,60,0.06)' : '#111120',
         border: isSelected ? '1px solid rgba(251,146,60,0.4)' : '1px solid rgba(255,255,255,0.06)',
       }}
-      onMouseEnter={(e) => {
-        if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
-      }}
-      onMouseLeave={(e) => {
-        if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
-      }}
+      onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)' }}
+      onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)' }}
     >
       <div className="flex items-start justify-between gap-2 mb-1.5">
-        <h4
-          className="font-semibold text-sm leading-snug m-0 line-clamp-2"
-          style={{ color: isSelected ? '#fb923c' : '#fafafa' }}
-        >
-          {job.title}
+        <h4 className="font-semibold text-sm leading-snug m-0 line-clamp-2" style={{ color: isSelected ? '#fb923c' : '#fafafa' }}>
+          {agency.company}
         </h4>
-        {job.posted_at && (
-          <span className="text-white/30 text-[10px] flex-shrink-0 whitespace-nowrap mt-0.5">
-            {timeAgo(job.posted_at)}
+        {agency.has_open_positions && (
+          <span title="Aktuálně hire-uje" className="flex-shrink-0 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: 'rgba(251,146,60,0.15)', color: '#fb923c' }}>
+            <Flame size={9} strokeWidth={2} /> HOT
           </span>
         )}
       </div>
-      <p className="text-white/55 text-xs m-0 mb-2 truncate">{job.company}</p>
-      <div className="flex items-center gap-1.5 text-[11px] text-white/45">
+      <div className="flex items-center gap-1.5 text-[11px] text-white/45 mb-1">
         <MapPin size={10} strokeWidth={2} />
-        <span className="truncate">{job.location}{job.canton ? ` (${job.canton})` : ''}</span>
-        {job.remote && (
-          <span className="text-green-400 ml-1 shrink-0">• Remote</span>
-        )}
+        <span className="truncate">{agency.city || '—'}{agency.canton ? ` (${agency.canton})` : ''}</span>
       </div>
-      {job.category && (
-        <div className="mt-2">
-          <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] border ${categoryColors[job.category] || 'bg-white/[0.03] text-white/60 border-white/[0.06]'}`}>
-            {job.category}
-          </span>
+      <div className="flex items-center gap-1.5 text-[11px] text-white/40 truncate">
+        <Mail size={10} strokeWidth={2} />
+        <span className="truncate">{agency.email}</span>
+      </div>
+      {agency.industry && agency.industry.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {agency.industry.slice(0, 3).map((ind) => (
+            <span key={ind} className="inline-block rounded-full px-1.5 py-0.5 text-[10px] border" style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)' }}>
+              {ind}
+            </span>
+          ))}
         </div>
       )}
     </button>
@@ -543,46 +471,30 @@ function JobCardCompact({
 }
 
 // ============================================================================
-function JobDetailPanel({
-  job,
-  gmailConnected,
-  onBack,
-  timeAgo,
-  sourceLabel,
-}: {
-  job: Job
+function AgencyDetailPanel({ agency, gmailConnected, onBack }: {
+  agency: AgencyEntry
   gmailConnected: boolean
   onBack: () => void
-  timeAgo: (dateStr: string | null) => string
-  sourceLabel: (source: string) => string
 }) {
-  // Draft + send state. Resetuje se pri zmene jobu.
   const [draft, setDraft] = useState<{ subject: string; body: string } | null>(null)
   const [generating, setGenerating] = useState(false)
   const [draftError, setDraftError] = useState<string | null>(null)
-
-  const [recipient, setRecipient] = useState('')
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
   const [sent, setSent] = useState<{ messageId: string } | null>(null)
 
-  const lastJobIdRef = useRef<string | null>(null)
+  const lastAgencyIdRef = useRef<number | null>(null)
   useEffect(() => {
-    if (lastJobIdRef.current !== job.id) {
-      lastJobIdRef.current = job.id
+    if (lastAgencyIdRef.current !== agency.id) {
+      lastAgencyIdRef.current = agency.id
       setDraft(null)
       setGenerating(false)
       setDraftError(null)
-      // Pre-fill recipient: DB-cached contact_emails (priorita recruitment prefixy)
-      // → fallback regex z description (kdyz scraper jeste contact_emails nemel)
-      const cached = preferredFromArray(job.contact_emails)
-      const extracted = cached || extractRecruitmentEmail(job.description)
-      setRecipient(extracted || '')
       setSending(false)
       setSendError(null)
       setSent(null)
     }
-  }, [job.id, job.description, job.contact_emails])
+  }, [agency.id])
 
   async function generateDraft() {
     if (generating) return
@@ -593,11 +505,8 @@ function JobDetailPanel({
       if (!session) throw new Error('Musíš být přihlášený')
       const res = await fetch('/api/smart-apply/draft', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ jobId: job.id }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ agencyId: agency.id }),
       })
       const body = await res.json()
       if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`)
@@ -611,13 +520,7 @@ function JobDetailPanel({
 
   async function handleSend() {
     if (!draft || !gmailConnected) {
-      if (!gmailConnected) {
-        document.getElementById('gmail-setup')?.scrollIntoView({ behavior: 'smooth' })
-      }
-      return
-    }
-    if (!recipient.trim()) {
-      setSendError('Zadej e-mail příjemce (kontakt na firmu).')
+      if (!gmailConnected) document.getElementById('gmail-setup')?.scrollIntoView({ behavior: 'smooth' })
       return
     }
     setSending(true)
@@ -627,16 +530,8 @@ function JobDetailPanel({
       if (!session) throw new Error('Musíš být přihlášený')
       const res = await fetch('/api/smart-apply/send', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          jobId: job.id,
-          to: recipient.trim(),
-          subject: draft.subject,
-          body: draft.body,
-        }),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ agencyId: agency.id, to: agency.email, subject: draft.subject, body: draft.body }),
       })
       const body = await res.json()
       if (!res.ok) throw new Error(body?.error || `HTTP ${res.status}`)
@@ -649,95 +544,75 @@ function JobDetailPanel({
   }
 
   return (
-    <div
-      className="rounded-2xl border border-white/[0.06] bg-[#0d0d18] lg:sticky lg:top-6 flex flex-col"
-      style={{ maxHeight: 'calc(100vh - 3rem)' }}
-    >
-      <button
-        type="button"
-        onClick={onBack}
-        className="lg:hidden flex items-center gap-1.5 px-4 py-2.5 text-white/60 hover:text-white text-sm font-medium border-b border-white/[0.06]"
-      >
+    <div className="rounded-2xl border border-white/[0.06] bg-[#0d0d18] lg:sticky lg:top-6 flex flex-col" style={{ maxHeight: 'calc(100vh - 3rem)' }}>
+      <button type="button" onClick={onBack} className="lg:hidden flex items-center gap-1.5 px-4 py-2.5 text-white/60 hover:text-white text-sm font-medium border-b border-white/[0.06]">
         <ChevronLeft size={16} strokeWidth={1.75} /> Zpět na seznam
       </button>
 
       <div className="flex-1 overflow-y-auto p-5 lg:p-6">
         <div className="mb-4">
-          <h2 className="text-white text-xl font-bold leading-tight mb-2 m-0">{job.title}</h2>
-          <div className="flex items-center gap-2 text-white/60 text-sm mb-2">
-            <Building2 size={14} strokeWidth={1.75} />
-            <span>{job.company}</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/50 text-xs">
-            <span className="flex items-center gap-1">
-              <MapPin size={12} strokeWidth={1.75} />
-              {job.location}{job.canton ? ` (${job.canton})` : ''}
-            </span>
-            {job.posted_at && (
-              <span className="flex items-center gap-1">
-                <Calendar size={12} strokeWidth={1.75} />
-                {timeAgo(job.posted_at)}
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h2 className="text-white text-xl font-bold leading-tight m-0">{agency.company}</h2>
+            {agency.has_open_positions && (
+              <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold" style={{ background: 'rgba(251,146,60,0.15)', color: '#fb923c' }}>
+                <Flame size={11} strokeWidth={2} /> HOT
               </span>
             )}
-            {job.source && job.source !== 'arbeitnow' && (
-              <span className="text-white/35">via {sourceLabel(job.source)}</span>
-            )}
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-1.5 mb-5">
-          {job.category && (
-            <span className={`rounded-full px-2.5 py-0.5 text-[11px] border ${categoryColors[job.category] || 'bg-white/[0.03] text-white/60 border-white/[0.06]'}`}>
-              {job.category}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-white/55 text-sm">
+            {agency.city && (
+              <span className="flex items-center gap-1">
+                <MapPin size={13} strokeWidth={1.75} />
+                {agency.city}{agency.canton ? ` (${agency.canton})` : ''}
+              </span>
+            )}
+            <span className="flex items-center gap-1">
+              <Mail size={13} strokeWidth={1.75} />
+              <a href={`mailto:${agency.email}`} className="text-[#fb923c] no-underline hover:underline">{agency.email}</a>
             </span>
-          )}
-          {job.remote && (
-            <span className="bg-green-500/10 text-green-400 border border-green-500/30 rounded-full px-2.5 py-0.5 text-[11px] flex items-center gap-1">
-              <Home size={10} strokeWidth={2} /> Remote
-            </span>
-          )}
-          {job.salary_text && (
-            <span className="bg-white/[0.03] border border-white/[0.06] text-white/60 rounded-full px-2.5 py-0.5 text-[11px]">
-              💰 {job.salary_text}
-            </span>
-          )}
-        </div>
-
-        {job.description && (
-          <div className="mb-5">
-            <div className="text-[10px] uppercase font-semibold mb-2" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}>
-              O pozici
-            </div>
-            <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap m-0">
-              {job.description.length > 600 ? job.description.slice(0, 600) + '…' : job.description}
-            </p>
-            {job.url && (
-              <a
-                href={job.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 mt-2 text-[#fb923c] text-xs no-underline hover:underline"
-              >
-                <ExternalLink size={11} strokeWidth={1.75} /> Číst celý inzerát
+            {agency.website && (
+              <a href={agency.website.startsWith('http') ? agency.website : `https://${agency.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[#fb923c] no-underline hover:underline">
+                <Globe size={13} strokeWidth={1.75} /> Web
               </a>
             )}
           </div>
+        </div>
+
+        {agency.current_positions && agency.current_positions.length > 0 && (
+          <div className="rounded-xl border border-[#fb923c]/20 bg-[#fb923c]/[0.04] p-3 mb-5">
+            <div className="text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(251,146,60,0.85)', letterSpacing: '0.08em' }}>
+              Aktuálně nabízejí
+            </div>
+            <ul className="text-white/75 text-sm space-y-0.5 m-0 pl-0 list-none">
+              {agency.current_positions.slice(0, 6).map((p, i) => (
+                <li key={i} className="flex items-start gap-1.5">
+                  <Briefcase size={12} className="text-[#fb923c] shrink-0 mt-0.5" strokeWidth={1.75} />
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
 
-        {/* ===== AI motivacni email ===== */}
+        {agency.industry && agency.industry.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-5">
+            {agency.industry.map((ind) => (
+              <span key={ind} className="rounded-full px-2.5 py-0.5 text-[11px] border" style={{ background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)' }}>
+                {ind}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* AI motivacni email */}
         <div className="rounded-xl border border-[#fb923c]/20 bg-[#fb923c]/[0.04] p-4 mb-5">
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
               <Wand2 size={16} className="text-[#fb923c]" strokeWidth={1.75} />
-              <h3 className="text-white text-sm font-semibold m-0">AI motivační dopis</h3>
+              <h3 className="text-white text-sm font-semibold m-0">AI motivační email</h3>
             </div>
             {draft && !generating && (
-              <button
-                type="button"
-                onClick={generateDraft}
-                className="inline-flex items-center gap-1 text-white/50 hover:text-white text-xs transition"
-                title="Vygenerovat znovu"
-              >
+              <button type="button" onClick={generateDraft} className="inline-flex items-center gap-1 text-white/50 hover:text-white text-xs transition">
                 <RotateCw size={11} strokeWidth={1.75} /> Znovu
               </button>
             )}
@@ -746,14 +621,9 @@ function JobDetailPanel({
           {!draft && !generating && (
             <>
               <p className="text-white/55 text-xs leading-relaxed mb-3">
-                Wooky vygeneruje motivační email z tvého profilu (zkušenosti, jazyky, povolení) přesně pro tuto pozici.
-                Můžeš upravit před odesláním. Žádné vymýšlení faktů — jen to co máš v profilu.
+                Wooky vygeneruje general motivační email pro tuto agenturu z tvého profilu (zkušenosti, jazyky, povolení). Můžeš upravit před odesláním.
               </p>
-              <button
-                type="button"
-                onClick={generateDraft}
-                className="inline-flex items-center gap-1.5 bg-[#fb923c] hover:bg-[#f97316] text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
-              >
+              <button type="button" onClick={generateDraft} className="inline-flex items-center gap-1.5 bg-[#fb923c] hover:bg-[#f97316] text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
                 <Sparkles size={14} strokeWidth={1.75} /> Vygenerovat draft
               </button>
             </>
@@ -762,7 +632,7 @@ function JobDetailPanel({
           {generating && (
             <div className="flex items-center gap-2.5 text-white/70 text-sm py-2">
               <Loader2 size={16} className="animate-spin text-[#fb923c]" />
-              <span>Generuji motivační dopis… (může to trvat 5–10 s)</span>
+              <span>Generuji email… (~7s)</span>
             </div>
           )}
 
@@ -776,93 +646,32 @@ function JobDetailPanel({
           {draft && (
             <div className="space-y-3 mt-2">
               <div>
-                <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
-                  Předmět
-                </label>
-                <input
-                  type="text"
-                  value={draft.subject}
-                  onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
-                  className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40"
-                />
+                <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>Předmět</label>
+                <input type="text" value={draft.subject} onChange={(e) => setDraft({ ...draft, subject: e.target.value })} className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40" />
               </div>
               <div>
-                <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
-                  Tělo emailu
-                </label>
-                <textarea
-                  value={draft.body}
-                  onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-                  rows={12}
-                  className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm leading-relaxed focus:outline-none focus:border-[#fb923c]/40 resize-y font-[inherit]"
-                />
+                <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>Tělo emailu</label>
+                <textarea value={draft.body} onChange={(e) => setDraft({ ...draft, body: e.target.value })} rows={12} className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm leading-relaxed focus:outline-none focus:border-[#fb923c]/40 resize-y font-[inherit]" />
               </div>
             </div>
           )}
         </div>
-
-        {/* ===== Recipient email + CV info ===== */}
-        {draft && (
-          <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 mb-5">
-            <label className="block text-[10px] uppercase font-semibold mb-1.5" style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
-              Komu (e-mail firmy)
-            </label>
-            <div className="relative mb-2">
-              <input
-                type="email"
-                value={recipient}
-                onChange={(e) => setRecipient(e.target.value)}
-                placeholder="hr@firma.ch"
-                className="w-full bg-[#0a0a12] border border-white/[0.08] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#fb923c]/40"
-              />
-              {recipient && extractRecruitmentEmail(job.description) === recipient && (
-                <span
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] px-1.5 py-0.5 rounded font-semibold"
-                  style={{ background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}
-                  title="Automaticky vyplněno z inzerátu"
-                >
-                  z inzerátu
-                </span>
-              )}
-            </div>
-            <p className="text-white/40 text-xs m-0">
-              {recipient
-                ? 'Auto-vyplněno z inzerátu. Můžeš změnit pokud chceš jiný kontakt.'
-                : <>Nenašli jsme kontakt v inzerátu. Otevři {job.url ? <a href={job.url} target="_blank" rel="noopener noreferrer" className="text-[#fb923c] no-underline hover:underline">originál</a> : 'inzerát'} a zkopíruj email firmy.</>
-              }{' '}
-              CV přílohy připojíme v další verzi —{' '}
-              <Link href="/dokumenty" className="text-[#fb923c] no-underline hover:underline">tvé CV</Link>.
-            </p>
-          </div>
-        )}
 
         {sent && (
           <div className="rounded-xl border border-green-500/30 bg-green-500/[0.04] p-4 mb-5 flex items-start gap-2.5">
             <CheckCircle2 size={18} className="text-[#22c55e] shrink-0 mt-0.5" strokeWidth={1.75} />
             <div className="text-sm">
               <div className="text-white font-semibold mb-0.5">Email odeslán!</div>
-              <div className="text-white/55 text-xs">
-                Doručeno z tvého Gmailu. Odpověď přijde přímo do tvého Inboxu.
-              </div>
+              <div className="text-white/55 text-xs">Doručeno na {agency.email}. Odpověď přijde do tvého Inboxu.</div>
             </div>
           </div>
         )}
       </div>
 
       <div className="border-t border-white/[0.06] p-4 flex items-center gap-2">
-        {job.url && (
-          <a
-            href={job.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition shrink-0"
-            style={{
-              background: 'transparent',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.55)',
-            }}
-          >
-            <ExternalLink size={13} strokeWidth={1.75} /> Originál
+        {agency.website && (
+          <a href={agency.website.startsWith('http') ? agency.website : `https://${agency.website}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition shrink-0" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.55)' }}>
+            <ExternalLink size={13} strokeWidth={1.75} /> Web
           </a>
         )}
         <div className="flex-1 min-w-0">
@@ -877,35 +686,17 @@ function JobDetailPanel({
             disabled={sending || sent !== null}
             className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition disabled:cursor-not-allowed"
             style={{
-              background: !gmailConnected
-                ? 'rgba(251,146,60,0.12)'
-                : sent
-                  ? 'rgba(34,197,94,0.15)'
-                  : draft
-                    ? 'linear-gradient(135deg, #fb923c, #f97316)'
-                    : 'rgba(255,255,255,0.04)',
+              background: !gmailConnected ? 'rgba(251,146,60,0.12)' : sent ? 'rgba(34,197,94,0.15)' : draft ? 'linear-gradient(135deg, #fb923c, #f97316)' : 'rgba(255,255,255,0.04)',
               color: !gmailConnected ? '#fb923c' : sent ? '#22c55e' : draft ? 'white' : 'rgba(255,255,255,0.4)',
-              border: !gmailConnected
-                ? '1px solid rgba(251,146,60,0.35)'
-                : sent
-                  ? '1px solid rgba(34,197,94,0.4)'
-                  : draft
-                    ? 'none'
-                    : '1px solid rgba(255,255,255,0.06)',
+              border: !gmailConnected ? '1px solid rgba(251,146,60,0.35)' : sent ? '1px solid rgba(34,197,94,0.4)' : draft ? 'none' : '1px solid rgba(255,255,255,0.06)',
               opacity: sending ? 0.6 : 1,
             }}
           >
-            {!gmailConnected ? (
-              <><Mail size={15} strokeWidth={1.75} /> Připoj Gmail</>
-            ) : sent ? (
-              <><CheckCircle2 size={15} strokeWidth={1.75} /> Odesláno</>
-            ) : sending ? (
-              <><Loader2 size={15} className="animate-spin" /> Posílám…</>
-            ) : draft ? (
-              <><Send size={15} strokeWidth={1.75} /> Pošli za mě</>
-            ) : (
-              <><Wand2 size={15} strokeWidth={1.75} /> Nejdřív vygeneruj draft</>
-            )}
+            {!gmailConnected ? (<><Mail size={15} strokeWidth={1.75} /> Připoj Gmail</>) :
+             sent ? (<><CheckCircle2 size={15} strokeWidth={1.75} /> Odesláno</>) :
+             sending ? (<><Loader2 size={15} className="animate-spin" /> Posílám…</>) :
+             draft ? (<><Send size={15} strokeWidth={1.75} /> Pošli za mě</>) :
+             (<><Wand2 size={15} strokeWidth={1.75} /> Nejdřív vygeneruj draft</>)}
           </button>
         </div>
       </div>
@@ -913,16 +704,16 @@ function JobDetailPanel({
   )
 }
 
-// (helper imports presunuty nahoru souboru)
-
 function EmptyDetailState() {
   return (
     <div className="rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.01] flex flex-col items-center justify-center text-center py-20 px-6 min-h-[400px]">
-      <Briefcase size={42} className="text-white/20 mb-3" strokeWidth={1.5} />
-      <h3 className="text-white text-base font-semibold mb-1">Vyber nabídku</h3>
+      <Building2 size={42} className="text-white/20 mb-3" strokeWidth={1.5} />
+      <h3 className="text-white text-base font-semibold mb-1">Vyber agenturu</h3>
       <p className="text-white/50 text-sm max-w-sm">
-        Klikni na nabídku zleva. Worker pak vygeneruje motivační dopis přesně pro tu pozici a přiloží tvé CV.
+        Klikni na agenturu zleva. Worker pak vygeneruje motivační email a pošle ho přímo zaměstnavateli z tvého Gmailu.
       </p>
     </div>
   )
 }
+
+void Link

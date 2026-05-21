@@ -8,7 +8,8 @@ import { sendGmailMessage } from '@/lib/gmail'
 // tabulka existuje — jinak silently skip).
 
 interface SendRequest {
-  jobId: string
+  jobId?: string
+  agencyId?: number
   to: string
   subject: string
   body: string
@@ -27,8 +28,8 @@ export async function POST(req: NextRequest) {
     }
 
     const body = (await req.json()) as SendRequest
-    if (!body || !body.jobId || !body.to || !body.subject || !body.body) {
-      return NextResponse.json({ error: 'Missing required fields (jobId, to, subject, body)' }, { status: 400 })
+    if (!body || (!body.jobId && !body.agencyId) || !body.to || !body.subject || !body.body) {
+      return NextResponse.json({ error: 'Missing required fields (jobId or agencyId, to, subject, body)' }, { status: 400 })
     }
 
     // Validate email format
@@ -83,7 +84,8 @@ export async function POST(req: NextRequest) {
       try {
         await supabaseAdmin.from('sent_applications').insert({
           member_id: user.id,
-          job_id: body.jobId,
+          job_id: body.jobId || null,
+          agency_id: body.agencyId || null,
           to_email: body.to,
           subject: body.subject,
           body_preview: body.body.slice(0, 500),
@@ -92,7 +94,7 @@ export async function POST(req: NextRequest) {
           sent_at: new Date().toISOString(),
         })
       } catch {
-        // sent_applications neni vytvoreno — neha krok, neni kritike
+        // sent_applications neni vytvoreno — nebo nema agency_id sloupec, ne kritike
       }
 
       return NextResponse.json({
