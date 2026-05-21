@@ -32,6 +32,11 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  // Canonical URL pro root — Google Search Console: "Duplicitní stránka bez
+  // kanonické verze vybrané uživatelem". metadataBase rozbaluje na absolute URL.
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function RootLayout({
