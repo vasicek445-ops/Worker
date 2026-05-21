@@ -12,11 +12,27 @@ async function getUser(req: NextRequest) {
   return user
 }
 
-// GET — list saved documents (optionally filter by type)
+// GET — bud single doc (?id=X) NEBO list saved documents (optionally ?type=)
 export async function GET(req: NextRequest) {
   const user = await getUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const id = req.nextUrl.searchParams.get('id')
+
+  // Single document lookup — pouzito CV editorem pri loadu ulozeneho CV
+  if (id) {
+    const { data, error } = await supabaseAdmin
+      .from('saved_documents')
+      .select('id, type, title, document_data, template, accent_color, photo, created_at, updated_at')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!data) return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+    return NextResponse.json(data)
+  }
+
+  // List mode
   const type = req.nextUrl.searchParams.get('type')
   let query = supabaseAdmin
     .from('saved_documents')
