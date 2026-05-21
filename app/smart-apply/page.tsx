@@ -4,6 +4,12 @@ import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '../supabase'
+// Smart Apply email extraction — sdileny helper, scraper to pouziva pri insertu
+// do jobs.contact_emails[] sloupce. Frontend fallback pokud sloupec prazdny.
+import {
+  extractRecruitmentEmail,
+  preferredEmail as preferredFromArray,
+} from '../../lib/jobs/extract-email'
 import {
   Mail,
   CheckCircle2,
@@ -46,6 +52,7 @@ type Job = {
   posted_at: string | null
   tags: string[] | null
   source: string
+  contact_emails: string[] | null
 }
 
 type GmailStatus =
@@ -157,23 +164,20 @@ function SmartApplyContent() {
       if (canton) params.set('canton', canton)
       if (category) params.set('category', category)
       if (jobType) params.set('type', jobType)
+      // Smart Apply mode: jen nabidky s pre-extracted kontaktnim emailem v DB.
+      // Backfill viz migrace 20260521_jobs_contact_emails_backfill.sql.
+      // Scraper extrahuje contact_emails pri insertu (lib/jobs/extract-email.ts).
+      params.set('has_contact', '1')
       params.set('page', page.toString())
       const res = await fetch(`/api/jobs?${params}`)
       const data = await res.json()
-      // Smart Apply ma smysl jen pro nabidky kde dokazeme extrahovat kontakt.
-      // Inzeraty bez emailu (jen apply URL na externi ATS) zde nepatri — user
-      // by je neumel poslat pres Smart Apply. Otevri originál a aplikuj rucne.
-      const allJobs: Job[] = data.jobs || []
-      const applyable = allJobs.filter((j) => extractRecruitmentEmail(j.description) !== null)
+      const applyable: Job[] = data.jobs || []
       setJobs(applyable)
-      // Total zobrazuje skutecny pocet apply-able (vlevo "X nabidek"), ale
-      // pagination kotvi na backend total — pro v1 zobrazujeme oboje
       setTotal(data.total || 0)
       setTotalPages(data.totalPages || 0)
       if (!selectedJob && applyable.length > 0) {
         setSelectedJob(applyable[0])
       } else if (selectedJob && !applyable.find((j) => j.id === selectedJob.id)) {
-        // Aktualne vybrana nabidka filtrem vypadla — pretty selectni prvni
         setSelectedJob(applyable[0] || null)
       }
     } catch {
@@ -378,12 +382,9 @@ function SmartApplyContent() {
 
               <div className="text-white/40 text-xs mb-3 flex items-center gap-2 flex-wrap">
                 <span>
-                  {jobs.length > 0 && (
+                  {total > 0 && (
                     <>
-                      <span className="text-white/70 font-semibold">{jobs.length}</span> nabídek s kontaktem
-                      {total > jobs.length && (
-                        <span className="text-white/30"> (z {total} celkem)</span>
-                      )}
+                      <span className="text-white/70 font-semibold">{total}</span> nabídek s kontaktem
                     </>
                   )}
                 </span>
@@ -559,14 +560,16 @@ function JobDetailPanel({
       setDraft(null)
       setGenerating(false)
       setDraftError(null)
-      // Auto-extract email z job description (regex + recruitment heuristic)
-      const extracted = extractRecruitmentEmail(job.description)
+      // Pre-fill recipient: DB-cached contact_emails (priorita recruitment prefixy)
+      // → fallback regex z description (kdyz scraper jeste contact_emails nemel)
+      const cached = preferredFromArray(job.contact_emails)
+      const extracted = cached || extractRecruitmentEmail(job.description)
       setRecipient(extracted || '')
       setSending(false)
       setSendError(null)
       setSent(null)
     }
-  }, [job.id, job.description])
+  }, [job.id, job.description, job.contact_emails])
 
   async function generateDraft() {
     if (generating) return
@@ -897,33 +900,7 @@ function JobDetailPanel({
   )
 }
 
-// ============================================================================
-// Email extraction z job description.
-// Heuristika: preferuj recruitment-typical prefixy (bewerbung@, hr@, jobs@,
-// karriere@, recruiting@, application@, talent@). Jinak vrat prvni email.
-// Eliminuje noreply/no-reply/donotreply adresy (CH HR system spammy).
-const RECRUITMENT_PREFIXES = [
-  'bewerbung', 'bewerbungen', 'hr', 'jobs', 'job', 'karriere', 'recruiting',
-  'recruitment', 'recruit', 'application', 'applications', 'apply', 'talent',
-  'personal', 'careers', 'career', 'people',
-]
-
-function extractRecruitmentEmail(text: string | null | undefined): string | null {
-  if (!text) return null
-  const matches = text.match(/\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/gi)
-  if (!matches || matches.length === 0) return null
-  const cleaned = matches
-    .map((e) => e.toLowerCase())
-    .filter((e) => !/^(noreply|no-reply|donotreply|do-not-reply|webmaster)@/.test(e))
-    .filter((e, i, arr) => arr.indexOf(e) === i) // unique
-  if (cleaned.length === 0) return null
-  // Preferuj recruitment prefixy
-  for (const prefix of RECRUITMENT_PREFIXES) {
-    const found = cleaned.find((e) => e.startsWith(prefix + '@') || e.startsWith(prefix + '.'))
-    if (found) return found
-  }
-  return cleaned[0]
-}
+// (helper imports presunuty nahoru souboru)
 
 function EmptyDetailState() {
   return (

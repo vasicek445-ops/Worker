@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { extractEmails } from '@/lib/jobs/extract-email'
 
 export const maxDuration = 300
 
@@ -96,21 +97,26 @@ export async function GET(req: NextRequest) {
         }
 
         try {
-          await supabaseAdmin.from('jobs').upsert({
-            external_id: slug,
-            source: 'arbeitnow',
-            title,
-            company,
-            location,
-            canton: detectCanton(location),
-            description: cleanHtml(job.description || ''),
-            job_type: 'Full-time',
-            category: detectCategory(title),
-            url: job.url || '',
-            tags: (job.tags || []).slice(0, 10),
-            remote: job.remote || false,
-            posted_at: postedAt,
-          }, { onConflict: 'source,external_id' })
+          {
+            const descClean = cleanHtml(job.description || '')
+            const emails = extractEmails(descClean)
+            await supabaseAdmin.from('jobs').upsert({
+              external_id: slug,
+              source: 'arbeitnow',
+              title,
+              company,
+              location,
+              canton: detectCanton(location),
+              description: descClean,
+              job_type: 'Full-time',
+              category: detectCategory(title),
+              url: job.url || '',
+              tags: (job.tags || []).slice(0, 10),
+              remote: job.remote || false,
+              posted_at: postedAt,
+              contact_emails: emails.length > 0 ? emails : null,
+            }, { onConflict: 'source,external_id' })
+          }
           added++
         } catch {
           skipped++
@@ -153,21 +159,26 @@ export async function GET(req: NextRequest) {
             }
 
             try {
-              await supabaseAdmin.from('jobs').upsert({
-                external_id: externalId,
-                source: 'jooble',
-                title,
-                company,
-                location: job.location || 'Switzerland',
-                canton: detectCanton(job.location || ''),
-                description: cleanHtml(job.snippet || ''),
-                salary_text: job.salary || null,
-                job_type: job.type || 'Full-time',
-                category: detectCategory(title),
-                url: link,
-                remote: false,
-                posted_at: postedAt,
-              }, { onConflict: 'source,external_id' })
+              {
+                const descClean = cleanHtml(job.snippet || '')
+                const emails = extractEmails(descClean)
+                await supabaseAdmin.from('jobs').upsert({
+                  external_id: externalId,
+                  source: 'jooble',
+                  title,
+                  company,
+                  location: job.location || 'Switzerland',
+                  canton: detectCanton(job.location || ''),
+                  description: descClean,
+                  salary_text: job.salary || null,
+                  job_type: job.type || 'Full-time',
+                  category: detectCategory(title),
+                  url: link,
+                  remote: false,
+                  posted_at: postedAt,
+                  contact_emails: emails.length > 0 ? emails : null,
+                }, { onConflict: 'source,external_id' })
+              }
               added++
             } catch {
               skipped++
@@ -591,6 +602,8 @@ async function upsertRobertHalfJob(job: Record<string, unknown>): Promise<boolea
     ? (jobDetailUrl.startsWith('http') ? jobDetailUrl : `https://www.roberthalf.com${jobDetailUrl}`)
     : ''
 
+  const emails = extractEmails(description)
+
   try {
     await supabaseAdmin.from('jobs').upsert({
       external_id: String(jobId),
@@ -608,6 +621,7 @@ async function upsertRobertHalfJob(job: Record<string, unknown>): Promise<boolea
       url,
       remote: String(job.remote || '').toLowerCase().includes('remote'),
       posted_at: postedAt,
+      contact_emails: emails.length > 0 ? emails : null,
     }, { onConflict: 'source,external_id' })
     return true
   } catch {

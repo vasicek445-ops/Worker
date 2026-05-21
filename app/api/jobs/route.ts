@@ -13,13 +13,14 @@ export async function GET(req: NextRequest) {
     const canton = searchParams.get('canton') || ''
     const category = searchParams.get('category') || ''
     const jobType = searchParams.get('type') || ''
+    const hasContact = searchParams.get('has_contact') === '1'
     const page = parseInt(searchParams.get('page') || '1')
     const limit = 20
     const offset = (page - 1) * limit
 
     let query = supabaseAdmin
       .from('jobs')
-      .select('id, title, company, location, canton, salary_text, job_type, category, url, remote, posted_at, tags, source', { count: 'exact' })
+      .select('id, title, company, location, canton, salary_text, job_type, category, description, url, remote, posted_at, tags, source, contact_emails', { count: 'exact' })
 
     // Filters
     if (search) {
@@ -33,6 +34,11 @@ export async function GET(req: NextRequest) {
     }
     if (jobType === 'remote') {
       query = query.eq('remote', true)
+    }
+    if (hasContact) {
+      // Smart Apply mode — jen nabidky s extractovanym kontaktnim emailem.
+      // Index `idx_jobs_has_contact` (partial) zajisti rychlost.
+      query = query.not('contact_emails', 'is', null)
     }
 
     // Sort and paginate
