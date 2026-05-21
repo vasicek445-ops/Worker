@@ -100,6 +100,10 @@ export async function GET(req: NextRequest) {
           {
             const descClean = cleanHtml(job.description || '')
             const emails = extractEmails(descClean)
+            if (emails.length === 0) {
+              skipped++
+              continue
+            }
             await supabaseAdmin.from('jobs').upsert({
               external_id: slug,
               source: 'arbeitnow',
@@ -114,7 +118,7 @@ export async function GET(req: NextRequest) {
               tags: (job.tags || []).slice(0, 10),
               remote: job.remote || false,
               posted_at: postedAt,
-              contact_emails: emails.length > 0 ? emails : null,
+              contact_emails: emails,
             }, { onConflict: 'source,external_id' })
           }
           added++
@@ -162,6 +166,10 @@ export async function GET(req: NextRequest) {
               {
                 const descClean = cleanHtml(job.snippet || '')
                 const emails = extractEmails(descClean)
+                if (emails.length === 0) {
+                  skipped++
+                  continue
+                }
                 await supabaseAdmin.from('jobs').upsert({
                   external_id: externalId,
                   source: 'jooble',
@@ -176,7 +184,7 @@ export async function GET(req: NextRequest) {
                   url: link,
                   remote: false,
                   posted_at: postedAt,
-                  contact_emails: emails.length > 0 ? emails : null,
+                  contact_emails: emails,
                 }, { onConflict: 'source,external_id' })
               }
               added++
@@ -331,6 +339,24 @@ async function fetchMichaelPage(): Promise<{ added: number; skipped: number }> {
         const location = detectMichaelPageLocation(html, job.url) || 'Switzerland'
         const jobType = html.includes(`${job.refId}`) && html.includes('Interim') ? 'Interim' : 'Permanent'
 
+        let mpDesc = ''
+        try {
+          const detailRes = await fetch(`https://www.michaelpage.ch${job.url}`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; WokerBot/1.0)' },
+            signal: AbortSignal.timeout(8000),
+          })
+          const detailHtml = await detailRes.text()
+          mpDesc = cleanHtml(detailHtml)
+        } catch {
+          skipped++
+          continue
+        }
+        const mpEmails = extractEmails(mpDesc)
+        if (mpEmails.length === 0) {
+          skipped++
+          await new Promise(r => setTimeout(r, 200))
+          continue
+        }
         try {
           await supabaseAdmin.from('jobs').upsert({
             external_id: job.refId,
@@ -339,17 +365,19 @@ async function fetchMichaelPage(): Promise<{ added: number; skipped: number }> {
             company: 'Michael Page',
             location,
             canton: detectCanton(location),
-            description: '',
+            description: mpDesc,
             job_type: jobType === 'Interim' ? 'Temporary' : 'Full-time',
             category: detectCategory(job.title),
             url: `https://www.michaelpage.ch${job.url}`,
             remote: false,
             posted_at: extractDateFromRef(job.refId),
+            contact_emails: mpEmails,
           }, { onConflict: 'source,external_id' })
           added++
         } catch {
           skipped++
         }
+        await new Promise(r => setTimeout(r, 200))
       }
     } catch (err) {
       console.error(`Michael Page page ${page} error:`, err)
@@ -545,6 +573,25 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
             salaryText = `${currency} ${salaryMin || '?'} - ${salaryMax || '?'}`
           }
 
+          let jchDesc = ''
+          try {
+            const jchDetailRes = await fetch(`https://www.jobs.ch/en/vacancies/detail/${jobId}/`, {
+              headers: { 'User-Agent': 'Mozilla/5.0 (compatible; WokerBot/1.0)' },
+              signal: AbortSignal.timeout(8000),
+            })
+            const jchDetailHtml = await jchDetailRes.text()
+            jchDesc = cleanHtml(jchDetailHtml)
+          } catch {
+            skipped++
+            await new Promise(r => setTimeout(r, 200))
+            continue
+          }
+          const jchEmails = extractEmails(jchDesc)
+          if (jchEmails.length === 0) {
+            skipped++
+            await new Promise(r => setTimeout(r, 200))
+            continue
+          }
           try {
             await supabaseAdmin.from('jobs').upsert({
               external_id: jobId,
@@ -553,7 +600,7 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
               company,
               location: place || 'Switzerland',
               canton: detectCanton(place || ''),
-              description: '',
+              description: jchDesc,
               salary_min: salaryMin && salaryMin > 1000 ? salaryMin : null,
               salary_max: salaryMax && salaryMax > 1000 ? salaryMax : null,
               salary_text: salaryText,
@@ -562,11 +609,13 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
               url: `https://www.jobs.ch/en/vacancies/detail/${jobId}/`,
               remote: false,
               posted_at: postedAt,
+              contact_emails: jchEmails,
             }, { onConflict: 'source,external_id' })
             added++
           } catch {
             skipped++
           }
+          await new Promise(r => setTimeout(r, 200))
         }
       } catch (err) {
         console.error(`jobs.ch error for "${keyword}" page ${page}:`, err)
@@ -603,6 +652,7 @@ async function upsertRobertHalfJob(job: Record<string, unknown>): Promise<boolea
     : ''
 
   const emails = extractEmails(description)
+  if (emails.length === 0) return false
 
   try {
     await supabaseAdmin.from('jobs').upsert({
@@ -621,7 +671,7 @@ async function upsertRobertHalfJob(job: Record<string, unknown>): Promise<boolea
       url,
       remote: String(job.remote || '').toLowerCase().includes('remote'),
       posted_at: postedAt,
-      contact_emails: emails.length > 0 ? emails : null,
+      contact_emails: emails,
     }, { onConflict: 'source,external_id' })
     return true
   } catch {
