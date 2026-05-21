@@ -4,10 +4,31 @@ import { extractEmails } from '@/lib/jobs/extract-email'
 
 export const maxDuration = 300
 
+// Pre-flight cache: external_ids ktere uz maji contact_emails ulozene.
+// Resi timeout problem — kazdy cron run preskoci jobs co uz prosly detail
+// fetchem a kontaktni email maji. Posledni runs postupne doplni zbytek.
+// Definovany az PO supabaseAdmin (closure), aby TS nemusel resolvovat generics.
+
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
+
+async function loadEmailedIds(source: string): Promise<Set<string>> {
+  const set = new Set<string>()
+  try {
+    const { data } = await supabaseAdmin
+      .from('jobs')
+      .select('external_id')
+      .eq('source', source)
+      .not('contact_emails', 'is', null)
+      .limit(5000)
+    for (const row of (data || []) as Array<{ external_id: string }>) {
+      if (row.external_id) set.add(row.external_id)
+    }
+  } catch { /* fail open — empty set is fine */ }
+  return set
+}
 
 const SWISS_LOCATIONS = [
   "zurich", "zürich", "bern", "basel", "geneva", "genève", "lausanne",
@@ -300,9 +321,17 @@ export async function GET(req: NextRequest) {
 async function fetchMichaelPage(): Promise<{ added: number; skipped: number }> {
   let added = 0
   let skipped = 0
+  let cacheHits = 0
   const maxPages = 16 // ~465 jobs / 30 per page
 
+  // Pre-flight: nactu external_id ze vsech michaelpage jobs co uz maji email.
+  // Skip detail fetch (drahy ~700ms per job) pro tyto — postupny dohled pres
+  // vice cron runs misto timeoutu v jednom.
+  const alreadyEmailed = await loadEmailedIds('michaelpage')
+  const deadline = Date.now() + 110_000 // strop ~110s pro michaelpage faze cronu
+
   for (let page = 0; page < maxPages; page++) {
+    if (Date.now() > deadline) break
     try {
       const res = await fetch(`https://www.michaelpage.ch/jobs?page=${page}`, {
         headers: {
@@ -335,6 +364,9 @@ async function fetchMichaelPage(): Promise<{ added: number; skipped: number }> {
       // Extract location info - look for common Swiss locations in surrounding context
       // Also detect job type from "Permanent" or "Interim" badges
       for (const job of pageJobs) {
+        if (Date.now() > deadline) break
+        // Skip jobs co uz mame s emailem — dohledame zbytek pri pristim runu
+        if (alreadyEmailed.has(job.refId)) { cacheHits++; continue }
         // Detect location from URL slug or title
         const location = detectMichaelPageLocation(html, job.url) || 'Switzerland'
         const jobType = html.includes(`${job.refId}`) && html.includes('Interim') ? 'Interim' : 'Permanent'
@@ -354,7 +386,7 @@ async function fetchMichaelPage(): Promise<{ added: number; skipped: number }> {
         const mpEmails = extractEmails(mpDesc)
         if (mpEmails.length === 0) {
           skipped++
-          await new Promise(r => setTimeout(r, 200))
+          await new Promise(r => setTimeout(r, 100))
           continue
         }
         try {
@@ -377,7 +409,7 @@ async function fetchMichaelPage(): Promise<{ added: number; skipped: number }> {
         } catch {
           skipped++
         }
-        await new Promise(r => setTimeout(r, 200))
+        await new Promise(r => setTimeout(r, 100))
       }
     } catch (err) {
       console.error(`Michael Page page ${page} error:`, err)
@@ -385,6 +417,7 @@ async function fetchMichaelPage(): Promise<{ added: number; skipped: number }> {
     }
   }
 
+  console.log(`[scrape-jobs] michaelpage cache_hits=${cacheHits} added=${added} skipped=${skipped}`)
   return { added, skipped }
 }
 
@@ -496,7 +529,11 @@ async function fetchRobertHalf(): Promise<{ added: number; skipped: number }> {
 async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
   let added = 0
   let skipped = 0
+  let cacheHits = 0
   const seenIds = new Set<string>()
+
+  // Pre-flight cache: jobs.ch jobs co uz maji email — skip detail fetch
+  const alreadyEmailed = await loadEmailedIds('jobsch')
 
   // Široký záběr — řemesla, logistika, výroba, stavba, péče i pohostinství.
   // Agentury sem sypou Fest i Temporär nabídky napříč obory.
@@ -548,6 +585,9 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
           if (!jobId || seenIds.has(jobId)) continue
           seenIds.add(jobId)
 
+          // Skip jobs co uz mame s emailem — postupny dohled pres dalsi runs
+          if (alreadyEmailed.has(jobId)) { cacheHits++; continue }
+
           const title = String(job.title || '').trim()
           const companyObj = job.company as Record<string, unknown> | undefined
           const company = String(companyObj?.name || 'jobs.ch')
@@ -583,13 +623,13 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
             jchDesc = cleanHtml(jchDetailHtml)
           } catch {
             skipped++
-            await new Promise(r => setTimeout(r, 200))
+            await new Promise(r => setTimeout(r, 100))
             continue
           }
           const jchEmails = extractEmails(jchDesc)
           if (jchEmails.length === 0) {
             skipped++
-            await new Promise(r => setTimeout(r, 200))
+            await new Promise(r => setTimeout(r, 100))
             continue
           }
           try {
@@ -615,7 +655,7 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
           } catch {
             skipped++
           }
-          await new Promise(r => setTimeout(r, 200))
+          await new Promise(r => setTimeout(r, 100))
         }
       } catch (err) {
         console.error(`jobs.ch error for "${keyword}" page ${page}:`, err)
@@ -623,6 +663,8 @@ async function fetchJobsCh(): Promise<{ added: number; skipped: number }> {
       }
     }
   }
+
+  console.log(`[scrape-jobs] jobsch cache_hits=${cacheHits} added=${added} skipped=${skipped}`)
 
   return { added, skipped }
 }
