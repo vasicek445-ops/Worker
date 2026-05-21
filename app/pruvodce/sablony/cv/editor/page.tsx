@@ -79,14 +79,16 @@ function CVEditorInner() {
                 address: cv.personalData?.address || f.address,
                 driving: cv.personalData?.drivingLicense || f.driving,
                 position: cv.profil || f.position,
-                experiences: (cv.experience || []).map((e) => ({
+                experiences: (cv.experience || []).map((e, i: number) => ({
+                  id: `doc-exp-${i}-${Date.now()}`,
                   period: e.period || '',
                   title: e.title || '',
                   company: e.company || '',
                   location: e.location || '',
                   description: (e.tasks || []).join('\n'),
                 })),
-                educations: (cv.education || []).map((e) => ({
+                educations: (cv.education || []).map((e, i: number) => ({
+                  id: `doc-edu-${i}-${Date.now()}`,
                   period: e.period || '',
                   school: e.school || '',
                   degree: e.degree || '',
@@ -112,12 +114,33 @@ function CVEditorInner() {
         try {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, dovednosti, nemcina_uroven, dalsi_jazyky, avatar_url')
+            .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, avatar_url')
             .eq('id', session.user.id)
             .maybeSingle()
           if (profile && !cancelled) {
             // Auth email jako fallback pro contact email
             const contactEmail = profile.email || session.user.email || ''
+            // Strukturovana data maji prednost; legacy text jako fallback pokud strukt prazdne.
+            // CVFormData vyzaduje `id` per radek — pridame ho pri mapping.
+            const structExperiences = Array.isArray(profile.experiences)
+              ? profile.experiences.map((e, i: number) => ({
+                  id: `prof-exp-${i}-${Date.now()}`,
+                  period: e.period || '',
+                  title: e.title || '',
+                  company: e.company || '',
+                  location: e.location || '',
+                  description: e.description || '',
+                }))
+              : []
+            const structEducations = Array.isArray(profile.educations)
+              ? profile.educations.map((e, i: number) => ({
+                  id: `prof-edu-${i}-${Date.now()}`,
+                  period: e.period || '',
+                  school: e.school || '',
+                  degree: e.degree || '',
+                  location: e.location || '',
+                }))
+              : []
             setFormData((f) => ({
               ...f,
               name: profile.full_name || f.name,
@@ -129,8 +152,10 @@ function CVEditorInner() {
               driving: profile.ridicky_prukaz || f.driving,
               position: profile.pozice || f.position,
               field: profile.obor || f.field,
-              experience_detail: profile.zkusenosti || f.experience_detail,
-              education: profile.vzdelani || f.education,
+              experiences: structExperiences.length > 0 ? structExperiences : f.experiences,
+              educations: structEducations.length > 0 ? structEducations : f.educations,
+              experience_detail: structExperiences.length === 0 ? (profile.zkusenosti || f.experience_detail) : f.experience_detail,
+              education: structEducations.length === 0 ? (profile.vzdelani || f.education) : f.education,
               german: profile.nemcina_uroven || f.german,
               other_languages: profile.dalsi_jazyky || f.other_languages,
               skills: profile.dovednosti || f.skills,

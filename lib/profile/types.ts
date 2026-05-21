@@ -1,6 +1,23 @@
 // Sdílené typy pro profil. Jediný zdroj pravdy o tom co je v `profiles` tabulce.
 import type React from 'react'
 
+// Strukturovany zaznam pracovni zkusenosti — ulozeny v profiles.experiences jsonb.
+// Shape kompatibilni s CVFormData.experiences (lib/cv/types.ts) pro snadny prefill.
+export interface ProfileExperience {
+  period?: string
+  title?: string
+  company?: string
+  location?: string
+  description?: string
+}
+
+export interface ProfileEducation {
+  period?: string
+  school?: string
+  degree?: string
+  location?: string
+}
+
 export interface ProfileRow {
   id: string
 
@@ -17,8 +34,10 @@ export interface ProfileRow {
   // Kariéra
   obor?: string | null
   pozice?: string | null
-  zkusenosti?: string | null        // raw text — AI rozšíří v CV
-  vzdelani?: string | null
+  zkusenosti?: string | null        // legacy raw text — fallback kdyz experiences[] je prazdne
+  vzdelani?: string | null          // legacy raw text — fallback kdyz educations[] je prazdne
+  experiences?: ProfileExperience[] | null
+  educations?: ProfileEducation[] | null
   dovednosti?: string | null
   nemcina_uroven?: string | null    // 'A1', 'B1', ...
   dalsi_jazyky?: string | null

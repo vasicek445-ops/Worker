@@ -1,6 +1,8 @@
 'use client'
 
+import { Plus, Trash2 } from 'lucide-react'
 import { useProfileShell } from '../_components/ProfileShell'
+import type { ProfileExperience, ProfileEducation } from '@/lib/profile/types'
 
 const FIELDS = [
   'Gastronomie',
@@ -101,28 +103,17 @@ export default function KarieraPage() {
             />
           </div>
 
-          <div>
-            <label className={labelClass}>Zkušenosti</label>
-            <textarea
-              rows={6}
-              value={profile?.zkusenosti || ''}
-              onChange={(e) => update({ zkusenosti: e.target.value })}
-              className={inputClass + ' resize-y'}
-              placeholder={'2020-2024 — Kuchař v restauraci Slunce (Praha)\n2018-2020 — Pomocník v kuchyni, Hotel Lev'}
-            />
-            <p className={hintClass}>Roky — pozice — firma. Body postačí, AI to rozšíří.</p>
-          </div>
+          <ExperienceList
+            experiences={profile?.experiences || []}
+            legacyText={profile?.zkusenosti || ''}
+            onChange={(experiences) => update({ experiences })}
+          />
 
-          <div>
-            <label className={labelClass}>Vzdělání</label>
-            <textarea
-              rows={3}
-              value={profile?.vzdelani || ''}
-              onChange={(e) => update({ vzdelani: e.target.value })}
-              className={inputClass + ' resize-y'}
-              placeholder="SOU gastronomické, Praha 2014-2017"
-            />
-          </div>
+          <EducationList
+            educations={profile?.educations || []}
+            legacyText={profile?.vzdelani || ''}
+            onChange={(educations) => update({ educations })}
+          />
 
           <div>
             <label className={labelClass}>Dovednosti</label>
@@ -136,6 +127,200 @@ export default function KarieraPage() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ─── Multi-row pracovni zkusenosti ─────────────────────────────────────────
+function ExperienceList({
+  experiences,
+  legacyText,
+  onChange,
+}: {
+  experiences: ProfileExperience[]
+  legacyText: string
+  onChange: (next: ProfileExperience[]) => void
+}) {
+  const updateRow = (i: number, patch: Partial<ProfileExperience>) => {
+    onChange(experiences.map((e, idx) => (idx === i ? { ...e, ...patch } : e)))
+  }
+  const removeRow = (i: number) => onChange(experiences.filter((_, idx) => idx !== i))
+  const addRow = () =>
+    onChange([
+      ...experiences,
+      { period: '', title: '', company: '', location: '', description: '' },
+    ])
+
+  return (
+    <div>
+      <label className={labelClass}>Pracovní zkušenosti</label>
+
+      {experiences.length === 0 && legacyText && (
+        <div className="mb-3 rounded-xl bg-[#fb923c]/5 border border-[#fb923c]/15 p-3 text-xs text-white/60">
+          <p className="m-0 mb-1.5 font-medium text-[#fb923c]/80">Máš stará data v textovém formátu:</p>
+          <p className="m-0 whitespace-pre-line text-white/40">{legacyText}</p>
+          <p className="m-0 mt-2 text-white/30">Přidej řádky níže pro nový formát — staré se použije jako fallback.</p>
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {experiences.map((exp, i) => (
+          <div
+            key={i}
+            className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 space-y-2.5 relative"
+          >
+            <button
+              onClick={() => removeRow(i)}
+              aria-label="Odstranit zkušenost"
+              className="absolute top-2 right-2 text-white/30 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-500/10"
+            >
+              <Trash2 size={14} />
+            </button>
+
+            <div className="grid grid-cols-2 gap-2.5 pr-8">
+              <input
+                type="text"
+                value={exp.period || ''}
+                onChange={(e) => updateRow(i, { period: e.target.value })}
+                className={inputClass}
+                placeholder="2020 – 2024"
+              />
+              <input
+                type="text"
+                value={exp.title || ''}
+                onChange={(e) => updateRow(i, { title: e.target.value })}
+                className={inputClass}
+                placeholder="Pozice (Kuchař)"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <input
+                type="text"
+                value={exp.company || ''}
+                onChange={(e) => updateRow(i, { company: e.target.value })}
+                className={inputClass}
+                placeholder="Firma"
+              />
+              <input
+                type="text"
+                value={exp.location || ''}
+                onChange={(e) => updateRow(i, { location: e.target.value })}
+                className={inputClass}
+                placeholder="Místo (Praha)"
+              />
+            </div>
+            <textarea
+              rows={2}
+              value={exp.description || ''}
+              onChange={(e) => updateRow(i, { description: e.target.value })}
+              className={inputClass + ' resize-y'}
+              placeholder="Co jsi tam dělal — body stačí, AI rozšíří"
+            />
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={addRow}
+        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
+      >
+        <Plus size={16} />
+        {experiences.length === 0 ? 'Přidat první zkušenost' : 'Přidat další zkušenost'}
+      </button>
+      <p className={hintClass}>Většina lidí má 2 firmy. Roky, pozici a firmu uveď, popis je nepovinný — AI to rozšíří.</p>
+    </div>
+  )
+}
+
+// ─── Multi-row vzdelani ───────────────────────────────────────────────────
+function EducationList({
+  educations,
+  legacyText,
+  onChange,
+}: {
+  educations: ProfileEducation[]
+  legacyText: string
+  onChange: (next: ProfileEducation[]) => void
+}) {
+  const updateRow = (i: number, patch: Partial<ProfileEducation>) => {
+    onChange(educations.map((e, idx) => (idx === i ? { ...e, ...patch } : e)))
+  }
+  const removeRow = (i: number) => onChange(educations.filter((_, idx) => idx !== i))
+  const addRow = () =>
+    onChange([
+      ...educations,
+      { period: '', school: '', degree: '', location: '' },
+    ])
+
+  return (
+    <div>
+      <label className={labelClass}>Vzdělání</label>
+
+      {educations.length === 0 && legacyText && (
+        <div className="mb-3 rounded-xl bg-[#fb923c]/5 border border-[#fb923c]/15 p-3 text-xs text-white/60">
+          <p className="m-0 mb-1.5 font-medium text-[#fb923c]/80">Máš stará data v textovém formátu:</p>
+          <p className="m-0 whitespace-pre-line text-white/40">{legacyText}</p>
+          <p className="m-0 mt-2 text-white/30">Přidej řádky níže pro nový formát — staré se použije jako fallback.</p>
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {educations.map((edu, i) => (
+          <div
+            key={i}
+            className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 space-y-2.5 relative"
+          >
+            <button
+              onClick={() => removeRow(i)}
+              aria-label="Odstranit vzdělání"
+              className="absolute top-2 right-2 text-white/30 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-500/10"
+            >
+              <Trash2 size={14} />
+            </button>
+
+            <div className="grid grid-cols-2 gap-2.5 pr-8">
+              <input
+                type="text"
+                value={edu.period || ''}
+                onChange={(e) => updateRow(i, { period: e.target.value })}
+                className={inputClass}
+                placeholder="2014 – 2017"
+              />
+              <input
+                type="text"
+                value={edu.school || ''}
+                onChange={(e) => updateRow(i, { school: e.target.value })}
+                className={inputClass}
+                placeholder="Škola (SOU gastro)"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2.5">
+              <input
+                type="text"
+                value={edu.degree || ''}
+                onChange={(e) => updateRow(i, { degree: e.target.value })}
+                className={inputClass}
+                placeholder="Obor / titul"
+              />
+              <input
+                type="text"
+                value={edu.location || ''}
+                onChange={(e) => updateRow(i, { location: e.target.value })}
+                className={inputClass}
+                placeholder="Místo (Praha)"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={addRow}
+        className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 hover:border-[#fb923c]/40 hover:bg-[#fb923c]/[0.04] text-white/50 hover:text-[#fb923c] text-sm font-medium py-2.5 transition"
+      >
+        <Plus size={16} />
+        {educations.length === 0 ? 'Přidat školu/kurz' : 'Přidat další'}
+      </button>
     </div>
   )
 }
