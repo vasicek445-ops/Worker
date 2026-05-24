@@ -39,6 +39,7 @@ function CVEditorInner() {
   const [generating, setGenerating] = useState(false)
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
+  const [syncing, setSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
@@ -194,6 +195,78 @@ function CVEditorInner() {
   const handleSectionChange = useCallback((key: keyof CVFormData, value: unknown) => {
     setFormData((f) => ({ ...f, [key]: value }))
   }, [])
+
+  // ─── Aktualizovat z profilu — pull latest profile data + merge do formData ───
+  // Useful kdyz user otevre starsi saved CV a mezitim doplnil profil (nove experiences atd).
+  // Profile data dostanou prednost — prepise existujici hodnoty ve formData.
+  const handleSyncFromProfile = useCallback(async () => {
+    if (!userId) return
+    setSyncing(true); setError(null)
+    try {
+      const { data: profile, error: profErr } = await supabase
+        .from('profiles')
+        .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, dalsi_jazyky_struct, avatar_url')
+        .eq('id', userId)
+        .maybeSingle()
+      if (profErr) throw profErr
+      if (!profile) {
+        setError('Profil je prázdný. Vyplň ho v sekci Profil.')
+        return
+      }
+      const contactEmail = profile.email || ''
+      const structExperiences = Array.isArray(profile.experiences)
+        ? profile.experiences.map((e, i: number) => ({
+            id: `sync-exp-${i}-${Date.now()}`,
+            period: e.period || '',
+            title: e.title || '',
+            company: e.company || '',
+            location: e.location || '',
+            description: e.description || '',
+          }))
+        : []
+      const structEducations = Array.isArray(profile.educations)
+        ? profile.educations.map((e, i: number) => ({
+            id: `sync-edu-${i}-${Date.now()}`,
+            period: e.period || '',
+            school: e.school || '',
+            degree: e.degree || '',
+            location: e.location || '',
+          }))
+        : []
+      // Override: prefer profile data over existing formData (na rozdil od init prefill).
+      setFormData((f) => ({
+        ...f,
+        name: profile.full_name || f.name,
+        email: contactEmail || f.email,
+        phone: profile.telefon || f.phone,
+        birthdate: profile.datum_narozeni || f.birthdate,
+        address: profile.adresa || f.address,
+        nationality: profile.nationality || f.nationality,
+        driving: profile.ridicky_prukaz || f.driving,
+        position: profile.pozice || f.position,
+        field: profile.obor || f.field,
+        experiences: structExperiences.length > 0 ? structExperiences : f.experiences,
+        educations: structEducations.length > 0 ? structEducations : f.educations,
+        experience_detail: structExperiences.length === 0 ? (profile.zkusenosti || f.experience_detail) : f.experience_detail,
+        education: structEducations.length === 0 ? (profile.vzdelani || f.education) : f.education,
+        german: profile.nemcina_uroven || f.german,
+        other_languages: (Array.isArray(profile.dalsi_jazyky_struct) && profile.dalsi_jazyky_struct.length > 0)
+          ? profile.dalsi_jazyky_struct.map((l) => l.level ? `${l.language}-${l.level}` : l.language).join(', ')
+          : (profile.dalsi_jazyky || f.other_languages),
+        skills: profile.dovednosti || f.skills,
+      }))
+      if (!photo && profile.avatar_url) setPhoto(profile.avatar_url)
+      // Reset cvData — uzivatel musi znovu kliknout "Vygenerovat AI CV" aby se preview obnovil
+      setCvData(null)
+      setToast('Data z profilu načtena. Klikni "Vygenerovat AI CV" pro nový náhled.')
+      setTimeout(() => setToast(null), 5000)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      setError(err?.message || 'Nepodařilo se načíst profil.')
+    } finally {
+      setSyncing(false)
+    }
+  }, [userId, photo])
 
   // ─── AI generování plnohodnotného CV ───
   const handleGenerate = async () => {
@@ -440,6 +513,8 @@ function CVEditorInner() {
         cvData={cvData}
         onSave={handleSave}
         onShare={cvData ? handleShare : undefined}
+        onSyncFromProfile={handleSyncFromProfile}
+        syncing={syncing}
         saving={saving || publishing}
       >
         {renderSection()}

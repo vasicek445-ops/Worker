@@ -35,6 +35,8 @@ interface CVBuilderLayoutProps {
   onSave?: () => void
   onExportPDF?: () => void
   onShare?: () => void
+  onSyncFromProfile?: () => void
+  syncing?: boolean
   saving?: boolean
 
   // Content slot — aktivní sekce (form)
@@ -55,6 +57,8 @@ export default function CVBuilderLayout({
   onSave,
   onExportPDF,
   onShare,
+  onSyncFromProfile,
+  syncing,
   saving,
   children,
 }: CVBuilderLayoutProps) {
@@ -80,6 +84,16 @@ export default function CVBuilderLayout({
             <div className="hidden sm:block">
               <WokerScore breakdown={score} compact />
             </div>
+            {onSyncFromProfile && (
+              <button
+                onClick={onSyncFromProfile}
+                disabled={syncing}
+                title="Načte aktuální data z tvého profilu a přepíše pole v editoru"
+                className="bg-white/[0.04] hover:bg-[#fb923c]/10 border border-white/[0.08] hover:border-[#fb923c]/30 text-white/70 hover:text-[#fb923c] text-xs font-semibold px-3 py-1.5 rounded-lg transition disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {syncing ? '...' : <><span>↻</span><span className="hidden sm:inline">Z profilu</span></>}
+              </button>
+            )}
             {onSave && (
               <button
                 onClick={onSave}
