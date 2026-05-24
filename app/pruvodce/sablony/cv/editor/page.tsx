@@ -130,7 +130,9 @@ function CVEditorInner() {
         // (full_name, telefon, datum_narozeni, adresa, ...). Mapujeme vsechny dostupne
         // CV-relevantni pole vcetne zkusenosti, vzdelani, jazyku a dovednosti.
         try {
-          const { data: profile } = await profilePromise
+          const { data: profile, error: profErr } = await profilePromise
+          // DEBUG: log do console pro autofill debugging (smaz po vyreseni)
+          console.log('[CV Editor] Profile autofill data:', profile, 'error:', profErr)
           if (profile && !cancelled) {
             // Auth email jako fallback pro contact email
             const contactEmail = profile.email || session.user.email || ''
