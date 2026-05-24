@@ -461,35 +461,37 @@ function LanguageList({
         {languages.map((lang, i) => {
           const flag = LANGUAGES.find((l) => l.name === lang.language)?.flag
           return (
-          <div key={i} className="flex items-center gap-2 w-full">
-            <div className="relative flex-1 min-w-0">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-lg pointer-events-none select-none z-10">
-                {flag || '🌐'}
+          <div key={i} className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-2 relative pr-10">
+            <div className="flex items-center gap-2 w-full">
+              <div className="relative flex-1 min-w-0">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-lg pointer-events-none select-none z-10">
+                  {flag || '🌐'}
+                </div>
+                <select
+                  value={lang.language || ''}
+                  onChange={(e) => updateRow(i, { language: e.target.value })}
+                  className={inputClass + ' appearance-none cursor-pointer pl-11'}
+                >
+                  <option value="" disabled className="bg-[#111120]">Vyber jazyk</option>
+                  {LANGUAGES.filter((l) => l.name === lang.language || !usedLanguages.has(l.name)).map((l) => (
+                    <option key={l.name} value={l.name} className="bg-[#111120]">{l.flag} {l.name}</option>
+                  ))}
+                </select>
               </div>
               <select
-                value={lang.language || ''}
-                onChange={(e) => updateRow(i, { language: e.target.value })}
-                className={inputClass + ' appearance-none cursor-pointer pl-11'}
+                value={lang.level || 'B1'}
+                onChange={(e) => updateRow(i, { level: e.target.value })}
+                className={inputClass + ' appearance-none cursor-pointer w-24 flex-shrink-0'}
               >
-                <option value="" disabled className="bg-[#111120]">Vyber jazyk</option>
-                {LANGUAGES.filter((l) => l.name === lang.language || !usedLanguages.has(l.name)).map((l) => (
-                  <option key={l.name} value={l.name} className="bg-[#111120]">{l.flag} {l.name}</option>
+                {LANG_LEVELS.map((l) => (
+                  <option key={l} value={l} className="bg-[#111120]">{l}</option>
                 ))}
               </select>
             </div>
-            <select
-              value={lang.level || 'B1'}
-              onChange={(e) => updateRow(i, { level: e.target.value })}
-              className={inputClass + ' appearance-none cursor-pointer w-24 flex-shrink-0'}
-            >
-              {LANG_LEVELS.map((l) => (
-                <option key={l} value={l} className="bg-[#111120]">{l}</option>
-              ))}
-            </select>
             <button
               onClick={() => removeRow(i)}
               aria-label="Odstranit jazyk"
-              className="text-white/30 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-500/10 flex-shrink-0"
+              className="absolute top-1/2 -translate-y-1/2 right-2 text-white/30 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-500/10"
             >
               <Trash2 size={14} />
             </button>
