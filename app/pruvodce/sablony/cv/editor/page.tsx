@@ -281,27 +281,35 @@ function CVEditorInner() {
     }
     setGenerating(true); setError(null)
     try {
-      // Skládat formData do flat shape co očekává /api/generate-cv (legacy)
-      const flatForm: Record<string, string> = {
-        name: formData.name || '',
-        birthdate: formData.birthdate || '',
-        phone: formData.phone || '',
-        email: formData.email || '',
-        nationality: formData.nationality || '',
-        address: formData.address || '',
-        driving: formData.driving || '',
-        position: formData.position || '',
-        field: formData.field || '',
-        experience_detail: formData.experience_detail || (formData.experiences || []).map((e) => `${e.period}: ${e.title}, ${e.company}${e.description ? ' — ' + e.description : ''}`).join('\n'),
-        education: formData.education || (formData.educations || []).map((e) => `${e.period}: ${e.school} ${e.degree ? '— ' + e.degree : ''}`).join('\n'),
-        german: formData.german || '',
-        other_languages: formData.other_languages || '',
-        skills: formData.skills || '',
+      // Posilame strukturovana data primarne (experiences[], educations[]) — backend
+      // je pouzije v AI promptu jako rich input. Text fallback (experience_detail,
+      // education) se posila tez pro pripad ze strukt prazdne nebo legacy clients.
+      const payload = {
+        formData: {
+          name: formData.name || '',
+          birthdate: formData.birthdate || '',
+          phone: formData.phone || '',
+          email: formData.email || '',
+          nationality: formData.nationality || '',
+          address: formData.address || '',
+          driving: formData.driving || '',
+          position: formData.position || '',
+          field: formData.field || '',
+          // Structured arrays (preferovane backendem)
+          experiences: formData.experiences || [],
+          educations: formData.educations || [],
+          // Legacy text fallback (kdyz strukt prazdne nebo z legacy zdroju)
+          experience_detail: formData.experience_detail || (formData.experiences || []).map((e) => `${e.period}: ${e.title}, ${e.company}${e.description ? ' — ' + e.description : ''}`).join('\n'),
+          education: formData.education || (formData.educations || []).map((e) => `${e.period}: ${e.school} ${e.degree ? '— ' + e.degree : ''}`).join('\n'),
+          german: formData.german || '',
+          other_languages: formData.other_languages || '',
+          skills: formData.skills || '',
+        },
       }
       const res = await fetch('/api/generate-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ formData: flatForm }),
+        body: JSON.stringify(payload),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Generování selhalo')

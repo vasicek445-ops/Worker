@@ -112,6 +112,39 @@ export async function POST(req: NextRequest) {
     const { formData } = await req.json()
     if (!formData || typeof formData !== 'object') return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
 
+    // Prefer structured arrays. Fallback na legacy text fields kdyz strukt prazdne.
+    const structuredExperiences = Array.isArray(formData.experiences) ? formData.experiences : []
+    const structuredEducations = Array.isArray(formData.educations) ? formData.educations : []
+
+    const experienceBlock = structuredExperiences.length > 0
+      ? structuredExperiences
+          .map((e: { period?: string; title?: string; company?: string; location?: string; description?: string }, idx: number) => {
+            const lines = [
+              `[${idx + 1}] Period: ${e.period || '?'}`,
+              `    Position: ${e.title || '?'}`,
+              `    Company: ${e.company || '?'}`,
+              e.location ? `    Location: ${e.location}` : '',
+              e.description ? `    Tasks/Description (raw):\n      ${e.description.split('\n').filter(Boolean).join('\n      ')}` : '',
+            ].filter(Boolean)
+            return lines.join('\n')
+          })
+          .join('\n\n')
+      : (formData.experience_detail || '')
+
+    const educationBlock = structuredEducations.length > 0
+      ? structuredEducations
+          .map((e: { period?: string; school?: string; degree?: string; location?: string }, idx: number) => {
+            const lines = [
+              `[${idx + 1}] Period: ${e.period || '?'}`,
+              `    School: ${e.school || '?'}`,
+              e.degree ? `    Degree/Field: ${e.degree}` : '',
+              e.location ? `    Location: ${e.location}` : '',
+            ].filter(Boolean)
+            return lines.join('\n')
+          })
+          .join('\n\n')
+      : (formData.education || '')
+
     const userMessage = `Erstelle einen reichhaltigen strukturierten JSON-Lebenslauf für:
 
 Name: ${formData.name}
@@ -124,11 +157,11 @@ Führerschein: ${formData.driving || 'keiner'}
 Zielposition: ${formData.position}
 Branche: ${formData.field}
 
-BERUFSERFAHRUNG (erweitere und verbessere die Beschreibungen, min. 3-5 Tätigkeiten pro Position):
-${formData.experience_detail}
+BERUFSERFAHRUNG — strukturiert vom Benutzer (übernehme period/title/company/location 1:1, erweitere nur die Tätigkeiten auf 3-5 konkrete Bullet Points mit Aktionsverben):
+${experienceBlock}
 
-AUSBILDUNG:
-${formData.education}
+AUSBILDUNG — strukturiert vom Benutzer (übernehme period/school/degree/location 1:1, übersetze nur Fachrichtungen ins Deutsche):
+${educationBlock}
 
 SPRACHEN:
 Tschechisch: Muttersprache
@@ -138,7 +171,9 @@ ${formData.other_languages ? 'Weitere Sprachen: ' + formData.other_languages : '
 KOMPETENZEN (ergänze branchenrelevante):
 ${formData.skills}
 
-WICHTIG: Erweitere jede Position auf 3-5 konkrete Tätigkeiten mit Aktionsverben. Schreibe ein motivierendes Profil. Ergänze Skills wenn zu wenig. Antworte NUR mit validem JSON.`
+🚫 KRITISCH: Erfinde KEINE Firmennamen, Schulen, Jahre oder Orte, die der Benutzer nicht angegeben hat. Wenn ein Feld leer ist, lasse es leer im Output. Erweitere NUR die Tätigkeitsbeschreibungen (tasks) auf 3-5 Punkte pro Position.
+
+WICHTIG: Antworte NUR mit validem JSON.`
 
     const generateCV = async (): Promise<string> => {
       const response = await anthropic.messages.create({
