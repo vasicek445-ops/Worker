@@ -1,5 +1,8 @@
 "use client"
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import WokeeWidget from '../components/WokeeWidget'
+import { supabase } from '../supabase'
 import { useSubscription } from '../../hooks/useSubscription'
 import {
   ClipboardList,
@@ -40,6 +43,46 @@ const ACCENT = '#ff8c2b'
 
 export default function Pruvodce() {
   const { isActive } = useSubscription()
+
+  // Wooky AI chat context — nactena ze /profil pro personalizaci uvodni otazky
+  const [wookyCtx, setWookyCtx] = useState<{
+    profilePercent: number
+    profileData: { pozice?: string; obor?: string; nemcina_uroven?: string; zkusenosti?: string; dovednosti?: string; full_name?: string } | null
+    hasCv: boolean
+  }>({ profilePercent: 0, profileData: null, hasCv: false })
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user || cancelled) return
+      const [profileRes, docsRes] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('full_name, pozice, obor, nemcina_uroven, zkusenosti, dovednosti, telefon, adresa, preferovany_kanton')
+          .eq('id', session.user.id)
+          .maybeSingle(),
+        supabase
+          .from('saved_documents')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', session.user.id)
+          .eq('type', 'cv'),
+      ])
+      if (cancelled) return
+      const profile = profileRes.data || null
+      const filled = profile
+        ? ['pozice','obor','nemcina_uroven','zkusenosti','dovednosti','telefon','adresa','preferovany_kanton']
+            .filter((k) => String((profile as Record<string, unknown>)[k] || '').trim().length > 0).length
+        : 0
+      const percent = Math.round((filled / 8) * 100)
+      setWookyCtx({
+        profilePercent: percent,
+        profileData: profile,
+        hasCv: (docsRes.count || 0) > 0,
+      })
+    })()
+    return () => { cancelled = true }
+  }, [])
 
   const sections: Section[] = [
     {
@@ -136,6 +179,20 @@ export default function Pruvodce() {
             </section>
           ))}
         </div>
+
+        {/* ─── Wooky AI Team Leader chat — presunuto z dashboardu ────── */}
+        <section className="mt-12 max-w-3xl mx-auto">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-[10px] font-bold tracking-[0.12em] text-white/40 uppercase">
+              AI asistent
+            </span>
+          </div>
+          <WokeeWidget
+            profilePercent={wookyCtx.profilePercent}
+            profileData={wookyCtx.profileData}
+            hasCv={wookyCtx.hasCv}
+          />
+        </section>
       </div>
     </main>
   )
