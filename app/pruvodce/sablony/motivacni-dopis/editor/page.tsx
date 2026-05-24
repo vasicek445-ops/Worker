@@ -1,11 +1,12 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../../../supabase'
 import { useSubscription } from '../../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../../components/PaywallOverlay'
 import LetterBuilderLayout from '../../../../components/letter/LetterBuilderLayout'
+import LetterPreview from '../../../../components/LetterPreview'
 import SenderSection from '../../../../components/letter/sections/SenderSection'
 import RecipientSection from '../../../../components/letter/sections/RecipientSection'
 import SubjectSection from '../../../../components/letter/sections/SubjectSection'
@@ -13,6 +14,7 @@ import BodySection from '../../../../components/letter/sections/BodySection'
 import ClosingSection from '../../../../components/letter/sections/ClosingSection'
 import DesignSection from '../../../../components/letter/sections/DesignSection'
 import { getLetterTemplateById } from '../../../../../lib/letter/templates'
+import { buildLetterPdfBlob } from '../../../../../lib/letter/pdf-client'
 import type { LetterData, LetterFormData, LetterSectionId } from '../../../../../lib/letter/types'
 
 function LetterEditorInner() {
@@ -42,6 +44,10 @@ function LetterEditorInner() {
   const [syncing, setSyncing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
+
+  // Off-screen render target pro PDF generaci. Pri handleSave se z neho udela
+  // html2canvas snapshot → jsPDF blob → upload do storage.
+  const pdfRef = useRef<HTMLDivElement>(null)
 
   // Auth + load
   useEffect(() => {
@@ -313,7 +319,26 @@ function LetterEditorInner() {
       })
       if (!res.ok) throw new Error('Uložení selhalo')
       const data = await res.json()
-      if (data.id) setActiveDocId(data.id)
+      if (data.id) {
+        setActiveDocId(data.id)
+        // PDF generation + upload — pres skryty LetterPreview ref. Smart Apply
+        // pak najde PDF pres resolveLetterPdfPath (cv-pdfs/{user}/{doc}.pdf).
+        if (pdfRef.current) {
+          try {
+            const pdfBlob = await buildLetterPdfBlob(pdfRef.current)
+            const pdfForm = new FormData()
+            pdfForm.append('file', pdfBlob, 'letter.pdf')
+            pdfForm.append('documentId', String(data.id))
+            await fetch('/api/letter-pdf', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${accessToken}` },
+              body: pdfForm,
+            })
+          } catch (pdfErr) {
+            console.warn('Letter PDF upload failed (non-critical):', pdfErr)
+          }
+        }
+      }
       setToast('Dopis uložen. Najdeš ho v Moje dokumenty.')
       setTimeout(() => setToast(null), 3500)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -390,6 +415,25 @@ function LetterEditorInner() {
       >
         {renderSection()}
       </LetterBuilderLayout>
+
+      {/* Off-screen full-size LetterPreview pro PDF generaci — html2canvas
+          potrebuje rendrovany DOM v 1:1 sirce A4 (210mm). aria-hidden +
+          fixed pozice mimo viewport. */}
+      {letterData && (
+        <div
+          ref={pdfRef}
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            left: -99999,
+            top: 0,
+            pointerEvents: 'none',
+            visibility: 'hidden',
+          }}
+        >
+          <LetterPreview data={letterData} template={template} accentColor={accentColor} />
+        </div>
+      )}
 
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#22c55e]/15 border border-[#22c55e]/40 text-[#22c55e] text-sm px-4 py-2.5 rounded-xl backdrop-blur shadow-lg max-w-[90vw]">
