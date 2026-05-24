@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import PaywallOverlay from '../../../../components/PaywallOverlay'
@@ -9,6 +9,47 @@ import { useSubscription } from '../../../../../hooks/useSubscription'
 import { supabase } from '../../../../supabase'
 import { LETTER_TEMPLATES, getLetterTemplateById } from '../../../../../lib/letter/templates'
 import type { LetterData } from '../../../../../lib/letter/types'
+
+// A4 dimensions v pixelech (210mm × 297mm @ 96dpi)
+const A4_W_PX = 794
+const A4_H_PX = 1123
+
+// Mini preview wrapper — dynamicky scaluje LetterPreview podle sirky kontejneru
+// aby letter zaplnil cely card area (ne jen top-left roh).
+function MiniLetterPreview({ data, template, accentColor }: { data: LetterData; template: string; accentColor: string }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(0.5)
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const el = containerRef.current
+    const update = () => setScale(el.offsetWidth / A4_W_PX)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative bg-[#0a0a12] overflow-hidden"
+      style={{ aspectRatio: `${A4_W_PX}/${A4_H_PX}` }}
+    >
+      <div
+        style={{
+          width: `${A4_W_PX}px`,
+          height: `${A4_H_PX}px`,
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+          pointerEvents: 'none',
+        }}
+      >
+        <LetterPreview data={data} template={template} accentColor={accentColor} />
+      </div>
+    </div>
+  )
+}
 
 const DEFAULT_TEMPLATE_ID = 'klassisch'
 const NEXT_PATH = '/pruvodce/sablony/motivacni-dopis/vyber-sablonu'
@@ -172,25 +213,15 @@ export default function LetterVyberSablonuPage() {
                       : 'border-white/[0.08] hover:border-white/[0.18]'
                   }`}
                 >
-                  {/* Mini preview (scaled LetterPreview rendrovaný v aspect-ratio bunce) */}
-                  <div className="relative bg-[#0a0a12] overflow-hidden" style={{ aspectRatio: '210/297' }}>
-                    <div
-                      style={{
-                        transform: 'scale(0.32)',
-                        transformOrigin: 'top left',
-                        width: '312.5%',
-                        height: '312.5%',
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      <LetterPreview
-                        data={{ ...PREVIEW_DATA, design: { ...PREVIEW_DATA.design, templateId: tpl.id, accentColor: tpl.defaultColor } }}
-                        template={tpl.id}
-                        accentColor={tpl.defaultColor}
-                      />
-                    </div>
+                  {/* Mini preview — dynamicky scaled, vyplnuje cely card */}
+                  <div className="relative">
+                    <MiniLetterPreview
+                      data={{ ...PREVIEW_DATA, design: { ...PREVIEW_DATA.design, templateId: tpl.id, accentColor: tpl.defaultColor } }}
+                      template={tpl.id}
+                      accentColor={tpl.defaultColor}
+                    />
                     {isSelected && (
-                      <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-[#fb923c] text-[#0a0a12] flex items-center justify-center text-sm font-bold shadow-lg">
+                      <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-[#fb923c] text-[#0a0a12] flex items-center justify-center text-sm font-bold shadow-lg z-10">
                         ✓
                       </div>
                     )}
