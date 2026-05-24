@@ -120,6 +120,9 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount }
           />
         </div>
 
+        {/* ─── ACTIVITY CHART (full-width time-series) ──────────────────── */}
+        <ActivityChart />
+
         {/* ─── PROFILE + ACTIVITY ROW ───────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <ProfileCompletionCard />
@@ -389,6 +392,185 @@ function MiniStat({
         <p className="text-white text-lg font-extrabold tabular-nums m-0 leading-tight">{value}</p>
         <p className="text-white/40 text-[11px] m-0 mt-0.5 truncate">{label}</p>
       </div>
+    </div>
+  )
+}
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/*  ACTIVITY CHART — time series line chart (Flixy pattern)                   */
+/*  Pure SVG, no deps. Period switcher tabs (7/14/30 dni).                    */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+type ChartRange = '7d' | '14d' | '30d'
+
+// Skeleton dataset — user nahradi realnymi DB queries (per-day aggregations).
+const ACTIVITY_DATA: Record<ChartRange, Array<{ date: string; sent: number; opened: number; replied: number }>> = {
+  '7d': [
+    { date: '18. 5.', sent: 0, opened: 0, replied: 0 },
+    { date: '19. 5.', sent: 2, opened: 1, replied: 0 },
+    { date: '20. 5.', sent: 3, opened: 2, replied: 1 },
+    { date: '21. 5.', sent: 1, opened: 1, replied: 0 },
+    { date: '22. 5.', sent: 4, opened: 3, replied: 1 },
+    { date: '23. 5.', sent: 2, opened: 1, replied: 0 },
+    { date: '24. 5.', sent: 0, opened: 0, replied: 0 },
+  ],
+  '14d': [
+    { date: '11. 5.', sent: 0, opened: 0, replied: 0 },
+    { date: '12. 5.', sent: 1, opened: 0, replied: 0 },
+    { date: '13. 5.', sent: 2, opened: 1, replied: 0 },
+    { date: '14. 5.', sent: 0, opened: 0, replied: 0 },
+    { date: '15. 5.', sent: 3, opened: 2, replied: 1 },
+    { date: '16. 5.', sent: 2, opened: 1, replied: 0 },
+    { date: '17. 5.', sent: 1, opened: 1, replied: 0 },
+    { date: '18. 5.', sent: 0, opened: 0, replied: 0 },
+    { date: '19. 5.', sent: 2, opened: 1, replied: 0 },
+    { date: '20. 5.', sent: 3, opened: 2, replied: 1 },
+    { date: '21. 5.', sent: 1, opened: 1, replied: 0 },
+    { date: '22. 5.', sent: 4, opened: 3, replied: 1 },
+    { date: '23. 5.', sent: 2, opened: 1, replied: 0 },
+    { date: '24. 5.', sent: 0, opened: 0, replied: 0 },
+  ],
+  '30d': Array.from({ length: 30 }, (_, i) => ({
+    date: `${(i % 30) + 1}.`,
+    sent: Math.floor(Math.random() * 5),
+    opened: Math.floor(Math.random() * 3),
+    replied: Math.floor(Math.random() * 2),
+  })),
+}
+
+function ActivityChart() {
+  const [range, setRange] = useState<ChartRange>('7d')
+  const data = ACTIVITY_DATA[range]
+
+  // Chart dimensions
+  const W = 800
+  const H = 220
+  const PAD_L = 32
+  const PAD_R = 16
+  const PAD_T = 12
+  const PAD_B = 32
+  const innerW = W - PAD_L - PAD_R
+  const innerH = H - PAD_T - PAD_B
+
+  const maxY = Math.max(5, ...data.flatMap((d) => [d.sent, d.opened, d.replied]))
+  const yTicks = [0, Math.ceil(maxY / 2), maxY]
+
+  // X coords
+  const xAt = (i: number) =>
+    PAD_L + (data.length === 1 ? innerW / 2 : (i / (data.length - 1)) * innerW)
+  const yAt = (v: number) => PAD_T + innerH - (v / maxY) * innerH
+
+  // Polyline points for each series
+  const sentPath = data.map((d, i) => `${xAt(i)},${yAt(d.sent)}`).join(' ')
+  const openedPath = data.map((d, i) => `${xAt(i)},${yAt(d.opened)}`).join(' ')
+  const repliedPath = data.map((d, i) => `${xAt(i)},${yAt(d.replied)}`).join(' ')
+
+  // Area fill pod sent line
+  const sentArea = `M${PAD_L},${PAD_T + innerH} L${sentPath} L${xAt(data.length - 1)},${PAD_T + innerH} Z`
+
+  // Total stats z aktualniho range
+  const totalSent = data.reduce((a, b) => a + b.sent, 0)
+  const totalOpened = data.reduce((a, b) => a + b.opened, 0)
+  const totalReplied = data.reduce((a, b) => a + b.replied, 0)
+
+  return (
+    <section className="rounded-2xl bg-[#111120] border border-white/[0.06] p-5 sm:p-6">
+      {/* Header: title + period tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+        <div>
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-white/40 uppercase m-0">
+            Tvoje aktivita
+          </p>
+          <p className="text-white text-lg sm:text-xl font-bold mt-1 m-0">
+            Posílání přihlášek v čase
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-1 p-1 rounded-full bg-white/[0.04] border border-white/[0.06] self-start sm:self-auto">
+          {(['7d', '14d', '30d'] as ChartRange[]).map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={`text-[11px] font-bold px-3 py-1.5 rounded-full transition ${
+                r === range ? 'bg-[#fb923c]/15 text-[#fb923c]' : 'text-white/40 hover:text-white/70'
+              }`}
+            >
+              {r === '7d' ? '7 dní' : r === '14d' ? '14 dní' : '30 dní'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Legend + totals */}
+      <div className="flex flex-wrap items-center gap-4 mb-4">
+        <LegendItem color="#fb923c" label="Odesláno" value={totalSent} />
+        <LegendItem color="#60a5fa" label="HR otevřelo" value={totalOpened} />
+        <LegendItem color="#22c55e" label="Odpovědi" value={totalReplied} />
+      </div>
+
+      {/* SVG Chart */}
+      <div className="w-full overflow-hidden">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" preserveAspectRatio="none">
+          {/* Y grid */}
+          {yTicks.map((t) => (
+            <g key={t}>
+              <line
+                x1={PAD_L} y1={yAt(t)} x2={W - PAD_R} y2={yAt(t)}
+                stroke="rgba(255,255,255,0.05)" strokeWidth={1}
+              />
+              <text
+                x={PAD_L - 8} y={yAt(t) + 4}
+                fill="rgba(255,255,255,0.3)" fontSize="10" textAnchor="end"
+              >
+                {t}
+              </text>
+            </g>
+          ))}
+
+          {/* Area pod sent (orange tint) */}
+          <defs>
+            <linearGradient id="sentAreaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#fb923c" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#fb923c" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={sentArea} fill="url(#sentAreaGradient)" />
+
+          {/* Lines */}
+          <polyline points={sentPath} fill="none" stroke="#fb923c" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+          <polyline points={openedPath} fill="none" stroke="#60a5fa" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0" />
+          <polyline points={repliedPath} fill="none" stroke="#22c55e" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+
+          {/* Data point dots na sent (hero series) */}
+          {data.map((d, i) => (
+            <circle key={i} cx={xAt(i)} cy={yAt(d.sent)} r="3.5" fill="#fb923c" stroke="#0a0a12" strokeWidth={2} />
+          ))}
+
+          {/* X labels (each 2nd/3rd to avoid overlap on dense ranges) */}
+          {data.map((d, i) => {
+            const step = data.length > 14 ? Math.ceil(data.length / 7) : data.length > 7 ? 2 : 1
+            if (i % step !== 0 && i !== data.length - 1) return null
+            return (
+              <text
+                key={i}
+                x={xAt(i)} y={H - 8}
+                fill="rgba(255,255,255,0.35)" fontSize="10" textAnchor="middle"
+              >
+                {d.date}
+              </text>
+            )
+          })}
+        </svg>
+      </div>
+    </section>
+  )
+}
+
+function LegendItem({ color, label, value }: { color: string; label: string; value: number }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+      <span className="text-white/60 text-xs">{label}</span>
+      <span className="text-white font-bold text-sm tabular-nums">{value}</span>
     </div>
   )
 }
