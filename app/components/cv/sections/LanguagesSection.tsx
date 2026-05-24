@@ -7,13 +7,14 @@ interface LanguagesSectionProps {
   onChange: (key: keyof CVFormData, value: CVFormData[keyof CVFormData]) => void
 }
 
-const GERMAN_LEVELS = [
-  'Žádná – teprve se učím',
-  'Základy (A1)',
-  'Základní komunikace (A2)',
-  'Dorozumím se (B1)',
-  'Dobrá úroveň (B2)',
-  'Plynulá (C1/C2)',
+// Hodnota = CEFR kod (matchuje profile.nemcina_uroven). Label v dropdownu s popisem.
+const GERMAN_LEVELS: Array<{ value: string; label: string }> = [
+  { value: 'A1', label: 'A1 — Začátečník' },
+  { value: 'A2', label: 'A2 — Základy' },
+  { value: 'B1', label: 'B1 — Středně pokročilý' },
+  { value: 'B2', label: 'B2 — Plynulý' },
+  { value: 'C1', label: 'C1 — Velmi pokročilý' },
+  { value: 'C2', label: 'C2 — Téměř rodilý' },
 ]
 
 const inputClass =
@@ -37,8 +38,8 @@ export default function LanguagesSection({ formData, onChange }: LanguagesSectio
             Vyber úroveň
           </option>
           {GERMAN_LEVELS.map((level) => (
-            <option key={level} value={level} className="bg-[#111120]">
-              {level}
+            <option key={level.value} value={level.value} className="bg-[#111120]">
+              {level.label}
             </option>
           ))}
         </select>
