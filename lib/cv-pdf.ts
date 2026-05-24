@@ -26,7 +26,10 @@ export async function resolveCvPdfPath(
   return doc ? `${userId}/${doc.id}.pdf` : null
 }
 
-/** Cesta k PDF motivačního dopisu zvoleného pro Smart Apply. null = použít AI dopis. */
+/**
+ * Cesta k PDF motivačního dopisu: zvolené z member_agent_config,
+ * jinak poslední uložený letter dokument uživatele. null = nic není k dispozici.
+ */
 export async function resolveLetterPdfPath(
   admin: SupabaseClient,
   userId: string,
@@ -36,5 +39,15 @@ export async function resolveLetterPdfPath(
     .select('letter_pdf_path')
     .eq('member_id', userId)
     .maybeSingle()
-  return (cfg?.letter_pdf_path as string) || null
+  if (cfg?.letter_pdf_path) return cfg.letter_pdf_path as string
+
+  const { data: doc } = await admin
+    .from('saved_documents')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('type', 'letter')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  return doc ? `${userId}/${doc.id}.pdf` : null
 }
