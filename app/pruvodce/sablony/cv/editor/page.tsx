@@ -79,8 +79,6 @@ function CVEditorInner() {
           const profile = profileRes.data
           if (docRes.ok) {
             const doc = await docRes.json()
-            // DEBUG: log saved doc data + profile fallback
-            console.log('[CV Editor] Init documentId branch — saved doc:', doc, 'profile fallback:', profile)
             if (doc?.document_data && !cancelled) {
               const cv: CVData = doc.document_data
               setCvData(cv)
@@ -134,9 +132,7 @@ function CVEditorInner() {
         // (full_name, telefon, datum_narozeni, adresa, ...). Mapujeme vsechny dostupne
         // CV-relevantni pole vcetne zkusenosti, vzdelani, jazyku a dovednosti.
         try {
-          const { data: profile, error: profErr } = await profilePromise
-          // DEBUG: log do console pro autofill debugging (smaz po vyreseni)
-          console.log('[CV Editor] Profile autofill data:', profile, 'error:', profErr)
+          const { data: profile } = await profilePromise
           if (profile && !cancelled) {
             // Auth email jako fallback pro contact email
             const contactEmail = session.user.email || ''
@@ -214,8 +210,6 @@ function CVEditorInner() {
         .select('full_name, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, dalsi_jazyky_struct, avatar_url')
         .eq('id', userId)
         .maybeSingle()
-      // DEBUG: log Z profilu sync data (smaz po vyreseni)
-      console.log('[CV Editor] Z profilu sync — profile data:', profile, 'error:', profErr)
       if (profErr) throw profErr
       if (!profile) {
         setError('Profil je prázdný. Vyplň ho v sekci Profil.')
