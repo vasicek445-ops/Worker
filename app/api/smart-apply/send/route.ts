@@ -135,12 +135,43 @@ export async function POST(req: NextRequest) {
       .map((p) => `<p style="margin:0 0 12px 0; line-height:1.55; font-family: -apple-system, Helvetica, Arial, sans-serif; font-size:14px; color:#111;">${escapeHtml(p).replace(/\n/g, '<br>')}</p>`)
       .join('')
 
+    // Insert sent_applications FIRST (bez gmail_message_id) — potrebujeme ID
+    // pro Reply-To trick. Po uspesnem send updatneme s gmail_message_id.
+    let applicationId: number | null = null
+    try {
+      const { data: appRow } = await supabaseAdmin
+        .from('sent_applications')
+        .insert({
+          member_id: user.id,
+          job_id: body.jobId || null,
+          agency_id: body.agencyId || null,
+          to_email: body.to,
+          subject: body.subject,
+          body_preview: body.body.slice(0, 500),
+          sent_at: new Date().toISOString(),
+        })
+        .select('id')
+        .single()
+      applicationId = appRow?.id ?? null
+    } catch {
+      // sent_applications neexistuje — Reply-To trick stale funguje ale neumime parsovat
+    }
+
+    // Reply-To trick: replies jdou na nas inbound parser (Postmark/SendGrid).
+    // Format: apply+USER_ID+APP_ID@apply.gowoker.com
+    // Pri parsovani extrahujeme user + application z aliasu.
+    const inboundDomain = process.env.INBOUND_REPLY_DOMAIN || 'apply.gowoker.com'
+    const replyToHeader = applicationId
+      ? `apply+${user.id}+${applicationId}@${inboundDomain}`
+      : undefined
+
     try {
       const result = await sendGmailMessage({
         accessToken: tokenRow.access_token!,
         refreshToken: tokenRow.refresh_token,
         fromName,
         fromEmail: tokenRow.email,
+        replyTo: replyToHeader,
         to: body.to,
         subject: body.subject,
         bodyHtml,
@@ -157,21 +188,15 @@ export async function POST(req: NextRequest) {
         .eq('member_id', user.id)
         .eq('provider', 'gmail')
 
-      // Log do sent_applications pokud tabulka existuje (silently skip if not)
-      try {
-        await supabaseAdmin.from('sent_applications').insert({
-          member_id: user.id,
-          job_id: body.jobId || null,
-          agency_id: body.agencyId || null,
-          to_email: body.to,
-          subject: body.subject,
-          body_preview: body.body.slice(0, 500),
-          gmail_message_id: result.id,
-          gmail_thread_id: result.threadId,
-          sent_at: new Date().toISOString(),
-        })
-      } catch {
-        // sent_applications neni vytvoreno — nebo nema agency_id sloupec, ne kritike
+      // Update sent_applications s gmail_message_id (uz mame applicationId z insertu)
+      if (applicationId) {
+        await supabaseAdmin
+          .from('sent_applications')
+          .update({
+            gmail_message_id: result.id,
+            gmail_thread_id: result.threadId,
+          })
+          .eq('id', applicationId)
       }
 
       return NextResponse.json({
