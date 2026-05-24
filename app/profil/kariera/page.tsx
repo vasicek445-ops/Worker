@@ -29,7 +29,17 @@ const LANGUAGES: Array<{ name: string; flag: string }> = [
   { name: 'Jiný', flag: '🌍' },
 ]
 
-const LANG_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'Mateřský'] as const
+// Levels s popisem — v selectu se ukaze "B1 — Středně pokročilý" pro lepsi orientaci.
+// Hodnota ulozena = jen kod (B1, B2...) nebo "Mateřský" — clean pro AI/CV.
+const LANG_LEVELS: Array<{ value: string; label: string }> = [
+  { value: 'A1', label: 'A1 — Začátečník' },
+  { value: 'A2', label: 'A2 — Základy' },
+  { value: 'B1', label: 'B1 — Středně pokročilý' },
+  { value: 'B2', label: 'B2 — Plynulý' },
+  { value: 'C1', label: 'C1 — Velmi pokročilý' },
+  { value: 'C2', label: 'C2 — Téměř rodilý' },
+  { value: 'Mateřský', label: 'Mateřský jazyk' },
+]
 
 // Rozsah let pro Obdobi dropdowny (1980 - currentYear, descending — nejnovejsi nahore)
 const CURRENT_YEAR = new Date().getFullYear()
@@ -481,10 +491,10 @@ function LanguageList({
               <select
                 value={lang.level || 'B1'}
                 onChange={(e) => updateRow(i, { level: e.target.value })}
-                className={inputClass + ' appearance-none cursor-pointer w-24 flex-shrink-0'}
+                className={inputClass + ' appearance-none cursor-pointer w-44 flex-shrink-0'}
               >
                 {LANG_LEVELS.map((l) => (
-                  <option key={l} value={l} className="bg-[#111120]">{l}</option>
+                  <option key={l.value} value={l.value} className="bg-[#111120]">{l.label}</option>
                 ))}
               </select>
             </div>
