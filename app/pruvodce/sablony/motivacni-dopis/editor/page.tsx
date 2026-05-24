@@ -66,7 +66,7 @@ function LetterEditorInner() {
       // Profile fetch — sender info autofill + permit/german pro AI
       const profilePromise = supabase
         .from('profiles')
-        .select('full_name, email, telefon, datum_narozeni, adresa, nationality, pozice, obor, zkusenosti, vzdelani, experiences, dovednosti, nemcina_uroven, work_permit_status, preferovany_kanton')
+        .select('full_name, telefon, datum_narozeni, adresa, nationality, pozice, obor, zkusenosti, vzdelani, experiences, dovednosti, nemcina_uroven, work_permit_status, preferovany_kanton')
         .eq('id', session.user.id)
         .maybeSingle()
 
@@ -94,7 +94,7 @@ function LetterEditorInner() {
                 senderPostalCode: ld.sender?.postalCode || f.senderPostalCode,
                 senderCity: ld.sender?.city || profile?.preferovany_kanton || f.senderCity,
                 senderPhone: ld.sender?.phone || profile?.telefon || f.senderPhone,
-                senderEmail: ld.sender?.email || profile?.email || session.user.email || f.senderEmail,
+                senderEmail: ld.sender?.email || session.user.email || f.senderEmail,
                 recipientCompany: ld.recipient?.company || f.recipientCompany,
                 recipientContactPerson: ld.recipient?.contactPerson || f.recipientContactPerson,
                 recipientAddress: ld.recipient?.address || f.recipientAddress,
@@ -119,7 +119,7 @@ function LetterEditorInner() {
         try {
           const { data: profile } = await profilePromise
           if (profile && !cancelled) {
-            const contactEmail = profile.email || session.user.email || ''
+            const contactEmail = session.user.email || ''
             setFormData((f) => ({
               ...f,
               senderFullName: profile.full_name || f.senderFullName,
@@ -161,7 +161,7 @@ function LetterEditorInner() {
     try {
       const { data: profile, error: profErr } = await supabase
         .from('profiles')
-        .select('full_name, email, telefon, adresa, nationality, nemcina_uroven, work_permit_status, experiences, dovednosti, preferovany_kanton')
+        .select('full_name, telefon, adresa, nationality, nemcina_uroven, work_permit_status, experiences, dovednosti, preferovany_kanton')
         .eq('id', userId)
         .maybeSingle()
       if (profErr) throw profErr
@@ -169,7 +169,9 @@ function LetterEditorInner() {
         setError('Profil je prázdný. Vyplň ho v sekci Profil.')
         return
       }
-      const contactEmail = profile.email || ''
+      // profiles.email neexistuje v DB → pouzij auth.user.email
+      const { data: { session } } = await supabase.auth.getSession()
+      const contactEmail = session?.user?.email || ''
       setFormData((f) => ({
         ...f,
         senderFullName: profile.full_name || f.senderFullName,

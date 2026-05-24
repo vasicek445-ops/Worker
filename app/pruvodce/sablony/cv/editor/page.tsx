@@ -59,9 +59,11 @@ function CVEditorInner() {
 
       // Vzdy nactime profil paralelne — slouzi jako fallback pro pole co nemusi
       // byt v saved CV (hlavne avatar_url -> foto).
+      // POZN: profiles tabulka v produkci NEMA sloupec 'email' (auth email je v auth.users).
+      // Pro contact email pouzivame session.user.email jako fallback.
       const profilePromise = supabase
         .from('profiles')
-        .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, dalsi_jazyky_struct, avatar_url')
+        .select('full_name, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, dalsi_jazyky_struct, avatar_url')
         .eq('id', session.user.id)
         .maybeSingle()
 
@@ -137,7 +139,7 @@ function CVEditorInner() {
           console.log('[CV Editor] Profile autofill data:', profile, 'error:', profErr)
           if (profile && !cancelled) {
             // Auth email jako fallback pro contact email
-            const contactEmail = profile.email || session.user.email || ''
+            const contactEmail = session.user.email || ''
             // Strukturovana data maji prednost; legacy text jako fallback pokud strukt prazdne.
             // CVFormData vyzaduje `id` per radek — pridame ho pri mapping.
             const structExperiences = Array.isArray(profile.experiences)
@@ -209,7 +211,7 @@ function CVEditorInner() {
     try {
       const { data: profile, error: profErr } = await supabase
         .from('profiles')
-        .select('full_name, email, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, dalsi_jazyky_struct, avatar_url')
+        .select('full_name, telefon, datum_narozeni, adresa, nationality, ridicky_prukaz, pozice, obor, zkusenosti, vzdelani, experiences, educations, dovednosti, nemcina_uroven, dalsi_jazyky, dalsi_jazyky_struct, avatar_url')
         .eq('id', userId)
         .maybeSingle()
       // DEBUG: log Z profilu sync data (smaz po vyreseni)
@@ -219,7 +221,9 @@ function CVEditorInner() {
         setError('Profil je prázdný. Vyplň ho v sekci Profil.')
         return
       }
-      const contactEmail = profile.email || ''
+      // profiles.email neexistuje → auth email
+      const { data: { session } } = await supabase.auth.getSession()
+      const contactEmail = session?.user?.email || ''
       const structExperiences = Array.isArray(profile.experiences)
         ? profile.experiences.map((e, i: number) => ({
             id: `sync-exp-${i}-${Date.now()}`,
