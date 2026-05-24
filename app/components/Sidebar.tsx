@@ -99,8 +99,30 @@ export default function Sidebar() {
           </span>
         </div>
 
+        {/* Domu — vzdy prvni */}
+        <Link href="/dashboard" className={linkClass(isActivePath("/dashboard"))}>
+          <Home
+            size={ICON_SIZE}
+            strokeWidth={ICON_STROKE}
+            color={iconColor(isActivePath("/dashboard"))}
+          />
+          <span>Domů</span>
+        </Link>
+
+        {/* Nastroje — pod Domu, nad Smart Apply (vstupni brana k vsem AI nastrojum) */}
+        <Link href="/pruvodce" className={linkClass(isToolsActive)}>
+          <Wrench
+            size={ICON_SIZE}
+            strokeWidth={ICON_STROKE}
+            color={iconColor(isToolsActive)}
+          />
+          <span>Nástroje</span>
+          <span className="ml-auto text-[9px] bg-[#ff8c2b]/15 text-[#ff8c2b] font-bold px-1.5 py-0.5 rounded-full">
+            AI
+          </span>
+        </Link>
+
         {[
-          { href: "/dashboard", icon: Home, label: "Domů" },
           {
             href: "/smart-apply",
             icon: Briefcase,
@@ -137,18 +159,6 @@ export default function Sidebar() {
             </Link>
           );
         })}
-
-        <Link href="/pruvodce" className={linkClass(isToolsActive)}>
-          <Wrench
-            size={ICON_SIZE}
-            strokeWidth={ICON_STROKE}
-            color={iconColor(isToolsActive)}
-          />
-          <span>Nástroje</span>
-          <span className="ml-auto text-[9px] bg-[#ff8c2b]/15 text-[#ff8c2b] font-bold px-1.5 py-0.5 rounded-full">
-            AI
-          </span>
-        </Link>
 
         <div className="px-3 pt-5 pb-2">
           <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
