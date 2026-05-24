@@ -461,8 +461,8 @@ function LanguageList({
         {languages.map((lang, i) => {
           const flag = LANGUAGES.find((l) => l.name === lang.language)?.flag
           return (
-          <div key={i} className="flex items-center gap-2.5">
-            <div className="relative flex-1">
+          <div key={i} className="flex items-center gap-2 w-full">
+            <div className="relative flex-1 min-w-0">
               <div className="absolute left-3 top-1/2 -translate-y-1/2 text-lg pointer-events-none select-none z-10">
                 {flag || '🌐'}
               </div>
@@ -480,7 +480,7 @@ function LanguageList({
             <select
               value={lang.level || 'B1'}
               onChange={(e) => updateRow(i, { level: e.target.value })}
-              className={inputClass + ' appearance-none cursor-pointer w-32 flex-shrink-0'}
+              className={inputClass + ' appearance-none cursor-pointer w-24 flex-shrink-0'}
             >
               {LANG_LEVELS.map((l) => (
                 <option key={l} value={l} className="bg-[#111120]">{l}</option>
@@ -489,7 +489,7 @@ function LanguageList({
             <button
               onClick={() => removeRow(i)}
               aria-label="Odstranit jazyk"
-              className="text-white/30 hover:text-red-400 transition p-2 rounded-lg hover:bg-red-500/10 flex-shrink-0"
+              className="text-white/30 hover:text-red-400 transition p-1.5 rounded-lg hover:bg-red-500/10 flex-shrink-0"
             >
               <Trash2 size={14} />
             </button>
