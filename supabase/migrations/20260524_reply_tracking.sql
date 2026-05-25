@@ -3,7 +3,46 @@
 -- HR pak posila reply nam (ne user's Gmail), my parsujeme + forwardujeme.
 
 -- ============================================================================
--- 1. Pridat sloupce do sent_applications pro tracking
+-- 0. Vytvorit sent_applications tabulku pokud neexistuje
+--    (smart-apply/send do ni loguje vsechny posldne emaily)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS sent_applications (
+  id BIGSERIAL PRIMARY KEY,
+  member_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  job_id BIGINT DEFAULT NULL,
+  agency_id BIGINT DEFAULT NULL,
+  to_email TEXT NOT NULL,
+  subject TEXT,
+  body_preview TEXT,
+  gmail_message_id TEXT,
+  gmail_thread_id TEXT,
+  sent_at TIMESTAMPTZ DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_sent_applications_member_recent
+  ON sent_applications (member_id, sent_at DESC);
+CREATE INDEX IF NOT EXISTS idx_sent_applications_agency
+  ON sent_applications (agency_id) WHERE agency_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_sent_applications_job
+  ON sent_applications (job_id) WHERE job_id IS NOT NULL;
+
+-- RLS
+ALTER TABLE sent_applications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own sent applications" ON sent_applications;
+CREATE POLICY "Users can view own sent applications"
+  ON sent_applications FOR SELECT
+  USING (auth.uid() = member_id);
+
+DROP POLICY IF EXISTS "Users can insert own sent applications" ON sent_applications;
+CREATE POLICY "Users can insert own sent applications"
+  ON sent_applications FOR INSERT
+  WITH CHECK (auth.uid() = member_id);
+
+-- ============================================================================
+-- 1. Pridat sloupce pro reply tracking
 -- ============================================================================
 
 ALTER TABLE sent_applications
