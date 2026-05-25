@@ -1,220 +1,281 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { supabase } from "../supabase";
+import { useEffect, useState } from 'react'
+import { supabase } from '../supabase'
+import {
+  Mail, MailCheck, Calendar, ChevronDown, ChevronUp,
+  CheckCircle2, XCircle, MessageCircle, Clock, Sparkles, Send,
+} from 'lucide-react'
+
+type Classification = 'interview' | 'rejection' | 'question' | 'auto_reply' | 'positive' | 'neutral' | null
+
+interface ReplyRow {
+  id: string
+  from_email: string
+  from_name: string | null
+  subject: string | null
+  body_text: string | null
+  classification: Classification
+  classification_confidence: number | null
+  received_at: string
+}
+
+interface SentApplication {
+  id: number
+  to_email: string
+  subject: string | null
+  body_preview: string | null
+  sent_at: string
+  reply_received_at: string | null
+  reply_count: number
+  reply_classification: Classification
+  last_reply_preview: string | null
+  replies?: ReplyRow[]
+}
+
+const CLASSIFICATION_META: Record<Exclude<Classification, null>, { label: string; color: string; bg: string; border: string; icon: typeof CheckCircle2 }> = {
+  interview: { label: 'Pohovor', color: '#22c55e', bg: 'rgba(34,197,94,0.10)', border: 'rgba(34,197,94,0.25)', icon: CheckCircle2 },
+  positive:  { label: 'Pozitivní', color: '#60a5fa', bg: 'rgba(96,165,250,0.10)', border: 'rgba(96,165,250,0.25)', icon: Sparkles },
+  question:  { label: 'Dotaz HR', color: '#fb923c', bg: 'rgba(251,146,60,0.10)', border: 'rgba(251,146,60,0.25)', icon: MessageCircle },
+  rejection: { label: 'Zamítnuto', color: '#ef4444', bg: 'rgba(239,68,68,0.10)', border: 'rgba(239,68,68,0.25)', icon: XCircle },
+  auto_reply:{ label: 'Auto-reply', color: '#a3a3a3', bg: 'rgba(163,163,163,0.10)', border: 'rgba(163,163,163,0.25)', icon: Mail },
+  neutral:   { label: 'Odpověď', color: '#a3a3a3', bg: 'rgba(163,163,163,0.10)', border: 'rgba(163,163,163,0.25)', icon: Mail },
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso)
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000)
+  if (days === 0) return 'dnes'
+  if (days === 1) return 'včera'
+  if (days < 7) return `před ${days} dny`
+  return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })
+}
 
 export default function Prihlasky() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [applications, setApplications] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [smartApps, setSmartApps] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [apps, setApps] = useState<SentApplication[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
 
   useEffect(() => {
-    async function loadApplications() {
-      // 1. Load localStorage applications (legacy)
-      const applied = JSON.parse(localStorage.getItem("woker_applied") || "[]");
-      if (applied.length > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const ids = applied.map((a: any) => a.id);
-        const { data } = await supabase
-          .from("Nabídky")
-          .select("*")
-          .in("id", ids);
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const merged = (data || []).map((job: any) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const app = applied.find((a: any) => a.id === job.id);
-          return { ...job, appliedDate: app?.date, status: app?.status || "Odesláno" };
-        });
-        setApplications(merged);
+    let cancelled = false
+    ;(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || cancelled) {
+        setLoading(false)
+        return
       }
 
-      // 2. Load Smart Matching applications from Supabase
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: dbApps } = await supabase
-          .from("applications")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("sent_at", { ascending: false });
+      const { data: sentRows } = await supabase
+        .from('sent_applications')
+        .select('id, to_email, subject, body_preview, sent_at, reply_received_at, reply_count, reply_classification, last_reply_preview')
+        .eq('member_id', user.id)
+        .order('sent_at', { ascending: false })
 
-        setSmartApps(dbApps || []);
+      if (cancelled) return
+      const sent = (sentRows || []) as SentApplication[]
+
+      if (sent.length > 0) {
+        const appIds = sent.map((s) => s.id)
+        const { data: replyRows } = await supabase
+          .from('application_replies')
+          .select('id, application_id, from_email, from_name, subject, body_text, classification, classification_confidence, received_at')
+          .in('application_id', appIds)
+          .order('received_at', { ascending: false })
+
+        if (cancelled) return
+        const byApp: Record<number, ReplyRow[]> = {}
+        for (const r of (replyRows || []) as (ReplyRow & { application_id: number })[]) {
+          if (!byApp[r.application_id]) byApp[r.application_id] = []
+          byApp[r.application_id].push(r)
+        }
+        for (const app of sent) {
+          app.replies = byApp[app.id] || []
+        }
       }
 
-      setLoading(false);
-    }
-    loadApplications();
-  }, []);
+      setApps(sent)
+      setLoading(false)
+    })()
+    return () => { cancelled = true }
+  }, [])
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const statusColors: any = {
-    "Odesláno": "bg-blue-500/10 text-blue-400 border-blue-500/30",
-    "sent": "bg-blue-500/10 text-blue-400 border-blue-500/30",
-    "Zobrazeno": "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
-    "delivered": "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
-    "Pohovor": "bg-green-500/10 text-green-400 border-green-500/30",
-    "replied": "bg-green-500/10 text-green-400 border-green-500/30",
-    "Zamítnuto": "bg-red-500/10 text-red-400 border-red-500/30",
-    "rejected": "bg-red-500/10 text-red-400 border-red-500/30",
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const statusLabels: any = {
-    sent: "Odesláno",
-    delivered: "Doručeno",
-    replied: "Odpověděli",
-    rejected: "Zamítnuto",
-  };
-
-  const totalCount = applications.length + smartApps.length;
-  const sentCount = applications.filter(a => a.status === "Odesláno").length + smartApps.filter(a => a.status === "sent").length;
-  const repliedCount = applications.filter(a => a.status === "Pohovor").length + smartApps.filter(a => a.status === "replied").length;
+  const totalSent = apps.length
+  const totalReplies = apps.reduce((sum, a) => sum + (a.reply_count || 0), 0)
+  const interviews = apps.filter((a) => a.reply_classification === 'interview').length
 
   return (
-    <main className="min-h-screen bg-[#0E0E0E] pb-24">
-      <div className="px-5 pt-6 pb-4">
-        <h1 className="text-white text-2xl font-black mb-1">Moje přihlášky</h1>
-        <p className="text-gray-500 text-sm">
-          {totalCount} {totalCount === 1 ? "přihláška" : "přihlášek"}
-        </p>
-      </div>
+    <main
+      className="min-h-screen bg-[#0a0a12] text-white px-4 sm:px-6 lg:px-8 py-6 lg:py-8"
+      style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}
+    >
+      <div className="max-w-5xl mx-auto space-y-5">
 
-      {/* Stats */}
-      {totalCount > 0 && (
-        <div className="px-5 mb-6">
+        <header>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight m-0">
+            Moje přihlášky
+          </h1>
+          <p className="text-sm text-white/40 mt-1.5 m-0">
+            Sleduj odeslané přihlášky a odpovědi od HR
+          </p>
+        </header>
+
+        {totalSent > 0 && (
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-center">
-              <div className="text-white font-black text-xl">{totalCount}</div>
-              <div className="text-gray-500 text-xs">Celkem</div>
-            </div>
-            <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-center">
-              <div className="text-blue-400 font-black text-xl">{sentCount}</div>
-              <div className="text-gray-500 text-xs">Odesláno</div>
-            </div>
-            <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-center">
-              <div className="text-green-400 font-black text-xl">{repliedCount}</div>
-              <div className="text-gray-500 text-xs">Odpovědi</div>
-            </div>
+            <StatBox icon={Send} value={totalSent} label="odesláno" color="#fb923c" />
+            <StatBox icon={MailCheck} value={totalReplies} label="odpovědí" color="#22c55e" />
+            <StatBox icon={CheckCircle2} value={interviews} label="pohovorů" color="#60a5fa" />
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="px-5">
         {loading ? (
-          <div className="text-gray-500 text-center py-20">Načítám...</div>
-        ) : totalCount === 0 ? (
-          <div className="text-center py-20">
-            <div className="text-5xl mb-4">✉️</div>
-            <h3 className="text-white font-bold text-lg mb-2">Zatím žádné přihlášky</h3>
-            <p className="text-gray-500 text-sm mb-6">
-              Použij Smart Apply pro automatické přihlášení k práci i agenturám
-            </p>
-            <Link
-              href="/profil/gmail"
-              className="inline-block bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl font-bold text-sm no-underline"
-            >
-              🎯 Spustit Smart Apply
-            </Link>
+          <div className="rounded-2xl bg-white/[0.02] border border-white/[0.06] p-12 text-center text-white/40">
+            Načítám…
           </div>
+        ) : apps.length === 0 ? (
+          <EmptyState />
         ) : (
-          <div className="flex flex-col gap-3">
-            {/* Smart Matching applications */}
-            {smartApps.length > 0 && (
-              <>
-                <h3 className="text-white/40 text-[10px] font-bold uppercase tracking-wider mt-2">Smart Matching</h3>
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {smartApps.map((app: any) => (
-                  <div
-                    key={app.id}
-                    className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-4"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1 mr-3">
-                        <h4 className="text-white font-bold text-base leading-tight mb-1">
-                          {app.agency_name}
-                        </h4>
-                        <p className="text-gray-500 text-sm">
-                          {app.agency_email}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                            statusColors[app.status] || statusColors["sent"]
-                          }`}
-                        >
-                          {statusLabels[app.status] || app.status}
-                        </span>
-                        {app.match_score && (
-                          <span className="text-gray-600 text-[10px]">{app.match_score}% match</span>
-                        )}
-                      </div>
-                    </div>
-                    {app.match_reasoning && (
-                      <p className="text-gray-600 text-xs mb-2">{app.match_reasoning}</p>
-                    )}
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-gray-600 text-xs">
-                        {app.sent_at ? new Date(app.sent_at).toLocaleDateString('cs-CZ') : "Dnes"}
-                      </span>
-                      <span className="text-blue-400 text-[10px] font-medium">🎯 Smart Matching</span>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
-
-            {/* Legacy applications */}
-            {applications.length > 0 && (
-              <>
-                {smartApps.length > 0 && (
-                  <h3 className="text-white/40 text-[10px] font-bold uppercase tracking-wider mt-4">Ruční přihlášky</h3>
-                )}
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {applications.map((job: any) => (
-                  <div
-                    key={job.id}
-                    className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-4"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1 mr-3">
-                        <h4 className="text-white font-bold text-base leading-tight mb-1">
-                          {job.title}
-                        </h4>
-                        <p className="text-gray-500 text-sm">
-                          {job.company} • {job.location}
-                        </p>
-                      </div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                          statusColors[job.status] || statusColors["Odesláno"]
-                        }`}
-                      >
-                        {job.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="text-gray-600 text-xs">
-                        Přihlášeno: {job.appliedDate || "Dnes"}
-                      </span>
-                      <Link
-                        href={`/nabidka?id=${job.id}`}
-                        className="text-[#E8302A] text-sm font-bold"
-                      >
-                        Detail →
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
+          <div className="space-y-3">
+            {apps.map((app) => (
+              <ApplicationCard
+                key={app.id}
+                app={app}
+                expanded={expandedId === app.id}
+                onToggle={() => setExpandedId(expandedId === app.id ? null : app.id)}
+              />
+            ))}
           </div>
         )}
       </div>
-
     </main>
-  );
+  )
+}
+
+function StatBox({ icon: Icon, value, label, color }: { icon: typeof Send; value: number; label: string; color: string }) {
+  return (
+    <div className="rounded-xl bg-[#111120] border border-white/[0.06] p-4 flex items-center gap-3">
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${color}15` }}>
+        <Icon className="w-4 h-4" style={{ color }} strokeWidth={2} />
+      </div>
+      <div>
+        <p className="text-white text-xl font-extrabold tabular-nums m-0 leading-tight">{value}</p>
+        <p className="text-white/40 text-[11px] m-0 mt-0.5 uppercase tracking-wider">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function ApplicationCard({ app, expanded, onToggle }: { app: SentApplication; expanded: boolean; onToggle: () => void }) {
+  const meta = app.reply_classification ? CLASSIFICATION_META[app.reply_classification] : null
+  const StatusIcon = meta?.icon ?? Clock
+  const hasReplies = (app.replies?.length ?? 0) > 0
+
+  return (
+    <article className="rounded-2xl bg-[#111120] border border-white/[0.06] overflow-hidden">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full text-left p-4 sm:p-5 hover:bg-white/[0.02] transition flex items-start gap-4"
+      >
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+          style={{
+            background: meta?.bg ?? 'rgba(255,255,255,0.04)',
+            border: `1px solid ${meta?.border ?? 'rgba(255,255,255,0.06)'}`,
+          }}
+        >
+          <StatusIcon className="w-4 h-4" style={{ color: meta?.color ?? 'rgba(255,255,255,0.4)' }} strokeWidth={2} />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-3 mb-1">
+            <h3 className="text-white text-[15px] font-bold m-0 truncate">
+              {app.subject || '(bez předmětu)'}
+            </h3>
+            {meta && (
+              <span
+                className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full whitespace-nowrap"
+                style={{ background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}
+              >
+                {meta.label}
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 text-[12px] text-white/50">
+            <span className="truncate">{app.to_email}</span>
+            <span className="w-1 h-1 rounded-full bg-white/20 flex-shrink-0" />
+            <span className="flex items-center gap-1 flex-shrink-0">
+              <Calendar className="w-3 h-3" strokeWidth={2} />
+              {formatDate(app.sent_at)}
+            </span>
+          </div>
+
+          {app.last_reply_preview && !expanded && (
+            <p className="text-white/60 text-[13px] mt-3 m-0 line-clamp-2">
+              {app.last_reply_preview}
+            </p>
+          )}
+        </div>
+
+        {hasReplies && (
+          <div className="flex-shrink-0 self-center text-white/40">
+            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        )}
+      </button>
+
+      {expanded && hasReplies && (
+        <div className="border-t border-white/[0.06] px-5 py-4 space-y-4 bg-black/20">
+          {app.replies!.map((r) => {
+            const rMeta = r.classification ? CLASSIFICATION_META[r.classification] : null
+            return (
+              <div key={r.id} className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <p className="text-white text-sm font-bold m-0">
+                    {r.from_name || r.from_email}
+                  </p>
+                  <span className="text-white/40 text-[11px]">·</span>
+                  <span className="text-white/40 text-[11px]">{formatDate(r.received_at)}</span>
+                  {rMeta && (
+                    <span
+                      className="ml-auto text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{ background: rMeta.bg, color: rMeta.color }}
+                    >
+                      {rMeta.label}
+                    </span>
+                  )}
+                </div>
+                {r.subject && (
+                  <p className="text-white/60 text-xs m-0 italic">{r.subject}</p>
+                )}
+                <p className="text-white/80 text-[14px] m-0 whitespace-pre-wrap leading-relaxed">
+                  {r.body_text || '(prázdné)'}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </article>
+  )
+}
+
+function EmptyState() {
+  return (
+    <div className="rounded-2xl bg-[#111120] border border-white/[0.06] p-12 text-center">
+      <div className="w-14 h-14 rounded-2xl bg-[#fb923c]/10 border border-[#fb923c]/20 flex items-center justify-center mx-auto mb-4">
+        <Send className="w-6 h-6 text-[#fb923c]" strokeWidth={2} />
+      </div>
+      <p className="text-white text-lg font-bold m-0 mb-2">Zatím žádné přihlášky</p>
+      <p className="text-white/50 text-sm m-0 mb-5">
+        Začni posílat přihlášky přes Smart Apply
+      </p>
+      <a
+        href="/smart-apply"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#fb923c] text-black text-sm font-bold no-underline hover:bg-[#f97316] transition"
+      >
+        Otevřít Smart Apply →
+      </a>
+    </div>
+  )
 }
