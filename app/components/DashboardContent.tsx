@@ -45,8 +45,18 @@ const SKELETON = {
   newJobsThisWeek: 23,
 }
 
+interface UserStats {
+  sent_total: number
+  sent_week: number
+  replies_total: number
+  interviews_total: number
+  documents_total: number
+  reply_rate_pct: number
+}
+
 export default function DashboardContent({ agencyCount, jobCount, housingCount }: DashboardContentProps) {
   const [userName, setUserName] = useState(SKELETON.userName)
+  const [stats, setStats] = useState<UserStats | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -59,8 +69,17 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount }
         .eq('id', session.user.id)
         .maybeSingle()
       if (profile?.full_name && !cancelled) {
-        // Zobrazujeme jen křestní jméno
         setUserName(profile.full_name.split(' ')[0])
+      }
+
+      try {
+        const res = await fetch('/api/dashboard/stats', { credentials: 'include' })
+        if (res.ok && !cancelled) {
+          const json = (await res.json()) as UserStats
+          setStats(json)
+        }
+      } catch {
+        // necháme SKELETON placeholder
       }
     })()
     return () => { cancelled = true }
@@ -113,9 +132,13 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount }
           />
           <StatTile
             icon={MailOpen}
-            value={SKELETON.sentApplications.toString()}
+            value={(stats?.sent_total ?? 0).toString()}
             label="Tvých přihlášek"
-            sublabel={`${SKELETON.emailOpenRate}% otevřeli HR`}
+            sublabel={
+              stats && stats.sent_total > 0
+                ? `${stats.replies_total} odpovědí · ${stats.reply_rate_pct}%`
+                : 'Začni v Smart Apply'
+            }
             accent
           />
         </div>
@@ -403,44 +426,70 @@ function MiniStat({
 
 type ChartRange = '7d' | '14d' | '30d'
 
-// Skeleton dataset — user nahradi realnymi DB queries (per-day aggregations).
-const ACTIVITY_DATA: Record<ChartRange, Array<{ date: string; sent: number; opened: number; replied: number }>> = {
-  '7d': [
-    { date: '18. 5.', sent: 0, opened: 0, replied: 0 },
-    { date: '19. 5.', sent: 2, opened: 1, replied: 0 },
-    { date: '20. 5.', sent: 3, opened: 2, replied: 1 },
-    { date: '21. 5.', sent: 1, opened: 1, replied: 0 },
-    { date: '22. 5.', sent: 4, opened: 3, replied: 1 },
-    { date: '23. 5.', sent: 2, opened: 1, replied: 0 },
-    { date: '24. 5.', sent: 0, opened: 0, replied: 0 },
-  ],
-  '14d': [
-    { date: '11. 5.', sent: 0, opened: 0, replied: 0 },
-    { date: '12. 5.', sent: 1, opened: 0, replied: 0 },
-    { date: '13. 5.', sent: 2, opened: 1, replied: 0 },
-    { date: '14. 5.', sent: 0, opened: 0, replied: 0 },
-    { date: '15. 5.', sent: 3, opened: 2, replied: 1 },
-    { date: '16. 5.', sent: 2, opened: 1, replied: 0 },
-    { date: '17. 5.', sent: 1, opened: 1, replied: 0 },
-    { date: '18. 5.', sent: 0, opened: 0, replied: 0 },
-    { date: '19. 5.', sent: 2, opened: 1, replied: 0 },
-    { date: '20. 5.', sent: 3, opened: 2, replied: 1 },
-    { date: '21. 5.', sent: 1, opened: 1, replied: 0 },
-    { date: '22. 5.', sent: 4, opened: 3, replied: 1 },
-    { date: '23. 5.', sent: 2, opened: 1, replied: 0 },
-    { date: '24. 5.', sent: 0, opened: 0, replied: 0 },
-  ],
-  '30d': Array.from({ length: 30 }, (_, i) => ({
-    date: `${(i % 30) + 1}.`,
-    sent: Math.floor(Math.random() * 5),
-    opened: Math.floor(Math.random() * 3),
-    replied: Math.floor(Math.random() * 2),
-  })),
+interface ActivityPoint {
+  date: string           // ISO yyyy-mm-dd
+  label: string          // "23. 5."
+  sent: number
+  replies: number
+  agencies_added: number
+}
+
+interface ActivityPayload {
+  range: ChartRange
+  data: ActivityPoint[]
+  totals: {
+    sent: number
+    replies: number
+    agencies_added: number
+    total_agencies: number
+  }
+}
+
+function emptyPayload(range: ChartRange): ActivityPayload {
+  const days = range === '7d' ? 7 : range === '14d' ? 14 : 30
+  const now = new Date()
+  const out: ActivityPoint[] = []
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now)
+    d.setDate(d.getDate() - i)
+    out.push({
+      date: d.toISOString().slice(0, 10),
+      label: `${d.getDate()}. ${d.getMonth() + 1}.`,
+      sent: 0,
+      replies: 0,
+      agencies_added: 0,
+    })
+  }
+  return { range, data: out, totals: { sent: 0, replies: 0, agencies_added: 0, total_agencies: 0 } }
 }
 
 function ActivityChart() {
   const [range, setRange] = useState<ChartRange>('7d')
-  const data = ACTIVITY_DATA[range]
+  const [payload, setPayload] = useState<ActivityPayload>(() => emptyPayload('7d'))
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/dashboard/activity?range=${range}`, { credentials: 'include' })
+        if (res.ok && !cancelled) {
+          const json = (await res.json()) as ActivityPayload
+          setPayload(json)
+        } else if (!cancelled) {
+          setPayload(emptyPayload(range))
+        }
+      } catch {
+        if (!cancelled) setPayload(emptyPayload(range))
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [range])
+
+  const data = payload.data
 
   // Chart dimensions
   const W = 800
@@ -452,7 +501,7 @@ function ActivityChart() {
   const innerW = W - PAD_L - PAD_R
   const innerH = H - PAD_T - PAD_B
 
-  const maxY = Math.max(5, ...data.flatMap((d) => [d.sent, d.opened, d.replied]))
+  const maxY = Math.max(5, ...data.flatMap((d) => [d.sent, d.replies, d.agencies_added]))
   const yTicks = [0, Math.ceil(maxY / 2), maxY]
 
   // X coords
@@ -462,16 +511,17 @@ function ActivityChart() {
 
   // Polyline points for each series
   const sentPath = data.map((d, i) => `${xAt(i)},${yAt(d.sent)}`).join(' ')
-  const openedPath = data.map((d, i) => `${xAt(i)},${yAt(d.opened)}`).join(' ')
-  const repliedPath = data.map((d, i) => `${xAt(i)},${yAt(d.replied)}`).join(' ')
+  const agenciesPath = data.map((d, i) => `${xAt(i)},${yAt(d.agencies_added)}`).join(' ')
+  const repliesPath = data.map((d, i) => `${xAt(i)},${yAt(d.replies)}`).join(' ')
 
   // Area fill pod sent line
   const sentArea = `M${PAD_L},${PAD_T + innerH} L${sentPath} L${xAt(data.length - 1)},${PAD_T + innerH} Z`
 
-  // Total stats z aktualniho range
-  const totalSent = data.reduce((a, b) => a + b.sent, 0)
-  const totalOpened = data.reduce((a, b) => a + b.opened, 0)
-  const totalReplied = data.reduce((a, b) => a + b.replied, 0)
+  // Totals z payload (autoritativni — backend uz agreguje)
+  const totalSent = payload.totals.sent
+  const totalReplies = payload.totals.replies
+  const totalAgenciesAdded = payload.totals.agencies_added
+  const totalAgencies = payload.totals.total_agencies
 
   return (
     <section className="rounded-2xl bg-[#111120] border border-white/[0.06] p-5 sm:p-6">
@@ -482,8 +532,13 @@ function ActivityChart() {
             Tvoje aktivita
           </p>
           <p className="text-white text-lg sm:text-xl font-bold mt-1 m-0">
-            Posílání přihlášek v čase
+            {loading ? 'Načítám…' : 'Posílání přihlášek v čase'}
           </p>
+          {totalAgencies > 0 && (
+            <p className="text-[11px] text-white/40 mt-1 m-0">
+              Pro tebe pracuje {totalAgencies.toLocaleString('cs-CZ')} zaměstnavatelů
+            </p>
+          )}
         </div>
         <div className="inline-flex items-center gap-1 p-1 rounded-full bg-white/[0.04] border border-white/[0.06] self-start sm:self-auto">
           {(['7d', '14d', '30d'] as ChartRange[]).map((r) => (
@@ -503,8 +558,8 @@ function ActivityChart() {
       {/* Legend + totals */}
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <LegendItem color="#fb923c" label="Odesláno" value={totalSent} />
-        <LegendItem color="#60a5fa" label="HR otevřelo" value={totalOpened} />
-        <LegendItem color="#22c55e" label="Odpovědi" value={totalReplied} />
+        <LegendItem color="#22c55e" label="Odpovědi" value={totalReplies} />
+        <LegendItem color="#60a5fa" label="Nových zaměstnavatelů" value={totalAgenciesAdded} />
       </div>
 
       {/* SVG Chart */}
@@ -537,8 +592,8 @@ function ActivityChart() {
 
           {/* Lines */}
           <polyline points={sentPath} fill="none" stroke="#fb923c" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-          <polyline points={openedPath} fill="none" stroke="#60a5fa" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="0" />
-          <polyline points={repliedPath} fill="none" stroke="#22c55e" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          <polyline points={repliesPath} fill="none" stroke="#22c55e" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          <polyline points={agenciesPath} fill="none" stroke="#60a5fa" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
 
           {/* Data point dots na sent (hero series) */}
           {data.map((d, i) => (
