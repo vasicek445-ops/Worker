@@ -149,7 +149,7 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount }
         {/* ─── PROFILE + ACTIVITY ROW ───────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           <ProfileCompletionCard />
-          <ActivityCard />
+          <ActivityCard stats={stats} />
         </div>
 
         {/* ─── BENCHMARK FOOTER ─────────────────────────────────────────── */}
@@ -377,8 +377,12 @@ function ProfileCompletionCard() {
 /*  ACTIVITY CARD  (sent vs replied bar chart simplified)                     */
 /* ────────────────────────────────────────────────────────────────────────── */
 
-function ActivityCard() {
-  const { sentApplications, emailOpenRate, contactedAgencies, documentsCount } = SKELETON
+function ActivityCard({ stats }: { stats: UserStats | null }) {
+  const sentTotal = stats?.sent_total ?? 0
+  const repliesTotal = stats?.replies_total ?? 0
+  const interviewsTotal = stats?.interviews_total ?? 0
+  const documentsTotal = stats?.documents_total ?? 0
+  const replyRate = stats?.reply_rate_pct ?? 0
 
   return (
     <div className="rounded-2xl bg-[#111120] border border-white/[0.06] p-5 sm:p-6">
@@ -386,14 +390,14 @@ function ActivityCard() {
         <p className="text-[11px] font-semibold tracking-[0.12em] text-white/40 uppercase m-0">
           Tvoje aktivita
         </p>
-        <span className="text-[10px] text-white/30">posledních 30 dní</span>
+        <span className="text-[10px] text-white/30">celkem</span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <MiniStat icon={MailOpen} value={sentApplications} label="přihlášek" />
-        <MiniStat icon={Target} value={`${emailOpenRate}%`} label="otevřelo HR" />
-        <MiniStat icon={Building2} value={contactedAgencies} label="agentur kontaktováno" />
-        <MiniStat icon={FileText} value={documentsCount} label="dokumentů" />
+        <MiniStat icon={MailOpen} value={sentTotal} label="přihlášek odesláno" />
+        <MiniStat icon={Target} value={`${replyRate}%`} label={`${repliesTotal} odpovědí`} />
+        <MiniStat icon={Building2} value={interviewsTotal} label="pozvání na pohovor" />
+        <MiniStat icon={FileText} value={documentsTotal} label="dokumentů" />
       </div>
     </div>
   )
