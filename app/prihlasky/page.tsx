@@ -17,6 +17,9 @@ interface ReplyRow {
   body_text: string | null
   classification: Classification
   classification_confidence: number | null
+  classification_source?: 'ai' | 'user' | null
+  low_confidence?: boolean
+  ai_classification?: Classification
   received_at: string
 }
 
@@ -51,6 +54,20 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric', year: 'numeric' })
 }
 
+async function reclassifyReply(replyId: string, classification: Exclude<Classification, null>): Promise<boolean> {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.access_token) return false
+  const res = await fetch(`/api/replies/${replyId}/classify`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ classification }),
+  })
+  return res.ok
+}
+
 export default function Prihlasky() {
   const [apps, setApps] = useState<SentApplication[]>([])
   const [loading, setLoading] = useState(true)
@@ -78,7 +95,7 @@ export default function Prihlasky() {
         const appIds = sent.map((s) => s.id)
         const { data: replyRows } = await supabase
           .from('application_replies')
-          .select('id, application_id, from_email, from_name, subject, body_text, classification, classification_confidence, received_at')
+          .select('id, application_id, from_email, from_name, subject, body_text, classification, classification_confidence, classification_source, low_confidence, ai_classification, received_at')
           .in('application_id', appIds)
           .order('received_at', { ascending: false })
 
@@ -225,38 +242,107 @@ function ApplicationCard({ app, expanded, onToggle }: { app: SentApplication; ex
       </button>
 
       {expanded && hasReplies && (
-        <div className="border-t border-white/[0.06] px-5 py-4 space-y-4 bg-black/20">
-          {app.replies!.map((r) => {
-            const rMeta = r.classification ? CLASSIFICATION_META[r.classification] : null
-            return (
-              <div key={r.id} className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <p className="text-white text-sm font-bold m-0">
-                    {r.from_name || r.from_email}
-                  </p>
-                  <span className="text-white/40 text-[11px]">·</span>
-                  <span className="text-white/40 text-[11px]">{formatDate(r.received_at)}</span>
-                  {rMeta && (
-                    <span
-                      className="ml-auto text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                      style={{ background: rMeta.bg, color: rMeta.color }}
-                    >
-                      {rMeta.label}
-                    </span>
-                  )}
-                </div>
-                {r.subject && (
-                  <p className="text-white/60 text-xs m-0 italic">{r.subject}</p>
-                )}
-                <p className="text-white/80 text-[14px] m-0 whitespace-pre-wrap leading-relaxed">
-                  {r.body_text || '(prázdné)'}
-                </p>
-              </div>
-            )
-          })}
+        <div className="border-t border-white/[0.06] px-5 py-4 space-y-5 bg-black/20">
+          {app.replies!.map((r) => (
+            <ReplyDetail key={r.id} reply={r} />
+          ))}
         </div>
       )}
     </article>
+  )
+}
+
+function ReplyDetail({ reply }: { reply: ReplyRow }) {
+  const [classification, setClassification] = useState<Classification>(reply.classification)
+  const [source, setSource] = useState<'ai' | 'user' | null>(reply.classification_source ?? 'ai')
+  const [lowConfidence, setLowConfidence] = useState<boolean>(!!reply.low_confidence)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  const meta = classification ? CLASSIFICATION_META[classification] : null
+  const StatusIcon = meta?.icon ?? Mail
+  const aiGuessLabel = reply.ai_classification && reply.ai_classification !== classification
+    ? CLASSIFICATION_META[reply.ai_classification]?.label
+    : null
+
+  async function handlePick(c: Exclude<Classification, null>) {
+    setSaving(true)
+    const ok = await reclassifyReply(reply.id, c)
+    if (ok) {
+      setClassification(c)
+      setSource('user')
+      setLowConfidence(false)
+      setPickerOpen(false)
+    }
+    setSaving(false)
+  }
+
+  return (
+    <div className="space-y-3">
+      {/* Header row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <p className="text-white text-sm font-bold m-0">
+          {reply.from_name || reply.from_email}
+        </p>
+        <span className="text-white/40 text-[11px]">·</span>
+        <span className="text-white/40 text-[11px]">{formatDate(reply.received_at)}</span>
+
+        <div className="ml-auto flex items-center gap-2 relative">
+          {lowConfidence && !pickerOpen && (
+            <span className="text-[10px] text-amber-400/80 font-bold">Potvrď klasifikaci</span>
+          )}
+          <button
+            type="button"
+            onClick={() => setPickerOpen(!pickerOpen)}
+            disabled={saving}
+            className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full flex items-center gap-1.5 transition disabled:opacity-50 hover:opacity-80"
+            style={{ background: meta?.bg ?? 'rgba(163,163,163,0.10)', color: meta?.color ?? '#a3a3a3', border: `1px solid ${meta?.border ?? 'rgba(163,163,163,0.25)'}` }}
+          >
+            <StatusIcon className="w-3 h-3" strokeWidth={2.5} />
+            {meta?.label ?? 'Bez klasifikace'}
+            <ChevronDown className="w-3 h-3 opacity-60" strokeWidth={2.5} />
+          </button>
+
+          {pickerOpen && (
+            <div className="absolute top-full right-0 mt-2 w-48 bg-[#1a1a28] border border-white/10 rounded-xl shadow-2xl z-10 py-1.5">
+              {(Object.keys(CLASSIFICATION_META) as Exclude<Classification, null>[]).map((key) => {
+                const m = CLASSIFICATION_META[key]
+                const Icon = m.icon
+                const active = key === classification
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handlePick(key)}
+                    disabled={saving}
+                    className={`w-full text-left px-3 py-2 text-xs flex items-center gap-2 hover:bg-white/[0.04] transition disabled:opacity-50 ${active ? 'bg-white/[0.03]' : ''}`}
+                    style={{ color: m.color }}
+                  >
+                    <Icon className="w-3.5 h-3.5" strokeWidth={2} />
+                    <span className="font-bold">{m.label}</span>
+                    {active && <span className="ml-auto text-[10px] opacity-60">✓</span>}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Source hint — pokud AI uhadla jinak, ukaz */}
+      {source === 'user' && aiGuessLabel && (
+        <p className="text-[11px] text-white/40 italic m-0">
+          AI odhadla: {aiGuessLabel} · ručně přepsáno
+        </p>
+      )}
+
+      {reply.subject && (
+        <p className="text-white/60 text-xs m-0 italic">{reply.subject}</p>
+      )}
+      <p className="text-white/80 text-[14px] m-0 whitespace-pre-wrap leading-relaxed">
+        {reply.body_text || '(prázdné)'}
+      </p>
+    </div>
   )
 }
 

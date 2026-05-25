@@ -127,7 +127,12 @@ export async function POST(req: NextRequest) {
     const subject = payload.Subject || ''
 
     // AI klasifikace (best effort — pokud spadne, fallback na neutral)
-    const { classification, confidence } = await classifyReply(subject, bodyText)
+    const { classification: aiClassification, confidence } = await classifyReply(subject, bodyText)
+
+    // Confidence threshold: pokud AI < 0.6, degradeujem na 'neutral' (user potvrdi)
+    const LOW_CONFIDENCE_THRESHOLD = 0.6
+    const lowConfidence = confidence < LOW_CONFIDENCE_THRESHOLD
+    const finalClassification: ReplyClass = lowConfidence ? 'neutral' : aiClassification
 
     // Ulozit reply
     const { error: insertErr } = await supabaseAdmin
@@ -141,8 +146,11 @@ export async function POST(req: NextRequest) {
         body_text: bodyText,
         body_html: payload.HtmlBody || null,
         raw_headers: payload.Headers || [],
-        classification,
+        classification: finalClassification,
+        ai_classification: aiClassification,
         classification_confidence: confidence,
+        classification_source: 'ai',
+        low_confidence: lowConfidence,
         received_at: new Date().toISOString(),
       })
 
@@ -159,7 +167,7 @@ export async function POST(req: NextRequest) {
       .update({
         reply_received_at: isFirst ? new Date().toISOString() : undefined,
         reply_count: (app.reply_count || 0) + 1,
-        reply_classification: isFirst ? classification : undefined,
+        reply_classification: isFirst ? finalClassification : undefined,
         last_reply_preview: bodyText.slice(0, 300),
       })
       .eq('id', app.id)
@@ -170,8 +178,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       ok: true,
       application_id: app.id,
-      classification,
+      classification: finalClassification,
+      ai_classification: aiClassification,
       confidence,
+      low_confidence: lowConfidence,
     })
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Internal error'
