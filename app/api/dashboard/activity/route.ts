@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 // GET /api/dashboard/activity?range=7d|14d|30d
-// Vrati denni time-series pro 3 metriky: Odeslano / Odpovedi / Zamestnavatelu
-// Vsechna data 100% accurate (na nasem serveru).
+// Auth: Bearer token (matching pattern from /api/documents)
 
 type Range = '7d' | '14d' | '30d'
 
 interface DayPoint {
-  date: string         // ISO yyyy-mm-dd
-  label: string        // "23. 5." display
+  date: string
+  label: string
   sent: number
   replies: number
   agencies_added: number
@@ -21,7 +19,21 @@ interface Totals {
   sent: number
   replies: number
   agencies_added: number
-  total_agencies: number   // cumulative (current pool)
+  total_agencies: number
+}
+
+const adminAuth = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+)
+
+async function getUser(req: NextRequest) {
+  const authHeader = req.headers.get('authorization')
+  if (!authHeader) return null
+  const token = authHeader.replace('Bearer ', '')
+  const { data: { user }, error } = await adminAuth.auth.getUser(token)
+  if (error || !user) return null
+  return user
 }
 
 function daysInRange(r: Range): number {
@@ -38,27 +50,13 @@ function csLabel(d: Date): string {
 
 export async function GET(req: NextRequest) {
   try {
+    const user = await getUser(req)
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const { searchParams } = new URL(req.url)
     const range = (searchParams.get('range') || '7d') as Range
     const days = daysInRange(range)
 
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() { return cookieStore.getAll() },
-          setAll() {},
-        },
-      },
-    )
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Build day buckets
     const now = new Date()
     const startDate = new Date(now)
     startDate.setHours(0, 0, 0, 0)
@@ -71,18 +69,11 @@ export async function GET(req: NextRequest) {
       d.setDate(d.getDate() + i)
       const key = isoDate(d)
       orderedDates.push(key)
-      buckets[key] = {
-        date: key,
-        label: csLabel(d),
-        sent: 0,
-        replies: 0,
-        agencies_added: 0,
-      }
+      buckets[key] = { date: key, label: csLabel(d), sent: 0, replies: 0, agencies_added: 0 }
     }
 
     const startIso = startDate.toISOString()
 
-    // 1. Sent applications (per user)
     const { data: sentRows } = await supabaseAdmin
       .from('sent_applications')
       .select('sent_at')
@@ -94,7 +85,6 @@ export async function GET(req: NextRequest) {
       if (buckets[d]) buckets[d].sent += 1
     }
 
-    // 2. Replies (per user)
     const { data: replyRows } = await supabaseAdmin
       .from('application_replies')
       .select('received_at')
@@ -106,8 +96,6 @@ export async function GET(req: NextRequest) {
       if (buckets[d]) buckets[d].replies += 1
     }
 
-    // 3. Agencies added (global pool growth)
-    // Try query agencies.created_at — pokud sloupec neexistuje, gracefully degrade na 0.
     try {
       const { data: agencyRows, error: agencyErr } = await supabaseAdmin
         .from('agencies')
@@ -123,10 +111,9 @@ export async function GET(req: NextRequest) {
         }
       }
     } catch {
-      // agencies.created_at neexistuje — necháme 0s
+      // agencies.created_at neexistuje
     }
 
-    // Total agencies pool (current snapshot)
     const { count: totalAgencies } = await supabaseAdmin
       .from('agencies')
       .select('id', { count: 'exact', head: true })

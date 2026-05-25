@@ -73,7 +73,9 @@ export default function DashboardContent({ agencyCount, jobCount, housingCount }
       }
 
       try {
-        const res = await fetch('/api/dashboard/stats', { credentials: 'include' })
+        const res = await fetch('/api/dashboard/stats', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        })
         if (res.ok && !cancelled) {
           const json = (await res.json()) as UserStats
           setStats(json)
@@ -477,7 +479,14 @@ function ActivityChart() {
     setLoading(true)
     ;(async () => {
       try {
-        const res = await fetch(`/api/dashboard/activity?range=${range}`, { credentials: 'include' })
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session?.access_token) {
+          if (!cancelled) setPayload(emptyPayload(range))
+          return
+        }
+        const res = await fetch(`/api/dashboard/activity?range=${range}`, {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        })
         if (res.ok && !cancelled) {
           const json = (await res.json()) as ActivityPayload
           setPayload(json)
