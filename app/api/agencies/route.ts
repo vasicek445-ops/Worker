@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     let query = supabaseAdmin
       .from('agencies')
       .select(
-        'id, company, city, canton, region, email, website, has_open_positions, current_positions, industry, last_hiring_check_at',
+        'id, company, city, canton, region, email, telephone, website, has_open_positions, current_positions, industry, last_hiring_check_at',
         { count: 'exact' },
       )
       .not('email', 'is', null)
