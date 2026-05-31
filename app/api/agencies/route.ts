@@ -21,6 +21,9 @@ export async function GET(req: NextRequest) {
     const canton = searchParams.get('canton') || ''
     const industry = searchParams.get('industry') || ''
     const hiringOnly = searchParams.get('hiring_only') === '1'
+    // require_email=0 zobrazi vsechny agentury vcetne tech bez emailu (pro /kontakty browse).
+    // Default true (Smart Apply chce jen emailable).
+    const requireEmail = searchParams.get('require_email') !== '0'
     const page = parseInt(searchParams.get('page') || '1')
     const limit = 20
     const offset = (page - 1) * limit
@@ -31,8 +34,10 @@ export async function GET(req: NextRequest) {
         'id, company, city, canton, region, email, telephone, website, has_open_positions, current_positions, industry, last_hiring_check_at',
         { count: 'exact' },
       )
-      .not('email', 'is', null)
-      .neq('email', '')
+
+    if (requireEmail) {
+      query = query.not('email', 'is', null).neq('email', '')
+    }
 
     if (search) {
       query = query.or(`company.ilike.%${search}%,city.ilike.%${search}%`)

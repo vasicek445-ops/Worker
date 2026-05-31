@@ -54,6 +54,8 @@ export default function Kontakty() {
       if (region) params.set('region', region)
       if (canton) params.set('canton', canton)
       params.set('page', String(page))
+      // /kontakty je browse view — zobraz vsechny agentury vc. tech bez emailu (maji aspon telefon).
+      params.set('require_email', '0')
 
       const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch(`/api/agencies?${params}`, { headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {} })
