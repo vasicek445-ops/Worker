@@ -321,26 +321,21 @@ function LetterEditorInner() {
       })
       if (!res.ok) throw new Error('Uložení selhalo')
       const data = await res.json()
-      if (data.id) {
-        setActiveDocId(data.id)
-        // PDF generation + upload — pres skryty LetterPreview ref. Smart Apply
-        // pak najde PDF pres resolveLetterPdfPath (cv-pdfs/{user}/{doc}.pdf).
-        if (pdfRef.current) {
-          try {
-            const pdfBlob = await buildLetterPdfBlob(pdfRef.current)
-            const pdfForm = new FormData()
-            pdfForm.append('file', pdfBlob, 'letter.pdf')
-            pdfForm.append('documentId', String(data.id))
-            await fetch('/api/letter-pdf', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${accessToken}` },
-              body: pdfForm,
-            })
-          } catch (pdfErr) {
-            console.warn('Letter PDF upload failed (non-critical):', pdfErr)
-          }
-        }
-      }
+      if (!data.id) throw new Error('Uložení selhalo')
+      setActiveDocId(data.id)
+      // PDF MUSI skoncit ve Storage, jinak Smart Apply dostane no_letter_pdf. Drive byl
+      // upload v silent try/catch → pri chybe se metadata ulozila bez PDF a user to nevedel.
+      if (!pdfRef.current) throw new Error('Náhled dopisu se nestihl připravit. Klikni Uložit ještě jednou.')
+      const pdfBlob = await buildLetterPdfBlob(pdfRef.current)
+      const pdfForm = new FormData()
+      pdfForm.append('file', pdfBlob, 'letter.pdf')
+      pdfForm.append('documentId', String(data.id))
+      const pdfRes = await fetch('/api/letter-pdf', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: pdfForm,
+      })
+      if (!pdfRes.ok) throw new Error('Dopis se uložil, ale PDF se nepodařilo nahrát. Klikni Uložit ještě jednou.')
       setToast('Dopis uložen. Najdeš ho v Moje dokumenty.')
       setTimeout(() => setToast(null), 3500)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

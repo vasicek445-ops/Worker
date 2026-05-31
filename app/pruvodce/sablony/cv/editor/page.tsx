@@ -357,23 +357,21 @@ function CVEditorInner() {
       })
       if (!res.ok) throw new Error('Uložení selhalo')
       const data = await res.json()
-      if (data.id) {
-        setActiveDocId(data.id)
-        // Upload PDF do Supabase storage (cv-pdfs bucket), aby Smart Apply send
-        // ho mohl pripojit. Bez tohoto saved_documents existuje ale PDF v storage neni.
-        if (pdfBlob) {
-          try {
-            const pdfForm = new FormData()
-            pdfForm.append('file', pdfBlob, 'cv.pdf')
-            pdfForm.append('documentId', String(data.id))
-            await fetch('/api/cv-pdf', {
-              method: 'POST',
-              headers: { Authorization: `Bearer ${accessToken}` },
-              body: pdfForm,
-            })
-          } catch { /* upload selhal ale save je OK; user upozornen v Smart Apply */ }
-        }
-      }
+      if (!data.id) throw new Error('Uložení selhalo')
+      setActiveDocId(data.id)
+      // PDF MUSI skoncit v cv-pdfs/{user}/{docId}.pdf, jinak Smart Apply nema co prilozit
+      // a user dostane no_cv_pdf. Drive byl upload v silent try/catch → pri timeoutu se
+      // metadata ulozila bez PDF a user videl "ulozeno". Ted upload awaitujeme a chybu hlasime.
+      if (!pdfBlob) throw new Error('Náhled CV se nestihl připravit. Klikni Uložit ještě jednou.')
+      const pdfForm = new FormData()
+      pdfForm.append('file', pdfBlob, 'cv.pdf')
+      pdfForm.append('documentId', String(data.id))
+      const pdfRes = await fetch('/api/cv-pdf', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+        body: pdfForm,
+      })
+      if (!pdfRes.ok) throw new Error('CV se uložilo, ale PDF se nepodařilo nahrát. Klikni Uložit ještě jednou.')
       setToast('CV uloženo. Bude se přikládat k přihláškám přes Smart Apply.')
       setTimeout(() => setToast(null), 3500)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
