@@ -85,6 +85,7 @@ export default function Bydleni() {
   const [profileLoaded, setProfileLoaded] = useState(false)
   const [objectType, setObjectType] = useState('')
   const [hasPrice, setHasPrice] = useState(false)
+  const [termType, setTermType] = useState<'long' | 'short' | 'all'>('long')
 
   // Load saved listings & auto-fill canton from profile
   useEffect(() => {
@@ -123,6 +124,7 @@ export default function Bydleni() {
       if (sort !== 'newest') params.set('sort', sort)
       if (objectType) params.set('type', objectType)
       if (hasPrice) params.set('hasPrice', 'true')
+      if (termType !== 'long') params.set('term_type', termType)
       params.set('page', page.toString())
 
       // Pass auth token for premium detection
@@ -156,7 +158,7 @@ export default function Bydleni() {
   const clearFilters = () => {
     setSearch(''); setSearchInput(''); setCanton(''); setMaxPrice('')
     setMinRooms(''); setFurnished(false); setSort('newest'); setPage(1)
-    setObjectType(''); setHasPrice(false)
+    setObjectType(''); setHasPrice(false); setTermType('long')
   }
 
   const toggleSaved = (id: string) => {
@@ -165,7 +167,7 @@ export default function Bydleni() {
     localStorage.setItem('woker_saved_housing', JSON.stringify(updated))
   }
 
-  const hasFilters = search || canton || maxPrice || minRooms || furnished || objectType || hasPrice
+  const hasFilters = search || canton || maxPrice || minRooms || furnished || objectType || hasPrice || termType !== 'long'
 
   const [now] = useState(() => Date.now())
   function timeAgo(dateStr: string | null): string {
@@ -239,6 +241,27 @@ export default function Bydleni() {
             </p>
           </div>
         )}
+
+        {/* Term type pills */}
+        <div className="mb-3 inline-flex items-center gap-1 p-1 rounded-full bg-white/[0.04] border border-white/[0.06]">
+          {([
+            { v: 'long', label: 'Dlouhodobé' },
+            { v: 'short', label: 'Krátkodobé' },
+            { v: 'all', label: 'Vše' },
+          ] as const).map((opt) => (
+            <button
+              key={opt.v}
+              onClick={() => { setTermType(opt.v); setPage(1) }}
+              className={`text-xs font-bold px-3.5 py-1.5 rounded-full transition ${
+                termType === opt.v
+                  ? 'bg-[#fb923c]/15 text-[#fb923c]'
+                  : 'text-white/40 hover:text-white/70'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
 
         {/* Filters */}
         <div className="mb-5 flex flex-col gap-2">

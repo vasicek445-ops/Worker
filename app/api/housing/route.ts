@@ -37,6 +37,8 @@ export async function GET(req: NextRequest) {
     const sort = searchParams.get('sort') || 'newest'
     const source = searchParams.get('source') || ''
     const hasPrice = searchParams.get('hasPrice') === 'true'
+    // term_type: 'long' (is_temporary=false) | 'short' (is_temporary=true) | 'all' (default)
+    const termType = searchParams.get('term_type') || 'long'
     const page = parseInt(searchParams.get('page') || '1')
     const limit = 20
     const offset = (page - 1) * limit
@@ -76,6 +78,12 @@ export async function GET(req: NextRequest) {
     }
     if (hasPrice) {
       query = query.not('price', 'is', null).gt('price', 0)
+    }
+    if (termType === 'long') {
+      // dlouhodobé: is_temporary = false OR NULL (default)
+      query = query.or('is_temporary.is.null,is_temporary.eq.false')
+    } else if (termType === 'short') {
+      query = query.eq('is_temporary', true)
     }
 
     if (sort === 'price_asc') {
