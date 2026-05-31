@@ -53,19 +53,18 @@ const SORT_OPTIONS = [
   { label: 'Plocha ↓', value: 'area_desc' },
 ]
 
+// Typy v DB (po cisteni 2026-06): APARTMENT, Spolubydleni (WG), Rodinny dum,
+// SINGLE_ROOM, Duplex, Zarizeny byt, Chalet, Studio, Vila, Loft.
+// + wohnbau_coop maji NULL (zobrazi se pod Vsechny).
 const OBJECT_TYPES = [
   { label: 'Všechny typy', value: '' },
-  { label: 'Byty & WG', value: 'Byt' },
-  { label: 'Studio', value: 'Studio' },
+  { label: 'Byty', value: 'apartment' },
+  { label: 'Studio', value: 'studio' },
   { label: 'Spolubydlení (WG)', value: 'Spolubydlení (WG)' },
+  { label: 'Rodinný dům / Vila', value: 'dům' },
+  { label: 'Chalet', value: 'Chalet' },
   { label: 'Penziony & B&B', value: 'Penziony & B&B' },
-  { label: 'Pro pracující', value: 'Pro pracující' },
-  { label: 'Hostely', value: 'Hostely' },
-  { label: 'Ubytovny', value: 'Ubytovny' },
-  { label: 'Kláštery', value: 'Kláštery' },
-  { label: 'Semináře & kurzy', value: 'Semináře & kurzy' },
-  { label: 'Pro studenty', value: 'Pro studenty' },
-  { label: 'Byty & pokoje', value: 'Byty & pokoje' },
+  { label: 'Zařízený byt', value: 'Zařízený byt' },
 ]
 
 export default function Bydleni() {
