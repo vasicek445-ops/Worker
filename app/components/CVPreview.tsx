@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 
 export interface CVData {
   profil?: string
@@ -28,6 +28,12 @@ interface CVPreviewProps {
   onSave?: (html: string, pdfBlob: Blob) => void
   saving?: boolean
   saved?: boolean
+}
+
+// Imperativni handle — rodic (editor) si muze vyzadat PDF blob z prave renderovaneho CV.
+// Pouziva se v hlavickovem "Ulozit" kde nemame onSave(html, blob) flow.
+export interface CVPreviewHandle {
+  buildPdfBlob: () => Promise<Blob>
 }
 
 /* ═══ PARAMETRIC TEMPLATE SYSTEM ═══ */
@@ -392,7 +398,7 @@ function isColorDark(hex: string): boolean {
   return (r * 299 + g * 587 + b * 114) / 1000 < 128
 }
 
-export default function CVPreview({ data, photo, template, accentColor, onSave, saving, saved }: CVPreviewProps) {
+const CVPreview = forwardRef<CVPreviewHandle, CVPreviewProps>(function CVPreview({ data, photo, template, accentColor, onSave, saving, saved }, ref) {
   const cvRef = useRef<HTMLDivElement>(null)
   const [downloading, setDownloading] = useState(false)
   const [preparing, setPreparing] = useState(false)
@@ -419,6 +425,10 @@ export default function CVPreview({ data, photo, template, accentColor, onSave, 
     pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', (pageW - w) / 2, 0, w, h)
     return pdf
   }
+
+  useImperativeHandle(ref, () => ({
+    buildPdfBlob: async () => (await buildPdfDoc()).output('blob'),
+  }), [data, photo, template, accentColor])
 
   const handleDownload = async () => {
     if (!cvRef.current) return
@@ -476,7 +486,9 @@ export default function CVPreview({ data, photo, template, accentColor, onSave, 
       <p className="text-gray-500 text-xs text-center mt-4">💡 PDF ve formátu A4</p>
     </div>
   )
-}
+})
+
+export default CVPreview
 
 /* ═══ HELPERS ═══ */
 const F = "'Helvetica Neue', Helvetica, Arial, sans-serif"

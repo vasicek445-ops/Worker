@@ -1,11 +1,12 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../../../supabase'
 import { useSubscription } from '../../../../../hooks/useSubscription'
 import PaywallOverlay from '../../../../components/PaywallOverlay'
 import CVBuilderLayout from '../../../../components/cv/CVBuilderLayout'
+import CVPreview, { type CVPreviewHandle } from '../../../../components/CVPreview'
 import BasicsSection from '../../../../components/cv/sections/BasicsSection'
 import PositionSection from '../../../../components/cv/sections/PositionSection'
 import ExperienceSection from '../../../../components/cv/sections/ExperienceSection'
@@ -35,6 +36,10 @@ function CVEditorInner() {
   const [activeSection, setActiveSection] = useState<SectionId>('basics')
   const [cvData, setCvData] = useState<CVData | null>(null)
   const [activeDocId, setActiveDocId] = useState<string | null>(documentId)
+
+  // Skryta full-size CVPreview instance — zdroj PDF pro ukladani (header "Ulozit"
+  // negeneruje pdfBlob sam). Renderuje se off-screen kdyz existuje cvData.
+  const cvPreviewRef = useRef<CVPreviewHandle>(null)
 
   const [generating, setGenerating] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -362,9 +367,14 @@ function CVEditorInner() {
       // PDF MUSI skoncit v cv-pdfs/{user}/{docId}.pdf, jinak Smart Apply nema co prilozit
       // a user dostane no_cv_pdf. Drive byl upload v silent try/catch → pri timeoutu se
       // metadata ulozila bez PDF a user videl "ulozeno". Ted upload awaitujeme a chybu hlasime.
-      if (!pdfBlob) throw new Error('Náhled CV se nestihl připravit. Klikni Uložit ještě jednou.')
+      // Header "Uložit" nepředává blob → vygeneruj ho ze skryté CVPreview instance.
+      let blob = pdfBlob
+      if (!blob) {
+        if (!cvPreviewRef.current) throw new Error('Náhled CV se nestihl připravit. Zkus to za chvíli znovu.')
+        blob = await cvPreviewRef.current.buildPdfBlob()
+      }
       const pdfForm = new FormData()
-      pdfForm.append('file', pdfBlob, 'cv.pdf')
+      pdfForm.append('file', blob, 'cv.pdf')
       pdfForm.append('documentId', String(data.id))
       const pdfRes = await fetch('/api/cv-pdf', {
         method: 'POST',
@@ -529,6 +539,14 @@ function CVEditorInner() {
       >
         {renderSection()}
       </CVBuilderLayout>
+
+      {/* Skrytá full-size CVPreview — zdroj PDF pro ukládání přes header "Uložit".
+          Off-screen (NE display:none, aby html2canvas mělo co změřit). Jen když existuje CV. */}
+      {cvData && (
+        <div aria-hidden style={{ position: 'fixed', left: -10000, top: 0, width: 794, pointerEvents: 'none', opacity: 0, zIndex: -1 }}>
+          <CVPreview ref={cvPreviewRef} data={cvData} photo={photo} template={template} accentColor={accentColor} />
+        </div>
+      )}
 
       {/* Toast + error */}
       {toast && (
