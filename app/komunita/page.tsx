@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
 import { supabase } from '../supabase'
-import { LayoutList, Home, Lightbulb, HelpCircle, Target, MessageCircle, PenSquare, Pin, Sparkles, MapPin, Wallet, Calendar, ImagePlus, Inbox, ChevronUp } from 'lucide-react'
+import { LayoutList, Home, Lightbulb, HelpCircle, Target, MessageCircle, PenSquare, Pin, Sparkles, MapPin, Wallet, Calendar, ImagePlus, Inbox, ChevronUp, Search, X, Hash } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 const ICON_STROKE = 1.75
@@ -35,6 +35,7 @@ export default function KomunitaPage() {
   const { isActive, loading } = useSubscription()
   const [posts, setPosts] = useState<Post[]>([])
   const [category, setCategory] = useState('all')
+  const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [selectedPost, setSelectedPost] = useState<Post | null>(null)
   const [comments, setComments] = useState<Comment[]>([])
@@ -313,125 +314,171 @@ export default function KomunitaPage() {
   }
 
   // ─── POST LIST ───
+  const activeCat = CATEGORIES.find(c => c.id === category) || CATEGORIES[0]
+  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  const q = norm(search.trim())
+  const visiblePosts = q
+    ? posts.filter(p => [p.title, p.content, p.region, p.budget, p.user_name].some(f => norm(f || '').includes(q)))
+    : posts
+
   return (
-    <main className="min-h-screen bg-[#0E0E0E] px-4 py-6 pb-24">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="flex items-center gap-2 text-white text-xl font-bold"><MessageCircle size={20} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Komunita</h1>
-            <p className="text-gray-500 text-xs">Spolubydlení, nápady, dotazy, tipy</p>
+    <main className="min-h-screen bg-[#0E0E0E] pb-24">
+      <div className="max-w-6xl mx-auto md:grid md:grid-cols-[210px_1fr] lg:grid-cols-[210px_1fr_250px]">
+
+        {/* ─── Levý channel sidebar ─── */}
+        <aside className="hidden md:flex md:flex-col bg-[#141414] border-r border-gray-800/60 md:sticky md:top-0 md:h-screen overflow-y-auto px-2.5 py-4">
+          <div className="flex items-center gap-2 px-2 pb-3 mb-3 border-b border-gray-800/60">
+            <MessageCircle size={18} strokeWidth={ICON_STROKE} className="text-[#fb923c]" />
+            <span className="text-white text-sm font-bold">Komunita</span>
           </div>
           {isActive && (
-            <button onClick={() => setShowForm(true)} className="md:hidden inline-flex items-center gap-1.5 bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
-              <PenSquare size={15} strokeWidth={ICON_STROKE} /> Nový
+            <button onClick={() => setShowForm(true)} className="w-full inline-flex items-center justify-center gap-1.5 mb-4 bg-[#f97316] text-white font-bold text-sm px-3 py-2 rounded-lg hover:opacity-90 transition">
+              <PenSquare size={15} strokeWidth={ICON_STROKE} /> Nový příspěvek
             </button>
           )}
-        </div>
+          <p className="text-gray-600 text-[10px] font-bold uppercase tracking-wider mb-1.5 px-2">Kanály</p>
+          <nav className="space-y-0.5">
+            {CATEGORIES.map(c => {
+              const active = category === c.id
+              return (
+                <button key={c.id} onClick={() => { setCategory(c.id); setSearch('') }} className={`w-full flex items-center gap-1.5 text-sm px-2 py-1.5 rounded-md text-left transition ${active ? 'bg-[#f97316]/10 text-[#fb923c] font-medium' : 'text-gray-400 hover:bg-[#1A1A1A] hover:text-gray-200'}`}>
+                  <Hash size={14} strokeWidth={ICON_STROKE} className={active ? 'text-[#fb923c]' : 'text-gray-600'} />
+                  <c.Icon size={14} strokeWidth={ICON_STROKE} className={active ? 'text-[#fb923c]' : 'text-gray-500'} />
+                  {c.label}
+                </button>
+              )
+            })}
+          </nav>
+        </aside>
 
-        {/* Categories — mobil */}
-        <div className="flex md:hidden gap-2 mb-4 overflow-x-auto pb-1">
-          {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setCategory(c.id)} className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border whitespace-nowrap transition ${category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
-              <c.Icon size={14} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {c.label}
-            </button>
-          ))}
-        </div>
+        {/* ─── Střed — channel header + feed ─── */}
+        <div className="min-w-0 md:border-r md:border-gray-800/60">
+          {/* Channel header */}
+          <div className="sticky top-0 z-10 bg-[#0E0E0E]/90 backdrop-blur border-b border-gray-800/60 px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Hash size={18} strokeWidth={ICON_STROKE} className="text-gray-600 shrink-0" />
+                <activeCat.Icon size={16} strokeWidth={ICON_STROKE} className="text-[#fb923c] shrink-0" />
+                <h1 className="text-white text-sm font-bold truncate">{activeCat.label}</h1>
+                <span className="hidden sm:inline text-gray-600 text-xs truncate border-l border-gray-800 pl-2 ml-1">Spolubydlení, nápady, dotazy, tipy</span>
+              </div>
+              {isActive && (
+                <button onClick={() => setShowForm(true)} className="md:hidden inline-flex items-center gap-1.5 bg-[#f97316] text-white font-bold text-xs px-3 py-1.5 rounded-lg hover:opacity-90 transition shrink-0">
+                  <PenSquare size={14} strokeWidth={ICON_STROKE} /> Nový
+                </button>
+              )}
+            </div>
 
-        <div className="md:grid md:grid-cols-[200px_1fr] lg:grid-cols-[200px_1fr_260px] md:gap-6 md:items-start">
-          {/* Levý rail — kategorie */}
-          <aside className="hidden md:block md:sticky md:top-6 self-start">
-            {isActive && (
-              <button onClick={() => setShowForm(true)} className="w-full inline-flex items-center justify-center gap-1.5 mb-4 bg-[#f97316] text-white font-bold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition">
-                <PenSquare size={15} strokeWidth={ICON_STROKE} /> Nový příspěvek
-              </button>
-            )}
-            <p className="text-gray-600 text-[10px] font-semibold uppercase tracking-wider mb-2 px-3">Kategorie</p>
-            <nav className="space-y-1">
+            {/* Chytré hledání */}
+            <div className="relative mt-3">
+              <Search size={15} strokeWidth={ICON_STROKE} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Hledat v komunitě — spolubydlení, tipy, dotazy…" className="w-full bg-[#1A1A1A] border border-gray-800 rounded-lg pl-9 pr-9 py-2 text-white text-sm placeholder-gray-600 focus:border-[#f97316]/50 focus:outline-none transition" />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition">
+                  <X size={15} strokeWidth={ICON_STROKE} />
+                </button>
+              )}
+            </div>
+
+            {/* Channel pills — mobil */}
+            <div className="flex md:hidden gap-2 mt-3 overflow-x-auto pb-1">
               {CATEGORIES.map(c => (
-                <button key={c.id} onClick={() => setCategory(c.id)} className={`w-full flex items-center gap-2.5 text-sm px-3 py-2 rounded-lg text-left transition ${category === c.id ? 'bg-[#f97316]/10 text-[#fb923c] font-medium' : 'text-gray-400 hover:bg-[#1A1A1A] hover:text-gray-200'}`}>
-                  <c.Icon size={16} strokeWidth={ICON_STROKE} className={category === c.id ? 'text-[#fb923c]' : 'text-gray-500'} /> {c.label}
+                <button key={c.id} onClick={() => { setCategory(c.id); setSearch('') }} className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full border whitespace-nowrap transition ${category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400'}`}>
+                  <Hash size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {c.label}
                 </button>
               ))}
-            </nav>
-          </aside>
-
-          {/* Střed — feed */}
-          <div className="min-w-0">
-        <PaywallOverlay isLocked={!isActive && !loading} title="Komunita je součástí Premium" description="Spolubydlení, nápady, dotazy od ostatních Čechů ve Švýcarsku">
-
-          {loadingPosts ? (
-            <div className="text-center py-12">
-              <span className="w-6 h-6 border-2 border-gray-600 border-t-white rounded-full animate-spin inline-block" />
-              <p className="text-gray-500 text-sm mt-3">Načítám příspěvky...</p>
             </div>
-          ) : posts.length === 0 ? (
-            <div className="text-center py-12">
-              <Inbox size={40} strokeWidth={ICON_STROKE} className="text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-400 text-sm mb-1">Zatím žádné příspěvky</p>
-              <p className="text-gray-600 text-xs">Buď první kdo napíše!</p>
-              <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-1.5 bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
-                <PenSquare size={15} strokeWidth={ICON_STROKE} /> Napsat příspěvek
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {posts.map(post => {
-                const cm = catMeta(post.category)
-                return (
-                  <div key={post.id} onClick={() => fetchPost(post)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 hover:border-gray-600 transition cursor-pointer">
-                    <div className="flex items-start gap-3">
-                      {/* Upvote */}
-                      <button onClick={(e) => { e.stopPropagation(); handleUpvote(post.id) }} className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition ${post.hasUpvoted ? 'bg-[#f97316]/10 text-[#fb923c]' : 'text-gray-500 hover:bg-gray-800'}`}>
-                        <ChevronUp size={16} strokeWidth={post.hasUpvoted ? 2.5 : ICON_STROKE} />
-                        <span className="text-xs font-bold">{post.upvotes}</span>
-                      </button>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-gray-300"><cm.Icon size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {cm.label}</span>
-                          {post.is_pinned && <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]"><Pin size={11} strokeWidth={ICON_STROKE} /></span>}
-                          {post.category === 'spolubydleni' && post.region && <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400"><MapPin size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.region}</span>}
-                          {post.category === 'spolubydleni' && post.budget && <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400"><Wallet size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.budget}</span>}
-                        </div>
-                        <h3 className="text-white text-sm font-semibold mb-0.5 truncate">{post.title}</h3>
-                        <p className="text-gray-500 text-xs line-clamp-2">{post.content}</p>
-                        <div className="flex items-center gap-3 mt-2 text-gray-600 text-[10px]">
-                          <span>{post.user_name}</span>
-                          <span>{timeAgo(post.created_at)}</span>
-                          <span className="inline-flex items-center gap-1"><MessageCircle size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.comments_count}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-
-        </PaywallOverlay>
           </div>
 
-          {/* Pravý rail — info o komunitě */}
-          <aside className="hidden lg:block lg:sticky lg:top-6 self-start space-y-4">
-            <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4">
-              <h3 className="text-white text-sm font-semibold mb-1">O komunitě</h3>
-              <p className="text-gray-500 text-xs leading-relaxed">Místo, kde si čeští a slovenští pracovníci ve Švýcarsku vzájemně pomáhají — spolubydlení, dotazy, tipy z praxe.</p>
-            </div>
-            <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4">
-              <h3 className="flex items-center gap-1.5 text-white text-sm font-semibold mb-2"><Pin size={14} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Pravidla</h3>
-              <ul className="text-gray-400 text-xs space-y-1.5">
-                <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Buď slušný a pomáhej ostatním</li>
-                <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Žádný spam ani reklama</li>
-                <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Sdílej reálné zkušenosti ze Švýcarska</li>
-              </ul>
-            </div>
-            {isActive && (
-              <button onClick={() => setShowForm(true)} className="w-full inline-flex items-center justify-center gap-1.5 bg-[#f97316]/10 border border-[#f97316]/20 text-[#fb923c] font-medium text-sm px-4 py-2.5 rounded-xl hover:bg-[#f97316]/20 transition">
-                <PenSquare size={15} strokeWidth={ICON_STROKE} /> Sdílej něco s komunitou
-              </button>
-            )}
-          </aside>
+          {/* Feed */}
+          <div className="px-4 py-4">
+            <PaywallOverlay isLocked={!isActive && !loading} title="Komunita je součástí Premium" description="Spolubydlení, nápady, dotazy od ostatních Čechů ve Švýcarsku">
+
+              {loadingPosts ? (
+                <div className="text-center py-12">
+                  <span className="w-6 h-6 border-2 border-gray-600 border-t-white rounded-full animate-spin inline-block" />
+                  <p className="text-gray-500 text-sm mt-3">Načítám příspěvky...</p>
+                </div>
+              ) : visiblePosts.length === 0 ? (
+                q ? (
+                  <div className="text-center py-12">
+                    <Search size={40} strokeWidth={ICON_STROKE} className="text-gray-600 mx-auto mb-3" />
+                    <p className="text-gray-400 text-sm mb-1">Nic nenalezeno</p>
+                    <p className="text-gray-600 text-xs">{`Pro „${search}" nejsou žádné příspěvky. Zkus jiná slova.`}</p>
+                    <button onClick={() => setSearch('')} className="mt-4 inline-flex items-center gap-1.5 text-[#fb923c] text-sm hover:underline">
+                      <X size={14} strokeWidth={ICON_STROKE} /> Zrušit hledání
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Inbox size={40} strokeWidth={ICON_STROKE} className="text-gray-600 mx-auto mb-3" />
+                    <p className="text-gray-400 text-sm mb-1">Zatím žádné příspěvky</p>
+                    <p className="text-gray-600 text-xs">Buď první kdo napíše!</p>
+                    <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-1.5 bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
+                      <PenSquare size={15} strokeWidth={ICON_STROKE} /> Napsat příspěvek
+                    </button>
+                  </div>
+                )
+              ) : (
+                <div className="space-y-3">
+                  {q && <p className="text-gray-600 text-xs mb-1">{visiblePosts.length} {visiblePosts.length === 1 ? 'výsledek' : visiblePosts.length < 5 ? 'výsledky' : 'výsledků'} pro {`„${search}"`}</p>}
+                  {visiblePosts.map(post => {
+                    const cm = catMeta(post.category)
+                    return (
+                      <div key={post.id} onClick={() => fetchPost(post)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 hover:border-gray-600 transition cursor-pointer">
+                        <div className="flex items-start gap-3">
+                          {/* Upvote */}
+                          <button onClick={(e) => { e.stopPropagation(); handleUpvote(post.id) }} className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition ${post.hasUpvoted ? 'bg-[#f97316]/10 text-[#fb923c]' : 'text-gray-500 hover:bg-gray-800'}`}>
+                            <ChevronUp size={16} strokeWidth={post.hasUpvoted ? 2.5 : ICON_STROKE} />
+                            <span className="text-xs font-bold">{post.upvotes}</span>
+                          </button>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-gray-300"><cm.Icon size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {cm.label}</span>
+                              {post.is_pinned && <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]"><Pin size={11} strokeWidth={ICON_STROKE} /></span>}
+                              {post.category === 'spolubydleni' && post.region && <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400"><MapPin size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.region}</span>}
+                              {post.category === 'spolubydleni' && post.budget && <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400"><Wallet size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.budget}</span>}
+                            </div>
+                            <h3 className="text-white text-sm font-semibold mb-0.5 truncate">{post.title}</h3>
+                            <p className="text-gray-500 text-xs line-clamp-2">{post.content}</p>
+                            <div className="flex items-center gap-3 mt-2 text-gray-600 text-[10px]">
+                              <span>{post.user_name}</span>
+                              <span>{timeAgo(post.created_at)}</span>
+                              <span className="inline-flex items-center gap-1"><MessageCircle size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.comments_count}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+            </PaywallOverlay>
+          </div>
         </div>
+
+        {/* ─── Pravý rail — info o komunitě ─── */}
+        <aside className="hidden lg:flex lg:flex-col gap-4 bg-[#141414] border-l border-gray-800/60 lg:sticky lg:top-0 lg:h-screen overflow-y-auto px-4 py-4">
+          <div>
+            <p className="text-gray-600 text-[10px] font-bold uppercase tracking-wider mb-2">O komunitě</p>
+            <p className="text-gray-500 text-xs leading-relaxed">Místo, kde si čeští a slovenští pracovníci ve Švýcarsku vzájemně pomáhají — spolubydlení, dotazy, tipy z praxe.</p>
+          </div>
+          <div>
+            <p className="flex items-center gap-1.5 text-gray-600 text-[10px] font-bold uppercase tracking-wider mb-2"><Pin size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Pravidla</p>
+            <ul className="text-gray-400 text-xs space-y-1.5">
+              <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Buď slušný a pomáhej ostatním</li>
+              <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Žádný spam ani reklama</li>
+              <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Sdílej reálné zkušenosti ze Švýcarska</li>
+            </ul>
+          </div>
+          {isActive && (
+            <button onClick={() => setShowForm(true)} className="w-full inline-flex items-center justify-center gap-1.5 bg-[#f97316]/10 border border-[#f97316]/20 text-[#fb923c] font-medium text-sm px-4 py-2.5 rounded-xl hover:bg-[#f97316]/20 transition">
+              <PenSquare size={15} strokeWidth={ICON_STROKE} /> Sdílej něco s komunitou
+            </button>
+          )}
+        </aside>
       </div>
     </main>
   )
