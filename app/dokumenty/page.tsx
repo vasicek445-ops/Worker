@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { supabase } from '../supabase'
+import { FileText, Mail, Trash2, Plus } from 'lucide-react'
 
 type SavedDoc = {
   id: string
@@ -60,21 +60,13 @@ export default function Dokumenty() {
       <div className="fixed w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none z-0 opacity-10 bottom-[200px] -left-[200px]" style={{ background: "radial-gradient(circle, rgba(100,60,255,0.2), transparent 70%)" }} />
 
       <div className="max-w-2xl mx-auto relative z-10">
-        {/* Hero header */}
-        <div className="rounded-2xl p-6 mb-6 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
-          <Image src="/images/3d/document.png" alt="" width={120} height={120} className="absolute -right-4 -bottom-4 opacity-[0.08]" />
-          <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(251,146,60,0.15), transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(100,60,255,0.1), transparent 60%)" }} />
-          <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
-            <pattern id="docsGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="0.8" fill="white"/>
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#docsGrid)"/>
-          </svg>
-          <div className="relative flex items-center gap-4">
-            <Image src="/images/3d/document.png" alt="" width={56} height={56} className="drop-shadow-[0_4px_20px_rgba(251,146,60,0.3)]" />
+        {/* Header */}
+        <div className="pt-2 pb-4 mb-2">
+          <div className="flex items-center gap-3 mb-1">
+            <FileText size={32} strokeWidth={1.75} className="text-[#fb923c] drop-shadow-lg shrink-0" />
             <div>
               <h1 className="text-white text-2xl font-extrabold m-0 tracking-tight">Moje dokumenty</h1>
-              <p className="text-white/35 text-sm m-0 mt-1">Uložené životopisy a motivační dopisy · změň design bez AI</p>
+              <p className="text-white/35 text-sm m-0 mt-1">Uložené životopisy a motivační dopisy</p>
             </div>
           </div>
         </div>
@@ -106,11 +98,11 @@ export default function Dokumenty() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-8 text-center">
-            <Image src="/images/3d/document.png" alt="" width={48} height={48} className="mx-auto mb-3 opacity-30" />
+            <FileText size={44} strokeWidth={1.5} className="mx-auto mb-3 text-white/20" />
             <p className="text-white/40 text-sm mb-1">
               {docs.length === 0 ? 'Zatím nemáš žádné uložené dokumenty' : 'Žádné dokumenty v této kategorii'}
             </p>
-            <p className="text-white/20 text-xs mb-4">Vytvoř životopis nebo motivační dopis a ulož ho tlačítkem 💾</p>
+            <p className="text-white/20 text-xs mb-4">Vytvoř životopis nebo motivační dopis a ulož si ho.</p>
             <div className="flex gap-3 justify-center">
               <Link href="/pruvodce/sablony/cv" className="bg-[#fb923c]/10 border border-[#fb923c]/20 text-[#fb923c] text-sm font-bold px-5 py-2.5 rounded-xl no-underline transition hover:bg-[#fb923c]/20">
                 Vytvořit CV
@@ -127,7 +119,9 @@ export default function Dokumenty() {
                 <div className="flex items-center gap-4">
                   {/* Icon */}
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${doc.type === 'cv' ? 'bg-[#fb923c]/[0.08]' : 'bg-blue-500/[0.08]'}`}>
-                    <span className="text-lg">{doc.type === 'cv' ? '📄' : '✉️'}</span>
+                    {doc.type === 'cv'
+                      ? <FileText size={18} strokeWidth={1.75} className="text-[#fb923c]" />
+                      : <Mail size={18} strokeWidth={1.75} className="text-blue-400" />}
                   </div>
 
                   {/* Info */}
@@ -154,8 +148,9 @@ export default function Dokumenty() {
                     <button
                       onClick={() => handleDelete(doc.id)}
                       disabled={deleting === doc.id}
-                      className="text-white/15 hover:text-red-400 text-xs px-2 py-1.5 rounded-lg transition opacity-0 group-hover:opacity-100">
-                      {deleting === doc.id ? '...' : '🗑️'}
+                      aria-label="Smazat dokument"
+                      className="text-white/15 hover:text-red-400 px-2 py-1.5 rounded-lg transition opacity-0 group-hover:opacity-100">
+                      {deleting === doc.id ? <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-white/50 rounded-full animate-spin inline-block" /> : <Trash2 size={15} strokeWidth={1.75} />}
                     </button>
                   </div>
                 </div>
@@ -167,11 +162,11 @@ export default function Dokumenty() {
         {/* Quick actions */}
         {docs.length > 0 && (
           <div className="mt-6 flex gap-3">
-            <Link href="/pruvodce/sablony/cv" className="flex-1 bg-white/[0.02] border border-white/[0.06] text-white/40 text-sm font-medium py-3 rounded-xl text-center no-underline transition hover:bg-white/[0.05] hover:text-white">
-              + Nový životopis
+            <Link href="/pruvodce/sablony/cv" className="flex-1 inline-flex items-center justify-center gap-1.5 bg-white/[0.02] border border-white/[0.06] text-white/40 text-sm font-medium py-3 rounded-xl no-underline transition hover:bg-white/[0.05] hover:text-white">
+              <Plus size={15} strokeWidth={2} /> Nový životopis
             </Link>
-            <Link href="/pruvodce/sablony/motivacni-dopis" className="flex-1 bg-white/[0.02] border border-white/[0.06] text-white/40 text-sm font-medium py-3 rounded-xl text-center no-underline transition hover:bg-white/[0.05] hover:text-white">
-              + Nový dopis
+            <Link href="/pruvodce/sablony/motivacni-dopis" className="flex-1 inline-flex items-center justify-center gap-1.5 bg-white/[0.02] border border-white/[0.06] text-white/40 text-sm font-medium py-3 rounded-xl no-underline transition hover:bg-white/[0.05] hover:text-white">
+              <Plus size={15} strokeWidth={2} /> Nový dopis
             </Link>
           </div>
         )}
