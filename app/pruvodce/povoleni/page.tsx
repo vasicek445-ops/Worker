@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { ClipboardList, BookOpen } from "lucide-react";
 import { useLanguage } from "../../../lib/i18n/LanguageContext";
 import { getPermitsContent } from "../../../content/permits";
 
@@ -20,7 +21,7 @@ export default function PovoleniPage() {
 
       <div className="relative z-10 px-5 pt-4 pb-4">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/20 flex items-center justify-center text-2xl">📋</div>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/20 flex items-center justify-center"><ClipboardList size={24} strokeWidth={1.75} className="text-red-400" /></div>
           <div><span className="text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider text-red-400 bg-red-500/10">{t.pageTag}</span></div>
         </div>
         <h1 className="text-2xl font-bold text-white tracking-tight mt-3">{t.pageTitle}</h1>
@@ -128,7 +129,7 @@ export default function PovoleniPage() {
 
         <div className="bg-white/[0.03] rounded-2xl p-4 border border-white/[0.06] mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-xl">📚</span>
+            <BookOpen size={20} strokeWidth={1.75} className="text-blue-400 shrink-0" />
             <div className="flex-1"><p className="text-sm font-medium text-white">{t.officialTitle}</p><p className="text-[11px] text-gray-500">{t.officialDesc}</p></div>
             <a href="https://www.ch.ch" target="_blank" rel="noopener noreferrer" className="text-[12px] text-blue-400 font-medium hover:text-blue-300 transition-colors">{t.officialLink}</a>
           </div>
