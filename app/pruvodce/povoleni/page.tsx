@@ -16,13 +16,13 @@ export default function PovoleniPage() {
   const t = getPermitsContent(locale);
 
   return (
-    <main className="min-h-screen bg-[#0a0a0c] pb-24">
-      <div className="fixed top-[-120px] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(239,68,68,0.06)_0%,transparent_70%)] pointer-events-none z-0" />
+    <main className="min-h-screen bg-[#0a0a12] pb-24" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+      <div className="fixed top-[-120px] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.07)_0%,transparent_70%)] pointer-events-none z-0" />
 
       <div className="relative z-10 px-5 pt-4 pb-4">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/20 flex items-center justify-center"><ClipboardList size={24} strokeWidth={1.75} className="text-red-400" /></div>
-          <div><span className="text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider text-red-400 bg-red-500/10">{t.pageTag}</span></div>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#fb923c]/20 to-[#f97316]/20 border border-[#f97316]/25 flex items-center justify-center"><ClipboardList size={24} strokeWidth={1.75} className="text-[#fb923c]" /></div>
+          <div><span className="text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider text-[#fb923c] bg-[#f97316]/10">{t.pageTag}</span></div>
         </div>
         <h1 className="text-2xl font-bold text-white tracking-tight mt-3">{t.pageTitle}</h1>
         <p className="text-sm text-gray-400 mt-2 leading-relaxed">{t.pageDesc}</p>
@@ -122,7 +122,7 @@ export default function PovoleniPage() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-red-500/[0.1] to-orange-500/[0.04] rounded-2xl p-5 border border-red-500/[0.15] mb-6">
+        <div className="bg-gradient-to-br from-[#f97316]/[0.1] to-[#fb923c]/[0.04] rounded-2xl p-5 border border-[#f97316]/[0.15] mb-6">
           <p className="text-base font-bold text-white mb-2">{t.keyRuleTitle}</p>
           <p className="text-[13px] text-gray-300 leading-relaxed">{t.keyRuleText} <span className="text-white font-semibold">{t.keyRuleBold}</span>.</p>
         </div>
@@ -131,15 +131,15 @@ export default function PovoleniPage() {
           <div className="flex items-center gap-3">
             <BookOpen size={20} strokeWidth={1.75} className="text-blue-400 shrink-0" />
             <div className="flex-1"><p className="text-sm font-medium text-white">{t.officialTitle}</p><p className="text-[11px] text-gray-500">{t.officialDesc}</p></div>
-            <a href="https://www.ch.ch" target="_blank" rel="noopener noreferrer" className="text-[12px] text-blue-400 font-medium hover:text-blue-300 transition-colors">{t.officialLink}</a>
+            <a href="https://www.ch.ch" target="_blank" rel="noopener noreferrer" className="text-[12px] text-[#fb923c] font-medium hover:text-[#fb923c]/80 transition-colors">{t.officialLink}</a>
           </div>
         </div>
 
         <Link href="/kontakty" className="block mb-6">
-          <div className="bg-gradient-to-br from-red-500/[0.12] to-red-500/[0.04] rounded-2xl p-5 border border-red-500/[0.15] text-center hover:shadow-[0_0_30px_rgba(239,68,68,0.15)] transition-shadow duration-300">
+          <div className="bg-gradient-to-br from-[#f97316]/[0.12] to-[#f97316]/[0.04] rounded-2xl p-5 border border-[#f97316]/[0.15] text-center hover:shadow-[0_0_30px_rgba(249,115,22,0.18)] transition-shadow duration-300">
             <p className="text-sm font-bold text-white mb-1">{t.ctaTitle}</p>
             <p className="text-[12px] text-gray-400 mb-3">{t.ctaDesc}</p>
-            <span className="bg-red-500 text-white px-5 py-2.5 rounded-[10px] text-[13px] font-semibold shadow-lg shadow-red-500/30 inline-block">{t.ctaButton}</span>
+            <span className="bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] px-5 py-2.5 rounded-[10px] text-[13px] font-bold shadow-lg shadow-[#f97316]/30 inline-block">{t.ctaButton}</span>
           </div>
         </Link>
       </div>
