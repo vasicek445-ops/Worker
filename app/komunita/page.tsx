@@ -36,6 +36,8 @@ interface Message {
 
 interface Group { user_name: string; is_ai: boolean; items: Message[] }
 
+interface Member { id: string; name: string; avatar_url: string | null; online: boolean; self: boolean }
+
 export default function KomunitaPage() {
   const { isActive, loading } = useSubscription()
   const [channel, setChannel] = useState('general')
@@ -47,6 +49,7 @@ export default function KomunitaPage() {
   const [uploading, setUploading] = useState(false)
   const [slashOpen, setSlashOpen] = useState(false)
   const [slashIndex, setSlashIndex] = useState(0)
+  const [members, setMembers] = useState<Member[]>([])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesRef = useRef<Message[]>([])
@@ -121,6 +124,29 @@ export default function KomunitaPage() {
     }
     const t = setInterval(poll, 4000)
     return () => clearInterval(t)
+  }, [isActive])
+
+  // Presence heartbeat + seznam členů (online status v pravém railu)
+  useEffect(() => {
+    if (!isActive) return
+    const ping = async () => {
+      const auth = await authHeader()
+      if (!auth) return
+      fetch('/api/community', { method: 'POST', headers: { 'Content-Type': 'application/json', ...auth }, body: JSON.stringify({ action: 'ping' }) }).catch(() => {})
+    }
+    const loadMembers = async () => {
+      const auth = await authHeader()
+      if (!auth) return
+      try {
+        const res = await fetch('/api/community?members=1', { headers: auth })
+        const data = await res.json()
+        setMembers(data.members || [])
+      } catch {}
+    }
+    ping(); loadMembers()
+    const t1 = setInterval(ping, 45000)
+    const t2 = setInterval(loadMembers, 30000)
+    return () => { clearInterval(t1); clearInterval(t2) }
   }, [isActive])
 
   // Auto-scroll on new messages if user is near bottom
@@ -458,6 +484,52 @@ export default function KomunitaPage() {
 
       {/* Pravy rail - info o komunite (lg) */}
       <aside className="hidden lg:flex lg:flex-col w-[250px] shrink-0 gap-4 bg-[#141414] border-l border-gray-800/60 overflow-y-auto px-4 py-4">
+        {/* Online členové (Discord-style) */}
+        <div>
+          <p className="text-gray-600 text-[10px] font-bold uppercase tracking-wider mb-2">
+            Online — {members.filter(m => m.online).length}
+          </p>
+          <div className="space-y-0.5">
+            {members.filter(m => m.online).length === 0 && (
+              <p className="text-gray-600 text-xs">Zatím nikdo online</p>
+            )}
+            {members.filter(m => m.online).slice(0, 12).map(m => (
+              <div key={m.id} className="flex items-center gap-2 py-1">
+                <div className="relative shrink-0">
+                  {m.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={m.avatar_url} alt={m.name} className="w-7 h-7 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-[#252525] border border-gray-700 flex items-center justify-center text-gray-300 text-[11px] font-bold">{initial(m.name)}</div>
+                  )}
+                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#141414]" />
+                </div>
+                <span className="text-gray-300 text-xs truncate">{m.name}{m.self && <span className="text-gray-600"> (ty)</span>}</span>
+              </div>
+            ))}
+          </div>
+          {members.filter(m => !m.online).length > 0 && (
+            <>
+              <p className="text-gray-600 text-[10px] font-bold uppercase tracking-wider mt-3 mb-2">
+                Offline — {members.filter(m => !m.online).length}
+              </p>
+              <div className="space-y-0.5">
+                {members.filter(m => !m.online).slice(0, 8).map(m => (
+                  <div key={m.id} className="flex items-center gap-2 py-1 opacity-50">
+                    {m.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.avatar_url} alt={m.name} className="w-7 h-7 rounded-full object-cover grayscale" />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full bg-[#252525] border border-gray-700 flex items-center justify-center text-gray-400 text-[11px] font-bold">{initial(m.name)}</div>
+                    )}
+                    <span className="text-gray-400 text-xs truncate">{m.name}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
         <div>
           <p className="text-gray-600 text-[10px] font-bold uppercase tracking-wider mb-2">O komunitě</p>
           <p className="text-gray-500 text-xs leading-relaxed">Komunita Woker je o <span className="text-gray-300">vzájemném poznávání a pomoci</span> mezi Čechy a Slováky ve Švýcarsku. Jsem tu osobně hodně aktivní — s řadou věcí ti dokážu poradit individuálně.</p>

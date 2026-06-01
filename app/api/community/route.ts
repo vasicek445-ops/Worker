@@ -113,6 +113,25 @@ export async function GET(req: NextRequest) {
   const postId = searchParams.get('postId')
   const messagesChannel = searchParams.get('messages')
 
+  // Členové komunity + online status (presence). Online = heartbeat < 3 min.
+  if (searchParams.get('members')) {
+    const { data: profs } = await supabaseAdmin
+      .from('profiles')
+      .select('id, full_name, avatar_url, last_seen_at')
+      .not('last_seen_at', 'is', null)
+      .order('last_seen_at', { ascending: false })
+      .limit(200)
+    const cutoff = Date.now() - 3 * 60 * 1000
+    const members = (profs || []).map(p => ({
+      id: p.id,
+      name: p.full_name || 'Člen',
+      avatar_url: p.avatar_url || null,
+      online: p.last_seen_at ? new Date(p.last_seen_at).getTime() > cutoff : false,
+      self: p.id === user.id,
+    }))
+    return NextResponse.json({ members })
+  }
+
   // Chat: latest messages for a channel (ascending order for display)
   if (messagesChannel) {
     const since = searchParams.get('since')
@@ -194,6 +213,12 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json()
   const { action } = body
+
+  // Presence heartbeat — lehký zápis, bez subscription kontroly
+  if (action === 'ping') {
+    await supabaseAdmin.from('profiles').update({ last_seen_at: new Date().toISOString() }).eq('id', user.id)
+    return NextResponse.json({ ok: true })
+  }
 
   // Check subscription for posting
   const { data: sub } = await supabaseAdmin
