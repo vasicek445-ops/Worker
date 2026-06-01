@@ -58,6 +58,9 @@ export interface ProfileRow {
   // Preference
   profile_locale?: string | null    // 'cs', 'sk', 'en', ...
   notifications?: boolean | null
+  notify_mentions?: boolean | null   // komunita: e-mail při @zmínce
+  notify_dms?: boolean | null        // komunita: e-mail při soukromé zprávě (offline)
+  notify_weekly?: boolean | null     // komunita: týdenní souhrn
 
   // Computed
   profile_complete?: boolean | null

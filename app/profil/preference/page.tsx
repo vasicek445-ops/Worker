@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../supabase'
 import { useProfileShell } from '../_components/ProfileShell'
 import { useLanguage } from '../../../lib/i18n/LanguageContext'
+import { ArrowLeft, Globe, AtSign, MessageCircle, CalendarDays, Megaphone } from 'lucide-react'
 
 type Locale = 'cs' | 'sk' | 'en' | 'pl' | 'uk' | 'ro' | 'hu' | 'it' | 'pt' | 'es' | 'el'
 
@@ -22,6 +23,28 @@ const LANGUAGES: { code: Locale; flag: string; name: string }[] = [
   { code: 'es', flag: '🇪🇸', name: 'Español' },
   { code: 'el', flag: '🇬🇷', name: 'Ελληνικά' },
 ]
+
+function Toggle({ on, onClick, label, desc, Icon }: { on: boolean; onClick: () => void; label: string; desc?: string; Icon?: typeof Globe }) {
+  return (
+    <div className="flex items-center justify-between py-2.5">
+      <div className="min-w-0 pr-4 flex items-start gap-2.5">
+        {Icon && <Icon size={16} strokeWidth={1.75} className="text-[#fb923c] mt-0.5 shrink-0" />}
+        <div className="min-w-0">
+          <p className="text-white text-sm m-0">{label}</p>
+          {desc && <p className="text-white/40 text-xs m-0 mt-0.5">{desc}</p>}
+        </div>
+      </div>
+      <button
+        onClick={onClick}
+        className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${on ? 'bg-[#fb923c]' : 'bg-white/[0.1]'}`}
+        aria-pressed={on}
+        aria-label={label}
+      >
+        <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${on ? 'translate-x-[22px]' : 'translate-x-0.5'}`} />
+      </button>
+    </div>
+  )
+}
 
 export default function PreferencePage() {
   const router = useRouter()
@@ -50,6 +73,8 @@ export default function PreferencePage() {
     update({ notifications: !current })
   }
 
+  const toggleField = (field: string, current: boolean) => update({ [field]: !current })
+
   if (!authChecked || loading) {
     return (
       <div className="min-h-screen bg-[#0a0a12] text-white flex items-center justify-center">
@@ -67,11 +92,11 @@ export default function PreferencePage() {
       <div className="max-w-2xl mx-auto p-6">
         <header className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <Link href="/profil/nastaveni" className="text-white/40 text-sm hover:text-white/70 transition no-underline">
-              ← Zpět na nastavení
+            <Link href="/profil/nastaveni" className="inline-flex items-center gap-1.5 text-white/40 text-sm hover:text-white/70 transition no-underline">
+              <ArrowLeft size={15} strokeWidth={1.75} /> Zpět na nastavení
             </Link>
             <h1 className="text-2xl font-extrabold text-white m-0 mt-3 flex items-center gap-2">
-              <span>🌐</span> Preference
+              <Globe size={22} strokeWidth={1.75} className="text-[#fb923c]" /> Preference
             </h1>
             <p className="text-white/40 text-sm mt-1">Jazyk aplikace a notifikace.</p>
           </div>
@@ -116,6 +141,15 @@ export default function PreferencePage() {
               />
             </button>
           </div>
+        </div>
+
+        {/* Komunitní e-maily */}
+        <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
+          <h2 className="text-white/25 text-[10px] font-bold uppercase tracking-wider m-0 mb-1 flex items-center gap-1.5"><Megaphone size={12} strokeWidth={2} /> Komunitní e-maily</h2>
+          <p className="text-white/30 text-xs m-0 mb-2">Kdy ti přijde e-mail z komunity. Vše můžeš vypnout.</p>
+          <Toggle Icon={AtSign} label="Když mě někdo @zmíní" on={profile?.notify_mentions ?? true} onClick={() => toggleField('notify_mentions', profile?.notify_mentions ?? true)} />
+          <Toggle Icon={MessageCircle} label="Nová soukromá zpráva" desc="Jen když jsi offline." on={profile?.notify_dms ?? true} onClick={() => toggleField('notify_dms', profile?.notify_dms ?? true)} />
+          <Toggle Icon={CalendarDays} label="Týdenní souhrn komunity" on={profile?.notify_weekly ?? true} onClick={() => toggleField('notify_weekly', profile?.notify_weekly ?? true)} />
         </div>
       </div>
     </div>

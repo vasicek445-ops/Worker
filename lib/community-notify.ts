@@ -43,7 +43,7 @@ function wrap(inner: string): string {
     ${inner}
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0" />
     <p style="font-size:12px;color:#999">Dostáváš tohle, protože jsi součástí komunity Woker.
-      <a href="${BASE}/profil/osobni-udaje" style="color:#f97316">Upravit notifikace</a></p>
+      <a href="${BASE}/profil/preference" style="color:#f97316">Upravit notifikace</a></p>
   </div>`
 }
 
