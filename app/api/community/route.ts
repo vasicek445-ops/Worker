@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Anthropic from '@anthropic-ai/sdk'
+import { emailUser, btn, BASE } from '../../../lib/community-notify'
 
 const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -328,7 +329,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === 'send_message') {
-    const { channel, content, attachment_url, attachment_type, attachment_name } = body
+    const { channel, content, attachment_url, attachment_type, attachment_name, mentions } = body
     const text = (content || '').trim()
     if (!channel || (!text && !attachment_url)) {
       return NextResponse.json({ error: 'Prázdná zpráva' }, { status: 400 })
@@ -370,6 +371,21 @@ export async function POST(req: NextRequest) {
           channel, user_id: user.id, user_name: 'Woker AI', content: aiReply, is_ai: true,
         })
       })
+    }
+
+    // E-mail @zmíněným členům (z autocomplete pickeru), respektuje notify_mentions
+    if (Array.isArray(mentions) && mentions.length) {
+      const snippet = text.length > 160 ? text.slice(0, 160) + '…' : text
+      const unique = [...new Set(mentions)].filter((id): id is string => typeof id === 'string' && id !== user.id)
+      for (const id of unique) {
+        emailUser(
+          id, 'notify_mentions',
+          `${userName} tě zmínil v komunitě`,
+          `<p style="font-size:15px"><strong>${userName}</strong> tě zmínil v kanálu <strong>#${channel}</strong>:</p>
+           <p style="font-size:15px;color:#444;border-left:3px solid #f97316;padding-left:12px;margin:16px 0">${snippet}</p>
+           <p style="margin-top:20px">${btn(`${BASE}/komunita`, 'Otevřít komunitu')}</p>`,
+        )
+      }
     }
 
     const { data: prof } = await supabaseAdmin.from('profiles').select('avatar_url').eq('id', user.id).single()

@@ -50,6 +50,9 @@ export default function KomunitaPage() {
   const [slashOpen, setSlashOpen] = useState(false)
   const [slashIndex, setSlashIndex] = useState(0)
   const [members, setMembers] = useState<Member[]>([])
+  const [atOpen, setAtOpen] = useState(false)
+  const [atIndex, setAtIndex] = useState(0)
+  const mentionIdsRef = useRef<string[]>([])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesRef = useRef<Message[]>([])
@@ -168,13 +171,19 @@ export default function KomunitaPage() {
     setSending(true)
     setDraft('')
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
+    // Jen zmínky, jejichž @jméno v textu zůstalo
+    const mentions = mentionIdsRef.current.filter(id => {
+      const m = members.find(x => x.id === id)
+      return m && text.includes('@' + m.name.split(' ')[0])
+    })
+    mentionIdsRef.current = []
     try {
       const auth = await authHeader()
       if (!auth) { setDraft(text); return }
       const res = await fetch('/api/community', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...auth },
-        body: JSON.stringify({ action: 'send_message', channel, content: text }),
+        body: JSON.stringify({ action: 'send_message', channel, content: text, mentions }),
       })
       if (!res.ok) { setDraft(text); return }
       const data = await res.json()
@@ -187,6 +196,12 @@ export default function KomunitaPage() {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (showAt) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setAtIndex(i => (i + 1) % atMatches.length); return }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setAtIndex(i => (i - 1 + atMatches.length) % atMatches.length); return }
+      if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); selectMention(atMatches[atIndex]); return }
+      if (e.key === 'Escape') { e.preventDefault(); setAtOpen(false); return }
+    }
     if (showSlash) {
       if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex(i => (i + 1) % slashMatches.length); return }
       if (e.key === 'ArrowUp') { e.preventDefault(); setSlashIndex(i => (i - 1 + slashMatches.length) % slashMatches.length); return }
@@ -200,7 +215,9 @@ export default function KomunitaPage() {
     const val = e.target.value
     setDraft(val)
     setSlashOpen(/^\/\w*$/.test(val))
+    setAtOpen(/(?:^|\s)@\w*$/.test(val))
     setSlashIndex(0)
+    setAtIndex(0)
     const el = e.target
     el.style.height = 'auto'
     el.style.height = Math.min(el.scrollHeight, 140) + 'px'
@@ -209,6 +226,14 @@ export default function KomunitaPage() {
   const selectSlash = (cmd: string) => {
     setDraft(`/${cmd} `)
     setSlashOpen(false)
+    requestAnimationFrame(() => textareaRef.current?.focus())
+  }
+
+  const selectMention = (m: Member) => {
+    const firstName = m.name.split(' ')[0]
+    setDraft(prev => prev.replace(/(?:^|\s)@\w*$/, s => (s.startsWith(' ') ? ' ' : '') + `@${firstName} `))
+    if (!mentionIdsRef.current.includes(m.id)) mentionIdsRef.current.push(m.id)
+    setAtOpen(false)
     requestAnimationFrame(() => textareaRef.current?.focus())
   }
 
@@ -262,6 +287,11 @@ export default function KomunitaPage() {
   // Smart search (diacritics-insensitive)
   const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
   const q = norm(search.trim())
+
+  // @mention autocomplete (zrcadlí members)
+  const atRe = /(?:^|\s)@(\w*)$/.exec(draft)
+  const atMatches = atRe ? members.filter(m => !m.self && norm(m.name).includes(norm(atRe[1]))).slice(0, 6) : []
+  const showAt = atOpen && atMatches.length > 0
   const visibleMessages = q
     ? messages.filter(m => norm(m.content).includes(q) || norm(m.user_name).includes(q))
     : messages
@@ -448,6 +478,30 @@ export default function KomunitaPage() {
                     <p className={`text-sm font-semibold ${i === slashIndex ? 'text-white' : 'text-gray-300'}`}>{c.label}</p>
                     <p className="text-gray-500 text-xs truncate">{c.desc}</p>
                   </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* @mention autocomplete */}
+          {showAt && (
+            <div className="absolute left-4 right-4 bottom-full mb-2 bg-[#1A1A1A] border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-20">
+              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider px-3 pt-2.5 pb-1.5">Členové</p>
+              {atMatches.map((m, i) => (
+                <button
+                  key={m.id}
+                  onMouseDown={(e) => { e.preventDefault(); selectMention(m) }}
+                  onMouseEnter={() => setAtIndex(i)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-left transition ${i === atIndex ? 'bg-[#f97316]/10' : 'hover:bg-white/[0.03]'}`}
+                >
+                  {m.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={m.avatar_url} alt={m.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-[#252525] border border-gray-700 flex items-center justify-center text-gray-300 text-[11px] font-bold shrink-0">{initial(m.name)}</div>
+                  )}
+                  <span className={`text-sm ${i === atIndex ? 'text-white' : 'text-gray-300'}`}>{m.name}</span>
+                  {m.online && <span className="ml-auto w-2 h-2 rounded-full bg-green-500" />}
                 </button>
               ))}
             </div>
