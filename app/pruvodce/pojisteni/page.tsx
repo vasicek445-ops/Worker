@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { HeartPulse, AlertTriangle, Banknote, Lightbulb, Target, Check, Stethoscope, Phone, Building2, Hospital, BedDouble, Smile, Glasses, Sparkles, Wallet, Package, Zap, MapPin, Mail, Globe, ArrowRight } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 const INSURANCE_COMPANIES = [
   { name: "Assura-Basis SA", city: "Pully", phone: "021 721 44 11", email: "assura@assura.ch", web: "assura.ch", highlight: true, note: "Často nejlevnější" },
@@ -18,25 +20,24 @@ const INSURANCE_COMPANIES = [
   { name: "Aquilana", city: "Baden", phone: "056 203 44 44", email: "info@aquilana.ch", web: "aquilana.ch", highlight: false, note: "" },
 ];
 
-const CARE_MODELS = [
-  { name: "Standard", price: "Nejdražší", desc: "Můžeš jít ke každému doktorovi", icon: "🏥", recommended: false },
-  { name: "Hausarzt", price: "Střední", desc: "Máš jednoho hlavního doktora", icon: "👨‍⚕️", recommended: false },
-  { name: "Telmed", price: "Levný", desc: "Nejdřív zavoláš na lékařskou linku", icon: "📞", recommended: true },
-  { name: "HMO", price: "Nejlevnější", desc: "Chodíš přes vybrané HMO centrum", icon: "🏢", recommended: true },
+const CARE_MODELS: { name: string; price: string; desc: string; Icon: LucideIcon; recommended: boolean }[] = [
+  { name: "Standard", price: "Nejdražší", desc: "Můžeš jít ke každému doktorovi", Icon: Hospital, recommended: false },
+  { name: "Hausarzt", price: "Střední", desc: "Máš jednoho hlavního doktora", Icon: Stethoscope, recommended: false },
+  { name: "Telmed", price: "Levný", desc: "Nejdřív zavoláš na lékařskou linku", Icon: Phone, recommended: true },
+  { name: "HMO", price: "Nejlevnější", desc: "Chodíš přes vybrané HMO centrum", Icon: Building2, recommended: true },
 ];
 
 export default function PojisteniPage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0c] pb-24">
-      <div className="fixed top-[-120px] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(239,68,68,0.06)_0%,transparent_70%)] pointer-events-none z-0" />
+    <main className="min-h-screen bg-[#0a0a12] pb-24" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+      <div className="fixed top-[-120px] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.07)_0%,transparent_70%)] pointer-events-none z-0" />
 
       {/* Header */}
       <div className="relative z-10 px-5 pt-6 pb-4">
-        <Link href="/dashboard" className="text-gray-500 text-sm hover:text-gray-400 transition-colors mb-4 inline-block">← Zpět</Link>
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20 flex items-center justify-center text-2xl">🏥</div>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#fb923c]/20 to-[#f97316]/20 border border-[#f97316]/25 flex items-center justify-center"><HeartPulse size={24} strokeWidth={1.75} className="text-[#fb923c]" /></div>
           <div>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider text-red-400 bg-red-500/10">Důležité</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider text-[#fb923c] bg-[#f97316]/10">Důležité</span>
           </div>
         </div>
         <h1 className="text-2xl font-bold text-white tracking-tight mt-3">Zdravotní pojištění ve Švýcarsku</h1>
@@ -47,7 +48,7 @@ export default function PojisteniPage() {
 
         {/* Critical warning */}
         <div className="bg-red-500/[0.06] rounded-2xl p-5 border border-red-500/[0.12] mb-6">
-          <h2 className="text-base font-bold text-white mb-3">❗ Důležité vědět</h2>
+          <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2"><AlertTriangle size={18} strokeWidth={2} className="text-red-400" /> Důležité vědět</h2>
           <div className="flex flex-col gap-2.5">
             {[
               "Zdravotní pojištění si platí každý sám – z vlastní kapsy",
@@ -57,7 +58,7 @@ export default function PojisteniPage() {
               "Pokud to neuděláš včas, kanton ti pojišťovnu přiřadí – a často drahou!",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
-                <span className="text-red-400 mt-0.5 flex-shrink-0">⚠️</span>
+                <AlertTriangle size={14} strokeWidth={2} className="text-red-400 mt-0.5 shrink-0" />
                 <span className="text-[13px] text-gray-300 leading-relaxed">{item}</span>
               </div>
             ))}
@@ -67,7 +68,7 @@ export default function PojisteniPage() {
         {/* Price highlight */}
         <div className="bg-green-500/[0.06] rounded-2xl p-5 border border-green-500/[0.12] mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-bold text-white">💸 Kolik to stojí?</h2>
+            <h2 className="text-base font-bold text-white flex items-center gap-2"><Banknote size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Kolik to stojí?</h2>
           </div>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="bg-green-500/[0.08] rounded-xl p-3.5 border border-green-500/[0.1] text-center">
@@ -82,23 +83,23 @@ export default function PojisteniPage() {
             </div>
           </div>
           <div className="bg-yellow-500/[0.06] rounded-xl px-3 py-2 border border-yellow-500/[0.08]">
-            <p className="text-[11px] text-yellow-400 font-medium text-center">
-              💡 Rozdíl: <span className="font-bold">až 2 040 CHF ročně</span> jen správným nastavením!
+            <p className="text-[11px] text-yellow-400 font-medium text-center inline-flex items-center gap-1.5 justify-center w-full">
+              <Lightbulb size={13} strokeWidth={2} /> Rozdíl: <span className="font-bold">až 2 040 CHF ročně</span> jen správným nastavením!
             </p>
           </div>
         </div>
 
         {/* 3 Steps */}
-        <h2 className="text-lg font-bold text-white mb-4">🎯 3 kroky k nejlevnějšímu pojištění</h2>
+        <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2"><Target size={20} strokeWidth={1.75} className="text-[#fb923c]" /> 3 kroky k nejlevnějšímu pojištění</h2>
 
         {/* Step 1 - Franchise */}
-        <div className="bg-blue-500/[0.06] rounded-2xl p-5 border border-blue-500/[0.12] mb-4">
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06] mb-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">1</div>
+            <div className="w-7 h-7 rounded-lg bg-[#f97316]/15 flex items-center justify-center text-sm font-bold text-[#fb923c]">1</div>
             <h3 className="text-sm font-bold text-white">Franchise – nastav na maximum 2 500 CHF</h3>
           </div>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-3">
-            Franchise je částka, kterou si každý rok zaplatíš sám, než začne platit pojišťovna. <span className="text-blue-300 font-medium">Čím vyšší franchise, tím méně platíš měsíčně.</span>
+            Franchise je částka, kterou si každý rok zaplatíš sám, než začne platit pojišťovna. <span className="text-[#fb923c] font-medium">Čím vyšší franchise, tím méně platíš měsíčně.</span>
           </p>
           <div className="bg-white/[0.04] rounded-xl overflow-hidden">
             {[
@@ -116,23 +117,23 @@ export default function PojisteniPage() {
             ))}
           </div>
           <div className="mt-3 bg-green-500/[0.06] rounded-lg px-3 py-2 border border-green-500/[0.08]">
-            <p className="text-[12px] text-green-400 font-medium">✅ Doporučení: Zvol 2 500 CHF – pokud jsi zdravý/á a nechodíš často k doktorům, je to nejvýhodnější.</p>
+            <p className="text-[12px] text-green-400 font-medium flex items-start gap-1.5"><Check size={13} strokeWidth={2.5} className="mt-0.5 shrink-0" /> Doporučení: Zvol 2 500 CHF – pokud jsi zdravý/á a nechodíš často k doktorům, je to nejvýhodnější.</p>
           </div>
         </div>
 
         {/* Step 2 - Care model */}
-        <div className="bg-purple-500/[0.06] rounded-2xl p-5 border border-purple-500/[0.12] mb-4">
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06] mb-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg bg-purple-500/20 flex items-center justify-center text-sm font-bold text-purple-400">2</div>
+            <div className="w-7 h-7 rounded-lg bg-[#f97316]/15 flex items-center justify-center text-sm font-bold text-[#fb923c]">2</div>
             <h3 className="text-sm font-bold text-white">Model péče – vyber Telmed nebo HMO</h3>
           </div>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-4">
-            Můžeš ušetřit <span className="text-purple-300 font-medium">až 25 % měsíčně</span> výběrem správného modelu.
+            Můžeš ušetřit <span className="text-[#fb923c] font-medium">až 25 % měsíčně</span> výběrem správného modelu.
           </p>
           <div className="flex flex-col gap-2">
             {CARE_MODELS.map((m, i) => (
               <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors ${m.recommended ? "bg-green-500/[0.06] border-green-500/[0.12]" : "bg-white/[0.03] border-white/[0.06]"}`}>
-                <span className="text-xl">{m.icon}</span>
+                <m.Icon size={20} strokeWidth={1.75} className={m.recommended ? "text-green-400" : "text-gray-400"} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium text-white">{m.name}</p>
@@ -147,35 +148,35 @@ export default function PojisteniPage() {
         </div>
 
         {/* Step 3 - No extras */}
-        <div className="bg-yellow-500/[0.06] rounded-2xl p-5 border border-yellow-500/[0.12] mb-8">
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06] mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-7 h-7 rounded-lg bg-yellow-500/20 flex items-center justify-center text-sm font-bold text-yellow-400">3</div>
+            <div className="w-7 h-7 rounded-lg bg-[#f97316]/15 flex items-center justify-center text-sm font-bold text-[#fb923c]">3</div>
             <h3 className="text-sm font-bold text-white">Žádné doplňkové balíčky – zatím</h3>
           </div>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-3">
-            Pojišťovny ti nabídnou doplňky, které <span className="text-yellow-300 font-medium">výrazně zvyšují pojistné</span>:
+            Pojišťovny ti nabídnou doplňky, které <span className="text-[#fb923c] font-medium">výrazně zvyšují pojistné</span>:
           </p>
           <div className="flex flex-wrap gap-2 mb-3">
             {[
-              { icon: "🛏️", name: "Hospita", desc: "lepší pokoj" },
-              { icon: "🦷", name: "Denta", desc: "zuby" },
-              { icon: "👓", name: "Brýle", desc: "optika" },
-              { icon: "💆", name: "Alternativní", desc: "léčba" },
+              { Icon: BedDouble, name: "Hospita" },
+              { Icon: Smile, name: "Denta" },
+              { Icon: Glasses, name: "Brýle" },
+              { Icon: Sparkles, name: "Alternativní" },
             ].map((d, i) => (
-              <div key={i} className="bg-white/[0.04] rounded-lg px-3 py-2 border border-white/[0.06]">
-                <span className="text-sm">{d.icon}</span>
-                <span className="text-[11px] text-gray-400 ml-1.5">{d.name}</span>
+              <div key={i} className="inline-flex items-center gap-1.5 bg-white/[0.04] rounded-lg px-3 py-2 border border-white/[0.06]">
+                <d.Icon size={14} strokeWidth={1.75} className="text-gray-400" />
+                <span className="text-[11px] text-gray-400">{d.name}</span>
               </div>
             ))}
           </div>
           <div className="bg-green-500/[0.06] rounded-lg px-3 py-2 border border-green-500/[0.08]">
-            <p className="text-[12px] text-green-400 font-medium">✅ Začni jen se základním LAMal pojištěním. Doplňky můžeš přidat kdykoli později.</p>
+            <p className="text-[12px] text-green-400 font-medium flex items-start gap-1.5"><Check size={13} strokeWidth={2.5} className="mt-0.5 shrink-0" /> Začni jen se základním LAMal pojištěním. Doplňky můžeš přidat kdykoli později.</p>
           </div>
         </div>
 
         {/* Real example */}
-        <div className="bg-gradient-to-br from-green-500/[0.08] to-blue-500/[0.04] rounded-2xl p-5 border border-green-500/[0.12] mb-8">
-          <h2 className="text-base font-bold text-white mb-3">💰 Příklad z praxe</h2>
+        <div className="bg-gradient-to-br from-green-500/[0.08] to-[#f97316]/[0.04] rounded-2xl p-5 border border-green-500/[0.12] mb-8">
+          <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2"><Wallet size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Příklad z praxe</h2>
           <div className="bg-white/[0.04] rounded-xl p-4 border border-white/[0.06] mb-3">
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between"><span className="text-[12px] text-gray-400">Pojišťovna:</span><span className="text-[12px] text-white font-medium">Assura Basic Telmed</span></div>
@@ -206,16 +207,16 @@ export default function PojisteniPage() {
 
         {/* Summary box */}
         <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06] mb-8">
-          <h2 className="text-base font-bold text-white mb-4">📦 Shrnutí – nejlevnější pojištění</h2>
+          <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2"><Package size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Shrnutí – nejlevnější pojištění</h2>
           <div className="flex flex-col gap-2.5">
             {[
-              { label: "Franchise", value: "2 500 CHF (maximum)", icon: "✅" },
-              { label: "Model", value: "Telmed nebo HMO", icon: "✅" },
-              { label: "Doplňky", value: "Žádné (jen LAMal základ)", icon: "✅" },
-              { label: "Cena", value: "180–250 CHF/měsíc", icon: "💰" },
+              { label: "Franchise", value: "2 500 CHF (maximum)", Icon: Check },
+              { label: "Model", value: "Telmed nebo HMO", Icon: Check },
+              { label: "Doplňky", value: "Žádné (jen LAMal základ)", Icon: Check },
+              { label: "Cena", value: "180–250 CHF/měsíc", Icon: Wallet },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 bg-white/[0.03] rounded-xl px-4 py-3 border border-white/[0.04]">
-                <span className="text-base">{item.icon}</span>
+                <item.Icon size={16} strokeWidth={2} className="text-[#fb923c] shrink-0" />
                 <div className="flex-1">
                   <span className="text-[11px] text-gray-500">{item.label}</span>
                   <p className="text-sm font-medium text-white">{item.value}</p>
@@ -227,7 +228,7 @@ export default function PojisteniPage() {
 
         {/* Warning about cheap insurers */}
         <div className="bg-yellow-500/[0.06] rounded-2xl p-5 border border-yellow-500/[0.12] mb-8">
-          <h2 className="text-base font-bold text-white mb-3">⚠️ Na co si dát pozor</h2>
+          <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2"><Zap size={18} strokeWidth={2} className="text-yellow-400" /> Na co si dát pozor</h2>
           <div className="flex flex-col gap-2.5">
             {[
               "Assura má často delší dobu schválení a složitější komunikaci",
@@ -235,7 +236,7 @@ export default function PojisteniPage() {
               "U Telmed modelu musíš zavolat na linku dřív, než půjdeš k lékaři",
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-2.5">
-                <span className="text-yellow-400 mt-0.5 flex-shrink-0 text-sm">⚡</span>
+                <Zap size={14} strokeWidth={2} className="text-yellow-400 mt-0.5 shrink-0" />
                 <span className="text-[13px] text-gray-300 leading-relaxed">{item}</span>
               </div>
             ))}
@@ -243,7 +244,7 @@ export default function PojisteniPage() {
         </div>
 
         {/* Insurance contacts */}
-        <h2 className="text-lg font-bold text-white mb-1">🏥 Kontakty na pojišťovny</h2>
+        <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2"><Hospital size={20} strokeWidth={1.75} className="text-[#fb923c]" /> Kontakty na pojišťovny</h2>
         <p className="text-xs text-gray-500 mb-4">Nejlevnější pojišťovny jsou zvýrazněné</p>
 
         <div className="flex flex-col gap-2.5 mb-8">
@@ -257,13 +258,13 @@ export default function PojisteniPage() {
                       <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400 uppercase">{company.note}</span>
                     )}
                   </div>
-                  <p className="text-[11px] text-gray-500 mt-0.5">📍 {company.city}</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1"><MapPin size={11} strokeWidth={2} className="shrink-0" /> {company.city}</p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-1">
-                <a href={`tel:+41${company.phone.replace(/\s/g, "").replace(/^0/, "")}`} className="text-[12px] text-gray-400 hover:text-white transition-colors">📞 {company.phone}</a>
-                {company.email && <a href={`mailto:${company.email}`} className="text-[12px] text-gray-400 hover:text-white transition-colors">✉️ {company.email}</a>}
-                <a href={`https://www.${company.web}`} target="_blank" rel="noopener noreferrer" className="text-[12px] text-blue-400 hover:text-blue-300 transition-colors">🌐 {company.web}</a>
+                <a href={`tel:+41${company.phone.replace(/\s/g, "").replace(/^0/, "")}`} className="inline-flex items-center gap-1 text-[12px] text-gray-400 hover:text-white transition-colors"><Phone size={11} strokeWidth={2} /> {company.phone}</a>
+                {company.email && <a href={`mailto:${company.email}`} className="inline-flex items-center gap-1 text-[12px] text-gray-400 hover:text-white transition-colors"><Mail size={11} strokeWidth={2} /> {company.email}</a>}
+                <a href={`https://www.${company.web}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[12px] text-[#fb923c] hover:text-[#fb923c]/80 transition-colors"><Globe size={11} strokeWidth={2} /> {company.web}</a>
               </div>
             </div>
           ))}
@@ -271,10 +272,10 @@ export default function PojisteniPage() {
 
         {/* CTA */}
         <Link href="/kontakty" className="block mb-6">
-          <div className="bg-gradient-to-br from-red-500/[0.12] to-red-500/[0.04] rounded-2xl p-5 border border-red-500/[0.15] text-center hover:shadow-[0_0_30px_rgba(239,68,68,0.15)] transition-shadow duration-300">
+          <div className="bg-gradient-to-br from-[#f97316]/[0.12] to-[#f97316]/[0.04] rounded-2xl p-5 border border-[#f97316]/[0.15] text-center hover:shadow-[0_0_30px_rgba(249,115,22,0.18)] transition-shadow duration-300">
             <p className="text-sm font-bold text-white mb-1">Najdi práci přes ověřenou agenturu</p>
             <p className="text-[12px] text-gray-400 mb-3">1 000+ švýcarských personálních agentur s kontakty</p>
-            <span className="bg-red-500 text-white px-5 py-2.5 rounded-[10px] text-[13px] font-semibold shadow-lg shadow-red-500/30 inline-block">Zobrazit agentury →</span>
+            <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] px-5 py-2.5 rounded-[10px] text-[13px] font-bold shadow-lg shadow-[#f97316]/30">Zobrazit agentury <ArrowRight size={14} strokeWidth={2.5} /></span>
           </div>
         </Link>
       </div>
