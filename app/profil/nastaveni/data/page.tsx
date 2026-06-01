@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../../supabase'
-import { ArrowLeft, Database, Download, Trash2, AlertTriangle, FileDown } from 'lucide-react'
+import { ArrowLeft, Database, Trash2, AlertTriangle, FileDown } from 'lucide-react'
 
 const PROFILE_LABELS: Record<string, string> = {
   full_name: 'Jméno', telefon: 'Telefon', datum_narozeni: 'Datum narození', adresa: 'Adresa',
