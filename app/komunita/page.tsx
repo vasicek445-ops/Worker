@@ -587,7 +587,7 @@ export default function KomunitaPage() {
         <div>
           <p className="text-gray-600 text-[10px] font-bold uppercase tracking-wider mb-2">O komunitě</p>
           <p className="text-gray-500 text-xs leading-relaxed">Komunita Woker je o <span className="text-gray-300">vzájemném poznávání a pomoci</span> mezi Čechy a Slováky ve Švýcarsku. Jsem tu osobně hodně aktivní — s řadou věcí ti dokážu poradit individuálně.</p>
-          <p className="text-gray-500 text-xs leading-relaxed mt-2">Řeš tu spolubydlení, ptej se na dotazy a sdílej tipy z praxe. Když narazíš na překážku, stačí napsat sem do komunity — <span className="text-[#fb923c]">do 48 hodin ti na dotaz odpovím.</span></p>
+          <p className="text-gray-500 text-xs leading-relaxed mt-2">Řeš tu spolubydlení, ptej se na dotazy a sdílej tipy z praxe. Když narazíš na překážku, stačí napsat sem do komunity — nebo mi napiš osobně do <a href="/zpravy" className="text-[#fb923c] hover:underline">soukromé zprávy</a>. <span className="text-[#fb923c]">Do 48 hodin ti odpovím.</span></p>
         </div>
         <div>
           <p className="text-gray-600 text-[10px] font-bold uppercase tracking-wider mb-2">Pravidla</p>
