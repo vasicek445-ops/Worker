@@ -1,5 +1,7 @@
 import Link from "next/link";
 import TaxCalculator from "../../components/TaxCalculator";
+import { Coins, Info, Church, MapPin, BarChart3, Pin, Check, AlertTriangle, TrendingDown, TrendingUp, Minus, Lightbulb, ArrowRight } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 const LOW_TAX = [
   { canton: "Zug", rate: "22,2 %", lowest: "Baar (22,1 %), Neuheim (23,3 %)" },
@@ -65,11 +67,11 @@ const CANTONS_LINKS = [
   { name: "Zürich (ZH)", note: "jedna z nejlépe zpracovaných stránek, bez církevní daně" },
 ];
 
-function TaxTable({ title, emoji, data, colorClass }: { title: string; emoji: string; data: typeof LOW_TAX; colorClass: string }) {
+function TaxTable({ title, Icon, data, colorClass }: { title: string; Icon: LucideIcon; data: typeof LOW_TAX; colorClass: string }) {
   return (
     <div className="mb-8">
       <h3 className={`text-base font-bold mb-3 flex items-center gap-2 ${colorClass}`}>
-        <span>{emoji}</span> {title}
+        <Icon size={16} strokeWidth={2} /> {title}
       </h3>
       <div className="bg-white/[0.03] rounded-2xl border border-white/[0.06] overflow-hidden">
         {data.map((item, i) => (
@@ -90,16 +92,15 @@ function TaxTable({ title, emoji, data, colorClass }: { title: string; emoji: st
 
 export default function DanePage() {
   return (
-    <main className="min-h-screen bg-[#0a0a0c] pb-24">
-      <div className="fixed top-[-120px] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(239,68,68,0.06)_0%,transparent_70%)] pointer-events-none z-0" />
+    <main className="min-h-screen bg-[#0a0a12] pb-24" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+      <div className="fixed top-[-120px] left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,rgba(249,115,22,0.07)_0%,transparent_70%)] pointer-events-none z-0" />
 
       {/* Header */}
       <div className="relative z-10 px-5 pt-6 pb-4">
-        <Link href="/dashboard" className="text-gray-500 text-sm hover:text-gray-400 transition-colors mb-4 inline-block">← Zpět</Link>
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/20 flex items-center justify-center text-2xl">💰</div>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#fb923c]/20 to-[#f97316]/20 border border-[#f97316]/25 flex items-center justify-center"><Coins size={24} strokeWidth={1.75} className="text-[#fb923c]" /></div>
           <div>
-            <span className="text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider text-green-400 bg-green-500/10">Nové</span>
+            <span className="text-[10px] font-semibold px-2 py-1 rounded-md uppercase tracking-wider text-[#fb923c] bg-[#f97316]/10">Nové</span>
           </div>
         </div>
         <h1 className="text-2xl font-bold text-white tracking-tight mt-3">Quellensteuer: Kompletní průvodce srážkovou daní</h1>
@@ -110,15 +111,15 @@ export default function DanePage() {
       <div className="px-5 mt-4 relative z-10">
 
         {/* Intro box */}
-        <div className="bg-blue-500/[0.06] rounded-2xl p-5 border border-blue-500/[0.12] mb-8">
-          <h2 className="text-base font-bold text-white mb-3">🇨🇭 Co je Quellensteuer?</h2>
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06] mb-8">
+          <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2"><Info size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Co je Quellensteuer?</h2>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-3">
             Quellensteuer je forma daně, která se ti <span className="text-white font-semibold">automaticky strhává z výplaty</span>, pokud:
           </p>
           <div className="flex flex-col gap-2 mb-3">
             {["Nemáš švýcarské občanství", "Pracuješ ve Švýcarsku", "Nevyděláváš víc než 120 000 CHF ročně"].map((item, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#fb923c] flex-shrink-0" />
                 <span className="text-[13px] text-gray-300">{item}</span>
               </div>
             ))}
@@ -129,17 +130,17 @@ export default function DanePage() {
         </div>
 
         {/* Church tax warning */}
-        <div className="bg-red-500/[0.06] rounded-2xl p-5 border border-red-500/[0.12] mb-8">
-          <h2 className="text-base font-bold text-white mb-3">✝️ Církevní daň – pozor na zbytečné náklady</h2>
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06] mb-8">
+          <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2"><Church size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Církevní daň – pozor na zbytečné náklady</h2>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-3">
-            V některých kantonech ti do Quellensteuer automaticky přidají i <span className="text-red-400 font-semibold">církevní daň (Kirchensteuer)</span>, pokud jsi při registraci uvedl náboženské vyznání.
+            V některých kantonech ti do Quellensteuer automaticky přidají i <span className="text-white font-semibold">církevní daň (Kirchensteuer)</span>, pokud jsi při registraci uvedl náboženské vyznání.
           </p>
-          <div className="bg-red-500/[0.08] rounded-xl p-4 border border-red-500/[0.1] mb-3">
-            <p className="text-sm font-bold text-red-400 mb-1">Rozdíl může být až 500–800 CHF ročně!</p>
+          <div className="bg-red-500/[0.08] rounded-xl p-4 border border-red-500/[0.12] mb-3">
+            <p className="text-sm font-bold text-red-400 mb-1 flex items-center gap-1.5"><AlertTriangle size={14} strokeWidth={2} /> Rozdíl může být až 500–800 CHF ročně!</p>
             <p className="text-[12px] text-gray-400">Někdy i víc, v závislosti na kantonu a výši příjmu.</p>
           </div>
-          <div className="bg-green-500/[0.06] rounded-xl p-4 border border-green-500/[0.1]">
-            <p className="text-sm font-bold text-green-400 mb-1">👉 Doporučení</p>
+          <div className="bg-[#f97316]/[0.08] rounded-xl p-4 border border-[#f97316]/[0.15]">
+            <p className="text-sm font-bold text-[#fb923c] mb-1 flex items-center gap-1.5"><Lightbulb size={14} strokeWidth={2} /> Doporučení</p>
             <p className="text-[13px] text-gray-300 leading-relaxed">
               Uveď, že nemáš žádné náboženské vyznání (<span className="text-white font-medium">ohne Konfession</span>). Je to běžná a legální možnost – a ušetříš nemalé peníze.
             </p>
@@ -147,30 +148,30 @@ export default function DanePage() {
         </div>
 
         {/* Canton importance */}
-        <div className="bg-yellow-500/[0.06] rounded-2xl p-5 border border-yellow-500/[0.12] mb-8">
-          <h2 className="text-base font-bold text-white mb-3">📍 26 kantonů = 26 různých daní</h2>
+        <div className="bg-[#f97316]/[0.05] rounded-2xl p-5 border border-[#f97316]/[0.12] mb-8">
+          <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2"><MapPin size={18} strokeWidth={1.75} className="text-[#fb923c]" /> 26 kantonů = 26 různých daní</h2>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-3">
-            Tohle je <span className="text-yellow-400 font-semibold">extrémně důležité!</span> Každý kanton má jinou daňovou sazbu. Například:
+            Tohle je <span className="text-[#fb923c] font-semibold">extrémně důležité!</span> Každý kanton má jinou daňovou sazbu. Například:
           </p>
           <div className="flex flex-col gap-2 mb-4">
             <div className="flex items-start gap-2">
-              <span className="text-green-400 text-sm mt-0.5">▼</span>
+              <TrendingDown size={15} strokeWidth={2} className="text-green-400 mt-0.5 shrink-0" />
               <span className="text-[13px] text-gray-300"><span className="text-green-400 font-medium">Zug, Schwyz, Nidwalden</span> – nejnižší daně</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-red-400 text-sm mt-0.5">▲</span>
+              <TrendingUp size={15} strokeWidth={2} className="text-red-400 mt-0.5 shrink-0" />
               <span className="text-[13px] text-gray-300"><span className="text-red-400 font-medium">Ženeva, Lausanne, Basel, Bern</span> – vyšší zdanění</span>
             </div>
           </div>
-          <div className="bg-yellow-500/[0.08] rounded-xl p-4 border border-yellow-500/[0.1]">
-            <p className="text-sm font-bold text-yellow-400 mb-2">🧐 Proto je důležité vědět:</p>
+          <div className="bg-[#f97316]/[0.08] rounded-xl p-4 border border-[#f97316]/[0.12]">
+            <p className="text-sm font-bold text-[#fb923c] mb-2">Proto je důležité vědět:</p>
             <div className="flex flex-col gap-1.5">
               <p className="text-[13px] text-gray-300">• Kde je sídlo agentury, přes kterou pracuješ</p>
               <p className="text-[13px] text-gray-300">• Kde jsi oficiálně přihlášený k pobytu</p>
             </div>
           </div>
-          <div className="mt-3 bg-red-500/[0.06] rounded-xl p-3 border border-red-500/[0.08]">
-            <p className="text-[12px] text-red-400 font-medium">⚠️ Ne každá agentura to dělá správně. Pokud tě přihlásí do dražšího kantonu, můžeš zbytečně přijít o stovky franků měsíčně.</p>
+          <div className="mt-3 bg-red-500/[0.06] rounded-xl p-3 border border-red-500/[0.1]">
+            <p className="text-[12px] text-red-400 font-medium flex items-start gap-1.5"><AlertTriangle size={14} strokeWidth={2} className="mt-0.5 shrink-0" /> Ne každá agentura to dělá správně. Pokud tě přihlásí do dražšího kantonu, můžeš zbytečně přijít o stovky franků měsíčně.</p>
           </div>
         </div>
 
@@ -179,34 +180,34 @@ export default function DanePage() {
 
         {/* Tax rates by canton */}
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-white mb-1">📊 Daňové sazby podle kantonu</h2>
+          <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2"><BarChart3 size={20} strokeWidth={1.75} className="text-[#fb923c]" /> Daňové sazby podle kantonu</h2>
           <p className="text-xs text-gray-500 mb-6">Průměr za celou zemi: <span className="text-white font-bold">33,2 %</span></p>
 
-          <TaxTable title="Nejnižší zdanění" emoji="🟢" data={LOW_TAX} colorClass="text-green-400" />
-          <TaxTable title="Střední zdanění" emoji="🟡" data={MID_TAX} colorClass="text-yellow-400" />
-          <TaxTable title="Vyšší zdanění" emoji="🔴" data={HIGH_TAX} colorClass="text-red-400" />
+          <TaxTable title="Nejnižší zdanění" Icon={TrendingDown} data={LOW_TAX} colorClass="text-green-400" />
+          <TaxTable title="Střední zdanění" Icon={Minus} data={MID_TAX} colorClass="text-yellow-400" />
+          <TaxTable title="Vyšší zdanění" Icon={TrendingUp} data={HIGH_TAX} colorClass="text-red-400" />
         </div>
 
         {/* All 26 cantons links */}
         <div className="mb-8">
-          <h2 className="text-base font-bold text-white mb-4">🇨🇭 Quellensteuer podle kantonu – přehled</h2>
+          <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2"><MapPin size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Quellensteuer podle kantonu – přehled</h2>
           <div className="bg-white/[0.03] rounded-2xl border border-white/[0.06] overflow-hidden">
             {CANTONS_LINKS.map((c, i) => (
               <div key={i} className={`px-4 py-3 ${i < CANTONS_LINKS.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-white">{i + 1}. {c.name}</p>
                 </div>
-                <p className="text-[11px] text-gray-500 mt-0.5">✅ {c.note}</p>
+                <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1"><Check size={11} strokeWidth={2.5} className="text-[#fb923c] shrink-0" /> {c.note}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Final note */}
-        <div className="bg-purple-500/[0.06] rounded-2xl p-5 border border-purple-500/[0.12] mb-8">
-          <h2 className="text-base font-bold text-white mb-3">📌 Důležitá poznámka</h2>
+        <div className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.06] mb-8">
+          <h2 className="text-base font-bold text-white mb-3 flex items-center gap-2"><Pin size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Důležitá poznámka</h2>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-3">
-            Uvedená procenta (tzv. <span className="text-purple-300 font-medium">Steuerfüsse</span>) představují celkové daňové zatížení a často se vztahují na vysokopříjmové osoby.
+            Uvedená procenta (tzv. <span className="text-white font-medium">Steuerfüsse</span>) představují celkové daňové zatížení a často se vztahují na vysokopříjmové osoby.
           </p>
           <p className="text-[13px] text-gray-300 leading-relaxed mb-4">
             Pokud jsi běžný zaměstnanec s Quellensteuer, tvoje <span className="text-white font-semibold">efektivní sazba bude často o dost nižší</span> – hlavně pokud:
@@ -214,7 +215,7 @@ export default function DanePage() {
           <div className="flex flex-col gap-2 mb-4">
             {["Nemáš církevní daň", "Jsi svobodný bez dětí", "Máš příjem do cca 5 000–7 000 CHF měsíčně"].map((item, i) => (
               <div key={i} className="flex items-center gap-2">
-                <span className="text-green-400">✓</span>
+                <Check size={14} strokeWidth={2.5} className="text-green-400 shrink-0" />
                 <span className="text-[13px] text-gray-300">{item}</span>
               </div>
             ))}
@@ -227,10 +228,10 @@ export default function DanePage() {
 
         {/* CTA */}
         <Link href="/kontakty" className="block mb-6">
-          <div className="bg-gradient-to-br from-red-500/[0.12] to-red-500/[0.04] rounded-2xl p-5 border border-red-500/[0.15] text-center hover:shadow-[0_0_30px_rgba(239,68,68,0.15)] transition-shadow duration-300">
+          <div className="bg-gradient-to-br from-[#f97316]/[0.12] to-[#f97316]/[0.04] rounded-2xl p-5 border border-[#f97316]/[0.15] text-center hover:shadow-[0_0_30px_rgba(249,115,22,0.18)] transition-shadow duration-300">
             <p className="text-sm font-bold text-white mb-1">Najdi agenturu ve správném kantonu</p>
             <p className="text-[12px] text-gray-400 mb-3">Ušetři stovky franků měsíčně výběrem správné lokace</p>
-            <span className="bg-red-500 text-white px-5 py-2.5 rounded-[10px] text-[13px] font-semibold shadow-lg shadow-red-500/30 inline-block">Zobrazit 1 000+ agentur →</span>
+            <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] px-5 py-2.5 rounded-[10px] text-[13px] font-bold shadow-lg shadow-[#f97316]/30">Zobrazit 1 000+ agentur <ArrowRight size={14} strokeWidth={2.5} /></span>
           </div>
         </Link>
       </div>
