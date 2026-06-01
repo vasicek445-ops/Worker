@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HeartPulse, AlertTriangle, Banknote, Lightbulb, Target, Check, Stethoscope, Phone, Building2, Hospital, BedDouble, Smile, Glasses, Sparkles, Wallet, Package, Zap, MapPin, Mail, Globe, ArrowRight } from "lucide-react";
+import { HeartPulse, AlertTriangle, Banknote, Lightbulb, Target, Check, Stethoscope, Phone, Building2, Hospital, BedDouble, Smile, Glasses, Sparkles, Wallet, Package, Zap, MapPin, Mail, Globe, ArrowRight, ShieldCheck, Star } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const INSURANCE_COMPANIES = [
@@ -64,6 +64,30 @@ export default function PojisteniPage() {
             ))}
           </div>
         </div>
+
+        {/* Verified specialist — Branislav Hepner */}
+        <a href="https://helpner.ch" target="_blank" rel="noopener noreferrer" className="block mb-6 no-underline group">
+          <div className="bg-gradient-to-br from-[#f97316]/[0.1] to-[#fb923c]/[0.03] rounded-2xl p-5 border border-[#f97316]/20 hover:border-[#f97316]/40 hover:shadow-[0_0_30px_rgba(249,115,22,0.12)] transition">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#f97316]/15 border border-[#f97316]/25 flex items-center justify-center text-[#fb923c] font-extrabold text-base">BH</div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-white font-bold text-sm">Branislav Hepner</h3>
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider bg-[#f97316]/15 text-[#fb923c] px-1.5 py-0.5 rounded"><ShieldCheck size={11} strokeWidth={2.5} /> Ověřený</span>
+                </div>
+                <p className="text-[12px] text-gray-400 mt-0.5">Nezávislý pojišťovací poradce · Wallisellen (ZH)</p>
+                <p className="text-[13px] text-gray-300 leading-relaxed mt-2">
+                  Nechce se ti to řešit samotnému? <span className="text-white font-medium">Mluví česky a slovensky</span> a pomůže ti vybrat a nastavit nejlevnější pojištění, vyřídit Prämienverbilligung, daně i 3. pilíř.
+                </p>
+                <div className="flex items-center gap-3 mt-3 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-[11px] text-yellow-400"><Star size={12} strokeWidth={2} className="fill-yellow-400" /> 4,5/5 Trustpilot</span>
+                  <span className="text-[11px] text-gray-500">CZ · SK · DE · EN · PL</span>
+                  <span className="ml-auto inline-flex items-center gap-1 text-[12px] font-semibold text-[#fb923c]">helpner.ch <ArrowRight size={13} strokeWidth={2.5} className="group-hover:translate-x-0.5 transition-transform" /></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
 
         {/* Price highlight */}
         <div className="bg-green-500/[0.06] rounded-2xl p-5 border border-green-500/[0.12] mb-6">
