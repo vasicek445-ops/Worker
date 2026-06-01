@@ -124,7 +124,17 @@ export async function GET(req: NextRequest) {
       .limit(100)
     if (since) mq = mq.gt('created_at', since)
     const { data: msgs } = await mq
-    return NextResponse.json({ messages: (msgs || []).reverse() })
+    const ordered = (msgs || []).reverse()
+    // Dotáhni profilové fotky autorů (vždy aktuální, bez denormalizace do zpráv)
+    const ids = [...new Set(ordered.filter(m => !m.is_ai).map(m => m.user_id))]
+    const avatars: Record<string, string | null> = {}
+    if (ids.length) {
+      const { data: profs } = await supabaseAdmin.from('profiles').select('id, avatar_url').in('id', ids)
+      for (const p of profs || []) avatars[p.id] = p.avatar_url
+    }
+    return NextResponse.json({
+      messages: ordered.map(m => ({ ...m, avatar_url: m.is_ai ? null : (avatars[m.user_id] || null) })),
+    })
   }
 
   // Single post with comments
@@ -337,7 +347,8 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    return NextResponse.json({ message: data })
+    const { data: prof } = await supabaseAdmin.from('profiles').select('avatar_url').eq('id', user.id).single()
+    return NextResponse.json({ message: { ...data, avatar_url: prof?.avatar_url || null } })
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 })

@@ -31,6 +31,7 @@ const CHANNELS: { id: string; label: string; topic: string; Icon: LucideIcon }[]
 interface Message {
   id: string; channel: string; user_name: string; content: string; is_ai: boolean; created_at: string
   attachment_url?: string | null; attachment_type?: string | null; attachment_name?: string | null
+  avatar_url?: string | null
 }
 
 interface Group { user_name: string; is_ai: boolean; items: Message[] }
@@ -355,6 +356,9 @@ export default function KomunitaPage() {
                           <div className="w-9 h-9 rounded-full bg-[#f97316]/15 border border-[#f97316]/30 flex items-center justify-center">
                             <Sparkles size={16} strokeWidth={ICON_STROKE} className="text-[#fb923c]" />
                           </div>
+                        ) : g.items[0].avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={g.items[0].avatar_url} alt={g.user_name} className="w-9 h-9 rounded-full object-cover border border-gray-700" />
                         ) : (
                           <div className="w-9 h-9 rounded-full bg-[#252525] border border-gray-700 flex items-center justify-center text-gray-300 text-sm font-bold">
                             {initial(g.user_name)}
