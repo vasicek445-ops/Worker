@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../../supabase'
+import { ArrowLeft, ArrowRight, KeyRound, Mail, LogIn } from 'lucide-react'
 
 export default function UcetPage() {
   const router = useRouter()
@@ -76,18 +77,19 @@ export default function UcetPage() {
 
   const userEmail = user?.email || ''
   const provider = user?.app_metadata?.provider
-  const providerLabel = provider === 'google' ? '🔵 Google' : '📧 Email + heslo'
+  const providerName = provider === 'google' ? 'Google' : 'Email + heslo'
+  const ProviderIcon = provider === 'google' ? LogIn : Mail
   const isOAuth = provider && provider !== 'email'
 
   return (
     <div className="min-h-screen bg-[#0a0a12] text-white" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="max-w-2xl mx-auto p-6">
         <header className="mb-8">
-          <Link href="/profil/nastaveni" className="text-white/40 text-sm hover:text-white/70 transition no-underline">
-            ← Zpět na nastavení
+          <Link href="/profil/nastaveni" className="inline-flex items-center gap-1.5 text-white/40 text-sm hover:text-white/70 transition no-underline">
+            <ArrowLeft size={15} strokeWidth={1.75} /> Zpět na nastavení
           </Link>
           <h1 className="text-2xl font-extrabold text-white m-0 mt-3 flex items-center gap-2">
-            <span>🔐</span> Účet
+            <KeyRound size={22} strokeWidth={1.75} className="text-[#fb923c]" /> Účet
           </h1>
           <p className="text-white/40 text-sm mt-1">Email, heslo a způsob přihlášení.</p>
         </header>
@@ -101,9 +103,9 @@ export default function UcetPage() {
           {!showEmailChange ? (
             <button
               onClick={() => setShowEmailChange(true)}
-              className="text-[#fb923c] text-sm font-medium hover:text-[#fb923c]/80 transition"
+              className="inline-flex items-center gap-1.5 text-[#fb923c] text-sm font-medium hover:text-[#fb923c]/80 transition"
             >
-              Změnit email →
+              Změnit email <ArrowRight size={14} strokeWidth={1.75} />
             </button>
           ) : (
             <div className="space-y-2 pt-2 border-t border-white/[0.04]">
@@ -139,14 +141,14 @@ export default function UcetPage() {
           <h2 className="text-white/25 text-[10px] font-bold uppercase tracking-wider m-0 mb-3">Heslo</h2>
           {isOAuth ? (
             <p className="text-white/40 text-sm m-0">
-              Přihlašuješ se přes {providerLabel}. Heslo se nastavuje u poskytovatele.
+              Přihlašuješ se přes {providerName}. Heslo se nastavuje u poskytovatele.
             </p>
           ) : !showPasswordChange ? (
             <button
               onClick={() => setShowPasswordChange(true)}
-              className="text-[#fb923c] text-sm font-medium hover:text-[#fb923c]/80 transition"
+              className="inline-flex items-center gap-1.5 text-[#fb923c] text-sm font-medium hover:text-[#fb923c]/80 transition"
             >
-              Změnit heslo →
+              Změnit heslo <ArrowRight size={14} strokeWidth={1.75} />
             </button>
           ) : (
             <div className="space-y-2">
@@ -186,7 +188,7 @@ export default function UcetPage() {
         {/* Login method */}
         <div className="bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 mb-4">
           <h2 className="text-white/25 text-[10px] font-bold uppercase tracking-wider m-0 mb-3">Přihlášení</h2>
-          <p className="text-white text-sm m-0">{providerLabel}</p>
+          <p className="inline-flex items-center gap-2 text-white text-sm m-0"><ProviderIcon size={16} strokeWidth={1.75} className="text-[#fb923c]" /> {providerName}</p>
         </div>
 
         {toast && (
