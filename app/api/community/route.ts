@@ -60,9 +60,19 @@ Odpověz jako AI asistent komunity. Buď konkrétní a užitečný.`
   }
 }
 
-async function generateChatAIReply(channel: string, question: string, history: { user_name: string; content: string }[]) {
+// Slash příkazy v komunitním chatu. Každý je AI zkratka s vlastní instrukcí
+// šitou na švýcarský trh. Frontend zrcadlí tenhle seznam do "/" menu.
+const SLASH_COMMANDS: Record<string, string> = {
+  ai: '',
+  mzda: 'Uživatel chce vědět obvyklou mzdu. Uveď konkrétní rozpětí (CHF/měsíc i CHF/hod) pro daný obor a kanton, zmíň 13. plat a hlavní faktory. Pokud obor nebo kanton chybí, krátce se doptej.',
+  povoleni: 'Uživatel se ptá na pracovní povolení. Vysvětli relevantní typ (L / B / C / G, Meldeverfahren do 90 dnů) — podmínky, dobu platnosti a jak ho získat. Buď konkrétní.',
+  byt: 'Uživatel hledá bydlení. Dej praktické tipy: portály (Homegate, Flatfox, ImmoScout24), obvyklé náklady v daném regionu, Bewerbungsdossier, Kaution (3 měsíce) a Nebenkosten.',
+}
+
+async function generateChatAIReply(channel: string, question: string, history: { user_name: string; content: string }[], commandInstruction = '') {
   try {
     const ctx = history.slice(-8).map(m => `${m.user_name}: ${m.content}`).join('\n')
+    const focus = commandInstruction ? `\nSPECIÁLNÍ INSTRUKCE PRO TENTO DOTAZ:\n${commandInstruction}\n` : ''
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 800,
@@ -71,8 +81,8 @@ async function generateChatAIReply(channel: string, question: string, history: {
         role: 'user',
         content: `Jsi v chat kanálu #${channel} komunity Woker. Nedávná konverzace:
 ${ctx || '(zatím prázdno)'}
-
-Někdo se tě právě zeptal (oslovil tě @AI):
+${focus}
+Někdo se tě právě zeptal (oslovil tě @AI nebo slash příkazem):
 ${question}
 
 Odpověz stručně a věcně jako účastník chatu — krátká zpráva, ne esej. Max 2-3 odstavce.`
@@ -283,23 +293,35 @@ export async function POST(req: NextRequest) {
   }
 
   if (action === 'send_message') {
-    const { channel, content } = body
-    if (!channel || !content?.trim()) {
+    const { channel, content, attachment_url, attachment_type, attachment_name } = body
+    const text = (content || '').trim()
+    if (!channel || (!text && !attachment_url)) {
       return NextResponse.json({ error: 'Prázdná zpráva' }, { status: 400 })
     }
-    const text = content.trim()
 
     const { data, error } = await supabaseAdmin
       .from('community_messages')
-      .insert({ channel, user_id: user.id, user_name: userName, content: text, is_ai: false })
+      .insert({
+        channel, user_id: user.id, user_name: userName, content: text, is_ai: false,
+        attachment_url: attachment_url || null,
+        attachment_type: attachment_type || null,
+        attachment_name: attachment_name || null,
+      })
       .select()
       .single()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // AI reply only when opted-in via @AI or /ai prefix
-    if (/^\s*(@ai|\/ai)\b/i.test(text)) {
-      const question = text.replace(/^\s*(@ai|\/ai)\b[:,]?\s*/i, '').trim() || text
+    // AI reply only when opted-in via @AI or a slash command (/ai, /mzda, /povoleni, /byt)
+    const slashMatch = text.match(/^\s*\/(\w+)\b[:,]?\s*/i)
+    const cmd = slashMatch?.[1]?.toLowerCase()
+    const isAt = /^\s*@ai\b/i.test(text)
+    const isSlash = cmd && cmd in SLASH_COMMANDS
+    if (isAt || isSlash) {
+      const question = isSlash
+        ? (text.slice(slashMatch![0].length).trim() || text)
+        : (text.replace(/^\s*@ai\b[:,]?\s*/i, '').trim() || text)
+      const instruction = isSlash ? SLASH_COMMANDS[cmd!] : ''
       const { data: recent } = await supabaseAdmin
         .from('community_messages')
         .select('user_name, content')
@@ -307,7 +329,7 @@ export async function POST(req: NextRequest) {
         .order('created_at', { ascending: false })
         .limit(8)
       const history = (recent || []).reverse()
-      generateChatAIReply(channel, question, history).then(async (aiReply) => {
+      generateChatAIReply(channel, question, history, instruction).then(async (aiReply) => {
         if (!aiReply) return
         await supabaseAdmin.from('community_messages').insert({
           channel, user_id: user.id, user_name: 'Woker AI', content: aiReply, is_ai: true,

@@ -4,10 +4,21 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
 import { supabase } from '../supabase'
-import { MessageCircle, Home, Lightbulb, HelpCircle, Target, Hash, Search, X, Sparkles, Send } from 'lucide-react'
+import { MessageCircle, Home, Lightbulb, HelpCircle, Target, Hash, Search, X, Sparkles, Send, Plus, Paperclip, FileText, Download, Banknote, KeyRound } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 const ICON_STROKE = 1.75
+
+// Slash příkazy — zrcadlí SLASH_COMMANDS v /api/community/route.ts.
+// Po napsání "/" vyskočí menu (jako Discord); výběr předvyplní příkaz.
+const SLASH_COMMANDS: { cmd: string; label: string; desc: string; Icon: LucideIcon }[] = [
+  { cmd: 'ai', label: '/ai', desc: 'Zeptej se AI asistenta na cokoliv', Icon: Sparkles },
+  { cmd: 'mzda', label: '/mzda', desc: 'Obvyklá mzda v oboru a kantonu', Icon: Banknote },
+  { cmd: 'povoleni', label: '/povoleni', desc: 'Pracovní povolení L / B / C / G', Icon: KeyRound },
+  { cmd: 'byt', label: '/byt', desc: 'Tipy na bydlení a obvyklé náklady', Icon: Home },
+]
+
+const MAX_UPLOAD = 8 * 1024 * 1024 // 8 MB
 
 const CHANNELS: { id: string; label: string; topic: string; Icon: LucideIcon }[] = [
   { id: 'general', label: 'general', topic: 'Obecná diskuze komunity', Icon: MessageCircle },
@@ -19,6 +30,7 @@ const CHANNELS: { id: string; label: string; topic: string; Icon: LucideIcon }[]
 
 interface Message {
   id: string; channel: string; user_name: string; content: string; is_ai: boolean; created_at: string
+  attachment_url?: string | null; attachment_type?: string | null; attachment_name?: string | null
 }
 
 interface Group { user_name: string; is_ai: boolean; items: Message[] }
@@ -31,7 +43,11 @@ export default function KomunitaPage() {
   const [draft, setDraft] = useState('')
   const [loadingMsgs, setLoadingMsgs] = useState(true)
   const [sending, setSending] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [slashOpen, setSlashOpen] = useState(false)
+  const [slashIndex, setSlashIndex] = useState(0)
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const messagesRef = useRef<Message[]>([])
   messagesRef.current = messages
   const channelRef = useRef(channel)
@@ -41,6 +57,11 @@ export default function KomunitaPage() {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const activeChannel = CHANNELS.find(c => c.id === channel) || CHANNELS[0]
+
+  // Slash menu: aktivní jen dokud uživatel píše "/slovo" bez mezery
+  const slashRe = /^\/(\w*)$/.exec(draft)
+  const slashMatches = slashRe ? SLASH_COMMANDS.filter(c => c.cmd.startsWith(slashRe[1].toLowerCase())) : []
+  const showSlash = slashOpen && slashMatches.length > 0
 
   const authHeader = async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -139,14 +160,64 @@ export default function KomunitaPage() {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (showSlash) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); setSlashIndex(i => (i + 1) % slashMatches.length); return }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setSlashIndex(i => (i - 1 + slashMatches.length) % slashMatches.length); return }
+      if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); selectSlash(slashMatches[slashIndex].cmd); return }
+      if (e.key === 'Escape') { e.preventDefault(); setSlashOpen(false); return }
+    }
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
   const autoGrow = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDraft(e.target.value)
+    const val = e.target.value
+    setDraft(val)
+    setSlashOpen(/^\/\w*$/.test(val))
+    setSlashIndex(0)
     const el = e.target
     el.style.height = 'auto'
     el.style.height = Math.min(el.scrollHeight, 140) + 'px'
+  }
+
+  const selectSlash = (cmd: string) => {
+    setDraft(`/${cmd} `)
+    setSlashOpen(false)
+    requestAnimationFrame(() => textareaRef.current?.focus())
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // umožní vybrat stejný soubor znovu
+    if (!file || uploading || locked) return
+    if (file.size > MAX_UPLOAD) { alert('Soubor je moc velký (max 8 MB)'); return }
+    setUploading(true)
+    try {
+      const auth = await authHeader()
+      if (!auth) return
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const safe = file.name.replace(/[^\w.\-]+/g, '_')
+      const path = `${channel}/${user.id}/${Date.now()}-${safe}`
+      const { error: upErr } = await supabase.storage.from('community').upload(path, file, { contentType: file.type })
+      if (upErr) { alert('Nahrání selhalo: ' + upErr.message); return }
+      const { data: { publicUrl } } = supabase.storage.from('community').getPublicUrl(path)
+      const res = await fetch('/api/community', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...auth },
+        body: JSON.stringify({
+          action: 'send_message', channel, content: draft.trim(),
+          attachment_url: publicUrl, attachment_type: file.type, attachment_name: file.name,
+        }),
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      if (data.message) {
+        setDraft('')
+        nearBottomRef.current = true
+        setMessages(prev => prev.some(m => m.id === data.message.id) ? prev : [...prev, data.message])
+      }
+    } catch { /* noop */ }
+    finally { setUploading(false) }
   }
 
   const timeAgo = (date: string) => {
@@ -296,9 +367,25 @@ export default function KomunitaPage() {
                           {g.is_ai && <span className="text-[9px] uppercase tracking-wider bg-[#f97316]/15 text-[#fb923c] px-1 py-0.5 rounded font-bold">AI</span>}
                           <span className="text-gray-600 text-[10px]">{timeAgo(g.items[0].created_at)}</span>
                         </div>
-                        <div className="space-y-0.5 mt-0.5">
+                        <div className="space-y-1 mt-0.5">
                           {g.items.map(m => (
-                            <p key={m.id} className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap break-words">{m.content}</p>
+                            <div key={m.id}>
+                              {m.content && <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap break-words">{m.content}</p>}
+                              {m.attachment_url && (
+                                m.attachment_type?.startsWith('image/') ? (
+                                  <a href={m.attachment_url} target="_blank" rel="noopener noreferrer" className="block mt-1 w-fit">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={m.attachment_url} alt={m.attachment_name || 'příloha'} className="max-w-[280px] max-h-[280px] rounded-lg border border-gray-800 object-cover hover:opacity-90 transition" />
+                                  </a>
+                                ) : (
+                                  <a href={m.attachment_url} target="_blank" rel="noopener noreferrer" download className="inline-flex items-center gap-2 mt-1 bg-[#1A1A1A] border border-gray-800 rounded-lg px-3 py-2 hover:border-[#f97316]/40 transition max-w-[280px]">
+                                    <FileText size={18} strokeWidth={ICON_STROKE} className="text-[#fb923c] shrink-0" />
+                                    <span className="text-gray-300 text-xs truncate flex-1">{m.attachment_name || 'soubor'}</span>
+                                    <Download size={14} strokeWidth={ICON_STROKE} className="text-gray-500 shrink-0" />
+                                  </a>
+                                )
+                              )}
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -311,8 +398,42 @@ export default function KomunitaPage() {
         </div>
 
         {/* Composer */}
-        <div className="shrink-0 px-4 pb-4 pt-2 bg-[#0E0E0E]">
+        <div className="shrink-0 px-4 pb-4 pt-2 bg-[#0E0E0E] relative">
+
+          {/* Slash menu (Discord-style) */}
+          {showSlash && (
+            <div className="absolute left-4 right-4 bottom-full mb-2 bg-[#1A1A1A] border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-20">
+              <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider px-3 pt-2.5 pb-1.5">Příkazy</p>
+              {slashMatches.map((c, i) => (
+                <button
+                  key={c.cmd}
+                  onMouseDown={(e) => { e.preventDefault(); selectSlash(c.cmd) }}
+                  onMouseEnter={() => setSlashIndex(i)}
+                  className={`w-full flex items-center gap-3 px-3 py-2 text-left transition ${i === slashIndex ? 'bg-[#f97316]/10' : 'hover:bg-white/[0.03]'}`}
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#252525] border border-gray-700 flex items-center justify-center shrink-0">
+                    <c.Icon size={16} strokeWidth={ICON_STROKE} className="text-[#fb923c]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className={`text-sm font-semibold ${i === slashIndex ? 'text-white' : 'text-gray-300'}`}>{c.label}</p>
+                    <p className="text-gray-500 text-xs truncate">{c.desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <input ref={fileInputRef} type="file" accept="image/*,application/pdf" onChange={handleFileUpload} className="hidden" />
+
           <div className={`flex items-end gap-2 bg-[#1A1A1A] border border-gray-800 rounded-2xl px-3 py-2 transition ${locked ? 'opacity-50' : 'focus-within:border-[#f97316]/50'}`}>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={locked || uploading || sending}
+              title="Nahrát soubor nebo fotku"
+              className="shrink-0 w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#fb923c] hover:bg-white/[0.04] rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {uploading ? <span className="w-4 h-4 border-2 border-gray-600 border-t-[#fb923c] rounded-full animate-spin inline-block" /> : <Plus size={20} strokeWidth={ICON_STROKE} />}
+            </button>
             <textarea
               ref={textareaRef}
               value={draft}
@@ -320,14 +441,14 @@ export default function KomunitaPage() {
               onKeyDown={handleKeyDown}
               rows={1}
               disabled={locked || sending}
-              placeholder={locked ? 'Komunita je Premium' : `Napiš do #${activeChannel.label}…  (@AI pro asistenta)`}
+              placeholder={locked ? 'Komunita je Premium' : `Napiš do #${activeChannel.label}…  (/ příkazy, @AI asistent)`}
               className="flex-1 bg-transparent resize-none text-white text-sm placeholder-gray-600 focus:outline-none py-1 max-h-[140px] disabled:cursor-not-allowed"
             />
             <button onClick={handleSend} disabled={locked || sending || !draft.trim()} className="shrink-0 w-9 h-9 flex items-center justify-center bg-[#f97316] text-white rounded-xl hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed">
               {sending ? <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin inline-block" /> : <Send size={16} strokeWidth={ICON_STROKE} />}
             </button>
           </div>
-          <p className="text-gray-700 text-[10px] mt-1.5 px-1">Enter odešle · Shift+Enter nový řádek · <span className="text-[#fb923c]/70">@AI</span> zavolá asistenta</p>
+          <p className="text-gray-700 text-[10px] mt-1.5 px-1"><span className="text-[#fb923c]/70">/</span> příkazy · <Paperclip size={9} className="inline -mt-0.5" /> nahraj soubor · <span className="text-[#fb923c]/70">@AI</span> zavolá asistenta</p>
         </div>
       </div>
 
