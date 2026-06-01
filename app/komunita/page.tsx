@@ -4,14 +4,17 @@ import { useState, useEffect, useCallback } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
 import { supabase } from '../supabase'
-import Link from 'next/link'
+import { LayoutList, Home, Lightbulb, HelpCircle, Target, MessageCircle, PenSquare, Pin, Sparkles, MapPin, Wallet, Calendar, ImagePlus, Inbox, ChevronUp } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-const CATEGORIES = [
-  { id: 'all', label: 'Vše', icon: '📋' },
-  { id: 'spolubydleni', label: 'Spolubydlení', icon: '🏠' },
-  { id: 'feature', label: 'Nápady', icon: '💡' },
-  { id: 'dotaz', label: 'Dotazy', icon: '❓' },
-  { id: 'tip', label: 'Tipy', icon: '🎯' },
+const ICON_STROKE = 1.75
+
+const CATEGORIES: { id: string; label: string; Icon: LucideIcon }[] = [
+  { id: 'all', label: 'Vše', Icon: LayoutList },
+  { id: 'spolubydleni', label: 'Spolubydlení', Icon: Home },
+  { id: 'feature', label: 'Nápady', Icon: Lightbulb },
+  { id: 'dotaz', label: 'Dotazy', Icon: HelpCircle },
+  { id: 'tip', label: 'Tipy', Icon: Target },
 ]
 
 const REGIONS = ['Zürich', 'Bern', 'Basel', 'Luzern', 'St. Gallen', 'Aargau', 'Solothurn', 'Thurgau', 'Zug', 'Schaffhausen', 'Graubünden', 'Wallis', 'Waadt', 'Genf', 'Ticino']
@@ -136,11 +139,11 @@ export default function KomunitaPage() {
   }
 
   const catMeta = (cat: string) => {
-    const m: Record<string, { icon: string; label: string }> = {
-      spolubydleni: { icon: '🏠', label: 'spolubydlení' },
-      feature: { icon: '💡', label: 'nápady' },
-      dotaz: { icon: '❓', label: 'dotaz' },
-      tip: { icon: '🎯', label: 'tip' },
+    const m: Record<string, { Icon: LucideIcon; label: string }> = {
+      spolubydleni: { Icon: Home, label: 'spolubydlení' },
+      feature: { Icon: Lightbulb, label: 'nápady' },
+      dotaz: { Icon: HelpCircle, label: 'dotaz' },
+      tip: { Icon: Target, label: 'tip' },
     }
     return m[cat] || m.dotaz
   }
@@ -164,17 +167,17 @@ export default function KomunitaPage() {
 
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-5 mb-4">
             <div className="flex items-start gap-3 mb-3">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[#252525] text-gray-300">{cm.icon} {cm.label}</span>
-              {selectedPost.is_pinned && <span className="text-xs px-2 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]">📌</span>}
+              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-[#252525] text-gray-300"><cm.Icon size={12} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {cm.label}</span>
+              {selectedPost.is_pinned && <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]"><Pin size={12} strokeWidth={ICON_STROKE} /></span>}
             </div>
             <h1 className="text-white text-lg font-bold mb-2">{selectedPost.title}</h1>
             <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{selectedPost.content}</p>
 
             {selectedPost.category === 'spolubydleni' && (
               <div className="flex gap-3 mt-3 flex-wrap">
-                {selectedPost.region && <span className="text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full">📍 {selectedPost.region}</span>}
-                {selectedPost.budget && <span className="text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full">💰 {selectedPost.budget}</span>}
-                {selectedPost.move_date && <span className="text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full">📅 {selectedPost.move_date}</span>}
+                {selectedPost.region && <span className="inline-flex items-center gap-1 text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full"><MapPin size={12} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {selectedPost.region}</span>}
+                {selectedPost.budget && <span className="inline-flex items-center gap-1 text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full"><Wallet size={12} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {selectedPost.budget}</span>}
+                {selectedPost.move_date && <span className="inline-flex items-center gap-1 text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full"><Calendar size={12} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {selectedPost.move_date}</span>}
               </div>
             )}
 
@@ -185,7 +188,7 @@ export default function KomunitaPage() {
           </div>
 
           {/* Comments */}
-          <h2 className="text-white text-sm font-bold mb-3">💬 Komentáře ({comments.length})</h2>
+          <h2 className="flex items-center gap-1.5 text-white text-sm font-bold mb-3"><MessageCircle size={15} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Komentáře ({comments.length})</h2>
 
           {comments.length === 0 && <p className="text-gray-600 text-sm mb-4">Zatím žádné komentáře. Buď první!</p>}
 
@@ -194,7 +197,7 @@ export default function KomunitaPage() {
               <div key={c.id} className={`rounded-xl p-3 ${c.is_ai ? 'bg-[#f97316]/5 border border-[#f97316]/15' : 'bg-[#1A1A1A] border border-gray-800'}`}>
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-xs font-semibold ${c.is_ai ? 'text-[#fb923c]' : 'text-gray-400'}`}>
-                    {c.is_ai ? '🤖 AI Woker' : c.user_name}
+                    {c.is_ai ? <span className="inline-flex items-center gap-1"><Sparkles size={12} strokeWidth={ICON_STROKE} /> AI Woker</span> : c.user_name}
                   </span>
                   <span className="text-gray-600 text-[10px]">{timeAgo(c.created_at)}</span>
                 </div>
@@ -222,7 +225,7 @@ export default function KomunitaPage() {
         <div className="max-w-2xl mx-auto">
           <button onClick={() => setShowForm(false)} className="text-gray-500 hover:text-white text-sm mb-4 inline-block">← Zpět</button>
 
-          <h1 className="text-white text-xl font-bold mb-4">✏️ Nový příspěvek</h1>
+          <h1 className="flex items-center gap-2 text-white text-xl font-bold mb-4"><PenSquare size={20} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Nový příspěvek</h1>
 
           <div className="space-y-4">
             {/* Category */}
@@ -230,8 +233,8 @@ export default function KomunitaPage() {
               <label className="text-gray-300 text-sm font-medium mb-2 block">Kategorie *</label>
               <div className="flex gap-2 flex-wrap">
                 {CATEGORIES.filter(c => c.id !== 'all').map(c => (
-                  <button key={c.id} onClick={() => setForm(f => ({ ...f, category: c.id }))} className={`text-sm px-3 py-1.5 rounded-full border transition ${form.category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
-                    {c.icon} {c.label}
+                  <button key={c.id} onClick={() => setForm(f => ({ ...f, category: c.id }))} className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border transition ${form.category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+                    <c.Icon size={14} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {c.label}
                   </button>
                 ))}
               </div>
@@ -250,7 +253,7 @@ export default function KomunitaPage() {
             {/* Spolubydlení extra fields */}
             {form.category === 'spolubydleni' && (
               <div className="bg-[#f97316]/5 border border-[#f97316]/15 rounded-xl p-4 space-y-3">
-                <p className="text-[#fb923c] text-xs font-bold">🏠 Detaily spolubydlení</p>
+                <p className="flex items-center gap-1.5 text-[#fb923c] text-xs font-bold"><Home size={13} strokeWidth={ICON_STROKE} /> Detaily spolubydlení</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-gray-400 text-xs mb-1 block">Region</label>
@@ -281,7 +284,7 @@ export default function KomunitaPage() {
 
             {/* Image upload */}
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-1.5 block">📷 Přidat obrázek (volitelné)</label>
+              <label className="flex items-center gap-1.5 text-gray-300 text-sm font-medium mb-1.5"><ImagePlus size={15} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Přidat obrázek (volitelné)</label>
               <label className="w-full bg-[#1A1A1A] border border-dashed border-gray-600 rounded-xl p-3 text-center cursor-pointer hover:border-gray-400 transition block">
                 <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
                 <span className="text-gray-400 text-sm">Klikni pro nahrání fotky</span>
@@ -300,8 +303,8 @@ export default function KomunitaPage() {
 
             {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3"><p className="text-red-400 text-sm">⚠️ {error}</p></div>}
 
-            <button onClick={handleCreatePost} disabled={submitting} className="w-full bg-[#f97316] text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
-              {submitting ? 'Publikuji...' : '✏️ Publikovat'}
+            <button onClick={handleCreatePost} disabled={submitting} className="w-full inline-flex items-center justify-center gap-2 bg-[#f97316] text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+              {submitting ? 'Publikuji...' : <><PenSquare size={16} strokeWidth={ICON_STROKE} /> Publikovat</>}
             </button>
           </div>
         </div>
@@ -315,12 +318,12 @@ export default function KomunitaPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-white text-xl font-bold">💬 Komunita</h1>
+            <h1 className="flex items-center gap-2 text-white text-xl font-bold"><MessageCircle size={20} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Komunita</h1>
             <p className="text-gray-500 text-xs">Spolubydlení, nápady, dotazy, tipy</p>
           </div>
           {isActive && (
-            <button onClick={() => setShowForm(true)} className="md:hidden bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
-              ✏️ Nový
+            <button onClick={() => setShowForm(true)} className="md:hidden inline-flex items-center gap-1.5 bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
+              <PenSquare size={15} strokeWidth={ICON_STROKE} /> Nový
             </button>
           )}
         </div>
@@ -328,8 +331,8 @@ export default function KomunitaPage() {
         {/* Categories — mobil */}
         <div className="flex md:hidden gap-2 mb-4 overflow-x-auto pb-1">
           {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setCategory(c.id)} className={`text-sm px-3 py-1.5 rounded-full border whitespace-nowrap transition ${category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
-              {c.icon} {c.label}
+            <button key={c.id} onClick={() => setCategory(c.id)} className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border whitespace-nowrap transition ${category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+              <c.Icon size={14} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {c.label}
             </button>
           ))}
         </div>
@@ -338,15 +341,15 @@ export default function KomunitaPage() {
           {/* Levý rail — kategorie */}
           <aside className="hidden md:block md:sticky md:top-6 self-start">
             {isActive && (
-              <button onClick={() => setShowForm(true)} className="w-full mb-4 bg-[#f97316] text-white font-bold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition">
-                ✏️ Nový příspěvek
+              <button onClick={() => setShowForm(true)} className="w-full inline-flex items-center justify-center gap-1.5 mb-4 bg-[#f97316] text-white font-bold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition">
+                <PenSquare size={15} strokeWidth={ICON_STROKE} /> Nový příspěvek
               </button>
             )}
             <p className="text-gray-600 text-[10px] font-semibold uppercase tracking-wider mb-2 px-3">Kategorie</p>
             <nav className="space-y-1">
               {CATEGORIES.map(c => (
                 <button key={c.id} onClick={() => setCategory(c.id)} className={`w-full flex items-center gap-2.5 text-sm px-3 py-2 rounded-lg text-left transition ${category === c.id ? 'bg-[#f97316]/10 text-[#fb923c] font-medium' : 'text-gray-400 hover:bg-[#1A1A1A] hover:text-gray-200'}`}>
-                  <span>{c.icon}</span> {c.label}
+                  <c.Icon size={16} strokeWidth={ICON_STROKE} className={category === c.id ? 'text-[#fb923c]' : 'text-gray-500'} /> {c.label}
                 </button>
               ))}
             </nav>
@@ -363,11 +366,11 @@ export default function KomunitaPage() {
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-12">
-              <span className="text-4xl block mb-3">📭</span>
+              <Inbox size={40} strokeWidth={ICON_STROKE} className="text-gray-600 mx-auto mb-3" />
               <p className="text-gray-400 text-sm mb-1">Zatím žádné příspěvky</p>
               <p className="text-gray-600 text-xs">Buď první kdo napíše!</p>
-              <button onClick={() => setShowForm(true)} className="mt-4 bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
-                ✏️ Napsat příspěvek
+              <button onClick={() => setShowForm(true)} className="mt-4 inline-flex items-center gap-1.5 bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
+                <PenSquare size={15} strokeWidth={ICON_STROKE} /> Napsat příspěvek
               </button>
             </div>
           ) : (
@@ -379,23 +382,23 @@ export default function KomunitaPage() {
                     <div className="flex items-start gap-3">
                       {/* Upvote */}
                       <button onClick={(e) => { e.stopPropagation(); handleUpvote(post.id) }} className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition ${post.hasUpvoted ? 'bg-[#f97316]/10 text-[#fb923c]' : 'text-gray-500 hover:bg-gray-800'}`}>
-                        <span className="text-sm">{post.hasUpvoted ? '▲' : '△'}</span>
+                        <ChevronUp size={16} strokeWidth={post.hasUpvoted ? 2.5 : ICON_STROKE} />
                         <span className="text-xs font-bold">{post.upvotes}</span>
                       </button>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-gray-300">{cm.icon} {cm.label}</span>
-                          {post.is_pinned && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]">📌</span>}
-                          {post.category === 'spolubydleni' && post.region && <span className="text-[10px] text-gray-400">📍 {post.region}</span>}
-                          {post.category === 'spolubydleni' && post.budget && <span className="text-[10px] text-gray-400">💰 {post.budget}</span>}
+                          <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-gray-300"><cm.Icon size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {cm.label}</span>
+                          {post.is_pinned && <span className="inline-flex items-center text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]"><Pin size={11} strokeWidth={ICON_STROKE} /></span>}
+                          {post.category === 'spolubydleni' && post.region && <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400"><MapPin size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.region}</span>}
+                          {post.category === 'spolubydleni' && post.budget && <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400"><Wallet size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.budget}</span>}
                         </div>
                         <h3 className="text-white text-sm font-semibold mb-0.5 truncate">{post.title}</h3>
                         <p className="text-gray-500 text-xs line-clamp-2">{post.content}</p>
                         <div className="flex items-center gap-3 mt-2 text-gray-600 text-[10px]">
                           <span>{post.user_name}</span>
                           <span>{timeAgo(post.created_at)}</span>
-                          <span>💬 {post.comments_count}</span>
+                          <span className="inline-flex items-center gap-1"><MessageCircle size={11} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> {post.comments_count}</span>
                         </div>
                       </div>
                     </div>
@@ -415,7 +418,7 @@ export default function KomunitaPage() {
               <p className="text-gray-500 text-xs leading-relaxed">Místo, kde si čeští a slovenští pracovníci ve Švýcarsku vzájemně pomáhají — spolubydlení, dotazy, tipy z praxe.</p>
             </div>
             <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4">
-              <h3 className="text-white text-sm font-semibold mb-2">📌 Pravidla</h3>
+              <h3 className="flex items-center gap-1.5 text-white text-sm font-semibold mb-2"><Pin size={14} strokeWidth={ICON_STROKE} className="text-[#fb923c]" /> Pravidla</h3>
               <ul className="text-gray-400 text-xs space-y-1.5">
                 <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Buď slušný a pomáhej ostatním</li>
                 <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Žádný spam ani reklama</li>
@@ -423,8 +426,8 @@ export default function KomunitaPage() {
               </ul>
             </div>
             {isActive && (
-              <button onClick={() => setShowForm(true)} className="w-full bg-[#f97316]/10 border border-[#f97316]/20 text-[#fb923c] font-medium text-sm px-4 py-2.5 rounded-xl hover:bg-[#f97316]/20 transition">
-                ✏️ Sdílej něco s komunitou
+              <button onClick={() => setShowForm(true)} className="w-full inline-flex items-center justify-center gap-1.5 bg-[#f97316]/10 border border-[#f97316]/20 text-[#fb923c] font-medium text-sm px-4 py-2.5 rounded-xl hover:bg-[#f97316]/20 transition">
+                <PenSquare size={15} strokeWidth={ICON_STROKE} /> Sdílej něco s komunitou
               </button>
             )}
           </aside>
