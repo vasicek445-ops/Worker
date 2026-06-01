@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
-import Link from 'next/link'
+import { supabase } from '../supabase'
+import { Languages, Lightbulb, Target, Smartphone, Bot, PenLine, Volume2 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const FREE_PHRASES = [
   { de: "Guten Morgen, ich bin der/die Neue.", cs: "Dobré ráno, jsem tu nový/nová.", context: "První den v práci" },
@@ -14,10 +16,10 @@ const FREE_PHRASES = [
   { de: "Ich bin krank und kann heute nicht kommen.", cs: "Jsem nemocný/á a dnes nemůžu přijít.", context: "Nemocenská" },
 ]
 
-const TIPS = [
-  { icon: "💡", title: "Schweizerdeutsch vs Hochdeutsch", desc: "Ve Švýcarsku mluví dialektem (Schwyzerdütsch), ale v práci a písemně se používá spisovná němčina (Hochdeutsch). Neboj se, na cizince mluví Hochdeutsch." },
-  { icon: "🎯", title: "Jazyková úroveň B1 stačí na start", desc: "Pro většinu manuálních pozic stačí A2-B1. Pro kancelářské a IT pozice potřebuješ B2+. Zdravotnictví vyžaduje často B2-C1." },
-  { icon: "📱", title: "Nejlepší appky na učení", desc: "Duolingo (zdarma, denně 15 min), Babbel (placený, lepší pro dospělé), Anki (kartičky na slovíčka). Kombinuj s YouTube kanálem 'Easy German'." },
+const TIPS: { Icon: LucideIcon; title: string; desc: string }[] = [
+  { Icon: Lightbulb, title: "Schweizerdeutsch vs Hochdeutsch", desc: "Ve Švýcarsku mluví dialektem (Schwyzerdütsch), ale v práci a písemně se používá spisovná němčina (Hochdeutsch). Neboj se, na cizince mluví Hochdeutsch." },
+  { Icon: Target, title: "Jazyková úroveň B1 stačí na start", desc: "Pro většinu manuálních pozic stačí A2-B1. Pro kancelářské a IT pozice potřebuješ B2+. Zdravotnictví vyžaduje často B2-C1." },
+  { Icon: Smartphone, title: "Nejlepší appky na učení", desc: "Duolingo (zdarma, denně 15 min), Babbel (placený, lepší pro dospělé), Anki (kartičky na slovíčka). Kombinuj s YouTube kanálem 'Easy German'." },
 ]
 
 const PROFESSIONS = [
@@ -28,9 +30,9 @@ const PROFESSIONS = [
 ]
 
 const LEVELS = [
-  { value: "beginner", label: "🟢 Začátečník (A1-A2)", desc: "Umím základy" },
-  { value: "intermediate", label: "🟡 Mírně pokročilý (B1)", desc: "Domluvím se" },
-  { value: "advanced", label: "🔴 Pokročilý (B2+)", desc: "Chci profesionální fráze" },
+  { value: "beginner", label: "Začátečník (A1-A2)", desc: "Umím základy" },
+  { value: "intermediate", label: "Mírně pokročilý (B1)", desc: "Domluvím se" },
+  { value: "advanced", label: "Pokročilý (B2+)", desc: "Chci profesionální fráze" },
 ]
 
 interface AIPhrase {
@@ -66,9 +68,11 @@ export default function Jazyky() {
     setError("")
     setAiResult(null)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) { setError("Přihlas se prosím"); return }
       const res = await fetch("/api/generate-phrases", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({ profession: prof, level }),
       })
       const data = await res.json()
@@ -84,9 +88,7 @@ export default function Jazyky() {
   return (
     <main className="min-h-screen bg-[#0a0a12] px-4 py-6 pb-24" style={{ fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
       <div className="max-w-2xl mx-auto">
-        <Link href="/pruvodce" className="text-white/30 hover:text-white mb-6 inline-block text-sm">← Zpět</Link>
-
-        <h1 className="text-white text-2xl font-extrabold mb-1">🇩🇪 Němčina pro práci</h1>
+        <h1 className="text-white text-2xl font-extrabold mb-1 flex items-center gap-2"><Languages size={26} strokeWidth={1.75} className="text-[#fb923c]" /> Němčina pro práci</h1>
         <p className="text-white/40 text-sm mb-6">Nejdůležitější fráze a slovíčka pro práci ve Švýcarsku</p>
 
         {/* Tips */}
@@ -94,7 +96,7 @@ export default function Jazyky() {
           {TIPS.map((tip) => (
             <div key={tip.title} className="bg-[#111120] border border-white/[0.06] rounded-2xl p-4">
               <div className="flex items-start gap-3">
-                <span className="text-xl">{tip.icon}</span>
+                <tip.Icon size={20} strokeWidth={1.75} className="text-[#fb923c] mt-0.5 shrink-0" />
                 <div>
                   <h3 className="text-white font-bold text-sm mb-1">{tip.title}</h3>
                   <p className="text-white/35 text-xs leading-relaxed">{tip.desc}</p>
@@ -113,7 +115,7 @@ export default function Jazyky() {
           <div className="space-y-2.5">
             {FREE_PHRASES.map((phrase) => (
               <div key={phrase.de} className="bg-[#111120] border border-white/[0.06] rounded-xl p-4">
-                <span className="text-[10px] bg-red-500/10 text-red-400 font-medium px-2 py-0.5 rounded-full">{phrase.context}</span>
+                <span className="text-[10px] bg-[#f97316]/10 text-[#fb923c] font-medium px-2 py-0.5 rounded-full">{phrase.context}</span>
                 <p className="text-white font-bold text-sm mt-2 mb-1">🇩🇪 {phrase.de}</p>
                 <p className="text-white/40 text-sm">🇨🇿 {phrase.cs}</p>
               </div>
@@ -124,8 +126,8 @@ export default function Jazyky() {
         {/* AI Section */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <h2 className="text-white text-lg font-bold">🤖 AI fráze pro tvůj obor</h2>
-            <span className="text-[10px] bg-blue-500/15 text-blue-400 font-bold px-2 py-0.5 rounded">AI</span>
+            <h2 className="text-white text-lg font-bold flex items-center gap-2"><Bot size={20} strokeWidth={1.75} className="text-[#fb923c]" /> AI fráze pro tvůj obor</h2>
+            <span className="text-[10px] bg-[#f97316]/15 text-[#fb923c] font-bold px-2 py-0.5 rounded">AI</span>
             {!isActive && <span className="text-[10px] bg-yellow-500/10 text-yellow-400 font-bold px-2 py-0.5 rounded">Premium</span>}
           </div>
 
@@ -141,7 +143,7 @@ export default function Jazyky() {
                     onClick={() => setProfession(p)}
                     className={`text-left px-3 py-2 rounded-lg text-xs transition ${
                       profession === p
-                        ? "bg-blue-500/15 border border-blue-500/30 text-blue-400 font-medium"
+                        ? "bg-[#f97316]/15 border border-[#f97316]/30 text-[#fb923c] font-medium"
                         : "bg-white/[0.03] border border-white/[0.06] text-white/50 hover:border-white/[0.12]"
                     }`}
                   >
@@ -152,11 +154,11 @@ export default function Jazyky() {
                   onClick={() => setProfession("custom")}
                   className={`text-left px-3 py-2 rounded-lg text-xs transition ${
                     profession === "custom"
-                      ? "bg-blue-500/15 border border-blue-500/30 text-blue-400 font-medium"
+                      ? "bg-[#f97316]/15 border border-[#f97316]/30 text-[#fb923c] font-medium"
                       : "bg-white/[0.03] border border-white/[0.06] text-white/50 hover:border-white/[0.12]"
                   }`}
                 >
-                  ✏️ Jiný obor...
+                  <PenLine size={13} strokeWidth={1.75} className="inline -mt-0.5 mr-1" /> Jiný obor...
                 </button>
               </div>
 
@@ -166,7 +168,7 @@ export default function Jazyky() {
                   value={customProfession}
                   onChange={(e) => setCustomProfession(e.target.value)}
                   placeholder="Napiš svůj obor..."
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm mb-3 focus:outline-none focus:border-blue-500/30"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm mb-3 focus:outline-none focus:border-[#f97316]/40"
                 />
               )}
 
@@ -179,7 +181,7 @@ export default function Jazyky() {
                     onClick={() => setLevel(l.value)}
                     className={`flex-1 px-3 py-2.5 rounded-lg text-xs transition text-center ${
                       level === l.value
-                        ? "bg-blue-500/15 border border-blue-500/30 text-blue-400 font-medium"
+                        ? "bg-[#f97316]/15 border border-[#f97316]/30 text-[#fb923c] font-medium"
                         : "bg-white/[0.03] border border-white/[0.06] text-white/50 hover:border-white/[0.12]"
                     }`}
                   >
@@ -195,13 +197,11 @@ export default function Jazyky() {
               <button
                 onClick={handleGenerate}
                 disabled={generating}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold py-3.5 rounded-xl hover:opacity-90 transition disabled:opacity-50 text-sm"
+                className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold py-3.5 rounded-xl hover:opacity-90 transition disabled:opacity-50 text-sm"
               >
                 {generating ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="animate-spin">⚙️</span> Generuji fráze pro tvůj obor...
-                  </span>
-                ) : "🤖 Vygenerovat fráze pro můj obor"}
+                  <><span className="w-4 h-4 border-2 border-[#0a0a12]/30 border-t-[#0a0a12] rounded-full animate-spin inline-block" /> Generuji fráze pro tvůj obor...</>
+                ) : <><Bot size={16} strokeWidth={2} /> Vygenerovat fráze pro můj obor</>}
               </button>
             </div>
 
@@ -210,7 +210,7 @@ export default function Jazyky() {
               <div className="space-y-6">
                 {aiResult.tip && (
                   <div className="bg-[#fb923c]/[0.06] border border-[#fb923c]/[0.12] rounded-2xl p-4">
-                    <p className="text-[#fb923c] text-sm font-medium">💡 {aiResult.tip}</p>
+                    <p className="text-[#fb923c] text-sm font-medium flex items-start gap-1.5"><Lightbulb size={14} strokeWidth={2} className="mt-0.5 shrink-0" /> {aiResult.tip}</p>
                   </div>
                 )}
 
@@ -220,11 +220,11 @@ export default function Jazyky() {
                     <div className="space-y-2.5">
                       {cat.phrases.map((phrase, pi) => (
                         <div key={pi} className="bg-[#111120] border border-white/[0.06] rounded-xl p-4">
-                          <span className="text-[10px] bg-blue-500/10 text-blue-400 font-medium px-2 py-0.5 rounded-full">{phrase.context}</span>
+                          <span className="text-[10px] bg-[#f97316]/10 text-[#fb923c] font-medium px-2 py-0.5 rounded-full">{phrase.context}</span>
                           <p className="text-white font-bold text-sm mt-2 mb-1">🇩🇪 {phrase.de}</p>
                           <p className="text-white/40 text-sm">🇨🇿 {phrase.cs}</p>
                           {phrase.pronunciation && (
-                            <p className="text-white/20 text-xs mt-1 italic">🔊 {phrase.pronunciation}</p>
+                            <p className="text-white/20 text-xs mt-1 italic inline-flex items-center gap-1"><Volume2 size={11} strokeWidth={2} /> {phrase.pronunciation}</p>
                           )}
                         </div>
                       ))}

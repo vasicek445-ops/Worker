@@ -1,11 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { createClient } from "@supabase/supabase-js";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+async function getUser(req: NextRequest) {
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader) return null;
+  const { data: { user } } = await supabaseAdmin.auth.getUser(authHeader.replace("Bearer ", ""));
+  return user;
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { profession, level, userId } = await req.json();
+    // Auth + premium gate — chrání placené AI volání před zneužitím
+    const user = await getUser(req);
+    if (!user) return NextResponse.json({ error: "Přihlas se prosím" }, { status: 401 });
+    const { data: sub } = await supabaseAdmin.from("subscriptions").select("status").eq("user_id", user.id).single();
+    if (sub?.status !== "active" && sub?.status !== "trialing") {
+      return NextResponse.json({ error: "AI fráze jsou součástí Premium" }, { status: 403 });
+    }
+
+    const { profession, level } = await req.json();
     if (!profession) return NextResponse.json({ error: "Zadej svůj obor" }, { status: 400 });
 
     const response = await client.messages.create({
@@ -17,13 +34,14 @@ PRAVIDLA:
 - Fráze musí být reálně použitelné v práci
 - Hochdeutsch (ne Schweizerdeutsch)
 - Přidej výslovnost kde je to těžké
+- Žádné emoji v textu
 - Vrať JSON a nic jiného
 
 Vrať POUZE validní JSON v tomto formátu:
 {
   "categories": [
     {
-      "title": "název kategorie (emoji + text)",
+      "title": "název kategorie (čistý text, bez emoji)",
       "phrases": [
         {
           "de": "německá fráze",
