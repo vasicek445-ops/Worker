@@ -1,6 +1,6 @@
 import Link from "next/link";
 import TaxCalculator from "../../components/TaxCalculator";
-import { Coins, Info, Church, MapPin, BarChart3, Pin, Check, AlertTriangle, TrendingDown, TrendingUp, Minus, Lightbulb, ArrowRight } from "lucide-react";
+import { Coins, Info, Church, MapPin, BarChart3, Pin, Check, AlertTriangle, TrendingDown, TrendingUp, Minus, Lightbulb, ArrowRight, ExternalLink } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 const LOW_TAX = [
@@ -39,32 +39,32 @@ const HIGH_TAX = [
 ];
 
 const CANTONS_LINKS = [
-  { name: "Aargau (AG)", note: "tarif bez církevní daně" },
-  { name: "Appenzell Ausserrhoden (AR)", note: "tarif s církevní daní" },
-  { name: "Appenzell Innerrhoden (AI)", note: "tarif bez církevní daně" },
-  { name: "Basel-Landschaft (BL)", note: "tarif bez církevní daně" },
-  { name: "Basel-Stadt (BS)", note: "daně od stránky 38 výš" },
-  { name: "Bern (BE)", note: "tarif bez církevní daně" },
-  { name: "Fribourg (FR)", note: "dvojjazyčný web, bez církevní daně" },
-  { name: "Genève (GE)", note: "pouze francouzsky, bez církevní daně" },
-  { name: "Glarus (GL)", note: "tarif bez církevní daně" },
-  { name: "Graubünden (GR)", note: "bez církevní daně" },
-  { name: "Jura (JU)", note: "jen francouzsky, bez církevní daně" },
-  { name: "Luzern (LU)", note: "tarif bez církevní daně" },
-  { name: "Neuchâtel (NE)", note: "jen francouzsky, bez církevní daně" },
-  { name: "Nidwalden (NW)", note: "tarif bez církevní daně" },
-  { name: "Obwalden (OW)", note: "nutno stáhnout PDF, bez církevní daně" },
-  { name: "Sankt Gallen (SG)", note: "tarif bez církevní daně" },
-  { name: "Schaffhausen (SH)", note: "tarif bez církevní daně" },
-  { name: "Schwyz (SZ)", note: "tarif bez církevní daně" },
-  { name: "Solothurn (SO)", note: "tarif bez církevní daně" },
-  { name: "Thurgau (TG)", note: "tarif bez církevní daně" },
-  { name: "Ticino (TI)", note: "pouze italsky, bez církevní daně" },
-  { name: "Uri (UR)", note: "tarif bez církevní daně" },
-  { name: "Valais (VS)", note: "daně od stránky 20 výš, bez církevní daně" },
-  { name: "Vaud (VD)", note: "pouze francouzsky, bez církevní daně" },
-  { name: "Zug (ZG)", note: "tarif bez církevní daně" },
-  { name: "Zürich (ZH)", note: "jedna z nejlépe zpracovaných stránek, bez církevní daně" },
+  { name: "Aargau (AG)", note: "tarif bez církevní daně", url: "https://www.ag.ch/de/verwaltung/dfr/steuern/quellensteuer" },
+  { name: "Appenzell Ausserrhoden (AR)", note: "tarif s církevní daní", url: "https://www.ar.ch/verwaltung/departement-finanzen/steuerverwaltung/formulare-und-wegleitungen/" },
+  { name: "Appenzell Innerrhoden (AI)", note: "tarif bez církevní daně", url: "https://www.ai.ch/themen/steuern/steuerarten/quellensteuer" },
+  { name: "Basel-Landschaft (BL)", note: "tarif bez církevní daně", url: "https://www.baselland.ch/politik-und-behorden/direktionen/finanz-und-kirchendirektion/steuerverwaltung/quellensteuer" },
+  { name: "Basel-Stadt (BS)", note: "daně od stránky 38 výš", url: "https://www.steuerverwaltung.bs.ch/quellensteuer.html" },
+  { name: "Bern (BE)", note: "tarif bez církevní daně", url: "https://www.sv.fin.be.ch/sv_fin/de/index/navi/index/quellensteuer.html" },
+  { name: "Fribourg (FR)", note: "dvojjazyčný web, bez církevní daně", url: "https://www.fr.ch/scc/de/pub/quellensteuer.htm" },
+  { name: "Genève (GE)", note: "pouze francouzsky, bez církevní daně", url: "https://www.ge.ch/impot-source" },
+  { name: "Glarus (GL)", note: "tarif bez církevní daně", url: "https://www.gl.ch/verwaltung/finanzen-und-gesundheit/online-schalter.html/511" },
+  { name: "Graubünden (GR)", note: "bez církevní daně", url: "https://www.gr.ch/DE/institutionen/verwaltung/dfg/stv/steuererklaerung/quellensteuer/Seiten/default.aspx" },
+  { name: "Jura (JU)", note: "jen francouzsky, bez církevní daně", url: "https://www.jura.ch/DFI/CTR/Impots-speciaux/Impot-a-la-source/Impot-a-la-source.html" },
+  { name: "Luzern (LU)", note: "tarif bez církevní daně", url: "https://steuern.lu.ch/publikationen/nav_wegleitungen/we_quellensteuer" },
+  { name: "Neuchâtel (NE)", note: "jen francouzsky, bez církevní daně", url: "https://www.ne.ch/autorites/DFS/SCCO/impot-source/Pages/accueil.aspx" },
+  { name: "Nidwalden (NW)", note: "tarif bez církevní daně", url: "https://www.steuern-nw.ch/natuerlichepersonen/quellensteuer/" },
+  { name: "Obwalden (OW)", note: "nutno stáhnout PDF, bez církevní daně", url: "https://www.ow.ch/steuern/3517" },
+  { name: "Sankt Gallen (SG)", note: "tarif bez církevní daně", url: "https://www.sg.ch/steuern-finanzen/steuern/steuerarten/quellensteuer.html" },
+  { name: "Schaffhausen (SH)", note: "tarif bez církevní daně", url: "https://sh.ch/CMS/Webseite/Kanton-Schaffhausen/Beh-rde/Services/Such-Portal-1212278-DE.html?search=quellensteuer" },
+  { name: "Schwyz (SZ)", note: "tarif bez církevní daně", url: "https://www.sz.ch/behoerden/verwaltung/finanzdepartement/steuerverwaltung/quellensteuer.html" },
+  { name: "Solothurn (SO)", note: "tarif bez církevní daně", url: "https://so.ch/verwaltung/finanzdepartement/steueramt/quellensteuer/" },
+  { name: "Thurgau (TG)", note: "tarif bez církevní daně", url: "https://steuerverwaltung.tg.ch/hauptrubrik-1/quellensteuern.html/2876" },
+  { name: "Ticino (TI)", note: "pouze italsky, bez církevní daně", url: "https://www.ti.ch/fonte" },
+  { name: "Uri (UR)", note: "tarif bez církevní daně", url: "https://www.ur.ch/finanzen/1576" },
+  { name: "Valais (VS)", note: "daně od stránky 20 výš, bez církevní daně", url: "https://www.vs.ch/de/web/scc/quelle" },
+  { name: "Vaud (VD)", note: "pouze francouzsky, bez církevní daně", url: "https://www.vd.ch/etat-droit-finances/impots/impot-a-la-source-pour-les-employeurs-et-les-personnes-imposees-a-la-source" },
+  { name: "Zug (ZG)", note: "tarif bez církevní daně", url: "https://zg.ch/de/steuern-finanzen/steuern/quellensteuer" },
+  { name: "Zürich (ZH)", note: "jedna z nejlépe zpracovaných stránek, bez církevní daně", url: "https://www.zh.ch/de/steuern-finanzen/steuern/quellensteuer.html" },
 ];
 
 function TaxTable({ title, Icon, data, colorClass }: { title: string; Icon: LucideIcon; data: typeof LOW_TAX; colorClass: string }) {
@@ -190,15 +190,17 @@ export default function DanePage() {
 
         {/* All 26 cantons links */}
         <div className="mb-8">
-          <h2 className="text-base font-bold text-white mb-4 flex items-center gap-2"><MapPin size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Quellensteuer podle kantonu – přehled</h2>
+          <h2 className="text-base font-bold text-white mb-1 flex items-center gap-2"><MapPin size={18} strokeWidth={1.75} className="text-[#fb923c]" /> Quellensteuer podle kantonu – přehled</h2>
+          <p className="text-xs text-gray-500 mb-4">Klikni na kanton → otevře se oficiální Quellensteuer stránka dané kantonální správy (tarify a PDF).</p>
           <div className="bg-white/[0.03] rounded-2xl border border-white/[0.06] overflow-hidden">
             {CANTONS_LINKS.map((c, i) => (
-              <div key={i} className={`px-4 py-3 ${i < CANTONS_LINKS.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-white">{i + 1}. {c.name}</p>
+              <a key={i} href={c.url} target="_blank" rel="noopener noreferrer" className={`block px-4 py-3 no-underline hover:bg-white/[0.03] transition group ${i < CANTONS_LINKS.length - 1 ? "border-b border-white/[0.04]" : ""}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-medium text-white group-hover:text-[#fb923c] transition-colors">{i + 1}. {c.name}</p>
+                  <span className="shrink-0 inline-flex items-center gap-1 text-[11px] font-medium text-[#fb923c]/60 group-hover:text-[#fb923c] transition-colors"><ExternalLink size={12} strokeWidth={2} /> Tarif</span>
                 </div>
                 <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1"><Check size={11} strokeWidth={2.5} className="text-[#fb923c] shrink-0" /> {c.note}</p>
-              </div>
+              </a>
             ))}
           </div>
         </div>
