@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { stripe } from "@/lib/stripe";
 
 // Validate required env vars at startup
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -31,6 +32,21 @@ export async function POST(req: NextRequest) {
     // Only allow users to delete their own account
     const userId = user.id;
 
+    // Stripe: smaž customera (zruší i aktivní předplatné). MUSÍ být před
+    // smazáním subscriptions řádku, jinak ztratíme customer_id.
+    try {
+      const { data: subRow } = await supabaseAdmin
+        .from("subscriptions")
+        .select("stripe_customer_id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      const customerId = subRow?.stripe_customer_id;
+      if (customerId) await stripe.customers.del(customerId);
+    } catch (e) {
+      // Nelogujeme do response (běží i tak), ale do server logu — kvůli auditu výmazu
+      console.error(`delete-account: Stripe výmaz selhal pro ${userId}:`, e);
+    }
+
     // Smaž veškerá osobní data napříč tabulkami. Každé mazání nezávisle
     // (allSettled) — pokud nějaká tabulka nemá user_id nebo neexistuje,
     // neshodí to celou operaci a účet se i tak smaže.
@@ -41,12 +57,18 @@ export async function POST(req: NextRequest) {
       "community_posts", "community_comments", "community_upvotes",
       "community_messages", "email_oauth_tokens", "email_send_log", "agency_leads",
     ];
-    await Promise.allSettled([
-      supabaseAdmin.from("profiles").delete().eq("id", userId),
-      ...byUserId.map((t) => supabaseAdmin.from(t).delete().eq("user_id", userId)),
-      supabaseAdmin.from("dm_messages").delete().eq("sender_id", userId),
-      supabaseAdmin.from("dm_messages").delete().eq("recipient_id", userId),
-    ]);
+    const dbOps: Array<[string, PromiseLike<{ error: unknown }>]> = [
+      ["profiles", supabaseAdmin.from("profiles").delete().eq("id", userId)],
+      ...byUserId.map((t) => [t, supabaseAdmin.from(t).delete().eq("user_id", userId)] as [string, PromiseLike<{ error: unknown }>]),
+      ["dm_messages(sender)", supabaseAdmin.from("dm_messages").delete().eq("sender_id", userId)],
+      ["dm_messages(recipient)", supabaseAdmin.from("dm_messages").delete().eq("recipient_id", userId)],
+    ];
+    const results = await Promise.allSettled(dbOps.map(([, op]) => op));
+    results.forEach((r, i) => {
+      const label = dbOps[i][0];
+      if (r.status === "rejected") console.error(`delete-account: výmaz ${label} selhal:`, r.reason);
+      else if (r.value?.error) console.error(`delete-account: výmaz ${label} chyba:`, r.value.error);
+    });
 
     // Best-effort smazání souborů ze Storage (avatar, CV PDF)
     await Promise.allSettled([
