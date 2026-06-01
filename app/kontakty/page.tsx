@@ -110,7 +110,7 @@ export default function Kontakty() {
 
   return (
     <main className="min-h-screen bg-[#0E0E0E] px-4 py-6 pb-24">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <Link href="/dashboard" className="text-gray-500 hover:text-white mb-6 inline-block text-sm">
           ← Zpět
         </Link>
@@ -121,20 +121,24 @@ export default function Kontakty() {
           <p className="text-gray-400 text-sm">
             1 000+ ověřených švýcarských personálních agentur s přímými kontakty
           </p>
+          <div className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] text-[#fb923c] bg-[#f97316]/10 border border-[#f97316]/20 rounded-full px-2.5 py-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+            Ručně ověřené kontakty · aktualizováno 2026
+          </div>
         </div>
 
         {/* Stats bar */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-center">
-            <p className="text-white text-lg font-bold">{total}</p>
+            <p className="text-[#fb923c] text-lg font-bold">{total}</p>
             <p className="text-gray-500 text-[10px]">Agentur celkem</p>
           </div>
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-center">
-            <p className="text-white text-lg font-bold">26</p>
+            <p className="text-[#fb923c] text-lg font-bold">26</p>
             <p className="text-gray-500 text-[10px]">Kantonů</p>
           </div>
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-3 text-center">
-            <p className="text-white text-lg font-bold">256</p>
+            <p className="text-[#fb923c] text-lg font-bold">256</p>
             <p className="text-gray-500 text-[10px]">Měst</p>
           </div>
         </div>
@@ -152,27 +156,29 @@ export default function Kontakty() {
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Hledat agenturu nebo město..."
-                className="flex-1 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-[#E8302A]"
+                className="flex-1 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-[#f97316]"
               />
               <button
                 type="submit"
-                className="bg-[#E8302A] text-white px-5 rounded-xl hover:opacity-90 transition font-medium text-sm"
+                className="bg-[#f97316] text-white px-5 rounded-xl hover:opacity-90 transition font-medium text-sm"
               >
                 Hledat
               </button>
             </div>
           </form>
 
-          {/* Filters */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {/* Region filter */}
+          <div className="md:grid md:grid-cols-[230px_1fr] md:gap-6 md:items-start">
+            {/* Filter sidebar */}
+            <aside className="md:sticky md:top-6">
+              {/* Region filter */}
+              <div className="flex flex-wrap md:flex-col gap-2 mb-4">
             {REGIONS.map((r) => (
               <button
                 key={r.value}
                 onClick={() => handleRegionChange(r.value)}
                 className={`text-xs px-3 py-2 rounded-full border transition-all ${
                   region === r.value
-                    ? 'border-[#E8302A] bg-[#E8302A]/20 text-white'
+                    ? 'border-[#f97316] bg-[#f97316]/20 text-white'
                     : 'border-gray-700 text-gray-400 hover:border-gray-500'
                 }`}
               >
@@ -186,7 +192,7 @@ export default function Kontakty() {
             <select
               value={canton}
               onChange={(e) => handleCantonChange(e.target.value)}
-              className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#E8302A] w-full appearance-none"
+              className="bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#f97316] w-full appearance-none"
               style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
             >
               <option value="">Všechny kantony</option>
@@ -217,13 +223,16 @@ export default function Kontakty() {
               )}
               <button
                 onClick={clearFilters}
-                className="text-xs text-[#E8302A] hover:underline ml-1"
+                className="text-xs text-[#f97316] hover:underline ml-1"
               >
                 Zrušit vše
               </button>
             </div>
           )}
+            </aside>
 
+            {/* Results column */}
+            <div className="min-w-0">
           {/* Results count */}
           <p className="text-gray-500 text-xs mb-3">
             {isPending ? 'Načítám...' : `${total} ${total === 1 ? 'agentura' : total < 5 ? 'agentury' : 'agentur'}`}
@@ -248,50 +257,62 @@ export default function Kontakty() {
               </div>
             ) : (
               agencies.map((a) => (
-                <div key={a.id} className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition">
-                  {/* Company name + canton badge */}
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="text-white font-semibold text-sm leading-tight">{a.company}</h3>
-                    {a.canton && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#252525] text-gray-400 flex-shrink-0">
-                        {a.canton}
-                      </span>
-                    )}
-                  </div>
+                <div key={a.id} className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 hover:border-[#f97316]/40 transition">
+                  <div className="flex items-start gap-3">
+                    {/* Monogram */}
+                    <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-[#f97316]/10 border border-[#f97316]/20 flex items-center justify-center text-[#fb923c] font-bold text-sm">
+                      {a.company.trim().charAt(0).toUpperCase()}
+                    </div>
 
-                  {/* Address */}
-                  <p className="text-gray-400 text-xs mb-3">
-                    📍 {[a.street, `${a.zip || ''} ${a.city || ''}`.trim()].filter(Boolean).join(', ')}
-                  </p>
+                    <div className="min-w-0 flex-1">
+                      {/* Company name + canton badge */}
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="text-white font-semibold text-sm leading-tight">{a.company}</h3>
+                        {a.canton && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#252525] text-gray-400 flex-shrink-0">
+                            {a.canton}
+                          </span>
+                        )}
+                      </div>
 
-                  {/* Contact buttons */}
-                  <div className="flex flex-wrap gap-2">
-                    {a.telephone && (
-                      <a
-                        href={`tel:${a.telephone}`}
-                        className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#252525] text-green-400 hover:bg-[#303030] transition"
-                      >
-                        📞 {a.telephone}
-                      </a>
-                    )}
-                    {a.email && (
-                      <a
-                        href={`mailto:${a.email}`}
-                        className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#252525] text-blue-400 hover:bg-[#303030] transition truncate max-w-[200px]"
-                      >
-                        ✉️ {a.email}
-                      </a>
-                    )}
-                    {a.website && (
-                      <a
-                        href={a.website.startsWith('http') ? a.website : `https://${a.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#252525] text-purple-400 hover:bg-[#303030] transition truncate max-w-[200px]"
-                      >
-                        🌐 {formatWebsite(a.website)}
-                      </a>
-                    )}
+                      {/* Address */}
+                      <p className="text-gray-500 text-xs mb-3">
+                        {[a.street, `${a.zip || ''} ${a.city || ''}`.trim()].filter(Boolean).join(', ')}
+                      </p>
+
+                      {/* Contact buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        {a.telephone && (
+                          <a
+                            href={`tel:${a.telephone}`}
+                            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#f97316]/10 text-[#fb923c] border border-[#f97316]/20 hover:bg-[#f97316]/20 transition"
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                            {a.telephone}
+                          </a>
+                        )}
+                        {a.email && (
+                          <a
+                            href={`mailto:${a.email}`}
+                            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#f97316]/10 text-[#fb923c] border border-[#f97316]/20 hover:bg-[#f97316]/20 transition truncate max-w-[220px]"
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></svg>
+                            {a.email}
+                          </a>
+                        )}
+                        {a.website && (
+                          <a
+                            href={a.website.startsWith('http') ? a.website : `https://${a.website}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#252525] text-gray-300 border border-gray-700 hover:border-gray-600 transition truncate max-w-[200px]"
+                          >
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" /></svg>
+                            {formatWebsite(a.website)}
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))
@@ -320,6 +341,8 @@ export default function Kontakty() {
               </button>
             </div>
           )}
+            </div>
+          </div>
         </PaywallOverlay>
       </div>
     </main>
