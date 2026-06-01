@@ -5,6 +5,7 @@ import { useSubscription } from '../../hooks/useSubscription'
 import PaywallOverlay from '../components/PaywallOverlay'
 import Link from 'next/link'
 import { supabase } from '../supabase'
+import { Contact } from 'lucide-react'
 
 type Agency = {
   id: number
@@ -117,7 +118,7 @@ export default function Kontakty() {
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-white text-2xl font-bold mb-1">📇 Databáze agentur</h1>
+          <h1 className="text-white text-2xl font-bold mb-1 flex items-center gap-2"><Contact size={22} strokeWidth={1.75} className="text-[#fb923c]" /> Databáze agentur</h1>
           <p className="text-gray-400 text-sm">
             1 000+ ověřených švýcarských personálních agentur s přímými kontakty
           </p>
