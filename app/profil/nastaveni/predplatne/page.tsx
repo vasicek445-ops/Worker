@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../../supabase'
 import { useSubscription } from '../../../../hooks/useSubscription'
+import { ArrowLeft, ArrowRight, CreditCard } from 'lucide-react'
 
 export default function PredplatnePage() {
   const router = useRouter()
@@ -74,11 +75,11 @@ export default function PredplatnePage() {
     <div className="min-h-screen bg-[#0a0a12] text-white" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="max-w-2xl mx-auto p-6">
         <header className="mb-8">
-          <Link href="/profil/nastaveni" className="text-white/40 text-sm hover:text-white/70 transition no-underline">
-            ← Zpět na nastavení
+          <Link href="/profil/nastaveni" className="inline-flex items-center gap-1.5 text-white/40 text-sm hover:text-white/70 transition no-underline">
+            <ArrowLeft size={15} strokeWidth={1.75} /> Zpět na nastavení
           </Link>
           <h1 className="text-2xl font-extrabold text-white m-0 mt-3 flex items-center gap-2">
-            <span>⭐</span> Předplatné
+            <CreditCard size={22} strokeWidth={1.75} className="text-[#fb923c]" /> Předplatné
           </h1>
           <p className="text-white/40 text-sm mt-1">Plán, fakturace a správa.</p>
         </header>
@@ -110,9 +111,9 @@ export default function PredplatnePage() {
               <button
                 onClick={handleManageSubscription}
                 disabled={portalLoading}
-                className="w-full bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50 text-sm"
+                className="w-full inline-flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#fb923c] to-[#f97316] text-[#0a0a12] font-bold py-3 rounded-xl hover:opacity-90 transition disabled:opacity-50 text-sm"
               >
-                {portalLoading ? 'Načítání...' : 'Spravovat fakturaci →'}
+                {portalLoading ? 'Načítání...' : <>Spravovat fakturaci <ArrowRight size={15} strokeWidth={2} /></>}
               </button>
               <button
                 onClick={handleManageSubscription}
@@ -123,12 +124,12 @@ export default function PredplatnePage() {
               </button>
             </div>
 
-            <div className="border-t border-white/[0.04] pt-6 mt-6 text-center">
+            <div className="border-t border-white/[0.04] pt-6 mt-8 text-center">
               <Link
                 href="/profil/nastaveni/predplatne/zrusit"
-                className="text-white/30 text-xs hover:text-white/60 transition no-underline"
+                className="text-white/20 text-[11px] hover:text-white/50 transition no-underline"
               >
-                Zrušit předplatné →
+                Zrušit předplatné
               </Link>
             </div>
           </>
