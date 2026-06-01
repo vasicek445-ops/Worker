@@ -31,19 +31,34 @@ export async function POST(req: NextRequest) {
     // Only allow users to delete their own account
     const userId = user.id;
 
-    // Delete profile data
-    await supabaseAdmin.from("profiles").delete().eq("id", userId);
+    // Smaž veškerá osobní data napříč tabulkami. Každé mazání nezávisle
+    // (allSettled) — pokud nějaká tabulka nemá user_id nebo neexistuje,
+    // neshodí to celou operaci a účet se i tak smaže.
+    const byUserId = [
+      "subscriptions", "saved_documents", "job_analyses", "daily_matches",
+      "transcriptions", "member_agent_config", "cancellation_feedback",
+      "sent_applications", "application_replies", "applications",
+      "community_posts", "community_comments", "community_upvotes",
+      "community_messages", "email_oauth_tokens", "email_send_log", "agency_leads",
+    ];
+    await Promise.allSettled([
+      supabaseAdmin.from("profiles").delete().eq("id", userId),
+      ...byUserId.map((t) => supabaseAdmin.from(t).delete().eq("user_id", userId)),
+      supabaseAdmin.from("dm_messages").delete().eq("sender_id", userId),
+      supabaseAdmin.from("dm_messages").delete().eq("recipient_id", userId),
+    ]);
 
-    // Delete community posts
-    await supabaseAdmin.from("community_posts").delete().eq("user_id", userId);
+    // Best-effort smazání souborů ze Storage (avatar, CV PDF)
+    await Promise.allSettled([
+      supabaseAdmin.storage.from("avatars").remove([`${userId}/avatar`]),
+      supabaseAdmin.storage.from("cv-pdfs").list(userId).then(({ data }) =>
+        data?.length
+          ? supabaseAdmin.storage.from("cv-pdfs").remove(data.map((f) => `${userId}/${f.name}`))
+          : null,
+      ),
+    ]);
 
-    // Delete community comments
-    await supabaseAdmin.from("community_comments").delete().eq("user_id", userId);
-
-    // Delete community upvotes
-    await supabaseAdmin.from("community_upvotes").delete().eq("user_id", userId);
-
-    // Delete user from auth
+    // Smaž uživatele z auth (tohle je to klíčové — účet přestane existovat)
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
     if (error) throw error;
 
