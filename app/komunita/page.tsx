@@ -136,11 +136,11 @@ export default function KomunitaPage() {
   }
 
   const catMeta = (cat: string) => {
-    const m: Record<string, { icon: string; color: string; bg: string }> = {
-      spolubydleni: { icon: '🏠', color: 'text-green-400', bg: 'bg-green-500/10' },
-      feature: { icon: '💡', color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
-      dotaz: { icon: '❓', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-      tip: { icon: '🎯', color: 'text-purple-400', bg: 'bg-purple-500/10' },
+    const m: Record<string, { icon: string; label: string }> = {
+      spolubydleni: { icon: '🏠', label: 'spolubydlení' },
+      feature: { icon: '💡', label: 'nápady' },
+      dotaz: { icon: '❓', label: 'dotaz' },
+      tip: { icon: '🎯', label: 'tip' },
     }
     return m[cat] || m.dotaz
   }
@@ -164,17 +164,17 @@ export default function KomunitaPage() {
 
           <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl p-5 mb-4">
             <div className="flex items-start gap-3 mb-3">
-              <span className={`text-xs px-2 py-0.5 rounded-full ${cm.bg} ${cm.color}`}>{cm.icon} {selectedPost.category}</span>
-              {selectedPost.is_pinned && <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-400">📌</span>}
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[#252525] text-gray-300">{cm.icon} {cm.label}</span>
+              {selectedPost.is_pinned && <span className="text-xs px-2 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]">📌</span>}
             </div>
             <h1 className="text-white text-lg font-bold mb-2">{selectedPost.title}</h1>
             <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{selectedPost.content}</p>
 
             {selectedPost.category === 'spolubydleni' && (
               <div className="flex gap-3 mt-3 flex-wrap">
-                {selectedPost.region && <span className="text-xs bg-green-500/10 text-green-400 px-2 py-1 rounded-full">📍 {selectedPost.region}</span>}
-                {selectedPost.budget && <span className="text-xs bg-blue-500/10 text-blue-400 px-2 py-1 rounded-full">💰 {selectedPost.budget}</span>}
-                {selectedPost.move_date && <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-1 rounded-full">📅 {selectedPost.move_date}</span>}
+                {selectedPost.region && <span className="text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full">📍 {selectedPost.region}</span>}
+                {selectedPost.budget && <span className="text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full">💰 {selectedPost.budget}</span>}
+                {selectedPost.move_date && <span className="text-xs bg-[#252525] text-gray-300 px-2 py-1 rounded-full">📅 {selectedPost.move_date}</span>}
               </div>
             )}
 
@@ -191,9 +191,9 @@ export default function KomunitaPage() {
 
           <div className="space-y-2 mb-4">
             {comments.map(c => (
-              <div key={c.id} className={`rounded-xl p-3 ${c.is_ai ? 'bg-blue-500/5 border border-blue-500/15' : 'bg-[#1A1A1A] border border-gray-800'}`}>
+              <div key={c.id} className={`rounded-xl p-3 ${c.is_ai ? 'bg-[#f97316]/5 border border-[#f97316]/15' : 'bg-[#1A1A1A] border border-gray-800'}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-xs font-semibold ${c.is_ai ? 'text-blue-400' : 'text-gray-400'}`}>
+                  <span className={`text-xs font-semibold ${c.is_ai ? 'text-[#fb923c]' : 'text-gray-400'}`}>
                     {c.is_ai ? '🤖 AI Woker' : c.user_name}
                   </span>
                   <span className="text-gray-600 text-[10px]">{timeAgo(c.created_at)}</span>
@@ -206,7 +206,7 @@ export default function KomunitaPage() {
           {/* New comment */}
           <div className="flex gap-2">
             <input type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleComment()} placeholder="Napiš komentář..." className="flex-1 bg-[#1A1A1A] border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-gray-600 focus:outline-none transition" />
-            <button onClick={handleComment} disabled={submitting || !newComment.trim()} className="bg-[#E8302A] text-white font-bold px-4 py-2.5 rounded-xl hover:opacity-90 transition disabled:opacity-50 text-sm">
+            <button onClick={handleComment} disabled={submitting || !newComment.trim()} className="bg-[#f97316] text-white font-bold px-4 py-2.5 rounded-xl hover:opacity-90 transition disabled:opacity-50 text-sm">
               {submitting ? '...' : '→'}
             </button>
           </div>
@@ -230,7 +230,7 @@ export default function KomunitaPage() {
               <label className="text-gray-300 text-sm font-medium mb-2 block">Kategorie *</label>
               <div className="flex gap-2 flex-wrap">
                 {CATEGORIES.filter(c => c.id !== 'all').map(c => (
-                  <button key={c.id} onClick={() => setForm(f => ({ ...f, category: c.id }))} className={`text-sm px-3 py-1.5 rounded-full border transition ${form.category === c.id ? 'border-[#E8302A] bg-[#E8302A]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+                  <button key={c.id} onClick={() => setForm(f => ({ ...f, category: c.id }))} className={`text-sm px-3 py-1.5 rounded-full border transition ${form.category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
                     {c.icon} {c.label}
                   </button>
                 ))}
@@ -249,8 +249,8 @@ export default function KomunitaPage() {
 
             {/* Spolubydlení extra fields */}
             {form.category === 'spolubydleni' && (
-              <div className="bg-green-500/5 border border-green-500/15 rounded-xl p-4 space-y-3">
-                <p className="text-green-400 text-xs font-bold">🏠 Detaily spolubydlení</p>
+              <div className="bg-[#f97316]/5 border border-[#f97316]/15 rounded-xl p-4 space-y-3">
+                <p className="text-[#fb923c] text-xs font-bold">🏠 Detaily spolubydlení</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-gray-400 text-xs mb-1 block">Region</label>
@@ -300,7 +300,7 @@ export default function KomunitaPage() {
 
             {error && <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3"><p className="text-red-400 text-sm">⚠️ {error}</p></div>}
 
-            <button onClick={handleCreatePost} disabled={submitting} className="w-full bg-[#E8302A] text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
+            <button onClick={handleCreatePost} disabled={submitting} className="w-full bg-[#f97316] text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition disabled:opacity-50">
               {submitting ? 'Publikuji...' : '✏️ Publikovat'}
             </button>
           </div>
@@ -312,28 +312,48 @@ export default function KomunitaPage() {
   // ─── POST LIST ───
   return (
     <main className="min-h-screen bg-[#0E0E0E] px-4 py-6 pb-24">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-white text-xl font-bold">💬 Komunita</h1>
             <p className="text-gray-500 text-xs">Spolubydlení, nápady, dotazy, tipy</p>
           </div>
           {isActive && (
-            <button onClick={() => setShowForm(true)} className="bg-[#E8302A] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
+            <button onClick={() => setShowForm(true)} className="md:hidden bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
               ✏️ Nový
             </button>
           )}
         </div>
 
-        {/* Categories */}
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
+        {/* Categories — mobil */}
+        <div className="flex md:hidden gap-2 mb-4 overflow-x-auto pb-1">
           {CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setCategory(c.id)} className={`text-sm px-3 py-1.5 rounded-full border whitespace-nowrap transition ${category === c.id ? 'border-[#E8302A] bg-[#E8302A]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
+            <button key={c.id} onClick={() => setCategory(c.id)} className={`text-sm px-3 py-1.5 rounded-full border whitespace-nowrap transition ${category === c.id ? 'border-[#f97316] bg-[#f97316]/10 text-white' : 'border-gray-700 text-gray-400 hover:border-gray-500'}`}>
               {c.icon} {c.label}
             </button>
           ))}
         </div>
 
+        <div className="md:grid md:grid-cols-[200px_1fr] lg:grid-cols-[200px_1fr_260px] md:gap-6 md:items-start">
+          {/* Levý rail — kategorie */}
+          <aside className="hidden md:block md:sticky md:top-6 self-start">
+            {isActive && (
+              <button onClick={() => setShowForm(true)} className="w-full mb-4 bg-[#f97316] text-white font-bold text-sm px-4 py-2.5 rounded-xl hover:opacity-90 transition">
+                ✏️ Nový příspěvek
+              </button>
+            )}
+            <p className="text-gray-600 text-[10px] font-semibold uppercase tracking-wider mb-2 px-3">Kategorie</p>
+            <nav className="space-y-1">
+              {CATEGORIES.map(c => (
+                <button key={c.id} onClick={() => setCategory(c.id)} className={`w-full flex items-center gap-2.5 text-sm px-3 py-2 rounded-lg text-left transition ${category === c.id ? 'bg-[#f97316]/10 text-[#fb923c] font-medium' : 'text-gray-400 hover:bg-[#1A1A1A] hover:text-gray-200'}`}>
+                  <span>{c.icon}</span> {c.label}
+                </button>
+              ))}
+            </nav>
+          </aside>
+
+          {/* Střed — feed */}
+          <div className="min-w-0">
         <PaywallOverlay isLocked={!isActive && !loading} title="Komunita je součástí Premium" description="Spolubydlení, nápady, dotazy od ostatních Čechů ve Švýcarsku">
 
           {loadingPosts ? (
@@ -346,7 +366,7 @@ export default function KomunitaPage() {
               <span className="text-4xl block mb-3">📭</span>
               <p className="text-gray-400 text-sm mb-1">Zatím žádné příspěvky</p>
               <p className="text-gray-600 text-xs">Buď první kdo napíše!</p>
-              <button onClick={() => setShowForm(true)} className="mt-4 bg-[#E8302A] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
+              <button onClick={() => setShowForm(true)} className="mt-4 bg-[#f97316] text-white font-bold text-sm px-4 py-2 rounded-xl hover:opacity-90 transition">
                 ✏️ Napsat příspěvek
               </button>
             </div>
@@ -358,17 +378,17 @@ export default function KomunitaPage() {
                   <div key={post.id} onClick={() => fetchPost(post)} className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 hover:border-gray-600 transition cursor-pointer">
                     <div className="flex items-start gap-3">
                       {/* Upvote */}
-                      <button onClick={(e) => { e.stopPropagation(); handleUpvote(post.id) }} className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition ${post.hasUpvoted ? 'bg-[#E8302A]/10 text-[#E8302A]' : 'text-gray-500 hover:bg-gray-800'}`}>
+                      <button onClick={(e) => { e.stopPropagation(); handleUpvote(post.id) }} className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition ${post.hasUpvoted ? 'bg-[#f97316]/10 text-[#fb923c]' : 'text-gray-500 hover:bg-gray-800'}`}>
                         <span className="text-sm">{post.hasUpvoted ? '▲' : '△'}</span>
                         <span className="text-xs font-bold">{post.upvotes}</span>
                       </button>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${cm.bg} ${cm.color}`}>{cm.icon} {post.category}</span>
-                          {post.is_pinned && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-400">📌</span>}
-                          {post.category === 'spolubydleni' && post.region && <span className="text-[10px] text-green-400">📍 {post.region}</span>}
-                          {post.category === 'spolubydleni' && post.budget && <span className="text-[10px] text-blue-400">💰 {post.budget}</span>}
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-gray-300">{cm.icon} {cm.label}</span>
+                          {post.is_pinned && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#f97316]/10 text-[#fb923c]">📌</span>}
+                          {post.category === 'spolubydleni' && post.region && <span className="text-[10px] text-gray-400">📍 {post.region}</span>}
+                          {post.category === 'spolubydleni' && post.budget && <span className="text-[10px] text-gray-400">💰 {post.budget}</span>}
                         </div>
                         <h3 className="text-white text-sm font-semibold mb-0.5 truncate">{post.title}</h3>
                         <p className="text-gray-500 text-xs line-clamp-2">{post.content}</p>
@@ -386,6 +406,29 @@ export default function KomunitaPage() {
           )}
 
         </PaywallOverlay>
+          </div>
+
+          {/* Pravý rail — info o komunitě */}
+          <aside className="hidden lg:block lg:sticky lg:top-6 self-start space-y-4">
+            <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4">
+              <h3 className="text-white text-sm font-semibold mb-1">O komunitě</h3>
+              <p className="text-gray-500 text-xs leading-relaxed">Místo, kde si čeští a slovenští pracovníci ve Švýcarsku vzájemně pomáhají — spolubydlení, dotazy, tipy z praxe.</p>
+            </div>
+            <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl p-4">
+              <h3 className="text-white text-sm font-semibold mb-2">📌 Pravidla</h3>
+              <ul className="text-gray-400 text-xs space-y-1.5">
+                <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Buď slušný a pomáhej ostatním</li>
+                <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Žádný spam ani reklama</li>
+                <li className="flex gap-1.5"><span className="text-[#fb923c]">•</span> Sdílej reálné zkušenosti ze Švýcarska</li>
+              </ul>
+            </div>
+            {isActive && (
+              <button onClick={() => setShowForm(true)} className="w-full bg-[#f97316]/10 border border-[#f97316]/20 text-[#fb923c] font-medium text-sm px-4 py-2.5 rounded-xl hover:bg-[#f97316]/20 transition">
+                ✏️ Sdílej něco s komunitou
+              </button>
+            )}
+          </aside>
+        </div>
       </div>
     </main>
   )
