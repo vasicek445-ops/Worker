@@ -143,6 +143,20 @@ export default function Kontakty() {
           </div>
         </div>
 
+        {/* Reality-check: jak fungují Temporärbüra (rozbalovací, ať nezabírá) */}
+        <details className="group mb-6 bg-[#1A1A1A] border border-gray-800 rounded-xl overflow-hidden">
+          <summary className="flex items-center gap-2 cursor-pointer px-4 py-3 text-sm font-medium text-gray-200 list-none [&::-webkit-details-marker]:hidden">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fb923c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
+            Než zavoláš agentuře — jak Temporärbüra fungují
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-auto text-gray-500 transition-transform group-open:rotate-180"><polyline points="6 9 12 15 18 9" /></svg>
+          </summary>
+          <div className="px-4 pb-4 pt-3 border-t border-gray-800 space-y-2.5 text-sm text-gray-400 leading-relaxed">
+            <p>I když přes agenturu získáš práci, většina <span className="text-gray-200 font-medium">Temporärbür</span> tě zavolá jen tehdy, když tě zrovna potřebují. Počítej s tím dopředu — příjem nemusí být každý měsíc stejný.</p>
+            <p>Existují ale i pozice na <span className="text-gray-200 font-medium">100 % každý den</span>. Když chceš jistotu, ptej se agentury rovnou, jestli jde o práci on-call, nebo o plný úvazek.</p>
+            <p>Výhoda Temporärbüra: dostaneš se do <span className="text-gray-200 font-medium">různých firem</span>. Když se osvědčíš, firma si tě po pár měsících často vezme na <span className="text-[#fb923c] font-medium">stálou smlouvu (Festanstellung)</span>.</p>
+          </div>
+        </details>
+
         <PaywallOverlay
           isLocked={!isActive && !subLoading}
           title="Odemkni databázi agentur"
