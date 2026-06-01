@@ -30,6 +30,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dmUnread, setDmUnread] = useState(0);
   const [prevPath, setPrevPath] = useState(pathname);
   if (prevPath !== pathname) {
     setPrevPath(pathname);
@@ -46,6 +47,23 @@ export default function Sidebar() {
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
+
+  // Nepřečtené soukromé zprávy (badge u "Zprávy")
+  useEffect(() => {
+    let stop = false;
+    const load = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      try {
+        const res = await fetch("/api/dm?unread=1", { headers: { Authorization: `Bearer ${session.access_token}` } });
+        const d = await res.json();
+        if (!stop) setDmUnread(d.unread || 0);
+      } catch {}
+    };
+    load();
+    const t = setInterval(load, 20000);
+    return () => { stop = true; clearInterval(t); };
+  }, [pathname]);
 
   const isActivePath = (href: string) => pathname === href;
   const isProfileActive =
@@ -176,6 +194,20 @@ export default function Sidebar() {
             color={iconColor(isActivePath("/komunita"))}
           />
           <span>Komunita</span>
+        </Link>
+
+        <Link href="/zpravy" className={linkClass(isActivePath("/zpravy"))}>
+          <Mail
+            size={ICON_SIZE}
+            strokeWidth={ICON_STROKE}
+            color={iconColor(isActivePath("/zpravy"))}
+          />
+          <span>Zprávy</span>
+          {dmUnread > 0 && (
+            <span className="ml-auto text-[9px] bg-[#f97316] text-white font-bold px-1.5 py-0.5 rounded-full">
+              {dmUnread}
+            </span>
+          )}
         </Link>
 
         <Link

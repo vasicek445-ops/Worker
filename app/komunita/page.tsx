@@ -494,7 +494,7 @@ export default function KomunitaPage() {
               <p className="text-gray-600 text-xs">Zatím nikdo online</p>
             )}
             {members.filter(m => m.online).slice(0, 12).map(m => (
-              <div key={m.id} className="flex items-center gap-2 py-1">
+              <a key={m.id} href={m.self ? undefined : `/zpravy?with=${m.id}`} className={`flex items-center gap-2 py-1 px-1 -mx-1 rounded-md transition ${m.self ? '' : 'hover:bg-white/[0.03] cursor-pointer'}`}>
                 <div className="relative shrink-0">
                   {m.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -505,7 +505,7 @@ export default function KomunitaPage() {
                   <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-[#141414]" />
                 </div>
                 <span className="text-gray-300 text-xs truncate">{m.name}{m.self && <span className="text-gray-600"> (ty)</span>}</span>
-              </div>
+              </a>
             ))}
           </div>
           {members.filter(m => !m.online).length > 0 && (
@@ -515,7 +515,7 @@ export default function KomunitaPage() {
               </p>
               <div className="space-y-0.5">
                 {members.filter(m => !m.online).slice(0, 8).map(m => (
-                  <div key={m.id} className="flex items-center gap-2 py-1 opacity-50">
+                  <a key={m.id} href={m.self ? undefined : `/zpravy?with=${m.id}`} className={`flex items-center gap-2 py-1 px-1 -mx-1 rounded-md opacity-50 transition ${m.self ? '' : 'hover:opacity-80 hover:bg-white/[0.03] cursor-pointer'}`}>
                     {m.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={m.avatar_url} alt={m.name} className="w-7 h-7 rounded-full object-cover grayscale" />
@@ -523,7 +523,7 @@ export default function KomunitaPage() {
                       <div className="w-7 h-7 rounded-full bg-[#252525] border border-gray-700 flex items-center justify-center text-gray-400 text-[11px] font-bold">{initial(m.name)}</div>
                     )}
                     <span className="text-gray-400 text-xs truncate">{m.name}</span>
-                  </div>
+                  </a>
                 ))}
               </div>
             </>
