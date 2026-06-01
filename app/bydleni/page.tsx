@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { supabase } from '../supabase'
+import { Building2, FileText } from 'lucide-react'
 
 type Listing = {
   id: string
@@ -201,7 +201,7 @@ export default function Bydleni() {
         <div className="pt-6 pb-4">
           <Link href="/dashboard" className="text-white/30 hover:text-white text-sm mb-4 inline-block no-underline transition">← Zpět</Link>
           <div className="flex items-center gap-3 mb-1">
-            <Image src="/images/3d/house.png" alt="" width={36} height={36} className="drop-shadow-lg" />
+            <Building2 size={32} strokeWidth={1.75} className="text-[#fb923c] drop-shadow-lg shrink-0" />
             <div>
               <h1 className="text-white text-2xl font-extrabold m-0 tracking-tight">Bydlení ve Švýcarsku</h1>
               <p className="text-white/30 text-sm m-0">
@@ -348,7 +348,7 @@ export default function Bydleni() {
           </div>
         ) : listings.length === 0 ? (
           <div className="text-center py-20">
-            <Image src="/images/3d/house.png" alt="" width={64} height={64} className="mx-auto mb-4 opacity-40" />
+            <Building2 size={56} strokeWidth={1.5} className="mx-auto mb-4 text-white/30" />
             <h3 className="text-white font-bold text-lg mb-2">Žádné nabídky nenalezeny</h3>
             <p className="text-white/30 text-sm mb-4">Zkus změnit filtry nebo hledaný výraz</p>
             {hasFilters && (
@@ -368,7 +368,7 @@ export default function Bydleni() {
                     <img src={listing.image_url} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Image src="/images/3d/house.png" alt="" width={48} height={48} className="opacity-20" />
+                      <Building2 size={44} strokeWidth={1.5} className="text-white/15" />
                     </div>
                   )}
                   {/* Overlay badges */}
@@ -521,7 +521,7 @@ export default function Bydleni() {
                         )}
                         <Link href="/pruvodce/sablony/bydleni"
                           className="bg-white/[0.04] border border-white/[0.06] text-white/40 hover:text-white py-2.5 px-3.5 rounded-xl text-sm font-medium no-underline hover:bg-white/[0.08] transition flex items-center gap-1.5">
-                          <Image src="/images/3d/document.png" alt="" width={14} height={14} />
+                          <FileText size={14} strokeWidth={1.75} />
                           AI dopis
                         </Link>
                       </>
@@ -552,10 +552,10 @@ export default function Bydleni() {
         <div className="mt-6">
           <Link href="/pruvodce/sablony/bydleni" className="block no-underline group">
             <div className="rounded-2xl p-5 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #111128 0%, #0d1a2e 40%, #0a1a14 100%)" }}>
-              <Image src="/images/3d/house.png" alt="" width={80} height={80} className="absolute -right-2 -top-2 opacity-[0.08] group-hover:opacity-[0.15] transition" />
+              <Building2 size={80} strokeWidth={1.25} className="absolute -right-2 -top-2 text-white/[0.08] group-hover:text-white/[0.15] transition" />
               <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at 80% 20%, rgba(251,146,60,0.15), transparent 60%)" }} />
               <div className="relative flex items-center gap-4">
-                <Image src="/images/3d/document.png" alt="" width={36} height={36} className="drop-shadow-lg" />
+                <FileText size={36} strokeWidth={1.75} className="text-[#fb923c] drop-shadow-lg shrink-0" />
                 <div>
                   <p className="text-white font-bold text-sm m-0 group-hover:text-[#fb923c] transition">Potřebuješ napsat dopis pronajímateli?</p>
                   <p className="text-white/30 text-xs m-0 mt-0.5">AI vygeneruje Bewerbungsdossier v němčině + checklist dokumentů</p>
