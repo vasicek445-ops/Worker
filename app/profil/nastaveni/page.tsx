@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../supabase'
+import { ArrowLeft, ArrowRight, KeyRound, CreditCard, Globe, Database } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 type CardDef = {
   href: string
-  icon: string
+  Icon: LucideIcon
   title: string
   description: string
 }
@@ -15,25 +17,25 @@ type CardDef = {
 const CARDS: CardDef[] = [
   {
     href: '/profil/nastaveni/ucet',
-    icon: '🔐',
+    Icon: KeyRound,
     title: 'Účet',
     description: 'Email, heslo, přihlášení',
   },
   {
     href: '/profil/nastaveni/predplatne',
-    icon: '⭐',
+    Icon: CreditCard,
     title: 'Předplatné',
     description: 'Plán, faktury, zrušit předplatné',
   },
   {
     href: '/profil/preference',
-    icon: '🌐',
+    Icon: Globe,
     title: 'Preference',
     description: 'Jazyk UI, e-mailové notifikace',
   },
   {
     href: '/profil/nastaveni/data',
-    icon: '📥',
+    Icon: Database,
     title: 'Data',
     description: 'Export GDPR, smazat účet',
   },
@@ -65,8 +67,8 @@ export default function NastaveniIndexPage() {
     <div className="min-h-screen bg-[#0a0a12] text-white" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <div className="max-w-2xl mx-auto p-6">
         <header className="mb-8">
-          <Link href="/profil" className="text-white/40 text-sm hover:text-white/70 transition no-underline">
-            ← Zpět na profil
+          <Link href="/profil" className="inline-flex items-center gap-1.5 text-white/40 text-sm hover:text-white/70 transition no-underline">
+            <ArrowLeft size={15} strokeWidth={1.75} /> Zpět na profil
           </Link>
           <h1 className="text-2xl font-extrabold text-white m-0 mt-3">Nastavení</h1>
           <p className="text-white/40 text-sm mt-1">Spravuj svůj účet, předplatné a preference.</p>
@@ -79,15 +81,17 @@ export default function NastaveniIndexPage() {
               href={card.href}
               className="group block bg-[#111120]/80 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-5 no-underline transition-all hover:border-[#fb923c]/30 hover:-translate-y-0.5 hover:bg-[#15152a]/80"
             >
-              <div className="flex items-start gap-3">
-                <div className="text-2xl leading-none">{card.icon}</div>
+              <div className="flex items-center gap-3.5">
+                <div className="shrink-0 w-11 h-11 rounded-xl bg-[#fb923c]/10 border border-[#fb923c]/20 flex items-center justify-center group-hover:bg-[#fb923c]/15 transition-colors">
+                  <card.Icon size={20} strokeWidth={1.75} className="text-[#fb923c]" />
+                </div>
                 <div className="flex-1 min-w-0">
                   <h2 className="text-white font-bold text-base m-0 group-hover:text-[#fb923c] transition-colors">
                     {card.title}
                   </h2>
                   <p className="text-white/40 text-xs mt-1 m-0">{card.description}</p>
                 </div>
-                <span className="text-white/20 text-sm group-hover:text-[#fb923c] transition-colors">→</span>
+                <ArrowRight size={16} strokeWidth={1.75} className="text-white/20 group-hover:text-[#fb923c] group-hover:translate-x-0.5 transition-all" />
               </div>
             </Link>
           ))}
