@@ -151,9 +151,11 @@ export default function Kontakty() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-auto text-gray-500 transition-transform group-open:rotate-180"><polyline points="6 9 12 15 18 9" /></svg>
           </summary>
           <div className="px-4 pb-4 pt-3 border-t border-gray-800 space-y-2.5 text-sm text-gray-400 leading-relaxed">
-            <p>I když přes agenturu získáš práci, většina <span className="text-gray-200 font-medium">Temporärbür</span> tě zavolá jen tehdy, když tě zrovna potřebují. Počítej s tím dopředu — příjem nemusí být každý měsíc stejný.</p>
-            <p>Existují ale i pozice na <span className="text-gray-200 font-medium">100 % každý den</span>. Když chceš jistotu, ptej se agentury rovnou, jestli jde o práci on-call, nebo o plný úvazek.</p>
-            <p>Výhoda Temporärbüra: dostaneš se do <span className="text-gray-200 font-medium">různých firem</span>. Když se osvědčíš, firma si tě po pár měsících často vezme na <span className="text-[#fb923c] font-medium">stálou smlouvu (Festanstellung)</span>.</p>
+            <p>Práce přes agentury je <span className="text-gray-200 font-medium">dočasná (Temporär)</span> — zavolají ti, jen když tě zrovna potřebují, takže příjem nemusí být každý měsíc stejný. Vedle toho jsou ale i <span className="text-gray-200 font-medium">stálé úvazky (Festanstellung)</span> na 100 % každý den. Ptej se rovnou, o co jde.</p>
+            <p>Právě proto je tahle databáze pro tebe <span className="text-[#fb923c] font-medium">poklad</span>: jakmile ti začne chodit málo práce, klidně se v pohodě ozveš jiné agentuře — nejsi vázaný na jednu.</p>
+            <p>Zároveň je to <span className="text-gray-200 font-medium">nejrychlejší cesta k práci ve Švýcarsku</span> — agentury volají v řádu dnů, když pro tebe mají práci, a nasadit tě chtějí většinou do týdne od kontaktu. Doporučuju si na tu dobu doma nedělat větší časové závazky.</p>
+            <p>Výhoda navíc: <span className="text-[#fb923c] font-medium">týdenní zálohy ze mzdy</span> — peníze máš každý týden, ne až na konci měsíce. (Ze zkušenosti všude chodily na čas.)</p>
+            <p>A když se osvědčíš, firma si tě po pár měsících může vzít na stálou smlouvu.</p>
           </div>
         </details>
 
