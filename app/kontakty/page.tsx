@@ -151,11 +151,12 @@ export default function Kontakty() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-auto text-gray-500 transition-transform group-open:rotate-180"><polyline points="6 9 12 15 18 9" /></svg>
           </summary>
           <div className="px-4 pb-4 pt-3 border-t border-gray-800 space-y-2.5 text-sm text-gray-400 leading-relaxed">
-            <p>Práce přes agentury je <span className="text-gray-200 font-medium">dočasná (Temporär)</span> — zavolají ti, jen když tě zrovna potřebují, takže příjem nemusí být každý měsíc stejný. Vedle toho jsou ale i <span className="text-gray-200 font-medium">stálé úvazky (Festanstellung)</span> na 100 % každý den. Ptej se rovnou, o co jde.</p>
-            <p>Právě proto je tahle databáze pro tebe <span className="text-[#fb923c] font-medium">poklad</span>: jakmile ti začne chodit málo práce, klidně se v pohodě ozveš jiné agentuře — nejsi vázaný na jednu.</p>
-            <p>Zároveň je to <span className="text-gray-200 font-medium">nejrychlejší cesta k práci ve Švýcarsku</span> — agentury volají v řádu dnů, když pro tebe mají práci, a nasadit tě chtějí většinou do týdne od kontaktu. Doporučuju si na tu dobu doma nedělat větší časové závazky.</p>
+            <p>Švýcarsko má <span className="text-gray-200 font-medium">jednu z nejvyšších měr agenturní práce v Evropě</span> — ročně jimi projde kolem 400 000 lidí. Pro nově příchozího jsou agentury proto často <span className="text-gray-200 font-medium">nejrychlejší cesta dovnitř</span> a pro flexibilitu jsou ideální.</p>
+            <p>Najdeš tu obojí: <span className="text-gray-200 font-medium">dočasné úvazky na pár měsíců</span> i práci na <span className="text-gray-200 font-medium">100 % každý den</span>. Agenturní práce je z principu dočasná (Temporär) — zavolají, když tě potřebují, takže příjem nemusí být každý měsíc stejný. Vedle toho jsou i stálé úvazky (Festanstellung). Ptej se rovnou, o co jde.</p>
+            <p>Právě proto je tahle databáze pro tebe <span className="text-[#fb923c] font-medium">poklad</span>: jakmile ti začne chodit málo práce, v pohodě se ozveš jiné agentuře — nejsi vázaný na jednu.</p>
+            <p>Je to taky <span className="text-gray-200 font-medium">nejrychlejší způsob, jak ve Švýcarsku sehnat práci</span> — agentury volají v řádu dnů a nasadit tě chtějí většinou do týdne od kontaktu. Na tu dobu si doma nedělej větší časové závazky. Některé pozice zvládneš i s angličtinou.</p>
             <p>Výhoda navíc: <span className="text-[#fb923c] font-medium">týdenní zálohy ze mzdy</span> — peníze máš každý týden, ne až na konci měsíce. (Ze zkušenosti všude chodily na čas.)</p>
-            <p>A když se osvědčíš, firma si tě po pár měsících může vzít na stálou smlouvu.</p>
+            <p><span className="text-gray-200 font-medium">Piš životopis pravdivě</span> — agentury si reference ověřují. A když se osvědčíš, firma si tě po pár měsících může vzít na stálou smlouvu.</p>
           </div>
         </details>
 
