@@ -60,6 +60,32 @@ Odpověz jako AI asistent komunity. Buď konkrétní a užitečný.`
   }
 }
 
+async function generateChatAIReply(channel: string, question: string, history: { user_name: string; content: string }[]) {
+  try {
+    const ctx = history.slice(-8).map(m => `${m.user_name}: ${m.content}`).join('\n')
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 800,
+      system: AI_SYSTEM_PROMPT,
+      messages: [{
+        role: 'user',
+        content: `Jsi v chat kanálu #${channel} komunity Woker. Nedávná konverzace:
+${ctx || '(zatím prázdno)'}
+
+Někdo se tě právě zeptal (oslovil tě @AI):
+${question}
+
+Odpověz stručně a věcně jako účastník chatu — krátká zpráva, ne esej. Max 2-3 odstavce.`
+      }]
+    })
+    const textBlock = response.content.find(b => b.type === 'text')
+    return textBlock ? textBlock.text : null
+  } catch (err) {
+    console.error('Chat AI reply error:', err)
+    return null
+  }
+}
+
 async function getUser(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
   if (!authHeader) return null
@@ -75,6 +101,21 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const category = searchParams.get('category')
   const postId = searchParams.get('postId')
+  const messagesChannel = searchParams.get('messages')
+
+  // Chat: latest messages for a channel (ascending order for display)
+  if (messagesChannel) {
+    const since = searchParams.get('since')
+    let mq = supabaseAdmin
+      .from('community_messages')
+      .select('*')
+      .eq('channel', messagesChannel)
+      .order('created_at', { ascending: false })
+      .limit(100)
+    if (since) mq = mq.gt('created_at', since)
+    const { data: msgs } = await mq
+    return NextResponse.json({ messages: (msgs || []).reverse() })
+  }
 
   // Single post with comments
   if (postId) {
@@ -239,6 +280,42 @@ export async function POST(req: NextRequest) {
       if (post) await supabaseAdmin.from('community_posts').update({ upvotes: (post.upvotes || 0) + 1 }).eq('id', post_id)
       return NextResponse.json({ upvoted: true })
     }
+  }
+
+  if (action === 'send_message') {
+    const { channel, content } = body
+    if (!channel || !content?.trim()) {
+      return NextResponse.json({ error: 'Prázdná zpráva' }, { status: 400 })
+    }
+    const text = content.trim()
+
+    const { data, error } = await supabaseAdmin
+      .from('community_messages')
+      .insert({ channel, user_id: user.id, user_name: userName, content: text, is_ai: false })
+      .select()
+      .single()
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // AI reply only when opted-in via @AI or /ai prefix
+    if (/^\s*(@ai|\/ai)\b/i.test(text)) {
+      const question = text.replace(/^\s*(@ai|\/ai)\b[:,]?\s*/i, '').trim() || text
+      const { data: recent } = await supabaseAdmin
+        .from('community_messages')
+        .select('user_name, content')
+        .eq('channel', channel)
+        .order('created_at', { ascending: false })
+        .limit(8)
+      const history = (recent || []).reverse()
+      generateChatAIReply(channel, question, history).then(async (aiReply) => {
+        if (!aiReply) return
+        await supabaseAdmin.from('community_messages').insert({
+          channel, user_id: user.id, user_name: 'Woker AI', content: aiReply, is_ai: true,
+        })
+      })
+    }
+
+    return NextResponse.json({ message: data })
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
