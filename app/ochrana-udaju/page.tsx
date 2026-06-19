@@ -26,6 +26,13 @@ export default function OchranaUdaju() {
           <div key={i} style={{ marginBottom: "32px" }}>
             <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#fb923c", marginBottom: "10px" }}>{s.title}</h2>
             <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)", lineHeight: 1.8 }}>{s.text}</p>
+            {s.title.includes("Smart Apply") && (
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", lineHeight: 1.8, marginTop: "8px" }}>
+                {"Více: "}
+                <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" style={{ color: "#fb923c", textDecoration: "underline" }}>{"Google API Services User Data Policy"}</a>
+                {" (článek Limited Use)."}
+              </p>
+            )}
           </div>
         ))}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "24px", marginTop: "20px" }}>
