@@ -44,8 +44,8 @@ export async function POST(req: NextRequest) {
         supabase_user_id: userId,
         plan: planKey,
       },
+      // Žádný trial — platba proběhne ihned. Spokojenost kryje 14denní garance vrácení peněz (viz Podmínky bod 5).
       subscription_data: {
-        trial_period_days: 7,
         metadata: {
           supabase_user_id: userId,
           plan: planKey,
